@@ -74,12 +74,14 @@ export default function IntelligencePage() {
   const [tab, setTab]               = useState<'logs' | 'alerts'>('logs');
   const [alerts, setAlerts]         = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError]   = useState('');
   const LIMIT = 20;
 
   const load = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     else setRefreshing(true);
     try {
+      setLoadError('');
       const params: Record<string, string> = { limit: String(LIMIT), offset: String(page * LIMIT) };
       if (filterLevel)  params.level  = filterLevel;
       if (filterStatus) params.status = filterStatus;
@@ -91,8 +93,14 @@ export default function IntelligencePage() {
       setSummary((sumRes as any).data);
       setLogs((logsRes as any).data || []);
       setTotal((logsRes as any).count || 0);
-    } catch {
-      router.push('/login');
+    } catch (e: any) {
+      const msg: string = e?.message || '';
+      // Only redirect to login on auth errors
+      if (msg.toLowerCase().includes('unauthorized') || msg.toLowerCase().includes('401')) {
+        router.push('/login');
+      } else {
+        setLoadError(msg || 'فشل في الاتصال بالخادم');
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -195,6 +203,24 @@ export default function IntelligencePage() {
             مراقبة الأخطاء في الوقت الفعلي، تحليل ذكاء اصطناعي، تنبيهات واتساب للمشاكل الحرجة
           </p>
         </div>
+
+        {/* Error banner */}
+        {loadError && (
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '12px 16px', marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#dc2626', margin: '0 0 4px' }}>⚠️ خطأ في تحميل البيانات</p>
+              <p style={{ fontSize: 12, color: '#7f1d1d', margin: 0 }}>{loadError}</p>
+              {loadError.includes('system_logs') && (
+                <p style={{ fontSize: 11, color: '#991b1b', margin: '4px 0 0', fontWeight: 600 }}>
+                  يجب تشغيل ملف system_intelligence_migration.sql على Supabase أولاً
+                </p>
+              )}
+            </div>
+            <button onClick={() => load()} style={{ fontSize: 12, padding: '6px 14px', borderRadius: 6, background: '#dc2626', color: 'white', border: 'none', cursor: 'pointer' }}>
+              إعادة المحاولة
+            </button>
+          </div>
+        )}
 
         {/* KPI Summary */}
         {summary && (
