@@ -33,4 +33,19 @@ export const adminApi = {
   getUsage:        (id: string)   => request<any>('GET',  `/admin/companies/${id}/usage`),
   // Stats
   getStats:        ()             => request<any>('GET',  '/admin/stats'),
+
+  // Intelligence / System Monitoring
+  intelligenceSummary:  ()                      => request<any>('GET',  '/admin/intelligence/summary'),
+  listLogs:             (params?: Record<string, string>) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>('GET', `/admin/intelligence/logs${qs}`);
+  },
+  listAlerts:           (params?: Record<string, string>) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>('GET', `/admin/intelligence/alerts${qs}`);
+  },
+  analyzeLog:           (log_id: string)        => request<any>('POST', `/admin/intelligence/analyze/${log_id}`),
+  resolveLog:           (id: string, notes: string) => request<any>('PATCH', `/admin/intelligence/logs/${id}/resolve`, { resolution_notes: notes }),
+  ignoreLog:            (id: string)            => request<any>('PATCH', `/admin/intelligence/logs/${id}/ignore`),
+  ingestLog:            (data: any)             => request<any>('POST', '/admin/intelligence/ingest', data),
 };

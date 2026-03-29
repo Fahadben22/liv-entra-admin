@@ -34,7 +34,8 @@ export default function AdminDashboard() {
         <div style={{display:'flex',gap:16,alignItems:'center'}}>
           <Link href="/dashboard/companies" style={{fontSize:12,color:'#93c5fd',textDecoration:'none'}}>الشركات</Link>
           <Link href="/dashboard/billing" style={{fontSize:12,color:'#93c5fd',textDecoration:'none'}}>الفواتير</Link>
-          <Link href="/dashboard/monitoring" style={{fontSize:12,color:'#93c5fd',textDecoration:'none'}}>المراقبة</Link>
+          <Link href="/dashboard/monitoring"    style={{fontSize:12,color:'#93c5fd',textDecoration:'none'}}>المراقبة</Link>
+          <Link href="/dashboard/intelligence"  style={{fontSize:12,color:'#93c5fd',textDecoration:'none'}}>🧠 الذكاء</Link>
           <button onClick={()=>{localStorage.clear();router.push('/login');}}
             style={{fontSize:11,padding:'4px 12px',borderRadius:6,background:'rgba(255,255,255,.15)',color:'white',border:'none',cursor:'pointer'}}>
             خروج
