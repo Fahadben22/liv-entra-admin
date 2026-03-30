@@ -4,6 +4,28 @@ import { useRouter } from 'next/navigation';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://liv-entra-api-production.up.railway.app/api/v1';
 
+async function tryNewLogin(email: string, password: string) {
+  const res = await fetch(`${BASE}/superadmin/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message || 'failed');
+  return { token: json.data?.token, user: json.data?.adminUser || json.data?.user };
+}
+
+async function tryOldLogin(secret: string) {
+  const res = await fetch(`${BASE}/admin/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ secret }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message || 'failed');
+  return { token: json.data?.token, user: json.data?.user };
+}
+
 export default function AdminLogin() {
   const router = useRouter();
   const [email,    setEmail]    = useState('');
@@ -15,18 +37,30 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true); setErr('');
     try {
-      const res = await fetch(`${BASE}/superadmin/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.message || 'فشل تسجيل الدخول');
-      localStorage.setItem('admin_token', json.data?.token);
-      localStorage.setItem('admin_user',  JSON.stringify(json.data?.adminUser || json.data?.user));
+      let result: { token: string; user: any } | null = null;
+
+      // 1. Try new email+password endpoint (requires superadmin_migration.sql to have run)
+      try {
+        result = await tryNewLogin(email, password);
+      } catch (newErr: any) {
+        // New endpoint failed — could be table missing (500) or wrong credentials (401)
+        // Only fall back to old secret if it's a server/table error, not a credential error
+        const msg = newErr.message?.toLowerCase() || '';
+        const isCredError = msg.includes('غير صحيح') || msg.includes('incorrect') || msg.includes('invalid') || msg.includes('not found');
+        if (isCredError) {
+          // Wrong credentials on new system
+          throw new Error('بيانات الدخول غير صحيحة');
+        }
+        // Server error (table missing) — try old secret-based login
+        result = await tryOldLogin(password);
+      }
+
+      if (!result?.token) throw new Error('لم يتم استلام رمز المصادقة');
+      localStorage.setItem('admin_token', result.token);
+      localStorage.setItem('admin_user',  JSON.stringify(result.user || { name: 'Admin', role: 'super_admin' }));
       router.push('/dashboard');
     } catch (e: any) {
-      setErr(e.message);
+      setErr(e.message === 'failed' ? 'بيانات الدخول غير صحيحة' : e.message);
     } finally {
       setLoading(false);
     }
@@ -50,14 +84,17 @@ export default function AdminLogin() {
             />
           </div>
           <div style={{ marginBottom: 20 }}>
-            <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>كلمة المرور</label>
+            <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>كلمة المرور / المفتاح السري</label>
             <input
               type="password" value={password} onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
               style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr' }}
             />
+            <p style={{ fontSize: 10, color: '#94a3b8', marginTop: 5, marginBottom: 0 }}>
+              أدخل كلمة مرور حساب المشرف أو المفتاح السري (SUPER_ADMIN_SECRET)
+            </p>
           </div>
-          {err && <p style={{ fontSize: 11, color: '#ef4444', marginBottom: 12, textAlign: 'center' }}>{err}</p>}
+          {err && <p style={{ fontSize: 11, color: '#ef4444', marginBottom: 12, textAlign: 'center', padding: '8px', background: '#fef2f2', borderRadius: 8 }}>{err}</p>}
           <button type="submit" disabled={loading || !email || !password}
             style={{ width: '100%', padding: '11px', background: '#0f172a', color: 'white', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: loading || !email || !password ? 0.6 : 1 }}>
             {loading ? 'جاري الدخول...' : 'دخول'}
