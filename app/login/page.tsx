@@ -42,17 +42,14 @@ export default function AdminLogin() {
       // 1. Try new email+password endpoint (requires superadmin_migration.sql to have run)
       try {
         result = await tryNewLogin(email, password);
-      } catch (newErr: any) {
-        // New endpoint failed — could be table missing (500) or wrong credentials (401)
-        // Only fall back to old secret if it's a server/table error, not a credential error
-        const msg = newErr.message?.toLowerCase() || '';
-        const isCredError = msg.includes('غير صحيح') || msg.includes('incorrect') || msg.includes('invalid') || msg.includes('not found');
-        if (isCredError) {
-          // Wrong credentials on new system
+      } catch {
+        // New endpoint failed for any reason (table missing, wrong creds, etc.)
+        // Always fall back to old secret-based login — uses password field as SUPER_ADMIN_SECRET
+        try {
+          result = await tryOldLogin(password);
+        } catch {
           throw new Error('بيانات الدخول غير صحيحة');
         }
-        // Server error (table missing) — try old secret-based login
-        result = await tryOldLogin(password);
       }
 
       if (!result?.token) throw new Error('لم يتم استلام رمز المصادقة');
