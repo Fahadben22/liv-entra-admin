@@ -290,23 +290,26 @@ export default function IntelligencePage() {
   }
 
   const loadOverview = useCallback(async (silent=false) => {
-    try {
-      if (!silent) setLoadError('');
-      const [h,t,ten,te,sum] = await Promise.all([
-        adminApi.getHealthScore(), adminApi.getTimeline(), adminApi.getTenantHealth(),
-        adminApi.getTopErrors(), adminApi.intelligenceSummary(),
-      ]);
-      setHealth((h as any).data);
-      setTimeline((t as any).data||[]);
-      setTenants((ten as any).data||[]);
-      setTopErr((te as any).data||[]);
-      setSummary((sum as any).data);
-      setLastRefresh(new Date());
-    } catch (e:any) {
-      const msg = e?.message||'';
-      if (msg.includes('401')||msg.toLowerCase().includes('unauthorized')) router.push('/login');
-      else if (!silent) setLoadError(msg);
-    }
+    if (!silent) setLoadError('');
+    const [h,t,ten,te,sum] = await Promise.allSettled([
+      adminApi.getHealthScore(), adminApi.getTimeline(), adminApi.getTenantHealth(),
+      adminApi.getTopErrors(), adminApi.intelligenceSummary(),
+    ]);
+    // Apply each result independently — one failure never blocks the rest
+    if (h.status==='fulfilled')   setHealth((h.value as any).data);
+    else if (!silent)             setLoadError((h.reason as any)?.message||'فشل تحميل البيانات');
+    if (t.status==='fulfilled')   setTimeline((t.value as any).data||[]);
+    if (ten.status==='fulfilled') setTenants((ten.value as any).data||[]);
+    if (te.status==='fulfilled')  setTopErr((te.value as any).data||[]);
+    if (sum.status==='fulfilled') setSummary((sum.value as any).data);
+    setLastRefresh(new Date());
+    // Only redirect on 401
+    [h,t,ten,te,sum].forEach(r => {
+      if (r.status==='rejected') {
+        const msg = (r.reason as any)?.message||'';
+        if (msg.includes('401')||msg.toLowerCase().includes('unauthorized')) router.push('/login');
+      }
+    });
   }, [router]);
 
   const loadLogs = useCallback(async () => {
@@ -538,7 +541,7 @@ export default function IntelligencePage() {
             {/* Services mini */}
             <div style={{ marginTop:10,display:'flex',flexDirection:'column',gap:4 }}>
               {[
-                { l:'API',     on:health?.api_status==='online' },
+                { l:'API',     on:sseStatus==='live'||health?.api_status==='online' },
                 { l:'DB',      on:true },
                 { l:'SSE',     on:sseStatus==='live' },
                 { l:'Vercel',  on:true },
