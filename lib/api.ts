@@ -22,19 +22,17 @@ export async function request<T>(method: string, path: string, body?: unknown): 
 }
 
 export const adminApi = {
-  // Companies
+  // ─── Legacy admin routes (preserved) ────────────────────────────────────────
   listCompanies:   ()             => request<any>('GET',  '/admin/companies'),
   getCompany:      (id: string)   => request<any>('GET',  `/admin/companies/${id}`),
   createCompany:   (data: any)    => request<any>('POST', '/admin/companies', data),
   updateCompany:   (id: string, data: any) => request<any>('PATCH', `/admin/companies/${id}`, data),
   suspendCompany:  (id: string)   => request<any>('POST', `/admin/companies/${id}/suspend`),
   activateCompany: (id: string)   => request<any>('POST', `/admin/companies/${id}/activate`),
-  // Usage
   getUsage:        (id: string)   => request<any>('GET',  `/admin/companies/${id}/usage`),
-  // Stats
   getStats:        ()             => request<any>('GET',  '/admin/stats'),
 
-  // Intelligence / System Monitoring
+  // ─── Intelligence / System Monitoring ────────────────────────────────────────
   intelligenceSummary:  ()                      => request<any>('GET',  '/admin/intelligence/summary'),
   listLogs:             (params?: Record<string, string>) => {
     const qs = params ? '?' + new URLSearchParams(params).toString() : '';
@@ -55,4 +53,69 @@ export const adminApi = {
   getHealthScore:       ()                      => request<any>('GET',  '/admin/intelligence/health-score'),
   aiChat:               (message: string, history: any[]) => request<any>('POST', '/admin/intelligence/chat', { message, history }),
   getStreamUrl:         () => `${BASE}/admin/intelligence/stream`,
+
+  // ─── Super Admin Control Plane ───────────────────────────────────────────────
+  sa: {
+    // Auth
+    login:           (email: string, password: string) => request<any>('POST', '/superadmin/auth/login', { email, password }),
+    me:              ()             => request<any>('GET',  '/superadmin/auth/me'),
+    listAdminUsers:  ()             => request<any>('GET',  '/superadmin/auth/users'),
+    createAdminUser: (data: any)    => request<any>('POST', '/superadmin/auth/users', data),
+    deactivateAdminUser: (id: string) => request<any>('PATCH', `/superadmin/auth/users/${id}/deactivate`),
+
+    // Platform stats
+    platformStats:   ()             => request<any>('GET',  '/superadmin/stats'),
+
+    // Tenant / Company control
+    listCompanies:   (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+      return request<any>('GET', `/superadmin/companies${qs}`);
+    },
+    getCompany:      (id: string)   => request<any>('GET',  `/superadmin/companies/${id}`),
+    getCompanyUsage: (id: string)   => request<any>('GET',  `/superadmin/companies/${id}/usage`),
+    activateCompany: (id: string)   => request<any>('POST', `/superadmin/companies/${id}/activate`),
+    suspendCompany:  (id: string, reason: string) => request<any>('POST', `/superadmin/companies/${id}/suspend`, { reason }),
+    deleteCompany:   (id: string, reason: string) => request<any>('POST', `/superadmin/companies/${id}/delete`, { reason }),
+    updateLimits:    (id: string, limits: any)    => request<any>('PATCH', `/superadmin/companies/${id}/limits`, limits),
+
+    // Subscription plans
+    listPlans:       ()             => request<any>('GET',  '/superadmin/plans'),
+    createPlan:      (data: any)    => request<any>('POST', '/superadmin/plans', data),
+    updatePlan:      (id: string, data: any) => request<any>('PATCH', `/superadmin/plans/${id}`, data),
+
+    // Tenant subscriptions
+    assignPlan:      (companyId: string, data: any) => request<any>('POST', `/superadmin/companies/${companyId}/assign-plan`, data),
+    extendTrial:     (companyId: string, days: number) => request<any>('POST', `/superadmin/companies/${companyId}/extend-trial`, { days }),
+
+    // Payments
+    listPayments:    (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+      return request<any>('GET', `/superadmin/payments${qs}`);
+    },
+    markPaymentPaid: (id: string, ref?: string) => request<any>('PATCH', `/superadmin/payments/${id}/mark-paid`, { payment_ref: ref }),
+    waivePayment:    (id: string, reason: string) => request<any>('PATCH', `/superadmin/payments/${id}/waive`, { reason }),
+    mrrStats:        ()             => request<any>('GET',  '/superadmin/billing/mrr'),
+
+    // Feature flags
+    featureRegistry: ()             => request<any>('GET',  '/superadmin/features/registry'),
+    companyFlags:    (id: string)   => request<any>('GET',  `/superadmin/companies/${id}/flags`),
+    setFlag:         (id: string, key: string, enabled: boolean, notes?: string) =>
+      request<any>('POST', `/superadmin/companies/${id}/flags`, { feature_key: key, is_enabled: enabled, notes }),
+    bulkSetFlags:    (id: string, flags: { feature_key: string; is_enabled: boolean }[]) =>
+      request<any>('POST', `/superadmin/companies/${id}/flags/bulk`, { flags }),
+
+    // Audit logs
+    listAudit:       (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+      return request<any>('GET', `/superadmin/audit${qs}`);
+    },
+
+    // Anomalies
+    listAnomalies:   (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+      return request<any>('GET', `/superadmin/anomalies${qs}`);
+    },
+    updateAnomaly:   (id: string, status: string, note?: string) =>
+      request<any>('PATCH', `/superadmin/anomalies/${id}`, { status, resolution_note: note }),
+  },
 };
