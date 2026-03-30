@@ -48,4 +48,9 @@ export const adminApi = {
   resolveLog:           (id: string, notes: string) => request<any>('PATCH', `/admin/intelligence/logs/${id}/resolve`, { resolution_notes: notes }),
   ignoreLog:            (id: string)            => request<any>('PATCH', `/admin/intelligence/logs/${id}/ignore`),
   ingestLog:            (data: any)             => request<any>('POST', '/admin/intelligence/ingest', data),
+  getTimeline:          ()                      => request<any>('GET',  '/admin/intelligence/timeline'),
+  getTenantHealth:      ()                      => request<any>('GET',  '/admin/intelligence/tenant-health'),
+  getTopErrors:         ()                      => request<any>('GET',  '/admin/intelligence/top-errors'),
+  getSecurityFeed:      ()                      => request<any>('GET',  '/admin/intelligence/security-feed'),
+  getHealthScore:       ()                      => request<any>('GET',  '/admin/intelligence/health-score'),
 };
