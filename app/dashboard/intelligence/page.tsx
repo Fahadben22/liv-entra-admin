@@ -267,7 +267,7 @@ export default function IntelligencePage() {
           }
           if (ev.type==='analysis_complete') {
             setLogs(prev => prev.map(l => l.id===ev.log_id ? { ...l, ai_analyses:[ev.analysis] } : l));
-            setSelectedLog(prev => prev?.id===ev.log_id ? { ...prev, ai_analyses:[ev.analysis] } : prev);
+            setSelectedLog(prev => (prev && prev.id===ev.log_id) ? { ...prev, ai_analyses:[ev.analysis] } : prev);
           }
         } catch {}
       };
