@@ -16,6 +16,13 @@ export async function request<T>(method: string, path: string, body?: unknown): 
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
+  // Expired or invalid token — clear storage and redirect to login
+  if (res.status === 401 && typeof window !== 'undefined') {
+    localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_user');
+    window.location.href = '/login';
+    throw new Error('session_expired');
+  }
   const json = await res.json();
   if (!res.ok) throw new Error(json.message || 'Request failed');
   return json;
