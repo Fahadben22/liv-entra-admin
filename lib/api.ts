@@ -16,8 +16,11 @@ export async function request<T>(method: string, path: string, body?: unknown): 
     },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
-  // Expired or invalid token — clear storage and redirect to login
-  if (res.status === 401 && typeof window !== 'undefined') {
+  // Expired or invalid token — redirect to login
+  // Skip auto-redirect for /superadmin/* paths: those return 401 when the
+  // migration tables don't exist yet or the old token lacks adminUser claim.
+  // Those failures are handled gracefully via Promise.allSettled in each page.
+  if (res.status === 401 && typeof window !== 'undefined' && !path.startsWith('/superadmin/')) {
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
     window.location.href = '/login';
