@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { adminApi } from '@/lib/api';
 
@@ -135,8 +135,7 @@ function CompanyCard({ c, onAction, actioning }: { c:any; onAction:(id:string, a
 
 export default function CompaniesPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [companies,  setCompanies]  = useState<any[]>([]);
+const [companies,  setCompanies]  = useState<any[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [search,     setSearch]     = useState('');
   const [view,       setView]       = useState<'kanban'|'list'>('kanban');
