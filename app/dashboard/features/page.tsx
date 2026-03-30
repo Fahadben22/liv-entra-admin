@@ -202,7 +202,7 @@ export default function FeaturesPage() {
                         return (
                           <div key={key}
                             style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', borderRadius: 12, border: '1px solid', borderColor: enabled ? '#bbf7d0' : '#e2e8f0', background: enabled ? '#f0fdf4' : '#fff', transition: 'all .2s', cursor: 'pointer' }}
-                            onClick={() => handleToggleFlag(key, enabled)}>
+                            onClick={() => handleToggle(key, enabled)}>
                             <div>
                               <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 2px', color: '#0f172a' }}>{meta.name_ar}</p>
                               <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, direction: 'ltr' }}>{key}</p>
