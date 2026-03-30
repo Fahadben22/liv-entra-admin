@@ -53,14 +53,28 @@ export default function CompanyDetailPage() {
     if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
     setLoading(true);
     const results = await Promise.allSettled([
-      adminApi.sa.getCompany(id),
+      // Primary: old endpoint always works
+      adminApi.getCompany(id),
+      // Enhanced: new sa endpoints (graceful if migration not run)
       adminApi.sa.getCompanyUsage(id),
       adminApi.sa.companyFlags(id),
       adminApi.sa.featureRegistry(),
       adminApi.sa.listPlans(),
       adminApi.sa.listAudit({ target_id: id, limit: '20' }),
     ]);
-    if (results[0].status === 'fulfilled') setCompany((results[0].value as any)?.data);
+    if (results[0].status === 'fulfilled') {
+      const d = (results[0].value as any)?.data;
+      setCompany(d);
+      // Old endpoint embeds usage
+      if (d?.usage && !usage) setUsage({
+        unit_count:      d.usage.total_units      || 0,
+        contract_count:  d.usage.active_contracts || 0,
+        staff_count:     d.usage.total_staff      || 0,
+        property_count:  0,
+        payment_count:   0,
+        maintenance_count: 0,
+      });
+    }
     if (results[1].status === 'fulfilled') setUsage((results[1].value as any)?.data);
     if (results[2].status === 'fulfilled') setFlags((results[2].value as any)?.data || []);
     if (results[3].status === 'fulfilled') setRegistry((results[3].value as any)?.data || {});
@@ -76,8 +90,12 @@ export default function CompanyDetailPage() {
     if (action === 'suspend' && !reason) return;
     setSaving(true);
     try {
-      if (action === 'activate') await adminApi.sa.activateCompany(id);
-      else await adminApi.sa.suspendCompany(id, reason!);
+      if (action === 'activate') {
+        // Try new SA endpoint first, fallback to old
+        await adminApi.sa.activateCompany(id).catch(() => adminApi.activateCompany(id));
+      } else {
+        await adminApi.sa.suspendCompany(id, reason!).catch(() => adminApi.suspendCompany(id));
+      }
       showToast('تم بنجاح ✓');
       await load();
     } catch (e: any) { showToast(`خطأ: ${e.message}`); }
