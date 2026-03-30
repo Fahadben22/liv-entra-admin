@@ -53,4 +53,6 @@ export const adminApi = {
   getTopErrors:         ()                      => request<any>('GET',  '/admin/intelligence/top-errors'),
   getSecurityFeed:      ()                      => request<any>('GET',  '/admin/intelligence/security-feed'),
   getHealthScore:       ()                      => request<any>('GET',  '/admin/intelligence/health-score'),
+  aiChat:               (message: string, history: any[]) => request<any>('POST', '/admin/intelligence/chat', { message, history }),
+  getStreamUrl:         () => `${BASE}/admin/intelligence/stream`,
 };
