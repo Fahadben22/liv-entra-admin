@@ -105,11 +105,12 @@ export default function AdminDashboard() {
         </div>
         <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
           {[
-            { href: '/dashboard/companies',   label: 'الشركات' },
-            { href: '/dashboard/billing',     label: 'الفواتير' },
-            { href: '/dashboard/audit',       label: 'التدقيق' },
-            { href: '/dashboard/features',    label: 'الميزات' },
-            { href: '/dashboard/intelligence', label: '🧠 الذكاء' },
+            { href: '/dashboard/companies',       label: 'الشركات' },
+            { href: '/dashboard/billing',         label: 'الفواتير' },
+            { href: '/dashboard/audit',           label: 'التدقيق' },
+            { href: '/dashboard/features',        label: 'الميزات' },
+            { href: '/dashboard/intelligence',    label: '🧠 الذكاء' },
+            { href: '/dashboard/security-center', label: '🛡️ الأمان' },
           ].map(n => (
             <Link key={n.href} href={n.href} style={{ fontSize: 12, color: '#94a3b8', textDecoration: 'none' }}>{n.label}</Link>
           ))}

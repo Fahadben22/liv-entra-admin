@@ -128,4 +128,11 @@ export const adminApi = {
     updateAnomaly:   (id: string, status: string, note?: string) =>
       request<any>('PATCH', `/superadmin/anomalies/${id}`, { status, resolution_note: note }),
   },
+
+  // ─── Security Center — platform-wide cross-company (admin only) ──────────────
+  securityEvents: (params?: Record<string, string>) => {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return request<any>('GET', `/security/events/all${qs}`);
+  },
+  platformSecuritySummary: () => request<any>('GET', '/security/platform-summary'),
 };
