@@ -171,19 +171,19 @@ export default function NewCompanyPage() {
             <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>✅</div>
             <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: '0 0 6px' }}>تم إنشاء الشركة بنجاح</h2>
             <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 28px' }}>
-              {success.email_sent
-                ? `تم إرسال بريد الترحيب إلى ${success.staff?.email || form.admin_email}`
-                : 'يمكنك مشاركة بيانات الدخول مع المدير يدوياً'}
+              {form.admin_email
+                ? `سيصل بريد الترحيب قريباً إلى ${form.admin_email}`
+                : 'شارك رابط الدخول ورقم الجوال مع مدير الشركة'}
             </p>
             <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '18px 22px', textAlign: 'right', marginBottom: 24 }}>
               <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 14px', fontWeight: 700, letterSpacing: '0.05em' }}>بيانات الدخول</p>
               {[
-                ['اسم الشركة', success.company?.name || form.name],
-                ['رابط تسجيل الدخول', 'https://app.liv-entra.com'],
-                ['اسم المستخدم (رقم الجوال)', success.staff?.phone || form.admin_phone],
-                ['كلمة المرور المؤقتة', success.temp_password],
+                ['اسم الشركة',              success.company?.name || form.name],
+                ['رابط تسجيل الدخول',       success.login_url || `https://app.liv-entra.com/${form.slug}`],
+                ['اسم المستخدم',            success.staff?.phone || form.admin_phone],
+                ['طريقة الدخول',            'OTP — رمز التحقق يُرسل إلى رقم الجوال'],
                 ...(form.admin_email ? [['البريد الإلكتروني', success.staff?.email || form.admin_email]] : []),
-                ['حالة البريد', success.email_sent ? '✅ تم الإرسال' : '⚠️ تعذّر الإرسال'],
+                ...(form.admin_email ? [['حالة البريد', '📤 جاري الإرسال في الخلفية']] : []),
               ].map(([k, v]) => (
                 <div key={k as string} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid #dbeafe' }}>
                   <span style={{ fontSize: 12, color: '#64748b' }}>{k}</span>
@@ -191,8 +191,8 @@ export default function NewCompanyPage() {
                 </div>
               ))}
             </div>
-            <div style={{ background: '#fef9c3', border: '1px solid #fde047', borderRadius: 8, padding: '10px 14px', textAlign: 'right', marginBottom: 24, fontSize: 12, color: '#854d0e' }}>
-              ⚠️ احفظ كلمة المرور المؤقتة الآن — لن تظهر مرة أخرى
+            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '10px 14px', textAlign: 'right', marginBottom: 24, fontSize: 12, color: '#15803d' }}>
+              ✅ الدخول عبر OTP — يُرسَل رمز التحقق إلى الجوال المسجّل عند كل تسجيل دخول
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => { setSuccess(null); setStep(1); setForm({ name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '', contact_phone: '', contact_email: '', plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30, admin_name: '', admin_phone: '', admin_email: '' }); setSlugManual(false); }}
