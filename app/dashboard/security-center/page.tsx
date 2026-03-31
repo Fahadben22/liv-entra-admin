@@ -26,6 +26,8 @@ const EVENT_AR: Record<string, string> = {
   'auth.token_expired':       'جلسة منتهية',
   'auth.role_violation':      'تصعيد صلاحيات',
   'auth.tenant_token_invalid':'رمز مستأجر مزيف',
+  'auth.unregistered_otp':    'رقم غير مسجل',
+  'auth.inactive_login':      'حساب معطّل',
   'otp.failed':               'OTP خاطئ',
   'otp.locked':               'قفل OTP',
   'rate_limit.exceeded':      'تجاوز الحد',
