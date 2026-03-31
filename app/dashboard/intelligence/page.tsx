@@ -406,20 +406,20 @@ export default function IntelligencePage() {
   }, [loadOverview, router]); // eslint-disable-line
 
   useEffect(() => { if (tab==='logs'||tab==='incidents') loadLogs(); }, [tab,filterLevel,filterStatus,filterTenant,logPage,loadLogs]);
-  // Logs + incidents auto-refresh every 15s while active
+  // Logs + incidents auto-refresh every 30s while active
   useEffect(() => {
     if (tab !== 'logs' && tab !== 'incidents') return;
-    const id = setInterval(() => loadLogs(), 15_000);
+    const id = setInterval(() => loadLogs(), 30_000);
     return () => clearInterval(id);
   }, [tab, loadLogs]);
   useEffect(() => { if (tab==='security') adminApi.getSecurityFeed().then(r=>setSecFeed((r as any).data||[])).catch(()=>{}); }, [tab]);
   useEffect(() => { if (tab==='alerts')   adminApi.listAlerts().then(r=>setAlerts((r as any).data||[])).catch(()=>{}); }, [tab]);
-  // Overview auto-refresh every 15 s
-  useEffect(() => { const id=setInterval(()=>loadOverview(true),15_000); return ()=>clearInterval(id); }, [loadOverview]);
-  // Security feed auto-refresh every 15 s while on security tab
+  // Overview auto-refresh every 30 s (SSE handles real-time; polling is just reconciliation)
+  useEffect(() => { const id=setInterval(()=>loadOverview(true),30_000); return ()=>clearInterval(id); }, [loadOverview]);
+  // Security feed auto-refresh every 30 s while on security tab
   useEffect(() => {
     if (tab !== 'security') return;
-    const id = setInterval(() => adminApi.getSecurityFeed().then(r=>setSecFeed((r as any).data||[])).catch(()=>{}), 15_000);
+    const id = setInterval(() => adminApi.getSecurityFeed().then(r=>setSecFeed((r as any).data||[])).catch(()=>{}), 30_000);
     return () => clearInterval(id);
   }, [tab]);
 
