@@ -189,7 +189,7 @@ function CreateInvoiceModal({ companies, onClose, onDone }: { companies: any[]; 
         <select value={form.company_id} onChange={e => set('company_id', e.target.value)}
           style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13, direction: 'rtl', boxSizing: 'border-box', marginBottom: 12 }}>
           <option value="">اختر شركة...</option>
-          {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          {(Array.isArray(companies) ? companies : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
         <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>الوصف</label>
         <input value={form.description} onChange={e => set('description', e.target.value)} placeholder="اشتراك شهري — الخطة الاحترافية"
@@ -247,16 +247,17 @@ export default function BillingPage() {
   const load = useCallback(async () => {
     if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
     setLoading(true);
+    const toArr = (v: any): any[] => Array.isArray(v) ? v : [];
     const results = await Promise.allSettled([
       adminApi.listCompanies(),
-      request<any>('GET', '/admin/billing/stats'),
-      request<any>('GET', '/admin/billing/invoices?limit=100'),
-      request<any>('GET', '/admin/billing/gateways'),
+      request<any>('GET', '/admin/billing/stats').catch(() => null),
+      request<any>('GET', '/admin/billing/invoices?limit=100').catch(() => null),
+      request<any>('GET', '/admin/billing/gateways').catch(() => null),
     ]);
-    if (results[0].status === 'fulfilled') setCompanies((results[0].value as any)?.data || []);
-    if (results[1].status === 'fulfilled') setStats((results[1].value as any)?.data);
-    if (results[2].status === 'fulfilled') setInvoices((results[2].value as any)?.data || []);
-    if (results[3].status === 'fulfilled') setGateways((results[3].value as any)?.data || []);
+    if (results[0].status === 'fulfilled') setCompanies(toArr((results[0].value as any)?.data));
+    if (results[1].status === 'fulfilled' && results[1].value) setStats((results[1].value as any)?.data ?? null);
+    if (results[2].status === 'fulfilled') setInvoices(toArr((results[2].value as any)?.data));
+    if (results[3].status === 'fulfilled') setGateways(toArr((results[3].value as any)?.data));
     setLoading(false);
   }, [router]);
 
@@ -307,8 +308,11 @@ export default function BillingPage() {
     setGwSaving(null);
   };
 
-  // Derived
-  const filteredInvoices = invoices.filter(inv => {
+  // Derived — always safe even if state is temporarily non-array
+  const safeInvoices  = Array.isArray(invoices)  ? invoices  : [];
+  const safeCompanies = Array.isArray(companies) ? companies : [];
+
+  const filteredInvoices = safeInvoices.filter(inv => {
     if (statusFilter !== 'all' && inv.status !== statusFilter) return false;
     if (search) {
       const q = search.toLowerCase();
@@ -320,14 +324,14 @@ export default function BillingPage() {
     return true;
   });
 
-  const trialCompanies     = companies.filter(c => lcOf(c) === 'trial');
+  const trialCompanies     = safeCompanies.filter(c => lcOf(c) === 'trial');
   const trialsExpiringSoon = trialCompanies.filter(c => c.trial_ends_at && daysUntil(c.trial_ends_at) <= 7);
-  const suspendedCompanies = companies.filter(c => lcOf(c) === 'suspended');
-  const overdueInvoices    = invoices.filter(i => i.status === 'overdue');
+  const suspendedCompanies = safeCompanies.filter(c => lcOf(c) === 'suspended');
+  const overdueInvoices    = safeInvoices.filter(i => i.status === 'overdue');
 
   const planDist: Record<string, number> = {};
-  for (const c of companies) planDist[c.plan] = (planDist[c.plan] || 0) + 1;
-  const estimatedMrr = companies.filter(c => c.plan && c.plan !== 'trial' && c.is_active)
+  for (const c of safeCompanies) planDist[c.plan] = (planDist[c.plan] || 0) + 1;
+  const estimatedMrr = safeCompanies.filter(c => c.plan && c.plan !== 'trial' && c.is_active)
     .reduce((s, c) => s + (PLAN_PRICE[c.plan] || 0), 0);
 
   return (
@@ -416,7 +420,7 @@ export default function BillingPage() {
                         style={{ padding: '6px 12px', borderRadius: 20, border: '1px solid ' + (statusFilter === s ? '#1d4070' : '#e2e8f0'), background: statusFilter === s ? '#1d4070' : '#fff', color: statusFilter === s ? '#fff' : '#64748b', fontSize: 11, cursor: 'pointer', fontWeight: statusFilter === s ? 700 : 400 }}>
                         {s === 'all' ? 'الكل' : INV_STATUS[s]?.label}
                         {s !== 'all' && (
-                          <span style={{ marginRight: 4 }}>({invoices.filter(i => i.status === s).length})</span>
+                          <span style={{ marginRight: 4 }}>({safeInvoices.filter(i => i.status === s).length})</span>
                         )}
                       </button>
                     ))}
@@ -505,8 +509,8 @@ export default function BillingPage() {
                 {/* Stats row */}
                 <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                   <StatCard label="إجمالي محصّل"  value={`${fmt(stats?.total_collected || 0)} ر.س`} color="#15803d" />
-                  <StatCard label="فواتير معلقة"  value={`${fmt(stats?.pending_amount || 0)} ر.س`} sub={`${invoices.filter(i => i.status === 'issued').length} فاتورة`} color="#c2410c" />
-                  <StatCard label="شركات نشطة"    value={companies.filter(c => c.is_active && c.plan !== 'trial').length} />
+                  <StatCard label="فواتير معلقة"  value={`${fmt(stats?.pending_amount || 0)} ر.س`} sub={`${safeInvoices.filter(i => i.status === 'issued').length} فاتورة`} color="#c2410c" />
+                  <StatCard label="شركات نشطة"    value={safeCompanies.filter(c => c.is_active && c.plan !== 'trial').length} />
                   <StatCard label="في التجربة"     value={trialCompanies.length} sub={trialsExpiringSoon.length > 0 ? `${trialsExpiringSoon.length} تنتهي هذا الأسبوع` : undefined} color={trialsExpiringSoon.length > 0 ? '#c2410c' : undefined} />
                 </div>
 
@@ -517,7 +521,7 @@ export default function BillingPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                       {['enterprise', 'professional', 'basic', 'trial'].map(plan => {
                         const count = planDist[plan] || 0;
-                        const pct   = Math.round((count / Math.max(companies.length, 1)) * 100);
+                        const pct   = Math.round((count / Math.max(safeCompanies.length, 1)) * 100);
                         const pc    = PLAN_C[plan] || PLAN_C.basic;
                         const mrr   = count * (PLAN_PRICE[plan] || 0);
                         return (
