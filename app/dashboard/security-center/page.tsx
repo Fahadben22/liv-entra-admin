@@ -88,15 +88,75 @@ export default function SecurityCenterPage() {
   const [actioning,  setActioning]  = useState<string | null>(null);
 
   // Live state
+  const [sseStatus,   setSseStatus]   = useState<'connecting'|'live'|'disconnected'>('connecting');
+  const [liveFeed,    setLiveFeed]    = useState<any[]>([]);
+  const [liveCount,   setLiveCount]   = useState(0);
+  const [kpiFlash,    setKpiFlash]    = useState<string|null>(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
-  const [pulse,       setPulse]       = useState(false);
+  const tickerRef = useRef<HTMLDivElement>(null);
 
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 3500); };
 
+  // ── SSE real-time connection ───────────────────────────────────────────────
+  useEffect(() => {
+    const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://liv-entra-api-production.up.railway.app/api/v1';
+    let es: EventSource, retryT: ReturnType<typeof setTimeout>;
+    function connect() {
+      setSseStatus('connecting');
+      es = new EventSource(`${BASE}/admin/intelligence/stream`);
+      es.onopen = () => setSseStatus('live');
+      es.onmessage = (e) => {
+        try {
+          const ev = JSON.parse(e.data);
+          if (ev.type === 'security_event') {
+            const d = ev.data;
+            setLiveFeed(prev => [{ ...d, _ts: Date.now() }, ...prev.slice(0, 29)]);
+            setLiveCount(p => p + 1);
+            // Normalize severity to 4-level for KPI update
+            const sev = d.severity === 'warning' ? 'high' : d.severity === 'info' ? 'low' : (d.severity || 'low');
+            setSummary((prev: any) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                last_24h: {
+                  ...prev.last_24h,
+                  [sev]: (prev.last_24h?.[sev] || 0) + 1,
+                  total:  (prev.last_24h?.total  || 0) + 1,
+                },
+                // Escalate threat level if needed
+                threat_level:
+                  sev === 'critical' ? 'critical' :
+                  sev === 'high' && (prev.threat_level === 'normal' || prev.threat_level === 'guarded') ? 'elevated' :
+                  prev.threat_level,
+              };
+            });
+            setKpiFlash(sev); setTimeout(() => setKpiFlash(null), 700);
+            setLastRefresh(new Date());
+          }
+        } catch {}
+      };
+      es.onerror = () => { setSseStatus('disconnected'); es.close(); retryT = setTimeout(connect, 5000); };
+    }
+    connect();
+    return () => { es?.close(); clearTimeout(retryT); };
+  }, []); // eslint-disable-line
+
+  // ── Ticker scroll ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    const el = tickerRef.current; if (!el || liveFeed.length === 0) return;
+    let x = 0;
+    const id = setInterval(() => {
+      x -= 0.4;
+      if (x < -el.scrollWidth / 2) x = 0;
+      el.style.transform = `translateX(${x}px)`;
+    }, 16);
+    return () => clearInterval(id);
+  }, [liveFeed]);
+
   // ── Load data ──────────────────────────────────────────────────────────────
-  const load = useCallback(async () => {
+  const load = useCallback(async (silent = false) => {
     if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
-    setLoading(true);
+    if (!silent) setLoading(true);
     const results = await Promise.allSettled([
       adminApi.platformSecuritySummary(),
       adminApi.sa.listAnomalies({ limit: '100' }),
@@ -105,9 +165,8 @@ export default function SecurityCenterPage() {
     if (results[0].status === 'fulfilled') setSummary((results[0].value as any)?.data || null);
     if (results[1].status === 'fulfilled') setAnomalies((results[1].value as any)?.data || []);
     if (results[2].status === 'fulfilled') setAudit((results[2].value as any)?.data || []);
-    setLoading(false);
+    if (!silent) setLoading(false);
     setLastRefresh(new Date());
-    setPulse(true); setTimeout(() => setPulse(false), 600);
   }, [router]);
 
   const loadEvents = useCallback(async () => {
@@ -124,7 +183,7 @@ export default function SecurityCenterPage() {
   useEffect(() => { if (tab === 'events') { setEvPage(0); loadEvents(); } }, [tab, loadEvents]);
 
   // Auto-refresh: summary + anomalies every 30 s, events every 15 s
-  useEffect(() => { const id = setInterval(() => load(), 30_000); return () => clearInterval(id); }, [load]);
+  useEffect(() => { const id = setInterval(() => load(true), 30_000); return () => clearInterval(id); }, [load]);
   useEffect(() => {
     if (tab !== 'events') return;
     const id = setInterval(() => loadEvents(), 15_000);
@@ -200,13 +259,21 @@ export default function SecurityCenterPage() {
           )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {/* Live indicator */}
-          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#94a3b8' }}>
+          {/* SSE live indicator */}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#94a3b8' }}>
             <span style={{ position: 'relative', display: 'inline-flex', width: 8, height: 8 }}>
-              <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#22c55e', animation: 'ping 1.5s cubic-bezier(0,0,.2,1) infinite', opacity: .6 }} />
-              <span style={{ position: 'relative', width: 8, height: 8, borderRadius: '50%', background: pulse ? '#22c55e' : '#16a34a' }} />
+              {sseStatus === 'live' && <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#22c55e', animation: 'ping 1.5s cubic-bezier(0,0,.2,1) infinite', opacity: .6 }} />}
+              <span style={{ position: 'relative', width: 8, height: 8, borderRadius: '50%', background: sseStatus === 'live' ? '#22c55e' : sseStatus === 'connecting' ? '#f59e0b' : '#ef4444' }} />
             </span>
-            مباشر · آخر تحديث {lastRefresh.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            <span style={{ color: sseStatus === 'live' ? '#22c55e' : sseStatus === 'connecting' ? '#f59e0b' : '#ef4444', fontWeight: 600 }}>
+              {sseStatus === 'live' ? 'مباشر' : sseStatus === 'connecting' ? 'جاري الاتصال...' : '⚠️ منقطع'}
+            </span>
+            {liveCount > 0 && (
+              <span style={{ background: '#dc2626', color: 'white', fontSize: 10, padding: '1px 7px', borderRadius: 10, fontWeight: 700, animation: 'pulse 2s infinite' }}>
+                +{liveCount} حدث
+              </span>
+            )}
+            <span style={{ color: '#475569' }}>· {lastRefresh.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
           </span>
           {/* Threat level badge */}
           <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 20, background: tl.bg, color: tl.color, fontSize: 12, fontWeight: 700, border: `1px solid ${tl.dot}44` }}>
@@ -218,6 +285,28 @@ export default function SecurityCenterPage() {
           </button>
         </div>
       </div>
+
+      {/* ── Live ticker ── */}
+      {liveFeed.length > 0 && (
+        <div style={{ background: '#0a0f1e', overflow: 'hidden', height: 30, display: 'flex', alignItems: 'center', borderBottom: '1px solid rgba(239,68,68,0.3)' }}>
+          <span style={{ flexShrink: 0, fontSize: 10, fontWeight: 800, color: '#ef4444', padding: '0 14px', borderRight: '1px solid rgba(255,255,255,0.12)', letterSpacing: 1 }}>● LIVE</span>
+          <div style={{ overflow: 'hidden', flex: 1, position: 'relative' }}>
+            <div ref={tickerRef} style={{ display: 'flex', gap: 48, whiteSpace: 'nowrap', willChange: 'transform', padding: '0 16px' }}>
+              {[...liveFeed, ...liveFeed].map((e, i) => {
+                const sevColor = e.severity === 'critical' ? '#ef4444' : e.severity === 'high' || e.severity === 'warning' ? '#f97316' : e.severity === 'medium' ? '#f59e0b' : '#38bdf8';
+                return (
+                  <span key={i} style={{ fontSize: 11, color: sevColor, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ background: sevColor, color: '#000', fontSize: 9, fontWeight: 800, padding: '1px 5px', borderRadius: 3 }}>{(e.severity || 'info').toUpperCase()}</span>
+                    {EVENT_AR[e.event_type] || e.event_type}
+                    {e.ip_address && <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>· {e.ip_address}</span>}
+                    <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 10 }}>{new Date(e.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Tab bar ── */}
       <div style={{ background: '#fff', borderBottom: '1px solid #e2e8f0', padding: '0 32px', display: 'flex', gap: 4 }}>
@@ -242,14 +331,15 @@ export default function SecurityCenterPage() {
             {/* KPI row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
               {[
-                { label: 'حرج (24h)',   val: s24.critical ?? '—', cfg: SEV.critical },
-                { label: 'عالي (24h)',  val: s24.high     ?? '—', cfg: SEV.high     },
-                { label: 'متوسط (24h)', val: s24.medium   ?? '—', cfg: SEV.medium   },
-                { label: 'منخفض (24h)', val: s24.low      ?? '—', cfg: SEV.info     },
-              ].map(({ label, val, cfg }) => (
-                <div key={label} style={{ background: '#fff', borderRadius: 14, border: `1px solid ${cfg.border}`, padding: '20px 22px', boxShadow: '0 1px 4px rgba(0,0,0,.04)' }}>
+                { key: 'critical', label: 'حرج (24h)',   val: s24.critical ?? '—', cfg: SEV.critical },
+                { key: 'high',     label: 'عالي (24h)',  val: s24.high     ?? '—', cfg: SEV.high     },
+                { key: 'medium',   label: 'متوسط (24h)', val: s24.medium   ?? '—', cfg: SEV.medium   },
+                { key: 'low',      label: 'منخفض (24h)', val: s24.low      ?? '—', cfg: SEV.info     },
+              ].map(({ key, label, val, cfg }) => (
+                <div key={label} style={{ background: kpiFlash === key ? cfg.bg : '#fff', borderRadius: 14, border: `2px solid ${kpiFlash === key ? cfg.color : cfg.border}`, padding: '20px 22px', boxShadow: kpiFlash === key ? `0 0 16px ${cfg.color}44` : '0 1px 4px rgba(0,0,0,.04)', transition: 'all .3s' }}>
                   <p style={{ fontSize: 11, color: '#64748b', fontWeight: 600, margin: '0 0 8px' }}>{label}</p>
                   <p style={{ fontSize: 30, fontWeight: 800, color: cfg.color, margin: 0, lineHeight: 1 }}>{val}</p>
+                  {kpiFlash === key && <p style={{ fontSize: 10, color: cfg.color, margin: '4px 0 0', fontWeight: 700 }}>▲ حدث جديد</p>}
                 </div>
               ))}
             </div>
