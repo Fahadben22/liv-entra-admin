@@ -252,7 +252,7 @@ export default function IntelligencePage() {
   // UI
   const [tab,          setTab]         = useState<TabId>('overview');
   const [filterLevel,  setFilterLevel] = useState('');
-  const [filterStatus, setFilterStatus]= useState('open');
+  const [filterStatus, setFilterStatus]= useState('');
   const [filterTenant, setFilterTenant]= useState<string|null>(null);
   const [selectedHour, setSelectedHour]= useState<string|null>(null);
   const [selectedLog,  setSelectedLog] = useState<SystemLog|null>(null);
@@ -380,6 +380,21 @@ export default function IntelligencePage() {
     return () => { es?.close(); clearTimeout(retryT); };
   }, []); // eslint-disable-line
 
+  // ── URL tab sync — read on mount, update on tab change ──────────────────────
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('tab') as TabId | null;
+    const validTabs: TabId[] = ['overview','logs','incidents','tenants','top-errors','security','alerts'];
+    if (t && validTabs.includes(t)) setTab(t);
+  }, []);
+
+  function navigateTab(newTab: TabId) {
+    setTab(newTab);
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', newTab);
+    window.history.replaceState({}, '', url.toString());
+  }
+
   useEffect(() => {
     if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
     // Load overview + pre-seed liveFeed from recent logs & security events
@@ -435,8 +450,8 @@ export default function IntelligencePage() {
     return () => clearInterval(id);
   }, [liveFeed]);
 
-  function handleHourSelect(hour:string|null) { setSelectedHour(hour); if(hour){setTab('logs');setLogPage(0);} }
-  function handleTenantClick(id:string) { setFilterTenant(prev=>prev===id?null:id); setTab('logs');setLogPage(0); }
+  function handleHourSelect(hour:string|null) { setSelectedHour(hour); if(hour){navigateTab('logs');setLogPage(0);} }
+  function handleTenantClick(id:string) { setFilterTenant(prev=>prev===id?null:id); navigateTab('logs');setLogPage(0); }
 
   async function handleAnalyze(log:SystemLog) {
     setAnalyzing(log.id);
@@ -564,7 +579,7 @@ export default function IntelligencePage() {
         {/* ─── Left Sidebar Tabs ────────────────────────────────────────── */}
         <div style={{ width:180,flexShrink:0,background:'rgba(0,0,0,0.3)',borderLeft:'1px solid rgba(255,255,255,0.06)',padding:'12px 8px',display:'flex',flexDirection:'column',gap:2 }}>
           {tabs.map(t=>(
-            <button key={t.id} onClick={()=>setTab(t.id)}
+            <button key={t.id} onClick={()=>navigateTab(t.id)}
               style={{ width:'100%',padding:'10px 12px',borderRadius:8,background:tab===t.id?'rgba(59,130,246,0.2)':'transparent',border:tab===t.id?'1px solid rgba(59,130,246,0.4)':'1px solid transparent',color:tab===t.id?'#93c5fd':'rgba(255,255,255,0.5)',fontSize:12,cursor:'pointer',textAlign:'right',display:'flex',alignItems:'center',gap:8,transition:'all .2s',position:'relative' }}>
               <span style={{ fontSize:14,flexShrink:0 }}>{t.icon}</span>
               <span style={{ fontWeight:tab===t.id?700:400 }}>{t.label}</span>
@@ -684,7 +699,7 @@ export default function IntelligencePage() {
                 <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:14,border:'1px solid rgba(239,68,68,0.2)',overflow:'hidden' }}>
                   <div style={{ padding:'11px 16px',borderBottom:'1px solid rgba(239,68,68,0.15)',background:'rgba(239,68,68,0.08)',display:'flex',justifyContent:'space-between',alignItems:'center' }}>
                     <span style={{ fontSize:12,fontWeight:700,color:'#fca5a5' }}>🚨 أحداث حرجة مفتوحة</span>
-                    <button onClick={()=>{setTab('logs');setFilterLevel('critical');}} style={{ fontSize:10,color:'#fca5a5',background:'none',border:'none',cursor:'pointer',opacity:.7 }}>عرض الكل ←</button>
+                    <button onClick={()=>{navigateTab('logs');setFilterLevel('critical');}} style={{ fontSize:10,color:'#fca5a5',background:'none',border:'none',cursor:'pointer',opacity:.7 }}>عرض الكل ←</button>
                   </div>
                   {!(summary?.open_criticals?.length) ? (
                     <div style={{ padding:'24px 16px',textAlign:'center' }}>
@@ -692,7 +707,7 @@ export default function IntelligencePage() {
                       <p style={{ fontSize:12,color:'rgba(255,255,255,0.3)',margin:0 }}>لا توجد أحداث حرجة</p>
                     </div>
                   ) : (summary.open_criticals as any[]).map((c:any)=>(
-                    <div key={c.id} className="rh" style={{ padding:'9px 16px',borderBottom:'1px solid rgba(255,255,255,0.04)',cursor:'pointer' }} onClick={()=>setTab('logs')}>
+                    <div key={c.id} className="rh" style={{ padding:'9px 16px',borderBottom:'1px solid rgba(255,255,255,0.04)',cursor:'pointer' }} onClick={()=>navigateTab('logs')}>
                       <div style={{ display:'flex',justifyContent:'space-between',marginBottom:2 }}>
                         <span style={{ fontSize:10,color:'rgba(255,255,255,0.4)',fontFamily:'monospace' }}>{c.source}</span>
                         <span style={{ fontSize:9,color:'rgba(255,255,255,0.25)' }}>{new Date(c.created_at).toLocaleTimeString('ar-SA')}</span>
@@ -742,7 +757,7 @@ export default function IntelligencePage() {
                 <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:14,border:'1px solid rgba(255,255,255,0.08)',overflow:'hidden' }}>
                   <div style={{ padding:'11px 16px',borderBottom:'1px solid rgba(255,255,255,0.07)',display:'flex',justifyContent:'space-between' }}>
                     <span style={{ fontSize:12,fontWeight:700,color:'white' }}>⬢ أكثر الشركات تضرراً</span>
-                    <button onClick={()=>setTab('tenants')} style={{ fontSize:10,color:'rgba(255,255,255,0.4)',background:'none',border:'none',cursor:'pointer' }}>عرض الكل ←</button>
+                    <button onClick={()=>navigateTab('tenants')} style={{ fontSize:10,color:'rgba(255,255,255,0.4)',background:'none',border:'none',cursor:'pointer' }}>عرض الكل ←</button>
                   </div>
                   {tenants.slice(0,5).map(t=>{
                     const sc=TS[t.status]||TS.healthy;
@@ -767,7 +782,7 @@ export default function IntelligencePage() {
                 <div style={{ background:'rgba(255,255,255,0.03)',borderRadius:14,border:'1px solid rgba(255,255,255,0.08)',overflow:'hidden' }}>
                   <div style={{ padding:'11px 16px',borderBottom:'1px solid rgba(255,255,255,0.07)',display:'flex',justifyContent:'space-between' }}>
                     <span style={{ fontSize:12,fontWeight:700,color:'white' }}>🔥 أكثر الأخطاء تكراراً</span>
-                    <button onClick={()=>setTab('top-errors')} style={{ fontSize:10,color:'rgba(255,255,255,0.4)',background:'none',border:'none',cursor:'pointer' }}>عرض الكل ←</button>
+                    <button onClick={()=>navigateTab('top-errors')} style={{ fontSize:10,color:'rgba(255,255,255,0.4)',background:'none',border:'none',cursor:'pointer' }}>عرض الكل ←</button>
                   </div>
                   {topErr.slice(0,5).map((e,i)=>{
                     const lc=LVL[e.level as LogLevel]||LVL.error;
@@ -941,7 +956,7 @@ export default function IntelligencePage() {
                       ))}
                     </div>
                     <div style={{ display:'flex',gap:8,marginTop:12 }}>
-                      <button onClick={()=>{setFilterLevel(inc.level);setTab('logs');}} style={{ fontSize:11,padding:'6px 12px',borderRadius:7,background:lc.bg,color:lc.c,border:`1px solid ${lc.c}40`,cursor:'pointer' }}>عرض السجلات</button>
+                      <button onClick={()=>{setFilterLevel(inc.level);navigateTab('logs');}} style={{ fontSize:11,padding:'6px 12px',borderRadius:7,background:lc.bg,color:lc.c,border:`1px solid ${lc.c}40`,cursor:'pointer' }}>عرض السجلات</button>
                       <button onClick={()=>setShowChat(true)} style={{ fontSize:11,padding:'6px 12px',borderRadius:7,background:'rgba(139,92,246,0.15)',color:'#c4b5fd',border:'1px solid rgba(139,92,246,0.3)',cursor:'pointer' }}>🧠 تحليل AI</button>
                     </div>
                   </div>
