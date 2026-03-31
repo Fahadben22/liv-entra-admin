@@ -382,8 +382,28 @@ export default function IntelligencePage() {
 
   useEffect(() => {
     if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
-    loadOverview().finally(()=>setLoading(false));
-  }, [loadOverview, router]);
+    // Load overview + pre-seed liveFeed from recent logs & security events
+    Promise.allSettled([
+      loadOverview(),
+      adminApi.listLogs({ limit: '15', level: 'error' }),
+      adminApi.securityEvents({ hours: '1', limit: '15' }),
+    ]).then(([, logsRes, secRes]) => {
+      const recentLogs: LiveEvent[] = [];
+      if (logsRes.status === 'fulfilled') {
+        ((logsRes.value as any)?.data || []).forEach((l: any) => {
+          recentLogs.push({ id: l.id, level: l.level as LogLevel, source: l.source, message: l.message, ts: new Date(l.created_at) });
+        });
+      }
+      if (secRes.status === 'fulfilled') {
+        ((secRes.value as any)?.data || []).forEach((e: any) => {
+          const lvl: LogLevel = e.severity === 'critical' ? 'critical' : e.severity === 'high' || e.severity === 'warning' ? 'warning' : 'info';
+          recentLogs.push({ id: e.id, level: lvl, source: `security/${e.event_type}`, message: e.ip_address ? `${e.event_type} · ${e.ip_address}` : e.event_type, ts: new Date(e.created_at) });
+        });
+      }
+      recentLogs.sort((a, b) => b.ts.getTime() - a.ts.getTime());
+      if (recentLogs.length > 0) setLiveFeed(recentLogs.slice(0, 20));
+    }).finally(() => setLoading(false));
+  }, [loadOverview, router]); // eslint-disable-line
 
   useEffect(() => { if (tab==='logs'||tab==='incidents') loadLogs(); }, [tab,filterLevel,filterStatus,filterTenant,logPage,loadLogs]);
   // Logs + incidents auto-refresh every 15s while active

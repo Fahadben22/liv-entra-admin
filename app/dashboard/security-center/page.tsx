@@ -181,7 +181,14 @@ export default function SecurityCenterPage() {
     setEvLoading(false);
   }, [hours, sevFilter, typeFilter]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+    // Pre-seed live ticker from recent security events so it's populated on refresh
+    adminApi.securityEvents({ hours: '1', limit: '20' }).then((res: any) => {
+      const recent = (res?.data || []).map((e: any) => ({ ...e, _ts: new Date(e.created_at).getTime() }));
+      if (recent.length > 0) setLiveFeed(recent);
+    }).catch(() => {});
+  }, [load]); // eslint-disable-line
   useEffect(() => { if (tab === 'events') { setEvPage(0); loadEvents(); } }, [tab, loadEvents]);
 
   // Auto-refresh: summary + anomalies every 30 s, events every 15 s
