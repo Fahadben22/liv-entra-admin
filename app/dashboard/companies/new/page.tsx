@@ -415,7 +415,7 @@ export default function NewCompanyPage() {
                 ['الخطة', currentPlan.label],
                 ['الحد الأقصى للوحدات', String(form.max_units)],
                 ['الحد الأقصى للموظفين', String(form.max_staff)],
-                ...(form.plan === 'trial' ? [['مدة التجربة', `${form.trial_days} يوم`]] : []),
+                ...(form.plan === 'trial' ? [['مدة التجربة', `${form.trial_days} يوم`] as [string, string]] : []),
               ]} accent={currentPlan.color} />
               {/* Admin */}
               <ReviewCard title="👤 مدير النظام" onEdit={() => setStep(3)} rows={[
