@@ -359,6 +359,19 @@ export default function IntelligencePage() {
             setLogs(prev=>prev.map(l=>l.id===ev.log_id?{...l,ai_analyses:[ev.analysis]}:l));
             setSelectedLog(prev=>(prev&&prev.id===ev.log_id)?{...prev,ai_analyses:[ev.analysis]}:prev);
           }
+          // Security events from logSecurityEvent() — add to live ticker
+          if (ev.type==='security_event') {
+            const d = ev.data;
+            const lvl: LogLevel = d.severity==='critical'?'critical':d.severity==='high'||d.severity==='warning'?'warning':d.severity==='medium'?'warning':'info';
+            setLiveFeed(prev => [{
+              id: d.id || String(Date.now()),
+              level: lvl,
+              source: `security/${d.event_type}`,
+              message: d.ip_address ? `${d.event_type} · ${d.ip_address}` : d.event_type,
+              ts: new Date(),
+            }, ...prev.slice(0, 19)]);
+            setNewLogCount(p => p + 1);
+          }
         } catch {}
       };
       es.onerror = ()=>{ setSseStatus('disconnected'); es.close(); retryT=setTimeout(connect,5000); };
@@ -373,6 +386,12 @@ export default function IntelligencePage() {
   }, [loadOverview, router]);
 
   useEffect(() => { if (tab==='logs'||tab==='incidents') loadLogs(); }, [tab,filterLevel,filterStatus,filterTenant,logPage,loadLogs]);
+  // Logs + incidents auto-refresh every 15s while active
+  useEffect(() => {
+    if (tab !== 'logs' && tab !== 'incidents') return;
+    const id = setInterval(() => loadLogs(), 15_000);
+    return () => clearInterval(id);
+  }, [tab, loadLogs]);
   useEffect(() => { if (tab==='security') adminApi.getSecurityFeed().then(r=>setSecFeed((r as any).data||[])).catch(()=>{}); }, [tab]);
   useEffect(() => { if (tab==='alerts')   adminApi.listAlerts().then(r=>setAlerts((r as any).data||[])).catch(()=>{}); }, [tab]);
   // Overview auto-refresh every 15 s
