@@ -280,7 +280,7 @@ export default function SecurityCenterPage() {
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: tl.dot, display: 'inline-block' }} />
             مستوى التهديد: {tl.label}
           </span>
-          <button onClick={load} style={{ fontSize: 11, padding: '4px 14px', borderRadius: 8, background: 'rgba(255,255,255,.1)', color: '#cbd5e1', border: '1px solid rgba(255,255,255,.15)', cursor: 'pointer' }}>
+          <button onClick={() => load()} style={{ fontSize: 11, padding: '4px 14px', borderRadius: 8, background: 'rgba(255,255,255,.1)', color: '#cbd5e1', border: '1px solid rgba(255,255,255,.15)', cursor: 'pointer' }}>
             ↻ تحديث
           </button>
         </div>
