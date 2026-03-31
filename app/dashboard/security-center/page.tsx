@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { adminApi } from '@/lib/api';
@@ -87,6 +87,10 @@ export default function SecurityCenterPage() {
   const [anomStatus, setAnomStatus] = useState('open');
   const [actioning,  setActioning]  = useState<string | null>(null);
 
+  // Live state
+  const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [pulse,       setPulse]       = useState(false);
+
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 3500); };
 
   // ── Load data ──────────────────────────────────────────────────────────────
@@ -102,6 +106,8 @@ export default function SecurityCenterPage() {
     if (results[1].status === 'fulfilled') setAnomalies((results[1].value as any)?.data || []);
     if (results[2].status === 'fulfilled') setAudit((results[2].value as any)?.data || []);
     setLoading(false);
+    setLastRefresh(new Date());
+    setPulse(true); setTimeout(() => setPulse(false), 600);
   }, [router]);
 
   const loadEvents = useCallback(async () => {
@@ -116,6 +122,14 @@ export default function SecurityCenterPage() {
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => { if (tab === 'events') { setEvPage(0); loadEvents(); } }, [tab, loadEvents]);
+
+  // Auto-refresh: summary + anomalies every 30 s, events every 15 s
+  useEffect(() => { const id = setInterval(() => load(), 30_000); return () => clearInterval(id); }, [load]);
+  useEffect(() => {
+    if (tab !== 'events') return;
+    const id = setInterval(() => loadEvents(), 15_000);
+    return () => clearInterval(id);
+  }, [tab, loadEvents]);
 
   const handleUpdateAnomaly = async (id: string, status: string) => {
     const note = status === 'resolved' ? (prompt('ملاحظة الحل (اختياري):') ?? '') : undefined;
@@ -164,6 +178,7 @@ export default function SecurityCenterPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', direction: 'rtl' }}>
+      <style>{`@keyframes ping{75%,100%{transform:scale(2);opacity:0}} @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}`}</style>
 
       {/* Toast */}
       {toast && (
@@ -185,6 +200,14 @@ export default function SecurityCenterPage() {
           )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Live indicator */}
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#94a3b8' }}>
+            <span style={{ position: 'relative', display: 'inline-flex', width: 8, height: 8 }}>
+              <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#22c55e', animation: 'ping 1.5s cubic-bezier(0,0,.2,1) infinite', opacity: .6 }} />
+              <span style={{ position: 'relative', width: 8, height: 8, borderRadius: '50%', background: pulse ? '#22c55e' : '#16a34a' }} />
+            </span>
+            مباشر · آخر تحديث {lastRefresh.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          </span>
           {/* Threat level badge */}
           <span style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 12px', borderRadius: 20, background: tl.bg, color: tl.color, fontSize: 12, fontWeight: 700, border: `1px solid ${tl.dot}44` }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: tl.dot, display: 'inline-block' }} />

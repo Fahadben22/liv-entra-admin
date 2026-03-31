@@ -375,7 +375,14 @@ export default function IntelligencePage() {
   useEffect(() => { if (tab==='logs'||tab==='incidents') loadLogs(); }, [tab,filterLevel,filterStatus,filterTenant,logPage,loadLogs]);
   useEffect(() => { if (tab==='security') adminApi.getSecurityFeed().then(r=>setSecFeed((r as any).data||[])).catch(()=>{}); }, [tab]);
   useEffect(() => { if (tab==='alerts')   adminApi.listAlerts().then(r=>setAlerts((r as any).data||[])).catch(()=>{}); }, [tab]);
-  useEffect(() => { const id=setInterval(()=>loadOverview(true),60_000); return ()=>clearInterval(id); }, [loadOverview]);
+  // Overview auto-refresh every 15 s
+  useEffect(() => { const id=setInterval(()=>loadOverview(true),15_000); return ()=>clearInterval(id); }, [loadOverview]);
+  // Security feed auto-refresh every 15 s while on security tab
+  useEffect(() => {
+    if (tab !== 'security') return;
+    const id = setInterval(() => adminApi.getSecurityFeed().then(r=>setSecFeed((r as any).data||[])).catch(()=>{}), 15_000);
+    return () => clearInterval(id);
+  }, [tab]);
 
   // Ticker scroll
   useEffect(() => {
