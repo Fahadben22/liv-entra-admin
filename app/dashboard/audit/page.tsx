@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { adminApi } from '@/lib/api';
+import { adminApi, request } from '@/lib/api';
 
 const SEV: Record<string, { bg: string; color: string }> = {
   critical: { bg: '#fef2f2', color: '#dc2626' },
@@ -36,7 +36,7 @@ export default function AuditPage() {
     if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
     setLoading(true);
     const results = await Promise.allSettled([
-      adminApi.sa.listAudit({ limit: '200' }),
+      request<any>('GET', '/admin/audit-logs?limit=200'),
       adminApi.sa.listAnomalies({ limit: '100' }),
     ]);
     if (results[0].status === 'fulfilled') setAudit((results[0].value as any)?.data || []);

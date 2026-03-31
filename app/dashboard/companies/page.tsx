@@ -135,12 +135,13 @@ function CompanyCard({ c, onAction, actioning }: { c:any; onAction:(id:string, a
 
 export default function CompaniesPage() {
   const router = useRouter();
-const [companies,  setCompanies]  = useState<any[]>([]);
+  const [companies,  setCompanies]  = useState<any[]>([]);
   const [loading,    setLoading]    = useState(true);
   const [search,     setSearch]     = useState('');
   const [view,       setView]       = useState<'kanban'|'list'>('kanban');
   const [actioning,  setActioning]  = useState<string|null>(null);
   const [toast,      setToast]      = useState('');
+  const [dragOver,   setDragOver]   = useState<string|null>(null);
 
   const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 3500); };
 
@@ -236,10 +237,24 @@ const [companies,  setCompanies]  = useState<any[]>([]);
         {loading ? (
           <div style={{ textAlign: 'center', padding: '80px 0', color: '#94a3b8' }}>جاري تحميل بيانات الشركات...</div>
         ) : view === 'kanban' ? (
-          /* ── Kanban board ── */
+          /* ── Kanban board with drag-and-drop ── */
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, alignItems: 'start' }}>
             {STAGES.map(st => (
-              <div key={st.key}>
+              <div key={st.key}
+                onDragOver={e => { e.preventDefault(); setDragOver(st.key); }}
+                onDragLeave={() => setDragOver(null)}
+                onDrop={async e => {
+                  e.preventDefault();
+                  setDragOver(null);
+                  const companyId = e.dataTransfer.getData('companyId');
+                  const fromStage = e.dataTransfer.getData('fromStage');
+                  if (!companyId || fromStage === st.key) return;
+                  // Only allow meaningful transitions
+                  if (st.key === 'active') await handleAction(companyId, 'activate');
+                  else if (st.key === 'suspended') await handleAction(companyId, 'suspend');
+                  else showToast('السحب متاح فقط للعمودين: نشط وموقوف');
+                }}
+                style={{ minHeight: 120, borderRadius: 12, transition: 'background .15s', background: dragOver === st.key ? st.bg : 'transparent', outline: dragOver === st.key ? `2px dashed ${st.color}` : 'none' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <div style={{ width: 10, height: 10, borderRadius: '50%', background: st.color }} />
                   <span style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{st.label}</span>
@@ -249,11 +264,15 @@ const [companies,  setCompanies]  = useState<any[]>([]);
                 </div>
                 {byStage[st.key]?.length === 0 ? (
                   <div style={{ padding: '24px 16px', borderRadius: 12, border: `2px dashed ${st.border}`, textAlign: 'center', color: '#94a3b8', fontSize: 12 }}>
-                    لا توجد شركات
+                    اسحب بطاقة هنا
                   </div>
                 ) : (
                   byStage[st.key].map(c => (
-                    <CompanyCard key={c.id} c={c} onAction={handleAction} actioning={actioning} />
+                    <div key={c.id} draggable
+                      onDragStart={e => { e.dataTransfer.setData('companyId', c.id); e.dataTransfer.setData('fromStage', st.key); }}
+                      style={{ cursor: 'grab', opacity: actioning === c.id ? 0.5 : 1 }}>
+                      <CompanyCard c={c} onAction={handleAction} actioning={actioning} />
+                    </div>
                   ))
                 )}
               </div>

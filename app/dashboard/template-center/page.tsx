@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { request } from '@/lib/api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -79,11 +80,14 @@ export default function TemplateCenterPage() {
     <div style={{ minHeight: '100vh', background: '#f1f5f9', direction: 'rtl' }}>
       {/* Header */}
       <div style={{ background: '#1d4070', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 20 }}>📨</span>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: 'white' }}>مركز القوالب</div>
-            <div style={{ fontSize: 11, color: '#93c5fd' }}>إدارة قوالب البريد والإشعارات</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <Link href="/dashboard" style={{ color: '#93c5fd', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 20 }}>📨</span>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: 'white' }}>مركز القوالب</div>
+              <div style={{ fontSize: 11, color: '#93c5fd' }}>إدارة قوالب البريد والإشعارات</div>
+            </div>
           </div>
         </div>
         <button onClick={() => setSmtpModal(true)}

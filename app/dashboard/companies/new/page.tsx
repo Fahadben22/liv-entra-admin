@@ -66,15 +66,17 @@ const STEPS = [
   { num: 4, label: 'مراجعة وإنشاء',   icon: '✅' },
 ];
 
-// Convert name to URL-safe slug
+// Convert name to URL-safe slug (Latin only — strips Arabic, falls back to timestamp)
 function toSlug(name: string) {
-  return name
+  const latin = name
     .trim()
     .toLowerCase()
-    .replace(/[\u0600-\u06FF\s]+/g, s => s.trim().replace(/\s+/g, '-'))  // Arabic → hyphen
-    .replace(/[^a-z0-9\u0600-\u06FF-]/g, '')
+    .replace(/[\u0600-\u06FF]/g, '')   // remove Arabic characters
+    .replace(/[^a-z0-9]+/g, '-')       // non-alphanumeric → hyphen
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
+  // If the name is entirely Arabic, generate a timestamp-based slug
+  return latin || `co-${Date.now().toString(36)}`;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
