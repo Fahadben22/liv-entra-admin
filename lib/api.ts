@@ -134,6 +134,16 @@ export const adminApi = {
     // Landing page CMS
     getLanding:      ()           => request<any>('GET', '/superadmin/landing'),
     updateLanding:   (data: any)  => request<any>('PUT', '/superadmin/landing', data),
+
+    // Demo requests (leads from landing page)
+    listDemoRequests: (status?: string, page?: number) => {
+      const qs = new URLSearchParams();
+      if (status) qs.set('status', status);
+      qs.set('page', String(page || 1));
+      return request<any>('GET', `/superadmin/demo-requests?${qs.toString()}`);
+    },
+    updateDemoRequest: (id: string, data: { status?: string; notes?: string }) =>
+      request<any>('PATCH', `/superadmin/demo-requests/${id}`, data),
   },
 
   // ─── Security Center — platform-wide cross-company (admin only) ──────────────

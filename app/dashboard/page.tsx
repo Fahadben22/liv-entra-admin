@@ -113,6 +113,7 @@ export default function AdminDashboard() {
             { href: '/dashboard/security-center', label: '🛡️ الأمان' },
             { href: '/dashboard/template-center', label: '📨 القوالب' },
             { href: '/dashboard/landing-page',    label: '🌐 الموقع' },
+            { href: '/dashboard/leads',           label: '📋 طلبات العرض' },
           ].map(n => (
             <Link key={n.href} href={n.href} style={{ fontSize: 12, color: '#94a3b8', textDecoration: 'none' }}>{n.label}</Link>
           ))}
