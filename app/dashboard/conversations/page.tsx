@@ -41,7 +41,7 @@ export default function ConversationsPage() {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const pollRef = useRef<NodeJS.Timeout>();
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     adminApi.sa.listCompanies().then((res: any) => {
