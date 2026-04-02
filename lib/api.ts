@@ -130,6 +130,10 @@ export const adminApi = {
     },
     updateAnomaly:   (id: string, status: string, note?: string) =>
       request<any>('PATCH', `/superadmin/anomalies/${id}`, { status, resolution_note: note }),
+
+    // Landing page CMS
+    getLanding:      ()           => request<any>('GET', '/superadmin/landing'),
+    updateLanding:   (data: any)  => request<any>('PUT', '/superadmin/landing', data),
   },
 
   // ─── Security Center — platform-wide cross-company (admin only) ──────────────
