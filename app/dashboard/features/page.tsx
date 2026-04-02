@@ -119,17 +119,37 @@ export default function FeaturesPage() {
 
   // ─── Actions ──────────────────────────────────────────────────────────────
   const toggle = async (companyId: string, featureKey: string, current: boolean, rollout_pct?: number, notes?: string) => {
+    const newVal = !current;
+
+    // Optimistic update — flip immediately so the toggle slides right away
+    setCompanyFlags(prev => prev.map(f =>
+      f.feature_key === featureKey ? { ...f, is_enabled: newVal } : f
+    ));
+    setFeatureRows(prev => prev.map(r =>
+      r.company_id === companyId ? { ...r, is_enabled: newVal } : r
+    ));
+
     setSaving(true);
     try {
-      await adminApi.sa.setFlag(companyId, featureKey, !current, rollout_pct, notes);
-      showToast(`${featureKey} ${!current ? 'مُفعَّل ✓' : 'مُعطَّل ✓'}`);
-      if (selectedCompany === companyId) await loadCompanyFlags(companyId);
-      if (selectedFeature === featureKey) await loadFeatureCompanies(featureKey);
-      if (view === 'matrix') await loadMatrix();
-      // Refresh stats
-      const r = await adminApi.sa.featureStats().catch(() => null);
-      if (r) { setStats((r as any)?.data?.stats || {}); setRecentChanges((r as any)?.data?.recent || []); }
-    } catch (e: any) { showToast(`خطأ: ${e.message}`); } finally { setSaving(false); }
+      await adminApi.sa.setFlag(companyId, featureKey, newVal, rollout_pct, notes);
+      showToast(`${featureKey} ${newVal ? 'مُفعَّل ✓' : 'مُعطَّل ✓'}`);
+      // Sync server state in background (no await — UI already updated)
+      if (selectedCompany === companyId) loadCompanyFlags(companyId).catch(() => {});
+      if (selectedFeature === featureKey) loadFeatureCompanies(featureKey).catch(() => {});
+      if (view === 'matrix') loadMatrix().catch(() => {});
+      adminApi.sa.featureStats().then(r => {
+        if (r) { setStats((r as any)?.data?.stats || {}); setRecentChanges((r as any)?.data?.recent || []); }
+      }).catch(() => {});
+    } catch (e: any) {
+      // Roll back on failure
+      setCompanyFlags(prev => prev.map(f =>
+        f.feature_key === featureKey ? { ...f, is_enabled: current } : f
+      ));
+      setFeatureRows(prev => prev.map(r =>
+        r.company_id === companyId ? { ...r, is_enabled: current } : r
+      ));
+      showToast(`خطأ: ${(e as any).message}`);
+    } finally { setSaving(false); }
   };
 
   const bulkApplyTier = async (tier: Tier) => {
