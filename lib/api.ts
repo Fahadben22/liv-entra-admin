@@ -135,4 +135,26 @@ export const adminApi = {
     return request<any>('GET', `/security/events/all${qs}`);
   },
   platformSecuritySummary: () => request<any>('GET', '/security/platform-summary'),
+
+  // ─── WhatsApp management (super-admin) ───────────────────────────────────────
+  wa: {
+    conversations: (companyId?: string) =>
+      request<any>('GET', `/conversations${companyId ? `?company_id=${companyId}` : ''}`),
+    conversation:  (id: string) =>
+      request<any>('GET', `/conversations/${id}`),
+    sendMessage:   (conversationId: string, body: string, companyId: string) =>
+      request<any>('POST', '/whatsapp/send', { conversation_id: conversationId, body, company_id: companyId }),
+    queue:         (params?: string) =>
+      request<any>('GET', `/whatsapp/queue${params || ''}`),
+    retryNotification: (id: string) =>
+      request<any>('POST', `/whatsapp/queue/${id}/retry`),
+    analytics:     () =>
+      request<any>('GET', '/whatsapp/analytics'),
+    setup:         (data: any) =>
+      request<any>('PATCH', '/whatsapp/setup', data),
+    testSetup:     (companyId: string) =>
+      request<any>('POST', '/whatsapp/setup/test', { company_id: companyId }),
+    templates:     () =>
+      request<any>('GET', '/whatsapp/templates'),
+  },
 };
