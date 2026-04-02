@@ -46,7 +46,7 @@ export default function QueuePage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
   const [retrying, setRetrying] = useState<string | null>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   async function loadQueue() {
     try {
