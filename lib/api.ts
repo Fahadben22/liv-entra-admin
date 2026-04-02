@@ -109,10 +109,13 @@ export const adminApi = {
     // Feature flags
     featureRegistry: ()             => request<any>('GET',  '/superadmin/features/registry'),
     companyFlags:    (id: string)   => request<any>('GET',  `/superadmin/companies/${id}/flags`),
-    setFlag:         (id: string, key: string, enabled: boolean, notes?: string) =>
-      request<any>('POST', `/superadmin/companies/${id}/flags`, { feature_key: key, is_enabled: enabled, notes }),
+    setFlag:         (id: string, key: string, enabled: boolean, rollout_pct?: number, notes?: string) =>
+      request<any>('POST', `/superadmin/companies/${id}/flags`, { feature_key: key, is_enabled: enabled, rollout_pct, notes }),
     bulkSetFlags:    (id: string, flags: { feature_key: string; is_enabled: boolean }[]) =>
       request<any>('POST', `/superadmin/companies/${id}/flags/bulk`, { flags }),
+    featureStats:    ()                   => request<any>('GET', '/superadmin/features/stats'),
+    featureCompanies:(key: string)        => request<any>('GET', `/superadmin/features/${key}/companies`),
+    featureMatrix:   ()                   => request<any>('GET', '/superadmin/features/matrix'),
 
     // Audit logs
     listAudit:       (params?: Record<string, string>) => {
