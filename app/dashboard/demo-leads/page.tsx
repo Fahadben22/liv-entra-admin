@@ -45,6 +45,12 @@ export default function DemoLeadsPage() {
       setTotal(res.data?.total || 0);
       setStatusCounts(res.data?.statusCounts || {});
     } catch (e: any) {
+      if (e.message?.includes('session_expired') || e.message?.includes('منتهي') || e.message?.includes('غير صالح')) {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        window.location.href = '/login';
+        return;
+      }
       setError(e.message || 'فشل تحميل البيانات');
     } finally {
       setLoading(false);
