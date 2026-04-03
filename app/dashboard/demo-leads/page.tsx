@@ -3,52 +3,47 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { adminApi } from '../../../lib/api';
 
-type DemoRequest = {
+type DemoLead = {
   id: string;
-  name: string;
+  name: string | null;
   phone: string;
-  email: string | null;
-  units_count: string | null;
-  message: string | null;
+  company_name: string | null;
+  demo_session_id: string | null;
+  ip_address: string | null;
   status: string;
   notes: string | null;
   created_at: string;
-  updated_at: string;
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  new:         { label: 'جديد',         color: '#3b82f6', bg: 'rgba(59,130,246,.12)' },
-  contacted:   { label: 'تم التواصل',   color: '#f59e0b', bg: 'rgba(245,158,11,.12)' },
-  demo_done:   { label: 'تم العرض',     color: '#8b5cf6', bg: 'rgba(139,92,246,.12)' },
-  converted:   { label: 'تحوّل عميل',   color: '#22c55e', bg: 'rgba(34,197,94,.12)'  },
-  lost:        { label: 'خسارة',        color: '#ef4444', bg: 'rgba(239,68,68,.12)'  },
+  new:       { label: 'جديد',         color: '#3b82f6', bg: 'rgba(59,130,246,.12)' },
+  contacted: { label: 'تم التواصل',   color: '#f59e0b', bg: 'rgba(245,158,11,.12)' },
+  converted: { label: 'تحوّل عميل',   color: '#22c55e', bg: 'rgba(34,197,94,.12)'  },
+  ignored:   { label: 'تجاهل',        color: '#94a3b8', bg: 'rgba(148,163,184,.12)' },
 };
 
-const ALL_STATUSES = ['new', 'contacted', 'demo_done', 'converted', 'lost'];
+const ALL_STATUSES = ['new', 'contacted', 'converted', 'ignored'];
 
-export default function LeadsPage() {
-  const [items, setItems]           = useState<DemoRequest[]>([]);
-  const [total, setTotal]           = useState(0);
-  const [loading, setLoading]       = useState(true);
-  const [filter, setFilter]         = useState('');
-  const [updating, setUpdating]     = useState<string | null>(null);
-  const [notesModal, setNotesModal] = useState<DemoRequest | null>(null);
-  const [notesText, setNotesText]   = useState('');
+export default function DemoLeadsPage() {
+  const [items, setItems]             = useState<DemoLead[]>([]);
+  const [total, setTotal]             = useState(0);
+  const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
+  const [loading, setLoading]         = useState(true);
+  const [filter, setFilter]           = useState('');
+  const [updating, setUpdating]       = useState<string | null>(null);
+  const [notesModal, setNotesModal]   = useState<DemoLead | null>(null);
+  const [notesText, setNotesText]     = useState('');
   const [savingNotes, setSavingNotes] = useState(false);
-  const [error, setError]           = useState('');
-  const [stats, setStats]           = useState<any>(null);
+  const [error, setError]             = useState('');
 
   const load = useCallback(async () => {
     try {
-      const [listRes, statsRes] = await Promise.allSettled([
-        adminApi.sa.listDemoRequests(filter || undefined),
-        adminApi.sa.getDemoRequestStats(),
-      ]);
-      if (listRes.status === 'fulfilled') {
-        setItems(listRes.value.data?.items || []);
-        setTotal(listRes.value.data?.total || 0);
-      }
-      if (statsRes.status === 'fulfilled') setStats(statsRes.value.data);
+      const params: Record<string, string> = {};
+      if (filter) params.status = filter;
+      const res = await adminApi.sa.listDemoLeads(params);
+      setItems(res.data?.items || []);
+      setTotal(res.data?.total || 0);
+      setStatusCounts(res.data?.statusCounts || {});
     } catch (e: any) {
       setError(e.message || 'فشل تحميل البيانات');
     } finally {
@@ -58,7 +53,7 @@ export default function LeadsPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Auto-refresh every 60 seconds
+  // Auto-refresh every 60 s
   useEffect(() => {
     const t = setInterval(load, 60_000);
     return () => clearInterval(t);
@@ -67,8 +62,15 @@ export default function LeadsPage() {
   async function changeStatus(id: string, status: string) {
     setUpdating(id);
     try {
-      await adminApi.sa.updateDemoRequest(id, { status });
+      await adminApi.sa.updateDemoLead(id, { status });
       setItems(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+      setStatusCounts(prev => {
+        const old = items.find(r => r.id === id)?.status || '';
+        const next = { ...prev };
+        if (old && next[old] !== undefined) next[old]--;
+        if (next[status] !== undefined) next[status]++;
+        return next;
+      });
     } catch { /* ignore */ }
     finally { setUpdating(null); }
   }
@@ -77,14 +79,14 @@ export default function LeadsPage() {
     if (!notesModal) return;
     setSavingNotes(true);
     try {
-      await adminApi.sa.updateDemoRequest(notesModal.id, { notes: notesText });
+      await adminApi.sa.updateDemoLead(notesModal.id, { notes: notesText });
       setItems(prev => prev.map(r => r.id === notesModal.id ? { ...r, notes: notesText } : r));
       setNotesModal(null);
     } catch { /* ignore */ }
     finally { setSavingNotes(false); }
   }
 
-  function openNotes(item: DemoRequest) {
+  function openNotes(item: DemoLead) {
     setNotesModal(item);
     setNotesText(item.notes || '');
   }
@@ -104,8 +106,7 @@ export default function LeadsPage() {
     text: '#e2e8f0', text2: '#94a3b8', accent: '#2563eb', accent2: '#0ea5e9',
   };
 
-  const filteredCount: Record<string, number> = {};
-  ALL_STATUSES.forEach(s => { filteredCount[s] = items.filter(r => r.status === s).length; });
+  const displayedItems = filter ? items.filter(r => r.status === filter) : items;
 
   return (
     <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: "'Tajawal', sans-serif", direction: 'rtl' }}>
@@ -127,7 +128,15 @@ export default function LeadsPage() {
               { href: '/dashboard/leads',           label: '📋 طلبات العرض' },
               { href: '/dashboard/demo-leads',      label: '⚡ قيادات الديمو' },
             ].map(n => (
-              <Link key={n.href} href={n.href} style={{ fontSize: 13, color: n.href === '/dashboard/leads' ? '#fff' : C.text2, fontWeight: n.href === '/dashboard/leads' ? 700 : 400, textDecoration: 'none' }}>{n.label}</Link>
+              <Link key={n.href} href={n.href}
+                style={{
+                  fontSize: 13,
+                  color: n.href === '/dashboard/demo-leads' ? '#fff' : C.text2,
+                  fontWeight: n.href === '/dashboard/demo-leads' ? 700 : 400,
+                  textDecoration: 'none',
+                }}>
+                {n.label}
+              </Link>
             ))}
           </div>
         </div>
@@ -137,38 +146,42 @@ export default function LeadsPage() {
 
         {/* HEADER */}
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 6 }}>طلبات حجز العرض</h1>
-          <p style={{ color: C.text2, fontSize: 14 }}>العملاء المحتملون الذين تقدموا من الموقع — إجمالي {total} طلب</p>
+          <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 6 }}>قيادات الديمو المباشر ⚡</h1>
+          <p style={{ color: C.text2, fontSize: 14 }}>
+            زوار استخدموا التجربة المجانية المباشرة — إجمالي {total} قيادة
+          </p>
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.3)', borderRadius: 12, padding: '14px 20px', marginBottom: 24, color: '#fca5a5', fontSize: 14 }}>{error}</div>
-        )}
-
-        {/* STATS STRIP */}
-        {stats && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 12, marginBottom: 28 }}>
-            {[
-              { label: 'إجمالي الطلبات',   value: stats.total,                         color: C.accent,  icon: '📋' },
-              { label: 'جديد',              value: stats.statusCounts?.new || 0,        color: '#3b82f6', icon: '🆕' },
-              { label: 'تم التواصل',        value: stats.statusCounts?.contacted || 0,  color: '#f59e0b', icon: '📞' },
-              { label: 'تحوّل عميل',        value: stats.statusCounts?.converted || 0,  color: '#22c55e', icon: '🎉' },
-              { label: 'معدل التحويل',      value: `${stats.conversionRate || 0}%`,     color: '#a78bfa', icon: '📈' },
-            ].map(k => (
-              <div key={k.label} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <span style={{ fontSize: 11, color: C.text2 }}>{k.label}</span>
-                  <span style={{ fontSize: 16 }}>{k.icon}</span>
-                </div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.value}</div>
-              </div>
-            ))}
+          <div style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.3)', borderRadius: 12, padding: '14px 20px', marginBottom: 24, color: '#fca5a5', fontSize: 14 }}>
+            {error}
           </div>
         )}
 
+        {/* STATS STRIP */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 28 }}>
+          {[
+            { label: 'إجمالي',      value: total,                       color: C.accent,  icon: '⚡' },
+            { label: 'جديد',        value: statusCounts.new || 0,       color: '#3b82f6', icon: '🆕' },
+            { label: 'تم التواصل', value: statusCounts.contacted || 0,  color: '#f59e0b', icon: '📞' },
+            { label: 'تحوّل عميل', value: statusCounts.converted || 0,  color: '#22c55e', icon: '🎉' },
+          ].map(k => (
+            <div key={k.label} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <span style={{ fontSize: 11, color: C.text2 }}>{k.label}</span>
+                <span style={{ fontSize: 16 }}>{k.icon}</span>
+              </div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.value}</div>
+            </div>
+          ))}
+        </div>
+
         {/* STATUS FILTER TABS */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 28, flexDirection: 'row', flexWrap: 'wrap' }}>
-          {[{ key: '', label: 'الكل', count: items.length }, ...ALL_STATUSES.map(s => ({ key: s, label: STATUS_CONFIG[s].label, count: filteredCount[s] }))].map(tab => (
+          {[
+            { key: '', label: 'الكل', count: total },
+            ...ALL_STATUSES.map(s => ({ key: s, label: STATUS_CONFIG[s].label, count: statusCounts[s] || 0 })),
+          ].map(tab => (
             <button key={tab.key} onClick={() => setFilter(tab.key)}
               style={{
                 padding: '8px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600,
@@ -176,12 +189,12 @@ export default function LeadsPage() {
                 background: filter === tab.key ? C.accent : 'rgba(255,255,255,.05)',
                 color: filter === tab.key ? '#fff' : C.text2,
                 border: filter === tab.key ? `1px solid ${C.accent}` : `1px solid ${C.border}`,
-              }}
-            >
+              }}>
               {tab.label} {tab.count > 0 && <span style={{ opacity: .7, marginRight: 4 }}>({tab.count})</span>}
             </button>
           ))}
-          <button onClick={load} style={{ marginRight: 'auto', padding: '8px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(255,255,255,.05)', border: `1px solid ${C.border}`, color: C.text2 }}>
+          <button onClick={load}
+            style={{ marginRight: 'auto', padding: '8px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(255,255,255,.05)', border: `1px solid ${C.border}`, color: C.text2 }}>
             تحديث ↻
           </button>
         </div>
@@ -189,29 +202,29 @@ export default function LeadsPage() {
         {/* TABLE */}
         {loading ? (
           <div style={{ textAlign: 'center', padding: '80px 0', color: C.text2 }}>جاري التحميل…</div>
-        ) : items.length === 0 ? (
+        ) : displayedItems.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0', color: C.text2 }}>
-            <div style={{ fontSize: 48, marginBottom: 16, opacity: .3 }}>📋</div>
-            <p>لا توجد طلبات {filter ? `بحالة "${STATUS_CONFIG[filter]?.label}"` : 'بعد'}</p>
+            <div style={{ fontSize: 48, marginBottom: 16, opacity: .3 }}>⚡</div>
+            <p>لا توجد قيادات {filter ? `بحالة "${STATUS_CONFIG[filter]?.label}"` : 'بعد'}</p>
           </div>
         ) : (
           <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, overflow: 'hidden' }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr 130px 120px 130px 160px 80px', gap: 0, background: 'rgba(255,255,255,.03)', borderBottom: `1px solid ${C.border}`, padding: '12px 20px' }}>
-              {['التاريخ', 'العميل', 'الجوال', 'الوحدات', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
-                <div key={h} style={{ fontSize: 11, fontWeight: 700, color: C.text2, letterSpacing: 1, textTransform: 'uppercase' }}>{h}</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: 'rgba(255,255,255,.03)', borderBottom: `1px solid ${C.border}`, padding: '12px 20px' }}>
+              {['التاريخ', 'الزائر', 'الجوال', 'الشركة', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
+                <div key={h} style={{ fontSize: 11, fontWeight: 700, color: C.text2, letterSpacing: 1 }}>{h}</div>
               ))}
             </div>
 
             {/* Rows */}
-            {items.map((item, i) => {
+            {displayedItems.map((item, i) => {
               const sc = STATUS_CONFIG[item.status] || STATUS_CONFIG.new;
               return (
                 <div key={item.id}
                   style={{
-                    display: 'grid', gridTemplateColumns: '160px 1fr 130px 120px 130px 160px 80px',
+                    display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px',
                     gap: 0, padding: '16px 20px', alignItems: 'center',
-                    borderBottom: i < items.length - 1 ? `1px solid ${C.border}` : 'none',
+                    borderBottom: i < displayedItems.length - 1 ? `1px solid ${C.border}` : 'none',
                     transition: 'background .15s',
                   }}
                   onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.02)')}
@@ -220,16 +233,21 @@ export default function LeadsPage() {
                   {/* Date */}
                   <div style={{ fontSize: 12, color: C.text2 }}>{fmt(item.created_at)}</div>
 
-                  {/* Name + email */}
+                  {/* Name */}
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700 }}>{item.name}</div>
-                    {item.email && <div style={{ fontSize: 12, color: C.text2 }}>{item.email}</div>}
-                    {item.message && <div style={{ fontSize: 11, color: C.text2, marginTop: 2, opacity: .7, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.message}</div>}
+                    <div style={{ fontSize: 14, fontWeight: 700 }}>{item.name || '—'}</div>
+                    {item.demo_session_id && (
+                      <div style={{ fontSize: 10, color: C.text2, fontFamily: 'Inter, monospace', marginTop: 2, opacity: .6 }}>
+                        {item.demo_session_id.slice(0, 8)}…
+                      </div>
+                    )}
                   </div>
 
                   {/* Phone */}
                   <div>
-                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: C.accent2, textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>{item.phone}</a>
+                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: C.accent2, textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
+                      {item.phone}
+                    </a>
                     <div style={{ marginTop: 4 }}>
                       <a href={`https://wa.me/${item.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener"
                         style={{ fontSize: 11, color: '#22c55e', textDecoration: 'none', background: 'rgba(34,197,94,.1)', border: '1px solid rgba(34,197,94,.2)', borderRadius: 6, padding: '2px 8px' }}>
@@ -238,8 +256,8 @@ export default function LeadsPage() {
                     </div>
                   </div>
 
-                  {/* Units */}
-                  <div style={{ fontSize: 13, color: C.text2 }}>{item.units_count || '—'}</div>
+                  {/* Company */}
+                  <div style={{ fontSize: 13, color: C.text2 }}>{item.company_name || '—'}</div>
 
                   {/* Status badge */}
                   <div>
@@ -258,11 +276,11 @@ export default function LeadsPage() {
                         color: item.notes ? '#f59e0b' : C.text2,
                         borderRadius: 8, padding: '4px 12px',
                       }}>
-                      {item.notes ? 'عرض الملاحظات' : '+ ملاحظة'}
+                      {item.notes ? 'عرض' : '+ ملاحظة'}
                     </button>
                   </div>
 
-                  {/* Status update dropdown */}
+                  {/* Status dropdown */}
                   <div>
                     <select
                       value={item.status}
@@ -273,8 +291,7 @@ export default function LeadsPage() {
                         borderRadius: 8, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
                         fontFamily: 'inherit', outline: 'none', width: '100%',
                         opacity: updating === item.id ? .5 : 1,
-                      }}
-                    >
+                      }}>
                       {ALL_STATUSES.map(s => (
                         <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
                       ))}
@@ -293,16 +310,18 @@ export default function LeadsPage() {
           onClick={e => { if (e.target === e.currentTarget) setNotesModal(null); }}>
           <div style={{ background: '#0c1535', border: '1px solid rgba(255,255,255,.1)', borderRadius: 18, padding: 32, width: '100%', maxWidth: 480 }}>
             <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>ملاحظات</h3>
-            <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20 }}>{notesModal.name} — {notesModal.phone}</p>
+            <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20 }}>
+              {notesModal.name || '—'} — {notesModal.phone}
+            </p>
             <textarea
               value={notesText}
               onChange={e => setNotesText(e.target.value)}
               rows={5}
-              placeholder="أضف ملاحظات حول هذا العميل…"
+              placeholder="أضف ملاحظات حول هذا الزائر…"
               style={{
                 width: '100%', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)',
                 borderRadius: 10, padding: '12px 14px', color: '#e2e8f0', fontSize: 14,
-                fontFamily: 'inherit', outline: 'none', resize: 'vertical',
+                fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box',
               }}
             />
             <div style={{ display: 'flex', gap: 12, marginTop: 20, flexDirection: 'row' }}>

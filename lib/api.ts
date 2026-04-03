@@ -142,8 +142,18 @@ export const adminApi = {
       qs.set('page', String(page || 1));
       return request<any>('GET', `/superadmin/demo-requests?${qs.toString()}`);
     },
-    updateDemoRequest: (id: string, data: { status?: string; notes?: string }) =>
+    updateDemoRequest: (id: string, data: { status?: string; notes?: string; assigned_to?: string }) =>
       request<any>('PATCH', `/superadmin/demo-requests/${id}`, data),
+    getDemoRequestStats: () =>
+      request<any>('GET', '/superadmin/demo-requests/stats'),
+
+    // Demo leads (free live demo portal leads)
+    listDemoLeads: (params?: Record<string, string>) => {
+      const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+      return request<any>('GET', `/superadmin/demo-leads${qs}`);
+    },
+    updateDemoLead: (id: string, data: { status?: string; notes?: string }) =>
+      request<any>('PATCH', `/superadmin/demo-leads/${id}`, data),
   },
 
   // ─── Security Center — platform-wide cross-company (admin only) ──────────────

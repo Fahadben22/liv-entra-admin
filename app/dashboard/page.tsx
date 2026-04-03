@@ -114,6 +114,7 @@ export default function AdminDashboard() {
             { href: '/dashboard/template-center', label: '📨 القوالب' },
             { href: '/dashboard/landing-page',    label: '🌐 الموقع' },
             { href: '/dashboard/leads',           label: '📋 طلبات العرض' },
+            { href: '/dashboard/demo-leads',      label: '⚡ قيادات الديمو' },
           ].map(n => (
             <Link key={n.href} href={n.href} style={{ fontSize: 12, color: '#94a3b8', textDecoration: 'none' }}>{n.label}</Link>
           ))}
