@@ -202,6 +202,25 @@ export default function CompanyDetailPage() {
         {/* ── نظرة عامة ── */}
         {tab === 'نظرة عامة' && (
           <>
+            {/* Health Score Card */}
+            {company.health && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 20 }}>
+                {[
+                  { label: 'صحة الشركة', value: `${company.health.score}%`, sub: `تقييم ${company.health.grade}`, color: company.health.grade === 'A' ? '#059669' : company.health.grade === 'B' ? '#2563eb' : company.health.grade === 'C' ? '#d97706' : '#dc2626' },
+                  { label: 'نسبة الإشغال', value: `${company.health.occupancy}%`, sub: 'الوحدات المشغولة', color: '#0ea5e9' },
+                  { label: 'معدل التحصيل', value: `${company.health.collection}%`, sub: 'آخر 90 يوم', color: '#059669' },
+                  { label: 'استجابة الصيانة', value: `${company.health.maintenance}%`, sub: 'تذاكر محلولة', color: '#8b5cf6' },
+                  { label: 'تبني الميزات', value: `${company.health.adoption}%`, sub: 'ميزات مفعلة', color: '#f59e0b' },
+                ].map(k => (
+                  <div key={k.label} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, padding: '16px 14px', textAlign: 'center' }}>
+                    <p style={{ fontSize: 10, color: '#64748b', margin: '0 0 6px' }}>{k.label}</p>
+                    <p style={{ fontSize: 22, fontWeight: 800, color: k.color, margin: 0 }}>{k.value}</p>
+                    <p style={{ fontSize: 9, color: '#94a3b8', margin: '4px 0 0' }}>{k.sub}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               <Section title="معلومات الشركة">
                 <Row label="الاسم"        value={company.name} />
