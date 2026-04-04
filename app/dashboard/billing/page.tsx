@@ -41,7 +41,7 @@ const GW_LABELS: Record<string, string> = {
   stripe: 'Stripe', payfort: 'PayFort', telr: 'Telr', tap: 'Tap Payments',
 };
 
-const TABS = ['الفواتير', 'نظرة عامة', 'بوابات الدفع'] as const;
+const TABS = ['الفواتير', 'نظرة عامة', 'بوابات الدفع', 'الإعدادات'] as const;
 type Tab = typeof TABS[number];
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
@@ -689,6 +689,20 @@ export default function BillingPage() {
             )}
           </>
         )}
+
+            {/* ═══ الإعدادات ═══ */}
+            {tab === 'الإعدادات' && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 0' }}>
+                <Link href="/dashboard/billing/settings" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  padding: '16px 32px', borderRadius: 12,
+                  background: '#1d4070', color: '#fff', fontSize: 15, fontWeight: 700,
+                  textDecoration: 'none', boxShadow: '0 4px 16px rgba(29,64,112,.3)',
+                }}>
+                  ⚙️ فتح إعدادات الفوترة
+                </Link>
+              </div>
+            )}
       </div>
     </div>
   );
