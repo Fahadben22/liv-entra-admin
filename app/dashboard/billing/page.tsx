@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { request, adminApi } from '@/lib/api';
+import { request, adminApi, BASE } from '@/lib/api';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function lcOf(c: any): string {
@@ -488,9 +488,30 @@ export default function BillingPage() {
                                       style={{ fontSize: 10, padding: '5px 8px', borderRadius: 6, background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                                       إلغاء
                                     </button>
+                                    <a href={`${BASE}/admin/billing/invoices/${inv.id}/pdf`} target="_blank" rel="noopener"
+                                      style={{ fontSize: 10, padding: '5px 8px', borderRadius: 6, background: '#f0f9ff', border: '1px solid #bae6fd', color: '#0369a1', cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none', display: 'inline-block' }}>
+                                      📄 PDF
+                                    </a>
+                                    {inv.status === 'paid' && (
+                                      <a href={`${BASE}/admin/billing/invoices/${inv.id}/receipt`} target="_blank" rel="noopener"
+                                        style={{ fontSize: 10, padding: '5px 8px', borderRadius: 6, background: '#f0fdf4', border: '1px solid #86efac', color: '#15803d', cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none', display: 'inline-block' }}>
+                                        🧾 إيصال
+                                      </a>
+                                    )}
                                   </div>
                                 ) : (
-                                  <span style={{ fontSize: 11, color: '#94a3b8' }}>—</span>
+                                  <div style={{ display: 'flex', gap: 5 }}>
+                                    <a href={`${BASE}/admin/billing/invoices/${inv.id}/pdf`} target="_blank" rel="noopener"
+                                      style={{ fontSize: 10, padding: '5px 8px', borderRadius: 6, background: '#f0f9ff', border: '1px solid #bae6fd', color: '#0369a1', cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none', display: 'inline-block' }}>
+                                      📄 PDF
+                                    </a>
+                                    {inv.status === 'paid' && (
+                                      <a href={`${BASE}/admin/billing/invoices/${inv.id}/receipt`} target="_blank" rel="noopener"
+                                        style={{ fontSize: 10, padding: '5px 8px', borderRadius: 6, background: '#f0fdf4', border: '1px solid #86efac', color: '#15803d', cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none', display: 'inline-block' }}>
+                                        🧾 إيصال
+                                      </a>
+                                    )}
+                                  </div>
                                 )}
                               </td>
                             </tr>

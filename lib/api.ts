@@ -1,5 +1,5 @@
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://liv-entra-api-production.up.railway.app/api/v1';
+export const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://liv-entra-api-production.up.railway.app/api/v1';
 
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
