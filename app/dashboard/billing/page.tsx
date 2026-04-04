@@ -290,7 +290,10 @@ export default function BillingPage() {
     ]);
     if (results[0].status === 'fulfilled') setCompanies(toArr((results[0].value as any)?.data));
     if (results[1].status === 'fulfilled' && results[1].value) setStats((results[1].value as any)?.data ?? null);
-    if (results[2].status === 'fulfilled') setInvoices(toArr((results[2].value as any)?.data));
+    if (results[2].status === 'fulfilled') {
+      const invData = (results[2].value as any)?.data;
+      setInvoices(toArr(invData?.invoices ?? invData));
+    }
     if (results[3].status === 'fulfilled') setGateways(toArr((results[3].value as any)?.data));
     setLoading(false);
   }, [router]);
