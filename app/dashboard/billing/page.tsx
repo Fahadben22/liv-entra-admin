@@ -12,7 +12,7 @@ function lcOf(c: any): string {
   return 'active';
 }
 function daysUntil(d: string) { return Math.ceil((new Date(d).getTime() - Date.now()) / 86400000); }
-function fmt(n: number) { return n.toLocaleString('ar-SA'); }
+function fmt(n: any) { return Number(n || 0).toLocaleString('ar-SA'); }
 function fmtDate(iso: string) { return iso ? new Date(iso).toLocaleDateString('ar-SA') : '—'; }
 
 const PLAN_AR: Record<string, string> = { trial: 'تجريبي', basic: 'أساسي', professional: 'احترافي', enterprise: 'مؤسسي' };
@@ -100,7 +100,7 @@ function CompanyDrawer({ companyId, onClose, showToast }: { companyId: string; o
                     <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 20, background: sc.bg, color: sc.color, fontWeight: 600 }}>{sc.label}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#64748b' }}>
-                    <span>{fmt(inv.total_amount_sar)} ر.س</span>
+                    <span>{fmt(inv.total_sar || inv.total_amount_sar)} ر.س</span>
                     <span>استحقاق: {fmtDate(inv.due_date)}</span>
                   </div>
                 </div>
@@ -137,7 +137,7 @@ function MarkPaidModal({ invoice, onClose, onDone }: { invoice: any; onClose: ()
       onClick={onClose}>
       <div style={{ background: '#fff', borderRadius: 16, padding: '28px 32px', width: 380, direction: 'rtl' }} onClick={e => e.stopPropagation()}>
         <h3 style={{ fontSize: 15, fontWeight: 700, margin: '0 0 4px' }}>تسجيل دفع</h3>
-        <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 20px' }}>{invoice.invoice_number} — {fmt(invoice.total_amount_sar)} ر.س</p>
+        <p style={{ fontSize: 12, color: '#64748b', margin: '0 0 20px' }}>{invoice.invoice_number} — {fmt(invoice.total_sar || invoice.total_amount_sar)} ر.س</p>
         <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>مرجع الدفع *</label>
         <input value={ref} onChange={e => setRef(e.target.value)} placeholder="رقم الحوالة / رقم المعاملة"
           style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13, direction: 'rtl', boxSizing: 'border-box', marginBottom: 12 }} />
@@ -494,8 +494,8 @@ export default function BillingPage() {
                                 </button>
                               </td>
                               <td style={{ padding: '12px 18px' }}>
-                                <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', margin: 0 }}>{fmt(inv.total_amount_sar)} ر.س</p>
-                                {inv.vat_amount_sar > 0 && <p style={{ fontSize: 10, color: '#94a3b8', margin: 0 }}>شامل {fmt(inv.vat_amount_sar)} ض.ق.م</p>}
+                                <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', margin: 0 }}>{fmt(inv.total_sar || inv.total_amount_sar)} ر.س</p>
+                                {inv.vat_sar || inv.vat_amount_sar > 0 && <p style={{ fontSize: 10, color: '#94a3b8', margin: 0 }}>شامل {fmt(inv.vat_sar || inv.vat_amount_sar)} ض.ق.م</p>}
                               </td>
                               <td style={{ padding: '12px 18px' }}>
                                 <span style={{ fontSize: 11, padding: '3px 9px', borderRadius: 20, background: sc.bg, color: sc.color, fontWeight: 600 }}>{sc.label}</span>
