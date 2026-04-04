@@ -159,7 +159,7 @@ function MarkPaidModal({ invoice, onClose, onDone }: { invoice: any; onClose: ()
 
 // ─── Create Invoice Modal ──────────────────────────────────────────────────────
 function CreateInvoiceModal({ companies, onClose, onDone }: { companies: any[]; onClose: () => void; onDone: () => void }) {
-  const [form, setForm]       = useState({ company_id: '', description: '', amount_sar: '', payment_terms: '15', notes: '' });
+  const [form, setForm]       = useState({ company_id: '', description: '', amount_sar: '', payment_terms: '15', notes: '', period_start: new Date().toISOString().split('T')[0], period_end: new Date(Date.now() + 30*86400000).toISOString().split('T')[0] });
   const [loading, setLoading] = useState(false);
   const [err, setErr]         = useState('');
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
@@ -173,6 +173,8 @@ function CreateInvoiceModal({ companies, onClose, onDone }: { companies: any[]; 
         description:   form.description || 'اشتراك شهري',
         amount_sar:    Number(form.amount_sar),
         payment_terms: Number(form.payment_terms),
+        period_start:  form.period_start,
+        period_end:    form.period_end,
         notes:         form.notes || undefined,
       });
       onDone();
@@ -208,6 +210,38 @@ function CreateInvoiceModal({ companies, onClose, onDone }: { companies: any[]; 
             </select>
           </div>
         </div>
+        {/* Period dates */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>بداية الفترة</label>
+            <input type="date" value={form.period_start} onChange={e => set('period_start', e.target.value)}
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13, boxSizing: 'border-box' }} />
+          </div>
+          <div>
+            <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>نهاية الفترة</label>
+            <input type="date" value={form.period_end} onChange={e => set('period_end', e.target.value)}
+              style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13, boxSizing: 'border-box' }} />
+          </div>
+        </div>
+
+        {/* VAT Preview */}
+        {form.amount_sar && Number(form.amount_sar) > 0 && (
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
+              <span style={{ color: '#64748b' }}>المجموع الفرعي</span>
+              <span style={{ fontWeight: 600 }}>{Number(form.amount_sar).toLocaleString()} ر.س</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
+              <span style={{ color: '#64748b' }}>ضريبة القيمة المضافة 15%</span>
+              <span style={{ fontWeight: 600 }}>{(Number(form.amount_sar) * 0.15).toLocaleString(undefined, {minimumFractionDigits:2})} ر.س</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 700, borderTop: '1px solid #e2e8f0', paddingTop: 6 }}>
+              <span>الإجمالي شامل الضريبة</span>
+              <span style={{ color: '#059669' }}>{(Number(form.amount_sar) * 1.15).toLocaleString(undefined, {minimumFractionDigits:2})} ر.س</span>
+            </div>
+          </div>
+        )}
+
         <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 4 }}>ملاحظات</label>
         <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2}
           style={{ width: '100%', padding: '9px 12px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 13, direction: 'rtl', boxSizing: 'border-box', marginBottom: 16, resize: 'vertical' }} />
