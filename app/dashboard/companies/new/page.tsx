@@ -92,6 +92,7 @@ export default function NewCompanyPage() {
     name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '',
     contact_phone: '', contact_email: '',
     plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30,
+    billing_cycle: 'monthly',
     admin_name: '', admin_phone: '', admin_email: '',
   });
 
@@ -155,6 +156,7 @@ export default function NewCompanyPage() {
         admin_phone: form.admin_phone,
         admin_email: form.admin_email,
         trial_days: form.plan === 'trial' ? form.trial_days : undefined,
+        billing_cycle: form.billing_cycle,
       };
       const res: any = await adminApi.createCompany(payload);
       setSuccess(res?.data);
