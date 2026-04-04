@@ -154,6 +154,10 @@ export const adminApi = {
     },
     updateDemoLead: (id: string, data: { status?: string; notes?: string }) =>
       request<any>('PATCH', `/superadmin/demo-leads/${id}`, data),
+
+    // Lead conversion
+    convertLead: (id: string, data: { plan?: string; max_units?: number; max_staff?: number; send_welcome?: boolean }) =>
+      request<any>('POST', `/superadmin/leads/${id}/convert`, data),
   },
 
   // ─── Security Center — platform-wide cross-company (admin only) ──────────────

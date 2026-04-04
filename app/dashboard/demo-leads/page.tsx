@@ -286,8 +286,8 @@ export default function DemoLeadsPage() {
                     </button>
                   </div>
 
-                  {/* Status dropdown */}
-                  <div>
+                  {/* Status dropdown + Convert */}
+                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
                     <select
                       value={item.status}
                       disabled={updating === item.id}
@@ -295,13 +295,32 @@ export default function DemoLeadsPage() {
                       style={{
                         background: '#060e24', border: `1px solid ${C.border}`, color: C.text,
                         borderRadius: 8, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
-                        fontFamily: 'inherit', outline: 'none', width: '100%',
+                        fontFamily: 'inherit', outline: 'none', flex: 1,
                         opacity: updating === item.id ? .5 : 1,
                       }}>
                       {ALL_STATUSES.map(s => (
                         <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
                       ))}
                     </select>
+                    {item.status !== 'converted' && (
+                      <button
+                        onClick={async () => {
+                          if (!confirm(`تحويل "${item.name || item.phone}" إلى عميل؟`)) return;
+                          try {
+                            await adminApi.sa.convertLead(item.id, { plan: 'trial', send_welcome: true });
+                            setItems(prev => prev.map(r => r.id === item.id ? { ...r, status: 'converted' } : r));
+                          } catch (e: any) { alert(e.message || 'فشل التحويل'); }
+                        }}
+                        style={{
+                          fontSize: 10, padding: '5px 8px', borderRadius: 6,
+                          background: 'rgba(5,150,105,.15)', border: '1px solid rgba(5,150,105,.3)',
+                          color: '#059669', cursor: 'pointer', fontFamily: 'inherit',
+                          whiteSpace: 'nowrap', fontWeight: 700,
+                        }}
+                      >
+                        تحويل ←
+                      </button>
+                    )}
                   </div>
                 </div>
               );
