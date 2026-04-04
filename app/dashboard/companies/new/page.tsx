@@ -21,6 +21,7 @@ interface FormData {
   max_units: number;
   max_staff: number;
   trial_days: number;
+  billing_cycle: 'monthly' | 'yearly';
   // Step 3 — Admin User
   admin_name: string;
   admin_phone: string;   // PRIMARY login username on app.liv-entra.com
@@ -197,7 +198,7 @@ export default function NewCompanyPage() {
               ✅ الدخول عبر OTP — يُرسَل رمز التحقق إلى الجوال المسجّل عند كل تسجيل دخول
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => { setSuccess(null); setStep(1); setForm({ name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '', contact_phone: '', contact_email: '', plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30, admin_name: '', admin_phone: '', admin_email: '' }); setSlugManual(false); }}
+              <button onClick={() => { setSuccess(null); setStep(1); setForm({ name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '', contact_phone: '', contact_email: '', plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30, billing_cycle: 'monthly', admin_name: '', admin_phone: '', admin_email: '' }); setSlugManual(false); }}
                 style={{ flex: 1, padding: '11px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 12, cursor: 'pointer', background: 'white', color: '#64748b', fontWeight: 500 }}>
                 إضافة شركة أخرى
               </button>
