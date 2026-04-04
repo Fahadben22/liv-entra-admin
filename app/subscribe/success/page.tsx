@@ -1,11 +1,15 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { BASE } from '@/lib/api';
 
 const API = BASE || process.env.NEXT_PUBLIC_API_URL || 'https://liv-entra-api-production.up.railway.app/api/v1';
 
-export default function SubscribeSuccessPage() {
+export default function SubscribeSuccessWrapper() {
+  return <Suspense fallback={<div style={{ minHeight: '100vh', background: '#05081a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ color: '#94a3b8' }}>جاري التحميل...</p></div>}><SubscribeSuccessPage /></Suspense>;
+}
+
+function SubscribeSuccessPage() {
   const searchParams = useSearchParams();
   const chargeId = searchParams?.get('charge_id') || searchParams?.get('tap_id') || '';
 

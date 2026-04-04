@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { BASE } from '@/lib/api';
 
@@ -10,7 +10,11 @@ interface Plan {
   price_monthly: number; price_yearly: number;
 }
 
-export default function SubscribePage() {
+export default function SubscribePageWrapper() {
+  return <Suspense fallback={<div style={{ minHeight: '100vh', background: '#05081a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p style={{ color: '#94a3b8' }}>جاري التحميل...</p></div>}><SubscribePage /></Suspense>;
+}
+
+function SubscribePage() {
   const searchParams = useSearchParams();
   const planId = searchParams?.get('plan_id') || '';
   const cycle  = searchParams?.get('cycle') || 'monthly';
