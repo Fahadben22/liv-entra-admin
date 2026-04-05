@@ -197,8 +197,8 @@ export default function LeadsPage() {
         ) : (
           <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, overflow: 'hidden' }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr 130px 120px 130px 160px 80px', gap: 0, background: 'rgba(255,255,255,.03)', borderBottom: `1px solid ${C.border}`, padding: '12px 20px' }}>
-              {['التاريخ', 'العميل', 'الجوال', 'الوحدات', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
+            <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr 180px 130px 80px 110px 140px 80px', gap: 0, background: 'rgba(255,255,255,.03)', borderBottom: `1px solid ${C.border}`, padding: '12px 20px' }}>
+              {['التاريخ', 'العميل', 'البريد', 'الجوال', 'الوحدات', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
                 <div key={h} style={{ fontSize: 11, fontWeight: 700, color: C.text2, letterSpacing: 1, textTransform: 'uppercase' }}>{h}</div>
               ))}
             </div>
@@ -209,7 +209,7 @@ export default function LeadsPage() {
               return (
                 <div key={item.id}
                   style={{
-                    display: 'grid', gridTemplateColumns: '160px 1fr 130px 120px 130px 160px 80px',
+                    display: 'grid', gridTemplateColumns: '130px 1fr 180px 130px 80px 110px 140px 80px',
                     gap: 0, padding: '16px 20px', alignItems: 'center',
                     borderBottom: i < items.length - 1 ? `1px solid ${C.border}` : 'none',
                     transition: 'background .15s',
@@ -220,11 +220,19 @@ export default function LeadsPage() {
                   {/* Date */}
                   <div style={{ fontSize: 12, color: C.text2 }}>{fmt(item.created_at)}</div>
 
-                  {/* Name + email */}
+                  {/* Name */}
                   <div>
                     <div style={{ fontSize: 14, fontWeight: 700 }}>{item.name}</div>
-                    {item.email && <div style={{ fontSize: 12, color: C.text2 }}>{item.email}</div>}
-                    {item.message && <div style={{ fontSize: 11, color: C.text2, marginTop: 2, opacity: .7, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.message}</div>}
+                    {item.message && <div style={{ fontSize: 11, color: C.text2, marginTop: 2, opacity: .7, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.message}</div>}
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    {item.email ? (
+                      <a href={`mailto:${item.email}`} style={{ fontSize: 12, color: C.accent2, textDecoration: 'none', direction: 'ltr', display: 'block' }}>{item.email}</a>
+                    ) : (
+                      <span style={{ fontSize: 11, color: C.text2, opacity: .5 }}>—</span>
+                    )}
                   </div>
 
                   {/* Phone */}
