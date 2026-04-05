@@ -34,6 +34,8 @@ const NAV_ITEMS = [
   { href: '/dashboard/billing/credit-notes',   label: 'إشعارات دائنة',  icon: '📝' },
   { href: '/dashboard/template-center',        label: 'مركز القوالب',   icon: '📨' },
   { href: '/dashboard/billing/settings',       label: 'الإعدادات',      icon: '⚙️' },
+  { href: '/pricing',                          label: 'صفحة الأسعار',   icon: '🌐' },
+  { href: '/subscribe',                        label: 'صفحة الاشتراك',  icon: '🛒' },
 ];
 
 export default function BillingLayout({ children }: { children: React.ReactNode }) {
