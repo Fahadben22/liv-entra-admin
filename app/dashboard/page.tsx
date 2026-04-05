@@ -110,6 +110,7 @@ export default function AdminDashboard() {
             { href: '/dashboard/audit',           label: 'التدقيق' },
             { href: '/dashboard/features',        label: 'الميزات' },
             { href: '/dashboard/intelligence',    label: '🧠 الذكاء' },
+            { href: '/dashboard/agents',          label: '🤖 الوكلاء' },
             { href: '/dashboard/security-center', label: '🛡️ الأمان' },
             { href: '/dashboard/template-center', label: '📨 القوالب' },
             { href: '/dashboard/landing-page',    label: '🌐 الموقع' },
