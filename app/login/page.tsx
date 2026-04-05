@@ -22,6 +22,7 @@ export default function AdminLogin() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'فشل تسجيل الدخول');
       localStorage.setItem('admin_token', json.data?.token);
+      if (json.data?.refresh_token) localStorage.setItem('admin_refresh_token', json.data.refresh_token);
       localStorage.setItem('admin_user',  JSON.stringify(json.data?.user || { name: 'Admin', role: 'super_admin' }));
       router.push('/dashboard');
     } catch (e: any) {

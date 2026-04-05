@@ -20,9 +20,34 @@ export async function request<T>(method: string, path: string, body?: unknown): 
   // Skip auto-redirect for /superadmin/* paths: those return 401 when the
   // migration tables don't exist yet or the old token lacks adminUser claim.
   // Those failures are handled gracefully via Promise.allSettled in each page.
-  if (res.status === 401 && typeof window !== 'undefined' && !path.startsWith('/superadmin/')) {
+  if (res.status === 401 && typeof window !== 'undefined' && !path.startsWith('/superadmin/') && !path.includes('/auth/refresh')) {
+    // Try silent refresh before redirecting to login
+    const rt = localStorage.getItem('admin_refresh_token');
+    if (rt) {
+      try {
+        const refreshRes = await fetch(`${BASE}/auth/refresh`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: rt }),
+        });
+        if (refreshRes.ok) {
+          const rj = await refreshRes.json();
+          if (rj.data?.token) {
+            localStorage.setItem('admin_token', rj.data.token);
+            if (rj.data.refresh_token) localStorage.setItem('admin_refresh_token', rj.data.refresh_token);
+            const retryRes = await fetch(`${BASE}${path}`, {
+              method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${rj.data.token}` },
+              ...(body ? { body: JSON.stringify(body) } : {}),
+            });
+            const retryJson = await retryRes.json();
+            if (!retryRes.ok) throw new Error(retryJson.message || 'Request failed');
+            return retryJson;
+          }
+        }
+      } catch { /* refresh failed — fall through to redirect */ }
+    }
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
+    localStorage.removeItem('admin_refresh_token');
     window.location.href = '/login';
     throw new Error('session_expired');
   }
