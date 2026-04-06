@@ -78,13 +78,16 @@ export default function FeaturesPage() {
       adminApi.sa.listCompanies({ limit: '200' }),
       adminApi.sa.featureStats(),
     ]);
-    if (companiesRes.status === 'fulfilled') setCompanies((companiesRes.value as any)?.data || []);
+    if (companiesRes.status === 'fulfilled') {
+      const raw = (companiesRes.value as any)?.data;
+      setCompanies(Array.isArray(raw) ? raw : []);
+    }
     if (statsRes.status === 'fulfilled') {
       const d = (statsRes.value as any)?.data;
-      if (d) {
-        setStats(d.stats || {});
-        setRecentChanges(d.recent || []);
-        setTotalCompanies(d.totalCompanies || 0);
+      if (d && typeof d === 'object') {
+        setStats(d.stats && typeof d.stats === 'object' && !Array.isArray(d.stats) ? d.stats : {});
+        setRecentChanges(Array.isArray(d.recent) ? d.recent : []);
+        setTotalCompanies(Number(d.totalCompanies) || 0);
       }
     }
   }, [router]);
@@ -95,7 +98,8 @@ export default function FeaturesPage() {
     setFlagsLoading(true);
     try {
       const r = await adminApi.sa.companyFlags(id);
-      setCompanyFlags((r as any)?.data || []);
+      const raw = (r as any)?.data;
+      setCompanyFlags(Array.isArray(raw) ? raw : []);
     } catch { setCompanyFlags([]); } finally { setFlagsLoading(false); }
   };
 
@@ -103,7 +107,8 @@ export default function FeaturesPage() {
     setFeatureLoading(true);
     try {
       const r = await adminApi.sa.featureCompanies(key);
-      setFeatureRows((r as any)?.data || []);
+      const raw = (r as any)?.data;
+      setFeatureRows(Array.isArray(raw) ? raw : []);
     } catch { setFeatureRows([]); } finally { setFeatureLoading(false); }
   };
 
@@ -111,7 +116,12 @@ export default function FeaturesPage() {
     setMatrixLoading(true);
     try {
       const r = await adminApi.sa.featureMatrix();
-      setMatrixData((r as any)?.data || null);
+      const raw = (r as any)?.data;
+      if (raw && typeof raw === 'object' && Array.isArray(raw.companies)) {
+        setMatrixData(raw);
+      } else {
+        setMatrixData(null);
+      }
     } catch { setMatrixData(null); } finally { setMatrixLoading(false); }
   };
 
