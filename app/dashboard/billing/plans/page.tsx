@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { request } from '@/lib/api';
-import { FEATURE_KEYS } from '@/lib/billing-helpers';
+
 
 const TIER_ORDER = ['trial', 'basic', 'professional', 'enterprise'];
 const TIER_AR: Record<string, string> = { trial: 'تجريبي', basic: 'أساسي', professional: 'احترافي', enterprise: 'مؤسسي' };
