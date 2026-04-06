@@ -3,6 +3,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { adminApi } from '@/lib/api';
+import { CITIES } from '@/lib/constants';
+import { useDebounce } from '@/lib/hooks';
+import { useToast } from '@/components/Toast';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Plan = 'trial' | 'basic' | 'professional' | 'enterprise';
@@ -28,7 +31,7 @@ interface FormData {
   admin_email: string;   // welcome email only (optional)
 }
 
-const CITIES = ['الرياض','جدة','مكة المكرمة','المدينة المنورة','الدمام','الخبر','الأحساء','تبوك','أبها','القصيم','حائل','جازان','نجران','الطائف'];
+// CITIES imported from @/lib/constants
 
 const PLANS: { key: Plan; label: string; labelEn: string; color: string; bg: string; border: string; desc: string; features: string[] }[] = [
   {
@@ -83,11 +86,14 @@ function toSlug(name: string) {
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function NewCompanyPage() {
   const router = useRouter();
+  const toast = useToast();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
   const [success, setSuccess] = useState<any>(null);
   const [slugManual, setSlugManual] = useState(false);
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [slugChecking, setSlugChecking] = useState(false);
 
   const [form, setForm] = useState<FormData>({
     name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '',
@@ -96,6 +102,18 @@ export default function NewCompanyPage() {
     billing_cycle: 'monthly',
     admin_name: '', admin_phone: '', admin_email: '',
   });
+
+  // Debounced slug check
+  const debouncedSlug = useDebounce(form.slug, 500);
+  useEffect(() => {
+    if (!debouncedSlug || debouncedSlug.length < 2) { setSlugAvailable(null); return; }
+    let cancelled = false;
+    setSlugChecking(true);
+    adminApi.sa.checkSlug(debouncedSlug).then((res: any) => {
+      if (!cancelled) { setSlugAvailable(res?.data?.available ?? null); setSlugChecking(false); }
+    }).catch(() => { if (!cancelled) { setSlugAvailable(null); setSlugChecking(false); } });
+    return () => { cancelled = true; };
+  }, [debouncedSlug]);
 
   // Auto-fill slug from name unless manually edited
   useEffect(() => {
@@ -125,10 +143,16 @@ export default function NewCompanyPage() {
       if (form.max_units < 1)  return 'الحد الأقصى للوحدات يجب أن يكون أكبر من صفر';
       if (form.max_staff < 1)  return 'الحد الأقصى للموظفين يجب أن يكون أكبر من صفر';
     }
+    if (s === 1) {
+      if (form.contact_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.contact_email))
+        return 'البريد الإلكتروني للتواصل غير صالح';
+    }
     if (s === 3) {
       if (!form.admin_phone.trim()) return 'رقم جوال المدير مطلوب — يُستخدم كاسم المستخدم للدخول';
-      if (!/^(\+966|966|05)\d{7,9}$/.test(form.admin_phone.replace(/\s/g, '')))
-        return 'رقم الجوال يجب أن يبدأ بـ 05 أو +966 أو 966';
+      if (!/^(\+?(966|971|973|968|965|974)|05)\d{7,10}$/.test(form.admin_phone.replace(/\s/g, '')))
+        return 'رقم الجوال يجب أن يبدأ بـ 05 أو رمز دولي صحيح (+966, +971, ...)';
+      if (form.admin_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.admin_email))
+        return 'البريد الإلكتروني غير صالح';
     }
     return '';
   }
@@ -287,8 +311,9 @@ export default function NewCompanyPage() {
                     )}
                   </div>
                   {form.slug && (
-                    <div style={{ marginTop: 6, padding: '6px 10px', background: '#eff6ff', borderRadius: 6, fontSize: 11, color: '#1d4070' }}>
-                      معرّف الشركة: <strong dir="ltr">{form.slug}</strong>
+                    <div style={{ marginTop: 6, padding: '6px 10px', background: slugAvailable === false ? '#fef2f2' : '#eff6ff', borderRadius: 6, fontSize: 11, color: slugAvailable === false ? '#dc2626' : '#1d4070', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>معرّف الشركة: <strong dir="ltr">{form.slug}</strong></span>
+                      <span>{slugChecking ? '...' : slugAvailable === true ? '✅ متاح' : slugAvailable === false ? '❌ مستخدم' : ''}</span>
                     </div>
                   )}
                 </Field>

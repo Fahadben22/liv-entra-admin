@@ -102,6 +102,7 @@ export const adminApi = {
     platformStats:   ()             => request<any>('GET',  '/superadmin/stats'),
 
     // Tenant / Company control
+    checkSlug:       (slug: string)  => request<any>('GET', `/superadmin/companies/check-slug?slug=${encodeURIComponent(slug)}`),
     listCompanies:   (params?: Record<string, string>) => {
       const qs = params ? '?' + new URLSearchParams(params).toString() : '';
       return request<any>('GET', `/superadmin/companies${qs}`);

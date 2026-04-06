@@ -4,9 +4,10 @@ import Link from 'next/link';
 const AGENTS = [
   {
     type: 'it',
-    name: 'مساعد تقنية المعلومات',
-    nameEn: 'IT Agent',
+    name: 'سالم — المهندس الأول',
+    nameEn: 'Salem · IT Engineer',
     desc: 'مراقبة صحة النظام، تشخيص الأخطاء، تحليل الأمان',
+    motto: '"النظام السليم هو الذي لا يلاحظه أحد"',
     icon: '🛡️',
     color: '#1d4070',
     bg: '#eff6ff',
@@ -14,9 +15,10 @@ const AGENTS = [
   },
   {
     type: 'sales',
-    name: 'مساعد المبيعات',
-    nameEn: 'Sales Agent',
-    desc: 'تتبع العملاء المحتملين، الاشتراكات، التحويلات',
+    name: 'خالد — مستشار المبيعات',
+    nameEn: 'Khaled · Sales Advisor',
+    desc: 'تتبع العملاء المحتملين، الاشتراكات، إغلاق الصفقات',
+    motto: '"العميل اللي ما تكلمه اليوم، منافسك يكلمه بكرة"',
     icon: '💼',
     color: '#15803d',
     bg: '#f0fdf4',
@@ -24,9 +26,10 @@ const AGENTS = [
   },
   {
     type: 'marketing',
-    name: 'مساعد التسويق',
-    nameEn: 'Marketing Agent',
-    desc: 'تحليل قمع التحويل، مصادر العملاء، أداء الديمو',
+    name: 'نورة — محللة التسويق',
+    nameEn: 'Noura · Marketing Analyst',
+    desc: 'تحليل قمع التحويل، مصادر العملاء، الفرص التسويقية',
+    motto: '"البيانات ما تكذب — بس لازم تعرف تقراها"',
     icon: '📊',
     color: '#9333ea',
     bg: '#faf5ff',
@@ -60,7 +63,8 @@ export default function AgentsPage() {
               </div>
               <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', margin: '0 0 4px' }}>{agent.name}</h3>
               <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 12px' }}>{agent.nameEn}</p>
-              <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6, margin: 0 }}>{agent.desc}</p>
+              <p style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.6, margin: '0 0 8px' }}>{agent.desc}</p>
+              <p style={{ fontSize: 10, color: '#64748b', fontStyle: 'italic', margin: 0 }}>{agent.motto}</p>
             </Link>
           ))}
         </div>

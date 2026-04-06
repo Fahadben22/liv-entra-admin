@@ -1,41 +1,42 @@
 'use client';
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { adminApi, request } from '@/lib/api';
-import { lcOf, daysUntil, fmt, fmtDate, PLAN_AR, PLAN_C } from '@/lib/billing-helpers';
+import { lcOf, daysUntil, fmt, fmtDate, PLAN_C } from '@/lib/billing-helpers';
+import { STAGES, PLAN_AR, CITIES } from '@/lib/constants';
+import { useDebounce } from '@/lib/hooks';
+import { useToast } from '@/components/Toast';
+import { KanbanSkeleton } from '@/components/LoadingSkeleton';
+import ConfirmDialog from '@/components/ConfirmDialog';
+import type { Company } from '@/lib/types';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-const STAGES = [
-  { key: 'trial',     label: 'تجريبي',  color: '#f59e0b', bg: '#fefce8', border: '#fde68a', icon: '⏳' },
-  { key: 'active',    label: 'نشط',      color: '#22c55e', bg: '#f0fdf4', border: '#bbf7d0', icon: '✅' },
-  { key: 'overdue',   label: 'متأخر',    color: '#f97316', bg: '#fff7ed', border: '#fed7aa', icon: '⚠️' },
-  { key: 'suspended', label: 'موقوف',    color: '#ef4444', bg: '#fef2f2', border: '#fecaca', icon: '🔴' },
-];
+function daysSince(d: string) { return Math.floor((Date.now() - new Date(d).getTime()) / 86400000); }
 
 const TABS = [
   { key: 'pipeline', label: 'خط الأنابيب', icon: '📊' },
-  { key: 'create',   label: 'إنشاء شركة',  icon: '➕' },
   { key: 'matrix',   label: 'مصفوفة الميزات', icon: '🔧' },
 ];
 
-const CITIES = ['الرياض','جدة','مكة','المدينة','الدمام','الخبر','أبها','تبوك','حائل','الطائف','بريدة','جازان','نجران','ينبع'];
-
-function daysSince(d: string) { return Math.floor((Date.now() - new Date(d).getTime()) / 86400000); }
-function toast(msg: string) { if (typeof window !== 'undefined') { const t = document.createElement('div'); t.textContent = msg; Object.assign(t.style, { position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)',background:'#1d4070',color:'white',padding:'10px 24px',borderRadius:'10px',fontSize:'13px',fontWeight:'600',zIndex:'9999',boxShadow:'0 4px 16px rgba(0,0,0,.15)' }); document.body.appendChild(t); setTimeout(() => t.remove(), 3000); } }
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// MAIN COMPONENT
-// ═══════════════════════════════════════════════════════════════════════════════
 export default function OnboardingCommandCenter() {
+  const router = useRouter();
+  const toast = useToast();
   const [tab, setTab] = useState('pipeline');
-  const [companies, setCompanies] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [registry, setRegistry] = useState<Record<string, any>>({});
   const [matrix, setMatrix] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState<any>(null);
+  const [selected, setSelected] = useState<Company | null>(null);
   const [detailData, setDetailData] = useState<any>(null);
   const [search, setSearch] = useState('');
   const [planFilter, setPlanFilter] = useState('all');
+
+  // Confirm dialog state
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{ id: string; action: string; extra?: any } | null>(null);
+  const [suspendReason, setSuspendReason] = useState('');
+
+  const debouncedSearch = useDebounce(search, 300);
 
   const load = useCallback(async () => {
     try {
@@ -53,46 +54,60 @@ export default function OnboardingCommandCenter() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Load matrix on tab switch
-  useEffect(() => {
-    if (tab === 'matrix') {
-      adminApi.sa.featureMatrix().then(r => setMatrix(r?.data || [])).catch(() => {});
-    }
-  }, [tab]);
-
-  // Load company detail when selected
-  const loadDetail = useCallback(async (id: string) => {
-    const [compRes, usageRes, flagsRes, auditRes] = await Promise.allSettled([
-      adminApi.sa.getCompany(id).catch(() => adminApi.getCompany(id)),
-      adminApi.sa.getCompanyUsage(id).catch(() => null),
-      adminApi.sa.companyFlags(id).catch(() => null),
-      adminApi.sa.listAudit({ target_id: id, limit: '20' }).catch(() => null),
-    ]);
-    setDetailData({
-      company: (compRes as any).value?.data || null,
-      usage: (usageRes as any).value?.data || null,
-      flags: (flagsRes as any).value?.data || [],
-      audit: (auditRes as any).value?.data || [],
-    });
-  }, []);
-
   const filtered = useMemo(() => {
     let list = companies;
-    if (search) list = list.filter(c => (c.name || '').includes(search) || (c.name_ar || '').includes(search) || (c.slug || '').includes(search));
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
+      list = list.filter(c => (c.name || '').toLowerCase().includes(q) || (c.name_ar || '').includes(q) || (c.slug || '').includes(q));
+    }
     if (planFilter !== 'all') list = list.filter(c => c.plan === planFilter);
     return list;
-  }, [companies, search, planFilter]);
+  }, [companies, debouncedSearch, planFilter]);
+
+  async function loadDetail(id: string) {
+    try {
+      const [compRes, usageRes, flagsRes, auditRes] = await Promise.allSettled([
+        adminApi.sa.getCompany(id).catch(() => adminApi.getCompany(id)),
+        adminApi.sa.getCompanyUsage(id).catch(() => null),
+        adminApi.sa.companyFlags(id).catch(() => null),
+        adminApi.sa.listAudit({ target_id: id, limit: '20' }).catch(() => null),
+      ]);
+      setDetailData({
+        company: (compRes as any).value?.data || null,
+        usage: (usageRes as any).value?.data || null,
+        flags: (flagsRes as any).value?.data || [],
+        audit: (auditRes as any).value?.data || [],
+      });
+    } catch {}
+  }
 
   async function handleAction(id: string, action: string, extra?: any) {
+    // Suspend needs confirmation
+    if (action === 'suspend') {
+      setConfirmAction({ id, action, extra });
+      setSuspendReason('');
+      setConfirmOpen(true);
+      return;
+    }
     try {
       if (action === 'activate') await adminApi.sa.activateCompany(id).catch(() => adminApi.activateCompany(id));
-      else if (action === 'suspend') await adminApi.sa.suspendCompany(id, extra || 'إيقاف من لوحة التحكم').catch(() => adminApi.suspendCompany(id));
       else if (action === 'extend') await adminApi.sa.extendTrial(id, extra || 7);
       else if (action === 'assign-plan') await adminApi.sa.assignPlan(id, extra);
       toast('تم التنفيذ');
       await load();
       if (selected?.id === id) loadDetail(id);
-    } catch (e: any) { toast('خطأ: ' + (e.message || '')); }
+    } catch (e: any) { toast('خطأ: ' + (e.message || ''), 'error'); }
+  }
+
+  async function confirmSuspend() {
+    if (!confirmAction) return;
+    setConfirmOpen(false);
+    try {
+      await adminApi.sa.suspendCompany(confirmAction.id, suspendReason || 'إيقاف من لوحة التحكم').catch(() => adminApi.suspendCompany(confirmAction.id));
+      toast('تم الإيقاف');
+      await load();
+      if (selected?.id === confirmAction.id) loadDetail(confirmAction.id);
+    } catch (e: any) { toast('خطأ: ' + (e.message || ''), 'error'); }
   }
 
   async function handleDrop(companyId: string, targetStage: string) {
@@ -102,7 +117,7 @@ export default function OnboardingCommandCenter() {
     if (current === targetStage) return;
     if (targetStage === 'active') await handleAction(companyId, 'activate');
     else if (targetStage === 'suspended') await handleAction(companyId, 'suspend');
-    else toast('لا يمكن النقل لهذه المرحلة');
+    else toast('لا يمكن النقل لهذه المرحلة', 'error');
   }
 
   async function handleToggleFlag(companyId: string, key: string, enabled: boolean) {
@@ -110,10 +125,10 @@ export default function OnboardingCommandCenter() {
       await adminApi.sa.setFlag(companyId, key, enabled);
       if (selected?.id === companyId) loadDetail(companyId);
       toast(enabled ? `تم تفعيل ${key}` : `تم تعطيل ${key}`);
-    } catch (e: any) { toast('خطأ: ' + (e.message || '')); }
+    } catch (e: any) { toast('خطأ: ' + (e.message || ''), 'error'); }
   }
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 80, color: '#94a3b8', fontSize: 14 }}>جاري التحميل...</div>;
+  if (loading) return <KanbanSkeleton />;
 
   return (
     <div style={{ direction: 'rtl', minHeight: '100vh' }}>
@@ -133,81 +148,94 @@ export default function OnboardingCommandCenter() {
               {t.icon} {t.label}
             </button>
           ))}
+          <button onClick={() => router.push('/dashboard/companies/new')} style={{
+            padding: '8px 18px', borderRadius: 10, border: '2px solid #22c55e',
+            background: '#22c55e', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+          }}>
+            ➕ إنشاء شركة
+          </button>
         </div>
       </div>
 
       {/* Tab Content */}
-      {tab === 'pipeline' && <PipelineTab companies={filtered} search={search} setSearch={setSearch} planFilter={planFilter} setPlanFilter={setPlanFilter} selected={selected} setSelected={(c: any) => { setSelected(c); if (c) loadDetail(c.id); else setDetailData(null); }} detailData={detailData} handleAction={handleAction} handleDrop={handleDrop} handleToggleFlag={handleToggleFlag} plans={plans} registry={registry} />}
-      {tab === 'create' && <CreateTab plans={plans} onCreated={() => { load(); setTab('pipeline'); }} />}
-      {tab === 'matrix' && <MatrixTab companies={companies} matrix={matrix} registry={registry} onToggle={handleToggleFlag} reload={() => { adminApi.sa.featureMatrix().then(r => setMatrix(r?.data || [])).catch(() => {}); }} />}
-    </div>
-  );
-}
+      {tab === 'pipeline' && (
+        <div>
+          {/* Search + Filter */}
+          <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالاسم أو الرابط..."
+              style={{ flex: 1, padding: '8px 14px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, outline: 'none' }} />
+            <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
+              style={{ padding: '8px 14px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, background: 'white' }}>
+              <option value="all">كل الخطط</option>
+              {['trial', 'basic', 'professional', 'enterprise'].map(p => <option key={p} value={p}>{PLAN_AR[p]}</option>)}
+            </select>
+          </div>
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// TAB 1: PIPELINE
-// ═══════════════════════════════════════════════════════════════════════════════
-function PipelineTab({ companies, search, setSearch, planFilter, setPlanFilter, selected, setSelected, detailData, handleAction, handleDrop, handleToggleFlag, plans, registry }: any) {
-  return (
-    <div>
-      {/* Search + Filter */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالاسم أو الرابط..." style={{ flex: 1, padding: '8px 14px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, outline: 'none' }} />
-        <select value={planFilter} onChange={e => setPlanFilter(e.target.value)} style={{ padding: '8px 14px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, background: 'white' }}>
-          <option value="all">كل الخطط</option>
-          {['trial', 'basic', 'professional', 'enterprise'].map(p => <option key={p} value={p}>{PLAN_AR[p]}</option>)}
-        </select>
-      </div>
+          {/* Kanban Board */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+            {STAGES.map(stage => {
+              const stageCompanies = filtered.filter(c => lcOf(c) === stage.key);
+              return (
+                <div key={stage.key}
+                  onDragOver={e => { e.preventDefault(); e.currentTarget.style.background = stage.bg; }}
+                  onDragLeave={e => { e.currentTarget.style.background = 'white'; }}
+                  onDrop={e => { e.preventDefault(); e.currentTarget.style.background = 'white'; const id = e.dataTransfer.getData('companyId'); if (id) handleDrop(id, stage.key); }}
+                  style={{ background: 'white', border: `1.5px solid ${stage.border}`, borderRadius: 14, padding: 12, minHeight: 200, transition: 'background .2s' }}>
 
-      {/* Kanban Board */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
-        {STAGES.map(stage => {
-          const stageCompanies = companies.filter((c: any) => lcOf(c) === stage.key);
-          return (
-            <div key={stage.key}
-              onDragOver={e => { e.preventDefault(); e.currentTarget.style.background = stage.bg; }}
-              onDragLeave={e => { e.currentTarget.style.background = 'white'; }}
-              onDrop={e => { e.preventDefault(); e.currentTarget.style.background = 'white'; const id = e.dataTransfer.getData('companyId'); if (id) handleDrop(id, stage.key); }}
-              style={{ background: 'white', border: `1.5px solid ${stage.border}`, borderRadius: 14, padding: 12, minHeight: 200, transition: 'background .2s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, padding: '0 4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span>{stage.icon}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: stage.color }}>{stage.label}</span>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 10px', borderRadius: 20, background: stage.bg, color: stage.color, border: `1px solid ${stage.border}` }}>
+                      {stageCompanies.length}
+                    </span>
+                  </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, padding: '0 4px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span>{stage.icon}</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: stage.color }}>{stage.label}</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {stageCompanies.map(c => (
+                      <CompanyCard key={c.id} company={c} isSelected={selected?.id === c.id}
+                        onSelect={() => { const next = selected?.id === c.id ? null : c; setSelected(next); if (next) loadDetail(next.id); else setDetailData(null); }}
+                        onAction={handleAction} />
+                    ))}
+                    {stageCompanies.length === 0 && <p style={{ fontSize: 11, color: '#94a3b8', textAlign: 'center', padding: 16 }}>لا توجد شركات</p>}
+                  </div>
                 </div>
-                <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 10px', borderRadius: 20, background: stage.bg, color: stage.color, border: `1px solid ${stage.border}` }}>
-                  {stageCompanies.length}
-                </span>
-              </div>
+              );
+            })}
+          </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {stageCompanies.map((c: any) => (
-                  <CompanyCard key={c.id} company={c} stage={stage} isSelected={selected?.id === c.id} onSelect={() => setSelected(selected?.id === c.id ? null : c)} onAction={handleAction} />
-                ))}
-                {stageCompanies.length === 0 && <p style={{ fontSize: 11, color: '#94a3b8', textAlign: 'center', padding: 16 }}>لا توجد شركات</p>}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Inline Detail Panel */}
-      {selected && detailData && (
-        <DetailPanel company={detailData.company || selected} usage={detailData.usage} flags={detailData.flags} audit={detailData.audit} plans={plans} registry={registry} onAction={handleAction} onToggleFlag={handleToggleFlag} onClose={() => setSelected(null)} />
+          {/* Inline Detail Panel */}
+          {selected && detailData && (
+            <DetailPanel company={detailData.company || selected} usage={detailData.usage} flags={detailData.flags} audit={detailData.audit}
+              plans={plans} registry={registry} onAction={handleAction} onToggleFlag={handleToggleFlag}
+              onClose={() => { setSelected(null); setDetailData(null); }} />
+          )}
+        </div>
       )}
+
+      {tab === 'matrix' && (
+        <MatrixTab companies={companies} matrix={matrix} registry={registry} onToggle={handleToggleFlag}
+          reload={() => { adminApi.sa.featureMatrix().then(r => setMatrix(r?.data || [])).catch(() => {}); }} />
+      )}
+
+      {/* Suspend Confirm Dialog */}
+      <ConfirmDialog open={confirmOpen} title="إيقاف الشركة" message="هل أنت متأكد؟ سيتم تعطيل جميع الميزات لهذه الشركة."
+        confirmLabel="إيقاف" danger requireReason reason={suspendReason} onReasonChange={setSuspendReason}
+        onConfirm={confirmSuspend} onCancel={() => setConfirmOpen(false)} />
     </div>
   );
 }
 
 // ─── Company Card ────────────────────────────────────────────────────────────
-function CompanyCard({ company: c, stage, isSelected, onSelect, onAction }: any) {
+function CompanyCard({ company: c, isSelected, onSelect, onAction }: { company: Company; isSelected: boolean; onSelect: () => void; onAction: (id: string, action: string, extra?: any) => void }) {
   const pc = PLAN_C[c.plan] || PLAN_C.basic;
   const trialDays = c.trial_ends_at ? daysUntil(c.trial_ends_at) : null;
-  const unitPct = c.max_units > 0 ? Math.min(100, Math.round((c.unit_count || 0) / c.max_units * 100)) : 0;
+  const unitPct = c.max_units > 0 ? Math.min(100, Math.round(((c as any).unit_count || 0) / c.max_units * 100)) : 0;
+  const status = lcOf(c);
 
   return (
-    <div draggable onDragStart={e => e.dataTransfer.setData('companyId', c.id)}
-      onClick={onSelect}
+    <div draggable onDragStart={e => e.dataTransfer.setData('companyId', c.id)} onClick={onSelect}
       style={{
         background: isSelected ? '#eff6ff' : '#fafafa', border: isSelected ? '2px solid #1d4070' : '1px solid #f1f5f9',
         borderRadius: 10, padding: '10px 12px', cursor: 'pointer', transition: 'all .15s',
@@ -220,12 +248,11 @@ function CompanyCard({ company: c, stage, isSelected, onSelect, onAction }: any)
       </div>
       <p style={{ fontSize: 10, color: '#94a3b8', margin: '0 0 6px' }}>{c.slug || '—'} · {daysSince(c.created_at)} يوم</p>
 
-      {/* Usage mini-bar */}
       <div style={{ height: 4, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden', marginBottom: 4 }}>
         <div style={{ height: '100%', width: `${unitPct}%`, background: unitPct > 90 ? '#ef4444' : unitPct > 70 ? '#f59e0b' : '#22c55e', borderRadius: 2, transition: 'width .3s' }} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#94a3b8' }}>
-        <span>{c.unit_count || 0}/{c.max_units || '∞'} وحدة</span>
+        <span>{(c as any).unit_count || 0}/{c.max_units || '∞'} وحدة</span>
         {trialDays !== null && trialDays <= 7 && (
           <span style={{ color: trialDays <= 3 ? '#ef4444' : '#f59e0b', fontWeight: 700 }}>
             {trialDays > 0 ? `${trialDays} يوم` : 'منتهي'}
@@ -233,13 +260,13 @@ function CompanyCard({ company: c, stage, isSelected, onSelect, onAction }: any)
         )}
       </div>
 
-      {/* Quick actions */}
+      {/* Quick actions — includes suspend for BOTH trial and active */}
       <div style={{ display: 'flex', gap: 4, marginTop: 6 }} onClick={e => e.stopPropagation()}>
-        {lcOf(c) === 'trial' && <MiniBtn label="تفعيل" color="#22c55e" onClick={() => onAction(c.id, 'activate')} />}
-        {lcOf(c) === 'trial' && <MiniBtn label="+7 أيام" color="#3b82f6" onClick={() => onAction(c.id, 'extend', 7)} />}
-        {lcOf(c) === 'active' && <MiniBtn label="إيقاف" color="#ef4444" onClick={() => onAction(c.id, 'suspend')} />}
-        {lcOf(c) === 'suspended' && <MiniBtn label="تفعيل" color="#22c55e" onClick={() => onAction(c.id, 'activate')} />}
-        {lcOf(c) === 'overdue' && <MiniBtn label="تفعيل" color="#22c55e" onClick={() => onAction(c.id, 'activate')} />}
+        {status === 'trial' && <MiniBtn label="تفعيل" color="#22c55e" onClick={() => onAction(c.id, 'activate')} />}
+        {status === 'trial' && <MiniBtn label="+7 أيام" color="#3b82f6" onClick={() => onAction(c.id, 'extend', 7)} />}
+        {(status === 'trial' || status === 'active') && <MiniBtn label="إيقاف" color="#ef4444" onClick={() => onAction(c.id, 'suspend')} />}
+        {status === 'suspended' && <MiniBtn label="تفعيل" color="#22c55e" onClick={() => onAction(c.id, 'activate')} />}
+        {status === 'overdue' && <MiniBtn label="تفعيل" color="#22c55e" onClick={() => onAction(c.id, 'activate')} />}
       </div>
     </div>
   );
@@ -253,7 +280,6 @@ function MiniBtn({ label, color, onClick }: { label: string; color: string; onCl
 function DetailPanel({ company: c, usage, flags, audit, plans, registry, onAction, onToggleFlag, onClose }: any) {
   const [dtab, setDtab] = useState('overview');
   const pc = PLAN_C[c?.plan] || PLAN_C.basic;
-
   if (!c) return null;
 
   const DTABS = [
@@ -276,7 +302,6 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
         </div>
       </div>
 
-      {/* Sub-tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
         {DTABS.map(t => (
           <button key={t.key} onClick={() => setDtab(t.key)} style={{
@@ -286,19 +311,17 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
         ))}
       </div>
 
-      {/* Overview */}
       {dtab === 'overview' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-          <StatCard label="الوحدات" value={`${usage?.units || c.unit_count || 0} / ${c.max_units || '∞'}`} color="#3b82f6" />
-          <StatCard label="الموظفين" value={`${usage?.staff || 0} / ${c.max_staff || '∞'}`} color="#8b5cf6" />
-          <StatCard label="العقارات" value={`${usage?.properties || 0} / ${c.max_properties || '∞'}`} color="#f59e0b" />
-          <StatCard label="العقود" value={`${usage?.contracts || 0} / ${c.max_contracts || '∞'}`} color="#22c55e" />
+          <StatCard label="الوحدات" value={`${usage?.units?.used ?? (c as any).unit_count ?? 0} / ${c.max_units || '∞'}`} color="#3b82f6" />
+          <StatCard label="الموظفين" value={`${usage?.staff?.used ?? 0} / ${c.max_staff || '∞'}`} color="#8b5cf6" />
+          <StatCard label="العقارات" value={`${usage?.properties?.used ?? 0} / ${c.max_properties || '∞'}`} color="#f59e0b" />
+          <StatCard label="العقود" value={`${usage?.contracts?.used ?? 0} / ${c.max_contracts || '∞'}`} color="#22c55e" />
           <StatCard label="البريد" value={c.contact_email || '—'} color="#64748b" />
           <StatCard label="الهاتف" value={c.contact_phone || '—'} color="#64748b" />
         </div>
       )}
 
-      {/* Subscription */}
       {dtab === 'subscription' && (
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 16 }}>
@@ -311,7 +334,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
               <button key={p.id} onClick={() => onAction(c.id, 'assign-plan', { plan_id: p.id, billing_cycle: 'monthly' })}
                 disabled={p.name === c.plan}
                 style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${p.name === c.plan ? '#1d4070' : '#e2e8f0'}`, background: p.name === c.plan ? '#1d4070' : 'white', color: p.name === c.plan ? 'white' : '#475569', fontSize: 11, fontWeight: 600, cursor: p.name === c.plan ? 'default' : 'pointer', opacity: p.name === c.plan ? 0.6 : 1 }}>
-                {p.name_ar || PLAN_AR[p.name] || p.name}
+                {p.name_ar || PLAN_AR[p.name] || p.name} {p.price_monthly ? `(${p.price_monthly} ر.س/شهر)` : ''}
               </button>
             ))}
           </div>
@@ -322,18 +345,19 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
         </div>
       )}
 
-      {/* Features */}
       {dtab === 'features' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           {Object.entries(registry).map(([key, meta]: [string, any]) => {
             const flag = (flags || []).find((f: any) => f.feature_key === key);
             const enabled = flag?.is_enabled || false;
+            const planIncludes = flag?.plan_includes || false;
             return (
               <div key={key} onClick={() => onToggleFlag(c.id, key, !enabled)}
                 style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 10, border: `1px solid ${enabled ? '#86efac' : '#e2e8f0'}`, background: enabled ? '#f0fdf4' : '#fafafa', cursor: 'pointer', transition: 'all .15s' }}>
                 <div>
                   <span style={{ fontSize: 11, fontWeight: 600, color: enabled ? '#16a34a' : '#94a3b8' }}>{meta.name_ar || key}</span>
                   <span style={{ fontSize: 9, color: '#94a3b8', marginRight: 6 }}>({meta.tier_min})</span>
+                  {planIncludes && <span style={{ fontSize: 8, color: '#16a34a', marginRight: 4 }}>مُضمّن</span>}
                 </div>
                 <div style={{ width: 36, height: 20, borderRadius: 10, background: enabled ? '#22c55e' : '#d1d5db', position: 'relative', transition: 'background .2s' }}>
                   <div style={{ width: 16, height: 16, borderRadius: '50%', background: 'white', position: 'absolute', top: 2, transition: 'all .2s', ...(enabled ? { left: 2 } : { right: 2 }) }} />
@@ -344,14 +368,13 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
         </div>
       )}
 
-      {/* Usage */}
       {dtab === 'usage' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {[
-            { label: 'الوحدات', used: usage?.units || 0, max: c.max_units },
-            { label: 'الموظفين', used: usage?.staff || 0, max: c.max_staff },
-            { label: 'العقارات', used: usage?.properties || 0, max: c.max_properties },
-            { label: 'العقود', used: usage?.contracts || 0, max: c.max_contracts },
+            { label: 'الوحدات', used: usage?.units?.used || 0, max: c.max_units },
+            { label: 'الموظفين', used: usage?.staff?.used || 0, max: c.max_staff },
+            { label: 'العقارات', used: usage?.properties?.used || 0, max: c.max_properties },
+            { label: 'العقود', used: usage?.contracts?.used || 0, max: c.max_contracts },
           ].map(u => {
             const pct = u.max > 0 ? Math.round(u.used / u.max * 100) : 0;
             const color = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#22c55e';
@@ -371,7 +394,6 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
         </div>
       )}
 
-      {/* Audit */}
       {dtab === 'audit' && (
         <div style={{ maxHeight: 300, overflow: 'auto' }}>
           {(audit || []).length === 0 ? <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', padding: 20 }}>لا توجد أنشطة</p> :
@@ -396,179 +418,12 @@ function StatCard({ label, value, color }: { label: string; value: string; color
   );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// TAB 2: CREATE (Enhanced Onboarding Wizard)
-// ═══════════════════════════════════════════════════════════════════════════════
-function CreateTab({ plans, onCreated }: { plans: any[]; onCreated: () => void }) {
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '', contact_phone: '', contact_email: '', plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30, billing_cycle: 'monthly', admin_name: '', admin_phone: '', admin_email: '' });
-  const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState('');
-  const [result, setResult] = useState<any>(null);
-  const [progress, setProgress] = useState('');
-
-  function f(key: string) { return (e: any) => setForm(p => ({ ...p, [key]: e.target.value })); }
-
-  function toSlug(name: string) {
-    return name.toLowerCase().replace(/[\u0600-\u06FF]/g, '').replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || `co-${Date.now().toString(36)}`;
-  }
-
-  function canProceed() {
-    if (step === 1) return form.name.trim() && form.slug.trim();
-    if (step === 2) return form.max_units > 0 && form.max_staff > 0;
-    if (step === 3) return form.admin_name.trim() && /^(\+966|966|05)\d{7,9}$/.test(form.admin_phone.replace(/\s/g, ''));
-    return true;
-  }
-
-  async function handleCreate() {
-    setSaving(true); setErr(''); setProgress('جاري إنشاء الشركة...');
-    try {
-      setProgress('إنشاء الحساب وتفعيل الميزات...');
-      const res: any = await adminApi.createCompany({
-        name: form.name, name_ar: form.name_ar || form.name, slug: form.slug, city: form.city,
-        cr_number: form.cr_number, contact_phone: form.contact_phone, contact_email: form.contact_email,
-        plan: form.plan, max_units: form.max_units, max_staff: form.max_staff, trial_days: form.trial_days,
-        billing_cycle: form.billing_cycle, admin_name: form.admin_name, admin_phone: form.admin_phone, admin_email: form.admin_email,
-      });
-      setProgress('');
-      setResult(res?.data || res);
-      setStep(5);
-    } catch (e: any) { setErr(e.message); setProgress(''); }
-    finally { setSaving(false); }
-  }
-
-  const inp = { width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, outline: 'none' } as const;
-
-  return (
-    <div style={{ maxWidth: 600, margin: '0 auto' }}>
-      {/* Progress bar */}
-      <div style={{ display: 'flex', gap: 4, marginBottom: 24 }}>
-        {[1, 2, 3, 4].map(s => (
-          <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: s <= step ? '#1d4070' : '#e2e8f0', transition: 'background .3s' }} />
-        ))}
-      </div>
-
-      {step === 1 && (
-        <div>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>بيانات الشركة</h3>
-          <div style={{ display: 'grid', gap: 12 }}>
-            <div><label style={{ fontSize: 11, color: '#64748b' }}>اسم الشركة *</label><input style={inp} value={form.name} onChange={e => { f('name')(e); setForm(p => ({ ...p, slug: toSlug(e.target.value) })); }} placeholder="Company Name" /></div>
-            <div><label style={{ fontSize: 11, color: '#64748b' }}>الاسم بالعربي</label><input style={inp} value={form.name_ar} onChange={f('name_ar')} placeholder="اسم الشركة" /></div>
-            <div><label style={{ fontSize: 11, color: '#64748b' }}>الرابط (slug) *</label><input style={inp} value={form.slug} onChange={f('slug')} placeholder="company-slug" dir="ltr" /></div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <div><label style={{ fontSize: 11, color: '#64748b' }}>المدينة</label><select style={inp} value={form.city} onChange={f('city')}>{CITIES.map(c => <option key={c}>{c}</option>)}</select></div>
-              <div><label style={{ fontSize: 11, color: '#64748b' }}>السجل التجاري</label><input style={inp} value={form.cr_number} onChange={f('cr_number')} /></div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              <div><label style={{ fontSize: 11, color: '#64748b' }}>هاتف التواصل</label><input style={inp} value={form.contact_phone} onChange={f('contact_phone')} dir="ltr" /></div>
-              <div><label style={{ fontSize: 11, color: '#64748b' }}>بريد التواصل</label><input style={inp} value={form.contact_email} onChange={f('contact_email')} dir="ltr" /></div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>الخطة والحدود</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 16 }}>
-            {['trial', 'basic', 'professional', 'enterprise'].map(p => {
-              const pc = PLAN_C[p] || PLAN_C.basic;
-              return (
-                <div key={p} onClick={() => setForm(prev => ({ ...prev, plan: p, max_units: p === 'trial' ? 50 : p === 'basic' ? 100 : p === 'professional' ? 500 : 9999, max_staff: p === 'trial' ? 5 : p === 'basic' ? 10 : p === 'professional' ? 25 : 100 }))}
-                  style={{ padding: 14, borderRadius: 12, border: form.plan === p ? '2px solid #1d4070' : `1px solid ${pc.border || '#e2e8f0'}`, background: form.plan === p ? '#eff6ff' : 'white', cursor: 'pointer', textAlign: 'center' }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: pc.color }}>{PLAN_AR[p]}</div>
-                  <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 4 }}>{p === 'trial' ? 'مجاني' : ''}</div>
-                </div>
-              );
-            })}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div><label style={{ fontSize: 11, color: '#64748b' }}>حد الوحدات</label><input style={inp} type="number" value={form.max_units} onChange={f('max_units')} /></div>
-            <div><label style={{ fontSize: 11, color: '#64748b' }}>حد الموظفين</label><input style={inp} type="number" value={form.max_staff} onChange={f('max_staff')} /></div>
-          </div>
-        </div>
-      )}
-
-      {step === 3 && (
-        <div>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>إعداد المدير</h3>
-          <div style={{ display: 'grid', gap: 12 }}>
-            <div><label style={{ fontSize: 11, color: '#64748b' }}>اسم المدير *</label><input style={inp} value={form.admin_name} onChange={f('admin_name')} /></div>
-            <div><label style={{ fontSize: 11, color: '#64748b' }}>رقم الجوال (اسم المستخدم) *</label><input style={inp} value={form.admin_phone} onChange={f('admin_phone')} dir="ltr" placeholder="05XXXXXXXX" /></div>
-            <div><label style={{ fontSize: 11, color: '#64748b' }}>البريد (اختياري)</label><input style={inp} value={form.admin_email} onChange={f('admin_email')} dir="ltr" /></div>
-            <div style={{ background: '#eff6ff', padding: 12, borderRadius: 10, fontSize: 11, color: '#1d4070' }}>
-              سيتم إنشاء حساب مدير بصلاحية كاملة. تسجيل الدخول عبر رمز OTP يُرسل لهذا الرقم.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {step === 4 && (
-        <div>
-          <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>مراجعة وإنشاء</h3>
-          <div style={{ background: '#f8fafc', borderRadius: 12, padding: 16, fontSize: 12 }}>
-            <Row label="الشركة" value={`${form.name_ar || form.name} (${form.slug})`} />
-            <Row label="المدينة" value={form.city} />
-            <Row label="الخطة" value={PLAN_AR[form.plan] || form.plan} />
-            <Row label="الحدود" value={`${form.max_units} وحدة · ${form.max_staff} موظف`} />
-            <Row label="المدير" value={`${form.admin_name} · ${form.admin_phone}`} />
-          </div>
-          {progress && <p style={{ fontSize: 12, color: '#1d4070', marginTop: 12, fontWeight: 600 }}>{progress}</p>}
-          {err && <p style={{ fontSize: 12, color: '#ef4444', marginTop: 8 }}>{err}</p>}
-        </div>
-      )}
-
-      {step === 5 && result && (
-        <div style={{ textAlign: 'center', padding: 20 }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
-          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>تم إنشاء الشركة بنجاح</h3>
-          <div style={{ background: '#f0fdf4', borderRadius: 12, padding: 16, fontSize: 12, textAlign: 'right', marginBottom: 16 }}>
-            <Row label="رابط الدخول" value={`https://app.liv-entra.com`} />
-            <Row label="اسم المستخدم" value={form.admin_phone} />
-            <Row label="طريقة الدخول" value="رمز OTP عبر الجوال" />
-          </div>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-            <button onClick={() => { setStep(1); setForm({ name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '', contact_phone: '', contact_email: '', plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30, billing_cycle: 'monthly', admin_name: '', admin_phone: '', admin_email: '' }); setResult(null); }} style={{ padding: '10px 20px', borderRadius: 10, border: '1px solid #e2e8f0', background: 'white', fontSize: 13, cursor: 'pointer' }}>إضافة شركة أخرى</button>
-            <button onClick={onCreated} style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: '#1d4070', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>عرض الشركات</button>
-          </div>
-        </div>
-      )}
-
-      {/* Navigation */}
-      {step < 5 && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 20 }}>
-          {step > 1 ? <button onClick={() => setStep(s => s - 1)} style={{ padding: '10px 20px', borderRadius: 10, border: '1px solid #e2e8f0', background: 'white', fontSize: 13, cursor: 'pointer' }}>السابق</button> : <div />}
-          {step < 4 ? (
-            <button onClick={() => setStep(s => s + 1)} disabled={!canProceed()} style={{ padding: '10px 24px', borderRadius: 10, border: 'none', background: canProceed() ? '#1d4070' : '#94a3b8', color: 'white', fontSize: 13, fontWeight: 600, cursor: canProceed() ? 'pointer' : 'not-allowed' }}>التالي</button>
-          ) : (
-            <button onClick={handleCreate} disabled={saving} style={{ padding: '10px 24px', borderRadius: 10, border: 'none', background: saving ? '#94a3b8' : '#22c55e', color: 'white', fontSize: 13, fontWeight: 600, cursor: saving ? 'wait' : 'pointer' }}>
-              {saving ? 'جاري الإنشاء...' : 'إنشاء الشركة'}
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #f1f5f9' }}>
-      <span style={{ color: '#94a3b8', fontSize: 11 }}>{label}</span>
-      <span style={{ fontWeight: 600, fontSize: 12 }}>{value}</span>
-    </div>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// TAB 3: FEATURES MATRIX
-// ═══════════════════════════════════════════════════════════════════════════════
+// ─── Feature Matrix Tab ──────────────────────────────────────────────────────
 function MatrixTab({ companies, matrix, registry, onToggle, reload }: any) {
   const [filterPlan, setFilterPlan] = useState('all');
   const featureKeys = Object.keys(registry);
   const filtered = filterPlan === 'all' ? companies : companies.filter((c: any) => c.plan === filterPlan);
 
-  // Build lookup: company_id → { feature_key → boolean }
   const flagMap: Record<string, Record<string, boolean>> = {};
   (matrix || []).forEach((row: any) => {
     if (!flagMap[row.company_id]) flagMap[row.company_id] = {};

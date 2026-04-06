@@ -5,7 +5,7 @@ export default function SalesAgentPage() {
   return (
     <AgentChat
       agentType="sales"
-      agentName="مساعد المبيعات"
+      agentName="خالد — مستشار المبيعات"
       agentIcon="💼"
       accentColor="#15803d"
       quickActions={[

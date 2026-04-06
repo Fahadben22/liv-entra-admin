@@ -5,7 +5,7 @@ export default function ITAgentPage() {
   return (
     <AgentChat
       agentType="it"
-      agentName="مساعد تقنية المعلومات"
+      agentName="سالم — المهندس الأول"
       agentIcon="🛡️"
       accentColor="#1d4070"
       quickActions={[

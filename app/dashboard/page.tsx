@@ -51,7 +51,6 @@ export default function AdminDashboard() {
   const [loading,   setLoading]   = useState(true);
 
   const load = useCallback(async () => {
-    if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
     setLoading(true);
     const results = await Promise.allSettled([
       adminApi.getStats(),                                           // always works

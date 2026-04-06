@@ -5,7 +5,7 @@ export default function MarketingAgentPage() {
   return (
     <AgentChat
       agentType="marketing"
-      agentName="مساعد التسويق"
+      agentName="نورة — محللة التسويق"
       agentIcon="📊"
       accentColor="#9333ea"
       quickActions={[
