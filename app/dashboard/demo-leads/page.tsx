@@ -15,11 +15,11 @@ type DemoLead = {
   created_at: string;
 };
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  new:       { label: 'جديد',         color: '#3b82f6', bg: 'rgba(59,130,246,.12)' },
-  contacted: { label: 'تم التواصل',   color: '#f59e0b', bg: 'rgba(245,158,11,.12)' },
-  converted: { label: 'تحوّل عميل',   color: '#22c55e', bg: 'rgba(34,197,94,.12)'  },
-  ignored:   { label: 'تجاهل',        color: '#a1a1aa', bg: 'rgba(148,163,184,.12)' },
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
+  new:       { label: 'جديد',         color: '#3b82f6' },
+  contacted: { label: 'تم التواصل',   color: '#f59e0b' },
+  converted: { label: 'تحوّل عميل',   color: '#22c55e' },
+  ignored:   { label: 'تجاهل',        color: '#52525b' },
 };
 
 const ALL_STATUSES = ['new', 'contacted', 'converted', 'ignored'];
@@ -110,20 +110,20 @@ export default function DemoLeadsPage() {
   const displayedItems = filter ? items.filter(r => r.status === filter) : items;
 
   return (
-    <div style={{ background: '#fafafa', color: '#18181b', fontFamily: "'Tajawal', sans-serif" }}>
+    <div className="fade-in" style={{ color: '#fafafa', fontFamily: "'Tajawal', sans-serif" }}>
 
       <div style={{ maxWidth: 1300, margin: '0 auto', padding: '28px 24px' }}>
 
         {/* HEADER */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#18181b', letterSpacing: '-0.02em' }}>قيادات الديمو المباشر</h1>
-          <p style={{ color: '#71717a', fontSize: 13 }}>
+          <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#fafafa', letterSpacing: '-0.02em' }}>قيادات الديمو المباشر</h1>
+          <p style={{ color: '#a1a1aa', fontSize: 13 }}>
             زوار استخدموا التجربة المجانية المباشرة — إجمالي {total} قيادة
           </p>
         </div>
 
         {error && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '12px 18px', marginBottom: 20, color: '#dc2626', fontSize: 13 }}>
+          <div style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.25)', borderRadius: 8, padding: '12px 18px', marginBottom: 20, color: '#ef4444', fontSize: 13 }}>
             {error}
           </div>
         )}
@@ -131,12 +131,12 @@ export default function DemoLeadsPage() {
         {/* STATS STRIP */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 24 }}>
           {[
-            { label: 'إجمالي',      value: total,                       color: '#18181b' },
+            { label: 'إجمالي',      value: total,                       color: '#fafafa' },
             { label: 'جديد',        value: statusCounts.new || 0,       color: '#3b82f6' },
             { label: 'تم التواصل', value: statusCounts.contacted || 0,  color: '#f59e0b' },
             { label: 'تحوّل عميل', value: statusCounts.converted || 0,  color: '#22c55e' },
           ].map(k => (
-            <div key={k.label} style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: '14px 16px' }}>
+            <div key={k.label} className="glass" style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 10, padding: '14px 16px' }}>
               <div style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 6, fontWeight: 500 }}>{k.label}</div>
               <div style={{ fontSize: 22, fontWeight: 600, color: k.color }}>{k.value}</div>
             </div>
@@ -144,7 +144,7 @@ export default function DemoLeadsPage() {
         </div>
 
         {/* STATUS FILTER TABS */}
-        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid #e5e5e5' }}>
+        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,.06)' }}>
           {[
             { key: '', label: 'الكل', count: total },
             ...ALL_STATUSES.map(s => ({ key: s, label: STATUS_CONFIG[s].label, count: statusCounts[s] || 0 })),
@@ -154,15 +154,15 @@ export default function DemoLeadsPage() {
                 padding: '10px 18px', fontSize: 13, fontWeight: filter === tab.key ? 600 : 400,
                 cursor: 'pointer', fontFamily: 'inherit',
                 background: 'none',
-                color: filter === tab.key ? '#18181b' : '#a1a1aa',
+                color: filter === tab.key ? '#fafafa' : '#52525b',
                 border: 'none',
-                borderBottom: filter === tab.key ? '2px solid #18181b' : '2px solid transparent',
+                borderBottom: filter === tab.key ? '2px solid #6366f1' : '2px solid transparent',
               }}>
-              {tab.label} {tab.count > 0 && <span style={{ color: '#a1a1aa', marginRight: 4 }}>({tab.count})</span>}
+              {tab.label} {tab.count > 0 && <span style={{ color: '#52525b', marginRight: 4 }}>({tab.count})</span>}
             </button>
           ))}
           <button onClick={load}
-            style={{ marginRight: 'auto', padding: '7px 16px', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', background: '#fff', border: '1px solid #e5e5e5', color: '#71717a' }}>
+            style={{ marginRight: 'auto', padding: '7px 16px', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', color: '#a1a1aa' }}>
             تحديث
           </button>
         </div>
@@ -175,11 +175,11 @@ export default function DemoLeadsPage() {
             <p>لا توجد قيادات {filter ? `بحالة "${STATUS_CONFIG[filter]?.label}"` : 'بعد'}</p>
           </div>
         ) : (
-          <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, overflow: 'hidden' }}>
+          <div style={{ borderRadius: 10, overflow: 'hidden' }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: '#fafafa', borderBottom: '1px solid #e5e5e5', padding: '10px 20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: 'rgba(255,255,255,.04)', borderBottom: '1px solid rgba(255,255,255,.06)', padding: '10px 20px' }}>
               {['التاريخ', 'الزائر', 'الجوال', 'الشركة', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
-                <div key={h} style={{ fontSize: 11, fontWeight: 500, color: '#a1a1aa' }}>{h}</div>
+                <div key={h} style={{ fontSize: 11, fontWeight: 500, color: '#52525b' }}>{h}</div>
               ))}
             </div>
 
@@ -191,18 +191,18 @@ export default function DemoLeadsPage() {
                   style={{
                     display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px',
                     gap: 0, padding: '14px 20px', alignItems: 'center',
-                    borderBottom: i < displayedItems.length - 1 ? '1px solid #f0f0f0' : 'none',
-                    background: i % 2 === 0 ? '#fff' : '#fafafa',
+                    borderBottom: i < displayedItems.length - 1 ? '1px solid rgba(255,255,255,.03)' : 'none',
+                    background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,.02)',
                   }}
                 >
                   {/* Date */}
-                  <div style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>{fmt(item.created_at)}</div>
+                  <div style={{ fontSize: 11, color: '#52525b', fontWeight: 500 }}>{fmt(item.created_at)}</div>
 
                   {/* Name */}
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: '#18181b' }}>{item.name || '—'}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: '#fafafa' }}>{item.name || '—'}</div>
                     {item.demo_session_id && (
-                      <div style={{ fontSize: 11, color: '#a1a1aa', fontFamily: 'Inter, monospace', marginTop: 2, fontWeight: 500 }}>
+                      <div style={{ fontSize: 11, color: '#52525b', fontFamily: 'Inter, monospace', marginTop: 2, fontWeight: 500 }}>
                         {item.demo_session_id.slice(0, 8)}...
                       </div>
                     )}
@@ -210,24 +210,24 @@ export default function DemoLeadsPage() {
 
                   {/* Phone */}
                   <div>
-                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: '#18181b', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
+                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: '#fafafa', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
                       {item.phone}
                     </a>
                     <div style={{ marginTop: 4 }}>
                       <a href={`https://wa.me/${item.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener"
-                        style={{ fontSize: 11, color: '#22c55e', textDecoration: 'none', background: 'rgba(34,197,94,.08)', border: '1px solid rgba(34,197,94,.2)', borderRadius: 7, padding: '2px 8px', fontWeight: 500 }}>
+                        style={{ fontSize: 11, color: '#22c55e', textDecoration: 'none', background: 'rgba(34,197,94,.1)', border: '1px solid rgba(34,197,94,.2)', borderRadius: 7, padding: '2px 8px', fontWeight: 500 }}>
                         واتساب
                       </a>
                     </div>
                   </div>
 
                   {/* Company */}
-                  <div style={{ fontSize: 13, color: '#3f3f46' }}>{item.company_name || '—'}</div>
+                  <div style={{ fontSize: 13, color: '#a1a1aa' }}>{item.company_name || '—'}</div>
 
-                  {/* Status badge */}
+                  {/* Status dot + label */}
                   <div>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 500, color: sc.color }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block' }} />
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block', boxShadow: `0 0 6px ${sc.color}66` }} />
                       {sc.label}
                     </span>
                   </div>
@@ -237,9 +237,9 @@ export default function DemoLeadsPage() {
                     <button onClick={() => openNotes(item)}
                       style={{
                         fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
-                        background: '#fff',
-                        border: '1px solid #e5e5e5',
-                        color: item.notes ? '#18181b' : '#a1a1aa',
+                        background: 'rgba(255,255,255,.04)',
+                        border: '1px solid rgba(255,255,255,.08)',
+                        color: item.notes ? '#fafafa' : '#52525b',
                         borderRadius: 7, padding: '4px 12px',
                       }}>
                       {item.notes ? 'عرض' : '+ ملاحظة'}
@@ -253,13 +253,13 @@ export default function DemoLeadsPage() {
                       disabled={updating === item.id}
                       onChange={e => changeStatus(item.id, e.target.value)}
                       style={{
-                        background: '#fff', border: '1px solid #e5e5e5', color: '#18181b',
+                        background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', color: '#fafafa',
                         borderRadius: 7, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
                         fontFamily: 'inherit', outline: 'none', flex: 1,
                         opacity: updating === item.id ? .5 : 1,
                       }}>
                       {ALL_STATUSES.map(s => (
-                        <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
+                        <option key={s} value={s} style={{ background: '#18181b', color: '#fafafa' }}>{STATUS_CONFIG[s].label}</option>
                       ))}
                     </select>
                     {item.status !== 'converted' && (
@@ -273,7 +273,7 @@ export default function DemoLeadsPage() {
                         }}
                         style={{
                           fontSize: 12, padding: '7px 16px', borderRadius: 7,
-                          background: '#18181b', border: 'none',
+                          background: '#6366f1', border: 'none',
                           color: '#fff', cursor: 'pointer', fontFamily: 'inherit',
                           whiteSpace: 'nowrap', fontWeight: 500,
                         }}
@@ -291,11 +291,11 @@ export default function DemoLeadsPage() {
 
       {/* NOTES MODAL */}
       {notesModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
           onClick={e => { if (e.target === e.currentTarget) setNotesModal(null); }}>
-          <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: 24, width: '100%', maxWidth: 480, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#18181b' }}>ملاحظات</h3>
-            <p style={{ fontSize: 13, color: '#71717a', marginBottom: 20 }}>
+          <div style={{ background: '#18181b', border: '1px solid rgba(255,255,255,.1)', borderRadius: 12, padding: 24, width: '100%', maxWidth: 480 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#fafafa' }}>ملاحظات</h3>
+            <p style={{ fontSize: 13, color: '#a1a1aa', marginBottom: 20 }}>
               {notesModal.name || '—'} — {notesModal.phone}
             </p>
             <textarea
@@ -304,18 +304,18 @@ export default function DemoLeadsPage() {
               rows={5}
               placeholder="أضف ملاحظات حول هذا الزائر..."
               style={{
-                width: '100%', background: '#fff', border: '1px solid #e5e5e5',
-                borderRadius: 7, padding: '7px 12px', color: '#18181b', fontSize: 13,
+                width: '100%', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)',
+                borderRadius: 8, padding: '7px 12px', color: '#fafafa', fontSize: 13,
                 fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box',
               }}
             />
             <div style={{ display: 'flex', gap: 10, marginTop: 16, flexDirection: 'row' }}>
               <button onClick={saveNotes} disabled={savingNotes}
-                style={{ flex: 1, padding: '7px 16px', background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1 }}>
+                style={{ flex: 1, padding: '7px 16px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1 }}>
                 {savingNotes ? 'جاري الحفظ...' : 'حفظ'}
               </button>
               <button onClick={() => setNotesModal(null)}
-                style={{ padding: '7px 16px', background: '#fff', color: '#71717a', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ padding: '7px 16px', background: 'rgba(255,255,255,.04)', color: '#a1a1aa', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
                 إلغاء
               </button>
             </div>

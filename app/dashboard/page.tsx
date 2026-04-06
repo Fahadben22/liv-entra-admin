@@ -92,107 +92,106 @@ export default function AdminDashboard() {
   const totalRevenue = s.total_revenue || 0;
 
   return (
-    <div style={{ direction: 'rtl' }}>
+    <div>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 }}>
+      <div className="fade-in" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 28 }}>
         <div>
-          <h1 style={{ fontSize: 18, fontWeight: 600, color: '#18181b', margin: 0, letterSpacing: '-0.02em' }}>لوحة التحكم</h1>
-          <p style={{ fontSize: 12, color: '#a1a1aa', marginTop: 3 }}>
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#fafafa', margin: 0, letterSpacing: '-0.03em' }}>لوحة التحكم</h1>
+          <p style={{ fontSize: 12, color: '#52525b', marginTop: 4 }}>
             {new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
         <Link href="/dashboard/companies/new"
-          style={{ fontSize: 12, padding: '7px 16px', borderRadius: 7, background: '#18181b', color: '#fff', textDecoration: 'none', fontWeight: 500 }}>
+          style={{ fontSize: 12, padding: '8px 18px', borderRadius: 8, background: '#6366f1', color: '#fff', textDecoration: 'none', fontWeight: 500, transition: 'all .15s' }}>
           + إضافة شركة
         </Link>
       </div>
 
       {/* KPI row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, marginBottom: 24 }}>
+      <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, marginBottom: 24 }}>
         {[
-          { label: 'إجمالي الشركات',   value: companies.length },
-          { label: 'شركات نشطة',        value: byStage.active.length },
-          { label: 'في التجربة',         value: byStage.trial.length },
-          { label: 'موقوفة / متأخرة',   value: byStage.suspended.length + byStage.overdue.length },
-          { label: 'إجمالي الوحدات',    value: s.total_units || 0 },
-        ].map(k => (
-          <div key={k.label} style={{ background: '#fff', borderRadius: 8, padding: '16px 18px', border: '1px solid #e5e5e5' }}>
-            <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 6px', fontWeight: 500 }}>{k.label}</p>
-            <p style={{ fontSize: 24, fontWeight: 600, color: '#18181b', margin: 0, letterSpacing: '-0.02em' }}>{k.value}</p>
+          { label: 'إجمالي الشركات', value: companies.length, accent: '#6366f1' },
+          { label: 'شركات نشطة', value: byStage.active.length, accent: '#22c55e' },
+          { label: 'في التجربة', value: byStage.trial.length, accent: '#f59e0b' },
+          { label: 'موقوفة / متأخرة', value: byStage.suspended.length + byStage.overdue.length, accent: '#ef4444' },
+          { label: 'إجمالي الوحدات', value: s.total_units || 0, accent: '#3b82f6' },
+        ].map((k, i) => (
+          <div key={k.label} className="fade-in" style={{ background: 'rgba(255,255,255,.03)', borderRadius: 10, padding: '18px 20px', border: '1px solid rgba(255,255,255,.06)', animationDelay: `${i * 0.05}s`, transition: 'all .2s', cursor: 'default' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <p style={{ fontSize: 11, color: '#52525b', margin: 0, fontWeight: 500 }}>{k.label}</p>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: k.accent, boxShadow: `0 0 8px ${k.accent}40` }} />
+            </div>
+            <p style={{ fontSize: 28, fontWeight: 600, color: '#fafafa', margin: 0, letterSpacing: '-0.03em' }}>{k.value}</p>
           </div>
         ))}
       </div>
 
       {/* Lifecycle pipeline */}
-        <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e5e5e5', padding: '18px 22px', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 14px', color: '#18181b' }}>دورة حياة الشركات</h2>
-          <div style={{ display: 'flex', alignItems: 'stretch', gap: 0 }}>
-            {[
-              { stage: 'trial',     label: 'تجريبي',    count: byStage.trial.length,     color: '#f59e0b', bg: '#fefce8', pct: companies.length ? Math.round(byStage.trial.length/companies.length*100) : 0 },
-              { stage: 'active',    label: 'نشط',        count: byStage.active.length,    color: '#22c55e', bg: '#f0fdf4', pct: companies.length ? Math.round(byStage.active.length/companies.length*100) : 0 },
-              { stage: 'overdue',   label: 'متأخر',      count: byStage.overdue.length,   color: '#f97316', bg: '#fff7ed', pct: companies.length ? Math.round(byStage.overdue.length/companies.length*100) : 0 },
-              { stage: 'suspended', label: 'موقوف',      count: byStage.suspended.length, color: '#ef4444', bg: '#fef2f2', pct: companies.length ? Math.round(byStage.suspended.length/companies.length*100) : 0 },
-            ].map((st, i, arr) => (
-              <div key={st.stage} style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
-                <Link href={`/dashboard/companies?status=${st.stage}`} style={{ flex: 1, padding: '14px 18px', borderRadius: i === 0 ? '8px 0 0 8px' : i === arr.length-1 ? '0 8px 8px 0' : 0, background: '#fafafa', border: '1px solid #f0f0f0', textDecoration: 'none', display: 'block', transition: 'all .12s' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: st.color }} />
-                    <p style={{ fontSize: 11, color: '#71717a', margin: 0, fontWeight: 500 }}>{st.label}</p>
-                  </div>
-                  <p style={{ fontSize: 22, fontWeight: 600, color: '#18181b', margin: '0 0 4px', letterSpacing: '-0.02em' }}>{st.count}</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ flex: 1, height: 4, borderRadius: 2, background: '#e2e8f0' }}>
-                      <div style={{ height: '100%', width: `${st.pct}%`, background: st.color, borderRadius: 2 }} />
-                    </div>
-                    <span style={{ fontSize: 10, color: '#94a3b8', whiteSpace: 'nowrap' }}>{st.pct}%</span>
-                  </div>
-                </Link>
-                {i < arr.length - 1 && (
-                  <div style={{ width: 24, textAlign: 'center', color: '#cbd5e1', fontSize: 16, flexShrink: 0 }}>→</div>
-                )}
+      <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,.06)', padding: '18px 22px', marginBottom: 24 }}>
+        <h2 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 14px', color: '#a1a1aa' }}>دورة حياة الشركات</h2>
+        <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+          {[
+            { stage: 'trial',     label: 'تجريبي',    count: byStage.trial.length,     color: '#f59e0b', pct: companies.length ? Math.round(byStage.trial.length/companies.length*100) : 0 },
+            { stage: 'active',    label: 'نشط',        count: byStage.active.length,    color: '#22c55e', pct: companies.length ? Math.round(byStage.active.length/companies.length*100) : 0 },
+            { stage: 'overdue',   label: 'متأخر',      count: byStage.overdue.length,   color: '#f97316', pct: companies.length ? Math.round(byStage.overdue.length/companies.length*100) : 0 },
+            { stage: 'suspended', label: 'موقوف',      count: byStage.suspended.length, color: '#ef4444', pct: companies.length ? Math.round(byStage.suspended.length/companies.length*100) : 0 },
+          ].map((st) => (
+            <Link key={st.stage} href={`/dashboard/companies?status=${st.stage}`}
+              style={{ padding: '16px 18px', borderRadius: 8, background: 'rgba(255,255,255,.02)', border: '1px solid rgba(255,255,255,.04)', textDecoration: 'none', display: 'block', transition: 'all .15s' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <div style={{ width: 6, height: 6, borderRadius: '50%', background: st.color, boxShadow: `0 0 6px ${st.color}60` }} />
+                <p style={{ fontSize: 11, color: '#52525b', margin: 0, fontWeight: 500 }}>{st.label}</p>
               </div>
-            ))}
-          </div>
+              <p style={{ fontSize: 24, fontWeight: 600, color: '#fafafa', margin: '0 0 8px', letterSpacing: '-0.03em' }}>{st.count}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ flex: 1, height: 3, borderRadius: 2, background: 'rgba(255,255,255,.06)' }}>
+                  <div style={{ height: '100%', width: `${st.pct}%`, background: st.color, borderRadius: 2, boxShadow: `0 0 4px ${st.color}40` }} />
+                </div>
+                <span style={{ fontSize: 10, color: '#52525b', whiteSpace: 'nowrap' }}>{st.pct}%</span>
+              </div>
+            </Link>
+          ))}
         </div>
+      </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 16 }}>
-          {/* Recent companies */}
-          <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e5e5e5', overflow: 'hidden' }}>
-            <div style={{ padding: '14px 18px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#18181b' }}>
-                جميع الشركات
-                <span style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 400, marginRight: 6 }}>({companies.length})</span>
-              </h2>
-              <Link href="/dashboard/companies" style={{ fontSize: 11, color: '#71717a', textDecoration: 'none', fontWeight: 500 }}>عرض الكل →</Link>
-            </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 14 }}>
+        {/* Recent companies */}
+        <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,.06)', overflow: 'hidden' }}>
+          <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#a1a1aa' }}>
+              جميع الشركات
+              <span style={{ fontSize: 11, color: '#3f3f46', fontWeight: 400, marginRight: 6 }}>({companies.length})</span>
+            </h2>
+            <Link href="/dashboard/companies" style={{ fontSize: 11, color: '#6366f1', textDecoration: 'none', fontWeight: 500 }}>عرض الكل →</Link>
+          </div>
             <div style={{ overflowY: 'auto', maxHeight: 420 }}>
               {companies.slice(0, 15).map((c, i) => {
                 const lc = LC[lcOf(c)] || LC.active;
                 const score = onboardingScore(c);
                 return (
-                  <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 18px', borderBottom: i < 14 ? '1px solid #f4f4f5' : 'none' }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 7, background: '#f4f4f5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: '#3f3f46', flexShrink: 0 }}>
+                  <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 20px', borderBottom: i < 14 ? '1px solid rgba(255,255,255,.03)' : 'none', transition: 'background .15s' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(99,102,241,.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: '#818cf8', flexShrink: 0 }}>
                       {c.name?.charAt(0)}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</p>
-                        <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 10, background: lc.bg, color: lc.color, fontWeight: 600, flexShrink: 0 }}>{lc.label}</span>
+                        <p style={{ fontSize: 13, fontWeight: 500, margin: 0, color: '#fafafa', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</p>
+                        <span style={{ fontSize: 9, padding: '2px 6px', borderRadius: 4, background: `${lc.color}15`, color: lc.color, fontWeight: 600, flexShrink: 0 }}>{lc.label}</span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
-                        <p style={{ fontSize: 11, color: '#94a3b8', margin: 0 }}>{PLAN_AR[c.plan] || c.plan}</p>
-                        <span style={{ color: '#e2e8f0' }}>·</span>
+                        <p style={{ fontSize: 11, color: '#52525b', margin: 0 }}>{PLAN_AR[c.plan] || c.plan}</p>
+                        <span style={{ color: '#27272a' }}>·</span>
                         {/* Onboarding progress dots */}
                         <div style={{ display: 'flex', gap: 3 }}>
                           {[1,2,3,4,5].map(n => (
-                            <div key={n} style={{ width: 6, height: 6, borderRadius: '50%', background: n <= score ? '#22c55e' : '#e2e8f0' }} />
+                            <div key={n} style={{ width: 5, height: 5, borderRadius: '50%', background: n <= score ? '#22c55e' : 'rgba(255,255,255,.08)' }} />
                           ))}
                         </div>
-                        <p style={{ fontSize: 10, color: '#94a3b8', margin: 0 }}>إعداد {score}/5</p>
+                        <p style={{ fontSize: 10, color: '#3f3f46', margin: 0 }}>إعداد {score}/5</p>
                       </div>
                     </div>
                     <div style={{ textAlign: 'left', flexShrink: 0 }}>
-                      <p style={{ fontSize: 11, color: '#94a3b8', margin: 0 }}>{c.max_units} وحدة</p>
+                      <p style={{ fontSize: 11, color: '#52525b', margin: 0 }}>{c.max_units} وحدة</p>
                       {c.trial_ends_at && lcOf(c) === 'trial' && (
                         <p style={{ fontSize: 10, color: daysUntil(c.trial_ends_at) <= 3 ? '#dc2626' : '#f59e0b', margin: '2px 0 0', fontWeight: 600 }}>
                           {daysUntil(c.trial_ends_at) >= 0 ? `${daysUntil(c.trial_ends_at)}ي` : 'منتهية'}
@@ -200,7 +199,7 @@ export default function AdminDashboard() {
                       )}
                     </div>
                     <Link href={`/dashboard/companies/${c.id}`}
-                      style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid #e2e8f0', color: '#1d4070', textDecoration: 'none', flexShrink: 0 }}>
+                      style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6, border: '1px solid rgba(255,255,255,.08)', color: '#6366f1', textDecoration: 'none', flexShrink: 0, transition: 'all .15s' }}>
                       ↗
                     </Link>
                   </div>
@@ -212,51 +211,49 @@ export default function AdminDashboard() {
           {/* Right column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {/* Revenue card */}
-            <div style={{ background: '#18181b', borderRadius: 8, padding: '18px 20px', color: '#fff' }}>
-              <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 6px', fontWeight: 500 }}>إجمالي الإيرادات المُحصَّلة</p>
-              <p style={{ fontSize: 22, fontWeight: 600, margin: '0 0 14px', letterSpacing: '-0.02em' }}>
+            <div style={{ background: 'linear-gradient(135deg, rgba(99,102,241,.12), rgba(139,92,246,.08))', borderRadius: 10, padding: '20px 22px', border: '1px solid rgba(99,102,241,.15)' }}>
+              <p style={{ fontSize: 11, color: '#818cf8', margin: '0 0 8px', fontWeight: 500 }}>إجمالي الإيرادات المُحصَّلة</p>
+              <p style={{ fontSize: 26, fontWeight: 600, color: '#fafafa', margin: '0 0 16px', letterSpacing: '-0.03em' }}>
                 {totalRevenue.toLocaleString('ar-SA')} ر.س
               </p>
-              <div style={{ display: 'flex', gap: 20 }}>
+              <div style={{ display: 'flex', gap: 24 }}>
                 <div>
-                  <p style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{s.active_contracts || 0}</p>
-                  <p style={{ fontSize: 10, color: '#71717a', margin: '2px 0 0' }}>عقد نشط</p>
+                  <p style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#fafafa' }}>{s.active_contracts || 0}</p>
+                  <p style={{ fontSize: 10, color: '#52525b', margin: '3px 0 0' }}>عقد نشط</p>
                 </div>
                 <div>
-                  <p style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>{s.active_companies || 0}</p>
-                  <p style={{ fontSize: 10, color: '#71717a', margin: '2px 0 0' }}>شركة نشطة</p>
+                  <p style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#fafafa' }}>{s.active_companies || 0}</p>
+                  <p style={{ fontSize: 10, color: '#52525b', margin: '3px 0 0' }}>شركة نشطة</p>
                 </div>
               </div>
             </div>
 
             {/* Needs attention */}
-            <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e5e5e5', overflow: 'hidden', flex: 1 }}>
-              <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ fontSize: 12, fontWeight: 600, margin: 0, color: '#18181b' }}>يحتاج انتباهاً</h3>
+            <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,.06)', overflow: 'hidden', flex: 1 }}>
+              <div style={{ padding: '12px 18px', borderBottom: '1px solid rgba(255,255,255,.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ fontSize: 12, fontWeight: 600, margin: 0, color: '#a1a1aa' }}>يحتاج انتباهاً</h3>
                 {needsAttention.length > 0 && (
-                  <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 10, background: '#fef2f2', color: '#dc2626', fontWeight: 600 }}>
+                  <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: 'rgba(239,68,68,.1)', color: '#ef4444', fontWeight: 600 }}>
                     {needsAttention.length}
                   </span>
                 )}
               </div>
               {needsAttention.length === 0 ? (
-                <div style={{ padding: '24px 0', textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>
-                  <div style={{ fontSize: 28, marginBottom: 6 }}>✅</div>
+                <div style={{ padding: '28px 0', textAlign: 'center', color: '#3f3f46', fontSize: 12 }}>
                   لا توجد تنبيهات
                 </div>
               ) : (
                 needsAttention.map((item, i) => {
-                  const color = item.type === 'suspended' ? '#dc2626' : item.type === 'overdue' ? '#f97316' : '#f59e0b';
-                  const icon  = item.type === 'suspended' ? '🔴' : item.type === 'overdue' ? '🟠' : '🟡';
+                  const color = item.type === 'suspended' ? '#ef4444' : item.type === 'overdue' ? '#f97316' : '#f59e0b';
                   return (
                     <Link key={i} href={`/dashboard/companies/${item.company.id}`}
-                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 18px', borderBottom: i < needsAttention.length-1 ? '1px solid #f8fafc' : 'none', textDecoration: 'none' }}>
-                      <span style={{ fontSize: 14 }}>{icon}</span>
+                      style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 18px', borderBottom: i < needsAttention.length-1 ? '1px solid rgba(255,255,255,.03)' : 'none', textDecoration: 'none', transition: 'background .15s' }}>
+                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: color, boxShadow: `0 0 6px ${color}50`, flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: 12, fontWeight: 600, color: '#0f172a', margin: 0 }}>{item.company.name}</p>
-                        <p style={{ fontSize: 11, color, margin: '2px 0 0' }}>{item.msg}</p>
+                        <p style={{ fontSize: 12, fontWeight: 500, color: '#fafafa', margin: 0 }}>{item.company.name}</p>
+                        <p style={{ fontSize: 11, color: '#52525b', margin: '2px 0 0' }}>{item.msg}</p>
                       </div>
-                      <span style={{ fontSize: 12, color: '#94a3b8' }}>←</span>
+                      <span style={{ fontSize: 12, color: '#3f3f46' }}>←</span>
                     </Link>
                   );
                 })
@@ -264,32 +261,32 @@ export default function AdminDashboard() {
 
               {/* New this week */}
               {newThisWeek.length > 0 && (
-                <div style={{ padding: '10px 18px', background: '#f8fafc', borderTop: '1px solid #f1f5f9' }}>
-                  <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 6px', fontWeight: 600 }}>انضمت هذا الأسبوع 🆕</p>
+                <div style={{ padding: '10px 18px', background: 'rgba(255,255,255,.02)', borderTop: '1px solid rgba(255,255,255,.04)' }}>
+                  <p style={{ fontSize: 11, color: '#3f3f46', margin: '0 0 6px', fontWeight: 600 }}>انضمت هذا الأسبوع</p>
                   {newThisWeek.slice(0, 3).map(c => (
                     <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 0' }}>
-                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
-                      <Link href={`/dashboard/companies/${c.id}`} style={{ fontSize: 12, color: '#1d4070', textDecoration: 'none' }}>{c.name}</Link>
-                      <span style={{ fontSize: 10, color: '#94a3b8', marginRight: 'auto' }}>منذ {daysSince(c.created_at)} يوم</span>
+                      <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 4px rgba(34,197,94,.4)', flexShrink: 0 }} />
+                      <Link href={`/dashboard/companies/${c.id}`} style={{ fontSize: 12, color: '#6366f1', textDecoration: 'none' }}>{c.name}</Link>
+                      <span style={{ fontSize: 10, color: '#3f3f46', marginRight: 'auto' }}>منذ {daysSince(c.created_at)} يوم</span>
                     </div>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Anomalies (if migration ran) */}
+            {/* Anomalies */}
             {anomalies.length > 0 && (
-              <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #fecaca', overflow: 'hidden' }}>
-                <div style={{ padding: '12px 18px', background: '#fef2f2', borderBottom: '1px solid #fecaca' }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: '#dc2626', margin: 0 }}>🚨 تنبيهات ذكية ({anomalies.length})</p>
+              <div style={{ background: 'rgba(239,68,68,.05)', borderRadius: 10, border: '1px solid rgba(239,68,68,.12)', overflow: 'hidden' }}>
+                <div style={{ padding: '12px 18px', borderBottom: '1px solid rgba(239,68,68,.08)' }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: '#ef4444', margin: 0 }}>تنبيهات ذكية ({anomalies.length})</p>
                 </div>
                 {anomalies.slice(0, 3).map((a, i) => (
-                  <div key={a.id} style={{ padding: '10px 18px', borderBottom: i < 2 ? '1px solid #fef2f2' : 'none' }}>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: '#0f172a', margin: '0 0 2px' }}>{a.anomaly_type?.replace(/_/g,' ')}</p>
-                    <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>{a.description}</p>
+                  <div key={a.id} style={{ padding: '10px 18px', borderBottom: i < 2 ? '1px solid rgba(239,68,68,.06)' : 'none' }}>
+                    <p style={{ fontSize: 12, fontWeight: 500, color: '#fafafa', margin: '0 0 2px' }}>{a.anomaly_type?.replace(/_/g,' ')}</p>
+                    <p style={{ fontSize: 11, color: '#52525b', margin: 0 }}>{a.description}</p>
                   </div>
                 ))}
-                <Link href="/dashboard/audit" style={{ display: 'block', textAlign: 'center', padding: '10px', fontSize: 12, color: '#dc2626', textDecoration: 'none', borderTop: '1px solid #fef2f2' }}>
+                <Link href="/dashboard/audit" style={{ display: 'block', textAlign: 'center', padding: '10px', fontSize: 11, color: '#ef4444', textDecoration: 'none', borderTop: '1px solid rgba(239,68,68,.08)' }}>
                   عرض الكل ←
                 </Link>
               </div>

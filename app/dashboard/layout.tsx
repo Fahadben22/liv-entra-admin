@@ -21,52 +21,57 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }, [router]);
 
   if (!ready) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
-      <div style={{ fontSize: 13, color: '#9ca3af', fontWeight: 500 }}>جاري التحميل...</div>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#09090b' }}>
+      <div style={{ width: 24, height: 24, borderRadius: '50%', border: '2px solid rgba(255,255,255,.1)', borderTopColor: '#6366f1', animation: 'spin .8s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 
-  const sideW = collapsed ? 56 : 200;
+  const sideW = collapsed ? 60 : 220;
   const sections = ['main', 'ops', 'growth', 'settings'];
 
   return (
     <ToastProvider>
-      <div style={{ display: 'flex', minHeight: '100vh', direction: 'rtl', background: '#fafafa' }}>
-        {/* Sidebar — Figma-clean */}
+      <div style={{ display: 'flex', minHeight: '100vh', direction: 'rtl', background: '#09090b' }}>
+        {/* Sidebar */}
         <aside style={{
-          width: sideW, background: '#fff', transition: 'width .2s ease',
+          width: sideW, background: '#09090b', transition: 'width .25s cubic-bezier(.4,0,.2,1)',
           display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, right: 0,
-          height: '100vh', zIndex: 100, borderLeft: '1px solid #e5e5e5', overflow: 'hidden',
+          height: '100vh', zIndex: 100, borderLeft: '1px solid rgba(255,255,255,.06)',
+          overflow: 'hidden',
         }}>
           {/* Logo */}
           <div style={{
             height: 56, display: 'flex', alignItems: 'center', gap: 10,
             padding: collapsed ? '0' : '0 16px', justifyContent: collapsed ? 'center' : 'flex-start',
-            borderBottom: '1px solid #f0f0f0', flexShrink: 0,
+            borderBottom: '1px solid rgba(255,255,255,.04)', flexShrink: 0,
           }}>
             <div style={{
               width: 28, height: 28, borderRadius: 7,
-              background: '#18181b', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 13, fontWeight: 700, color: '#fff', flexShrink: 0, letterSpacing: '-0.02em',
+              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, fontWeight: 700, color: '#fff', flexShrink: 0,
+              boxShadow: '0 0 20px rgba(99,102,241,.3)',
             }}>L</div>
             {!collapsed && (
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#18181b', letterSpacing: '-0.01em' }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#fafafa', letterSpacing: '-0.02em' }}>
                 Liventra
               </span>
             )}
           </div>
 
           {/* Nav */}
-          <nav style={{ flex: 1, padding: collapsed ? '8px 6px' : '8px 10px', overflowY: 'auto' }}>
+          <nav style={{ flex: 1, padding: collapsed ? '12px 8px' : '12px 10px', overflowY: 'auto' }}>
             {sections.map(section => {
               const items = NAV_ITEMS.filter(i => i.section === section);
               if (!items.length) return null;
               return (
-                <div key={section} style={{ marginBottom: 16 }}>
+                <div key={section} style={{ marginBottom: 20 }}>
                   {!collapsed && (
                     <div style={{
-                      fontSize: 10, fontWeight: 600, color: '#a1a1aa', textTransform: 'uppercase',
-                      letterSpacing: '0.06em', padding: '6px 8px 4px', userSelect: 'none',
+                      fontSize: 10, fontWeight: 600, color: '#3f3f46',
+                      textTransform: 'uppercase', letterSpacing: '0.08em',
+                      padding: '6px 10px 6px', userSelect: 'none',
                     }}>
                       {NAV_SECTIONS[section]}
                     </div>
@@ -76,22 +81,30 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                     return (
                       <Link key={item.href} href={item.href} style={{
                         display: 'flex', alignItems: 'center',
-                        padding: collapsed ? '8px 0' : '7px 10px',
+                        padding: collapsed ? '9px 0' : '8px 10px',
                         justifyContent: collapsed ? 'center' : 'flex-start',
-                        borderRadius: 7, marginBottom: 1, textDecoration: 'none',
-                        background: active ? '#f4f4f5' : 'transparent',
-                        color: active ? '#18181b' : '#71717a',
-                        fontSize: 13, fontWeight: active ? 600 : 400,
-                        transition: 'all .12s ease',
-                        letterSpacing: '-0.005em',
+                        borderRadius: 7, marginBottom: 2, textDecoration: 'none',
+                        background: active ? 'rgba(99,102,241,.1)' : 'transparent',
+                        color: active ? '#c7d2fe' : '#52525b',
+                        fontSize: 13, fontWeight: active ? 500 : 400,
+                        transition: 'all .15s ease',
+                        position: 'relative',
                       }}>
+                        {active && !collapsed && (
+                          <div style={{
+                            position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)',
+                            width: 3, height: 16, borderRadius: 2,
+                            background: '#6366f1',
+                          }} />
+                        )}
                         {collapsed ? (
                           <div style={{
-                            width: 6, height: 6, borderRadius: '50%',
-                            background: active ? '#18181b' : '#d4d4d8',
+                            width: 5, height: 5, borderRadius: '50%',
+                            background: active ? '#6366f1' : '#3f3f46',
+                            boxShadow: active ? '0 0 8px rgba(99,102,241,.5)' : 'none',
                           }} />
                         ) : (
-                          <span>{item.label}</span>
+                          <span style={{ paddingRight: 8 }}>{item.label}</span>
                         )}
                       </Link>
                     );
@@ -102,10 +115,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </nav>
 
           {/* Footer */}
-          <div style={{ borderTop: '1px solid #f0f0f0', padding: collapsed ? '10px 6px' : '12px 14px' }}>
+          <div style={{ borderTop: '1px solid rgba(255,255,255,.04)', padding: collapsed ? '12px 8px' : '14px 14px' }}>
             {!collapsed && (
-              <div style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 8, padding: '0 2px' }}>
-                {userName}
+              <div style={{
+                fontSize: 11, color: '#3f3f46', marginBottom: 10, padding: '0 4px',
+                display: 'flex', alignItems: 'center', gap: 8,
+              }}>
+                <div style={{
+                  width: 6, height: 6, borderRadius: '50%', background: '#22c55e',
+                  boxShadow: '0 0 6px rgba(34,197,94,.5)',
+                }} />
+                <span>{userName}</span>
               </div>
             )}
             <div style={{ display: 'flex', gap: 6, justifyContent: collapsed ? 'center' : 'flex-start' }}>
@@ -125,8 +145,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
         {/* Main */}
         <main style={{
-          flex: 1, marginRight: sideW, transition: 'margin .2s ease',
-          padding: '28px 32px', minHeight: '100vh',
+          flex: 1, marginRight: sideW, transition: 'margin .25s cubic-bezier(.4,0,.2,1)',
+          padding: '24px 28px', minHeight: '100vh',
         }}>
           {children}
         </main>
@@ -136,7 +156,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 }
 
 const footerBtn: React.CSSProperties = {
-  padding: '5px 10px', borderRadius: 6, border: '1px solid #e5e5e5',
-  background: '#fff', color: '#71717a', cursor: 'pointer', fontSize: 11,
-  fontWeight: 500, transition: 'all .12s',
+  padding: '5px 10px', borderRadius: 6, border: '1px solid rgba(255,255,255,.06)',
+  background: 'rgba(255,255,255,.03)', color: '#52525b', cursor: 'pointer', fontSize: 11,
+  fontWeight: 500, transition: 'all .15s',
 };

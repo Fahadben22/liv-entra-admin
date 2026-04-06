@@ -40,9 +40,9 @@ export default function BillingSettingsPage() {
 
   return (
     <div>
-      {toast && <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#18181b', color: '#fff', padding: '10px 28px', borderRadius: 7, fontSize: 13, zIndex: 9999 }}>{toast}</div>}
+      {toast && <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#18181b', color: '#fafafa', padding: '10px 28px', borderRadius: 7, fontSize: 13, zIndex: 9999, border: '1px solid rgba(255,255,255,.1)' }}>{toast}</div>}
 
-      <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: '#18181b' }}>إعدادات الفوترة والفواتير</h1>
+      <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: '#fafafa' }}>إعدادات الفوترة والفواتير</h1>
       <p style={{ color: '#a1a1aa', fontSize: 13, marginBottom: 28 }}>خصّص بيانات الشركة، الضريبة، البنك، وتنسيق الفواتير</p>
 
       {/* Section: Company Identity */}
@@ -100,7 +100,7 @@ export default function BillingSettingsPage() {
         <button onClick={save} disabled={saving}
           style={{
             padding: '10px 32px', borderRadius: 7, border: 'none', fontSize: 13, fontWeight: 600,
-            background: '#18181b', color: '#fff',
+            background: '#6366f1', color: '#fff',
             cursor: 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
           }}>
           {saving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
@@ -114,8 +114,8 @@ export default function BillingSettingsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: '24px 28px', marginBottom: 20 }}>
-      <h2 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: '#18181b' }}>
+    <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 8, padding: '24px 28px', marginBottom: 20 }}>
+      <h2 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: '#fafafa' }}>
         {title}
       </h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>{children}</div>
@@ -128,8 +128,8 @@ function Row({ label, value, onChange, type = 'text', placeholder, multiline }: 
 }) {
   const style: React.CSSProperties = {
     width: '100%', padding: '9px 12px', borderRadius: 7, fontSize: 13,
-    border: '1px solid #e5e5e5', background: '#fff',
-    color: '#18181b', fontFamily: 'inherit', boxSizing: 'border-box',
+    border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)',
+    color: '#fafafa', fontFamily: 'inherit', boxSizing: 'border-box',
     outline: 'none',
   };
 

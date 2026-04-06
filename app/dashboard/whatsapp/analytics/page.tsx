@@ -52,18 +52,18 @@ export default function AnalyticsPage() {
   const maxIntentCount = data ? Math.max(...data.intentDistribution.map(i => i.count), 1) : 1;
 
   return (
-    <div style={{ background: '#fafafa' }}>
+    <div style={{ background: '#09090b' }}>
       {/* Header */}
-      <div style={{ background: '#fff', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid #e5e5e5' }}>
-        <Link href="/dashboard" style={{ color: '#71717a', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
+      <div style={{ background: 'rgba(255,255,255,.03)', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(255,255,255,.06)', backdropFilter: 'blur(12px)' }}>
+        <Link href="/dashboard" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#18181b' }}>تحليلات واتساب</div>
-          <div style={{ fontSize: 11, color: '#a1a1aa' }}>إحصائيات المنصة الكاملة</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#fafafa' }}>تحليلات واتساب</div>
+          <div style={{ fontSize: 11, color: '#52525b' }}>إحصائيات المنصة الكاملة</div>
         </div>
         <div style={{ marginRight: 'auto', display: 'flex', gap: 12 }}>
-          <Link href="/dashboard/conversations" style={{ color: '#71717a', textDecoration: 'none', fontSize: 12 }}>المحادثات</Link>
-          <Link href="/dashboard/whatsapp/queue" style={{ color: '#71717a', textDecoration: 'none', fontSize: 12 }}>قائمة الإرسال</Link>
-          <Link href="/dashboard/whatsapp/settings" style={{ color: '#71717a', textDecoration: 'none', fontSize: 12 }}>الإعدادات</Link>
+          <Link href="/dashboard/conversations" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: 12 }}>المحادثات</Link>
+          <Link href="/dashboard/whatsapp/queue" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: 12 }}>قائمة الإرسال</Link>
+          <Link href="/dashboard/whatsapp/settings" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: 12 }}>الإعدادات</Link>
         </div>
       </div>
 
@@ -77,12 +77,12 @@ export default function AnalyticsPage() {
             {/* KPI Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
               {[
-                { label: 'إجمالي الرسائل هذا الشهر', value: data.totalMessages.toLocaleString(), color: '#18181b' },
+                { label: 'إجمالي الرسائل هذا الشهر', value: data.totalMessages.toLocaleString(), color: '#fafafa' },
                 { label: 'معالجة بالذكاء الاصطناعي', value: `${data.aiHandledPct}%`, color: '#16a34a' },
                 { label: 'معالجة بشرياً', value: `${data.humanHandledPct}%`, color: '#7c3aed' },
                 { label: 'متوسط وقت الرد', value: data.avgResponseMs > 1000 ? `${(data.avgResponseMs / 1000).toFixed(1)}ث` : `${data.avgResponseMs}ms`, color: '#d97706' },
               ].map(card => (
-                <div key={card.label} style={{ background: '#fff', borderRadius: 8, padding: '18px 20px', border: '1px solid #e5e5e5' }}>
+                <div key={card.label} style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: '18px 20px', border: '1px solid rgba(255,255,255,.06)' }}>
                   <div style={{ fontSize: 22, fontWeight: 600, color: card.color, marginBottom: 4 }}>{card.value}</div>
                   <div style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>{card.label}</div>
                 </div>
@@ -91,26 +91,26 @@ export default function AnalyticsPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 24 }}>
               {/* Intent Distribution */}
-              <div style={{ background: '#fff', borderRadius: 8, padding: 20, border: '1px solid #e5e5e5' }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#18181b', marginBottom: 16 }}>توزيع النوايا</div>
+              <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: 20, border: '1px solid rgba(255,255,255,.06)' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#fafafa', marginBottom: 16 }}>توزيع النوايا</div>
                 {data.intentDistribution.length === 0 ? (
                   <div style={{ color: '#a1a1aa', fontSize: 13, padding: 20, textAlign: 'center' }}>لا توجد بيانات بعد</div>
                 ) : data.intentDistribution.sort((a, b) => b.count - a.count).map(item => (
                   <div key={item.intent} style={{ marginBottom: 10 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <span style={{ fontSize: 12, color: '#71717a' }}>{INTENT_LABELS[item.intent] || item.intent}</span>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#18181b' }}>{item.count}</span>
+                      <span style={{ fontSize: 12, color: '#a1a1aa' }}>{INTENT_LABELS[item.intent] || item.intent}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa' }}>{item.count}</span>
                     </div>
-                    <div style={{ background: '#f0f0f0', borderRadius: 3, height: 5 }}>
-                      <div style={{ height: 5, borderRadius: 3, background: '#18181b', width: `${(item.count / maxIntentCount) * 100}%` }} />
+                    <div style={{ background: 'rgba(255,255,255,.04)', borderRadius: 3, height: 5 }}>
+                      <div style={{ height: 5, borderRadius: 3, background: '#6366f1', width: `${(item.count / maxIntentCount) * 100}%` }} />
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* AI vs Human ratio */}
-              <div style={{ background: '#fff', borderRadius: 8, padding: 20, border: '1px solid #e5e5e5' }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#18181b', marginBottom: 16 }}>بوت مقابل موظف — حسب الشركة</div>
+              <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: 20, border: '1px solid rgba(255,255,255,.06)' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#fafafa', marginBottom: 16 }}>بوت مقابل موظف — حسب الشركة</div>
                 {data.handledByRatio.length === 0 ? (
                   <div style={{ color: '#a1a1aa', fontSize: 13, padding: 20, textAlign: 'center' }}>لا توجد بيانات بعد</div>
                 ) : Object.entries(
@@ -121,12 +121,12 @@ export default function AnalyticsPage() {
                     }, {} as Record<string, Record<string, number>>)
                   ).map(([compId, ratio]) => (
                     <div key={compId} style={{ marginBottom: 12 }}>
-                      <div style={{ fontSize: 12, color: '#71717a', marginBottom: 4 }}>{companyName(compId)}</div>
+                      <div style={{ fontSize: 12, color: '#a1a1aa', marginBottom: 4 }}>{companyName(compId)}</div>
                       <div style={{ display: 'flex', height: 6, borderRadius: 3, overflow: 'hidden' }}>
                         <div style={{ width: `${ratio.bot || 0}%`, background: '#16a34a' }} title={`بوت ${ratio.bot || 0}%`} />
                         <div style={{ width: `${ratio.human || 0}%`, background: '#7c3aed' }} title={`موظف ${ratio.human || 0}%`} />
                       </div>
-                      <div style={{ display: 'flex', gap: 12, marginTop: 3, fontSize: 10, color: '#71717a' }}>
+                      <div style={{ display: 'flex', gap: 12, marginTop: 3, fontSize: 10, color: '#52525b' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />{ratio.bot || 0}%</span>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#7c3aed', display: 'inline-block' }} />{ratio.human || 0}%</span>
                       </div>
@@ -136,28 +136,28 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Lead conversion table */}
-            <div style={{ background: '#fff', borderRadius: 8, padding: 20, border: '1px solid #e5e5e5' }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#18181b', marginBottom: 16 }}>معدل تحويل العملاء المحتملين — واتساب</div>
+            <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: 20, border: '1px solid rgba(255,255,255,.06)' }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#fafafa', marginBottom: 16 }}>معدل تحويل العملاء المحتملين — واتساب</div>
               {data.leadConversion.length === 0 ? (
                 <div style={{ color: '#a1a1aa', fontSize: 13, textAlign: 'center', padding: 20 }}>لا توجد بيانات بعد</div>
               ) : (
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
-                    <tr style={{ background: '#fafafa' }}>
+                    <tr style={{ background: 'rgba(255,255,255,.04)' }}>
                       {['الشركة', 'عملاء واتساب', 'تحولوا لعقد', 'معدل التحويل'].map(h => (
-                        <th key={h} style={{ padding: '8px 14px', fontSize: 11, color: '#a1a1aa', fontWeight: 500, textAlign: 'right', borderBottom: '1px solid #e5e5e5' }}>{h}</th>
+                        <th key={h} style={{ padding: '8px 14px', fontSize: 11, color: '#a1a1aa', fontWeight: 500, textAlign: 'right', borderBottom: '1px solid rgba(255,255,255,.06)' }}>{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
                     {data.leadConversion.map((row, i) => (
-                      <tr key={row.company_id} style={{ borderBottom: '1px solid #f0f0f0', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
-                        <td style={{ padding: '10px 14px', fontSize: 13, color: '#18181b' }}>{companyName(row.company_id)}</td>
-                        <td style={{ padding: '10px 14px', fontSize: 13, color: '#18181b' }}>{row.whatsapp_leads}</td>
-                        <td style={{ padding: '10px 14px', fontSize: 13, color: '#18181b' }}>{row.converted}</td>
+                      <tr key={row.company_id} style={{ borderBottom: '1px solid rgba(255,255,255,.03)', background: i % 2 === 1 ? 'rgba(255,255,255,.02)' : 'transparent' }}>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: '#fafafa' }}>{companyName(row.company_id)}</td>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: '#fafafa' }}>{row.whatsapp_leads}</td>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: '#fafafa' }}>{row.converted}</td>
                         <td style={{ padding: '10px 14px', fontSize: 13 }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#16a34a', fontWeight: 600 }}>
-                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16a34a', display: 'inline-block' }} />
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16a34a', display: 'inline-block', boxShadow: '0 0 6px #16a34a' }} />
                             {row.conversion_rate || 0}%
                           </span>
                         </td>

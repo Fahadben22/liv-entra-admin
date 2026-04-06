@@ -24,21 +24,21 @@ interface LandingContent {
 }
 
 const S = {
-  page: { background: '#fafafa', color: '#18181b', fontFamily: 'system-ui, sans-serif' },
-  topbar: { background: '#fff', borderBottom: '1px solid #e5e5e5', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  logo: { color: '#18181b', fontWeight: 600, fontSize: 18, letterSpacing: '-0.02em' as const },
+  page: { color: '#fafafa', fontFamily: 'system-ui, sans-serif' } as React.CSSProperties,
+  topbar: { borderBottom: '1px solid rgba(255,255,255,.06)', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' } as React.CSSProperties,
+  logo: { color: '#fafafa', fontWeight: 600, fontSize: 18, letterSpacing: '-0.02em' as const },
   body: { maxWidth: 960, margin: '0 auto', padding: '32px 16px' },
-  card: { background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: 24, marginBottom: 20 },
-  sectionTitle: { fontSize: 13, fontWeight: 600 as const, color: '#18181b', letterSpacing: '-0.02em' as const, marginBottom: 16, marginTop: 0 },
+  card: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 10, padding: 24, marginBottom: 20 },
+  sectionTitle: { fontSize: 13, fontWeight: 600 as const, color: '#fafafa', letterSpacing: '-0.02em' as const, marginBottom: 16, marginTop: 0 },
   label: { fontSize: 11, color: '#a1a1aa', fontWeight: 500 as const, marginBottom: 4, display: 'block' },
-  input: { width: '100%', background: '#fff', border: '1px solid #e5e5e5', borderRadius: 7, padding: '10px 12px', color: '#18181b', fontSize: 13, outline: 'none', boxSizing: 'border-box' as const },
+  input: { width: '100%', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, padding: '10px 12px', color: '#fafafa', fontSize: 13, outline: 'none', boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  saveBtn: { background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, padding: '12px 32px', fontWeight: 600, cursor: 'pointer', fontSize: 13 },
+  saveBtn: { background: '#6366f1', color: '#fff', border: 'none', borderRadius: 7, padding: '12px 32px', fontWeight: 600, cursor: 'pointer', fontSize: 13 },
   saveRow: { display: 'flex', alignItems: 'center', gap: 16, marginTop: 24 },
-  badge: (ok: boolean) => ({ background: ok ? '#f0fdf4' : '#fef2f2', color: ok ? '#16a34a' : '#dc2626', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, border: ok ? '1px solid #bbf7d0' : '1px solid #fca5a5' }),
-  addBtn: { background: '#fafafa', color: '#18181b', border: '1px solid #e5e5e5', borderRadius: 7, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
-  removeBtn: { background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: 7, padding: '6px 10px', cursor: 'pointer', fontSize: 12 },
-  itemCard: { background: '#fafafa', border: '1px solid #f0f0f0', borderRadius: 8, padding: 16, marginBottom: 10 },
+  badge: (ok: boolean) => ({ background: ok ? 'rgba(22,163,74,.1)' : 'rgba(220,38,38,.1)', color: ok ? '#16a34a' : '#dc2626', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, border: ok ? '1px solid rgba(22,163,74,.2)' : '1px solid rgba(220,38,38,.2)' }),
+  addBtn: { background: 'rgba(255,255,255,.04)', color: '#a1a1aa', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
+  removeBtn: { background: 'rgba(220,38,38,.1)', color: '#dc2626', border: '1px solid rgba(220,38,38,.2)', borderRadius: 7, padding: '6px 10px', cursor: 'pointer', fontSize: 12 },
+  itemCard: { background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 8, padding: 16, marginBottom: 10 },
 };
 
 export default function LandingPageCMS() {
@@ -106,18 +106,18 @@ export default function LandingPageCMS() {
         <span style={S.logo}>إدارة الصفحة الرئيسية — www.liv-entra.com</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={S.badge(data.is_published)}>{data.is_published ? 'منشور' : 'مسودة'}</span>
-          <span style={{ fontSize: 11, color: '#a1a1aa' }}>آخر تحديث: {data.updated_at ? new Date(data.updated_at).toLocaleString('ar-SA') : '—'} بواسطة: {data.updated_by || '—'}</span>
+          <span style={{ fontSize: 11, color: '#52525b' }}>آخر تحديث: {data.updated_at ? new Date(data.updated_at).toLocaleString('ar-SA') : '—'} بواسطة: {data.updated_by || '—'}</span>
         </div>
       </div>
 
       <div style={S.body}>
-        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid #e5e5e5' }}>
+        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid rgba(255,255,255,.06)' }}>
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key as any)} style={{
               padding: '12px 18px', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: tab === t.key ? 600 : 400,
               background: 'transparent',
-              color: tab === t.key ? '#18181b' : '#71717a',
-              borderBottom: tab === t.key ? '2px solid #18181b' : '2px solid transparent',
+              color: tab === t.key ? '#fafafa' : '#52525b',
+              borderBottom: tab === t.key ? '2px solid #6366f1' : '2px solid transparent',
             }}>{t.label}</button>
           ))}
         </div>
@@ -172,7 +172,7 @@ export default function LandingPageCMS() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
               <input type="checkbox" id="pub" checked={data.is_published} onChange={e => set('is_published', e.target.checked)} style={{ width: 16, height: 16 }} />
-              <label htmlFor="pub" style={{ color: '#71717a', fontSize: 13, cursor: 'pointer' }}>نشر الصفحة (مرئية على الموقع)</label>
+              <label htmlFor="pub" style={{ color: '#a1a1aa', fontSize: 13, cursor: 'pointer' }}>نشر الصفحة (مرئية على الموقع)</label>
             </div>
           </div>
         )}
@@ -270,11 +270,11 @@ export default function LandingPageCMS() {
               }>+ خطة جديدة</button>
             </div>
             {data.pricing_plans.map((p, i) => (
-              <div key={i} style={{ ...S.itemCard, borderColor: p.highlighted ? '#18181b' : '#f0f0f0' }}>
+              <div key={i} style={{ ...S.itemCard, borderColor: p.highlighted ? '#6366f1' : 'rgba(255,255,255,.06)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                   <span style={{ color: '#a1a1aa', fontSize: 11, fontWeight: 500 }}>خطة #{i + 1} {p.highlighted ? 'مميزة' : ''}</span>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <label style={{ fontSize: 12, color: '#71717a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <label style={{ fontSize: 12, color: '#a1a1aa', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                       <input type="checkbox" checked={!!p.highlighted} onChange={e => updatePlan(i, 'highlighted', e.target.checked)} />
                       تمييز
                     </label>
@@ -332,14 +332,14 @@ export default function LandingPageCMS() {
               <div>
                 <label style={S.label}>رقم واتساب (بدون + — مثال: 966501234567)</label>
                 <input style={{ ...S.input, direction: 'ltr' }} value={data.contact_whatsapp} onChange={e => set('contact_whatsapp', e.target.value)} placeholder="966501234567" />
-                <div style={{ fontSize: 11, color: '#a1a1aa', marginTop: 4 }}>هذا الرقم يُستخدم في زر واتساب الطائر على الموقع</div>
+                <div style={{ fontSize: 11, color: '#52525b', marginTop: 4 }}>هذا الرقم يُستخدم في زر واتساب الطائر على الموقع</div>
               </div>
               <div>
                 <label style={S.label}>البريد الإلكتروني</label>
                 <input style={{ ...S.input, direction: 'ltr' }} value={data.contact_email} onChange={e => set('contact_email', e.target.value)} />
               </div>
             </div>
-            <div style={{ background: '#fafafa', borderRadius: 8, padding: 16, border: '1px solid #e5e5e5' }}>
+            <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: 16, border: '1px solid rgba(255,255,255,.06)' }}>
               <div style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 8, fontWeight: 500 }}>معاينة زر واتساب:</div>
               <a
                 href={`https://wa.me/${data.contact_whatsapp}`}
@@ -364,7 +364,7 @@ export default function LandingPageCMS() {
             </span>
           )}
           <a href="https://www.liv-entra.com" target="_blank" rel="noreferrer"
-            style={{ fontSize: 13, color: '#18181b', textDecoration: 'underline', marginRight: 'auto' }}>
+            style={{ fontSize: 13, color: '#6366f1', textDecoration: 'underline', marginRight: 'auto' }}>
             عرض الموقع
           </a>
         </div>

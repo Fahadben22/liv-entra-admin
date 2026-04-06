@@ -7,18 +7,18 @@ import { adminApi } from '@/lib/api';
 const TABS = ['نظرة عامة', 'الاشتراك', 'الميزات', 'الاستخدام', 'التدقيق'] as const;
 type Tab = typeof TABS[number];
 
-const LC: Record<string, { bg: string; color: string; label: string }> = {
-  trial:     { bg: '#fefce8', color: '#854d0e', label: 'تجريبي'   },
-  active:    { bg: '#f0fdf4', color: '#15803d', label: 'نشط'       },
-  overdue:   { bg: '#fff7ed', color: '#c2410c', label: 'متأخر'     },
-  suspended: { bg: '#fef2f2', color: '#dc2626', label: 'موقوف'     },
-  deleted:   { bg: '#fafafa', color: '#a1a1aa', label: 'محذوف'     },
+const LC: Record<string, { color: string; label: string }> = {
+  trial:     { color: '#f59e0b', label: 'تجريبي'   },
+  active:    { color: '#22c55e', label: 'نشط'       },
+  overdue:   { color: '#f59e0b', label: 'متأخر'     },
+  suspended: { color: '#ef4444', label: 'موقوف'     },
+  deleted:   { color: '#52525b', label: 'محذوف'     },
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e5e5e5', padding: '20px 24px', marginBottom: 20 }}>
-      <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#18181b' }}>{title}</h3>
+    <div className="glass" style={{ background: 'rgba(255,255,255,.03)', borderRadius: 10, border: '1px solid rgba(255,255,255,.06)', padding: '20px 24px', marginBottom: 20 }}>
+      <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#fafafa' }}>{title}</h3>
       {children}
     </div>
   );
@@ -26,9 +26,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,.04)' }}>
       <span style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>{label}</span>
-      <span style={{ fontSize: 13, fontWeight: 500, color: '#18181b' }}>{value ?? '—'}</span>
+      <span style={{ fontSize: 13, fontWeight: 500, color: '#fafafa' }}>{value ?? '—'}</span>
     </div>
   );
 }
@@ -135,14 +135,14 @@ export default function CompanyDetailPage() {
   };
 
   if (loading) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#fafafa' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
       <p style={{ color: '#a1a1aa', fontSize: 13 }}>جاري التحميل...</p>
     </div>
   );
 
   if (!company) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#fafafa' }}>
-      <p style={{ color: '#dc2626', fontSize: 13 }}>لم يتم العثور على الشركة</p>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <p style={{ color: '#ef4444', fontSize: 13 }}>لم يتم العثور على الشركة</p>
     </div>
   );
 
@@ -151,39 +151,39 @@ export default function CompanyDetailPage() {
   const sub = company.subscription;
 
   return (
-    <div style={{ background: '#fafafa' }}>
+    <div className="fade-in">
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#18181b', color: '#fff', padding: '7px 20px', borderRadius: 7, fontSize: 12, zIndex: 9999, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }}>
+        <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#6366f1', color: '#fff', padding: '7px 20px', borderRadius: 7, fontSize: 12, zIndex: 9999, boxShadow: '0 0 12px rgba(99,102,241,.4)' }}>
           {toast}
         </div>
       )}
 
       {/* Header */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: 'rgba(255,255,255,.03)', borderBottom: '1px solid rgba(255,255,255,.06)', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span style={{ fontSize: 18, fontWeight: 600, color: '#18181b', letterSpacing: '-0.02em' }}>{company.name}</span>
+          <span style={{ fontSize: 18, fontWeight: 600, color: '#fafafa', letterSpacing: '-0.02em' }}>{company.name}</span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: lc.color, display: 'inline-block' }} />
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: lc.color, display: 'inline-block', boxShadow: `0 0 6px ${lc.color}66` }} />
             <span style={{ fontSize: 11, color: lc.color, fontWeight: 500 }}>{lc.label}</span>
           </span>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {lcStatus !== 'active' && lcStatus !== 'deleted' && (
             <button onClick={() => handleLifecycle('activate')} disabled={saving}
-              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 7, background: '#18181b', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
+              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 7, background: '#6366f1', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
               {saving ? '...' : 'تفعيل'}
             </button>
           )}
           {lcStatus === 'active' && (
             <button onClick={() => handleLifecycle('suspend')} disabled={saving}
-              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 7, background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', cursor: 'pointer', fontWeight: 500 }}>
+              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 7, background: 'rgba(239,68,68,.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,.25)', cursor: 'pointer', fontWeight: 500 }}>
               {saving ? '...' : 'إيقاف'}
             </button>
           )}
           {lcStatus === 'trial' && (
             <button onClick={handleExtendTrial} disabled={saving}
-              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 7, background: '#fff', color: '#71717a', border: '1px solid #e5e5e5', cursor: 'pointer', fontWeight: 500 }}>
+              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 7, background: 'rgba(255,255,255,.04)', color: '#a1a1aa', border: '1px solid rgba(255,255,255,.08)', cursor: 'pointer', fontWeight: 500 }}>
               تمديد التجربة
             </button>
           )}
@@ -191,10 +191,10 @@ export default function CompanyDetailPage() {
       </div>
 
       {/* Tab bar */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', padding: '0 32px', display: 'flex', gap: 0 }}>
+      <div style={{ background: 'rgba(255,255,255,.03)', borderBottom: '1px solid rgba(255,255,255,.06)', padding: '0 32px', display: 'flex', gap: 0 }}>
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)}
-            style={{ fontSize: 13, padding: '12px 18px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: tab === t ? 600 : 400, color: tab === t ? '#18181b' : '#a1a1aa', borderBottom: tab === t ? '2px solid #18181b' : '2px solid transparent', transition: 'all .15s' }}>
+            style={{ fontSize: 13, padding: '12px 18px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: tab === t ? 600 : 400, color: tab === t ? '#fafafa' : '#52525b', borderBottom: tab === t ? '2px solid #6366f1' : '2px solid transparent', transition: 'all .15s' }}>
             {t}
           </button>
         ))}
@@ -208,16 +208,16 @@ export default function CompanyDetailPage() {
             {company.health && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 20 }}>
                 {[
-                  { label: 'صحة الشركة', value: `${company.health.score}%`, sub: `تقييم ${company.health.grade}`, color: company.health.grade === 'A' ? '#059669' : company.health.grade === 'B' ? '#2563eb' : company.health.grade === 'C' ? '#d97706' : '#dc2626' },
-                  { label: 'نسبة الإشغال', value: `${company.health.occupancy}%`, sub: 'الوحدات المشغولة', color: '#0ea5e9' },
-                  { label: 'معدل التحصيل', value: `${company.health.collection}%`, sub: 'آخر 90 يوم', color: '#059669' },
-                  { label: 'استجابة الصيانة', value: `${company.health.maintenance}%`, sub: 'تذاكر محلولة', color: '#8b5cf6' },
+                  { label: 'صحة الشركة', value: `${company.health.score}%`, sub: `تقييم ${company.health.grade}`, color: company.health.grade === 'A' ? '#22c55e' : company.health.grade === 'B' ? '#3b82f6' : company.health.grade === 'C' ? '#f59e0b' : '#ef4444' },
+                  { label: 'نسبة الإشغال', value: `${company.health.occupancy}%`, sub: 'الوحدات المشغولة', color: '#3b82f6' },
+                  { label: 'معدل التحصيل', value: `${company.health.collection}%`, sub: 'آخر 90 يوم', color: '#22c55e' },
+                  { label: 'استجابة الصيانة', value: `${company.health.maintenance}%`, sub: 'تذاكر محلولة', color: '#a78bfa' },
                   { label: 'تبني الميزات', value: `${company.health.adoption}%`, sub: 'ميزات مفعلة', color: '#f59e0b' },
                 ].map(k => (
-                  <div key={k.label} style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: '14px', textAlign: 'center' }}>
+                  <div key={k.label} className="glass" style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 10, padding: '14px', textAlign: 'center' }}>
                     <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 6px', fontWeight: 500 }}>{k.label}</p>
                     <p style={{ fontSize: 22, fontWeight: 600, color: k.color, margin: 0 }}>{k.value}</p>
-                    <p style={{ fontSize: 11, color: '#a1a1aa', margin: '4px 0 0', fontWeight: 500 }}>{k.sub}</p>
+                    <p style={{ fontSize: 11, color: '#52525b', margin: '4px 0 0', fontWeight: 500 }}>{k.sub}</p>
                   </div>
                 ))}
               </div>
@@ -264,20 +264,20 @@ export default function CompanyDetailPage() {
             ) : (
               <p style={{ fontSize: 13, color: '#a1a1aa', marginBottom: 16 }}>لا يوجد اشتراك نشط</p>
             )}
-            <div style={{ marginTop: 20, borderTop: '1px solid #f0f0f0', paddingTop: 20 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: '#18181b' }}>تغيير الخطة</p>
+            <div style={{ marginTop: 20, borderTop: '1px solid rgba(255,255,255,.04)', paddingTop: 20 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: '#fafafa' }}>تغيير الخطة</p>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {plans.filter(p => p.is_active).map(p => (
-                  <div key={p.id} style={{ border: '1px solid #e5e5e5', borderRadius: 8, padding: '12px 16px', background: '#fff', minWidth: 160 }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px', color: '#18181b' }}>{p.name}</p>
+                  <div key={p.id} style={{ border: '1px solid rgba(255,255,255,.06)', borderRadius: 10, padding: '12px 16px', background: 'rgba(255,255,255,.03)', minWidth: 160 }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px', color: '#fafafa' }}>{p.name}</p>
                     <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 10px', fontWeight: 500 }}>{p.price_monthly} ر.س/شهر</p>
                     <div style={{ display: 'flex', gap: 6 }}>
                       <button onClick={() => handleAssignPlan(p.id, 'monthly')} disabled={saving}
-                        style={{ flex: 1, fontSize: 12, padding: '7px 16px', borderRadius: 7, background: '#fff', border: '1px solid #e5e5e5', color: '#71717a', cursor: 'pointer', fontWeight: 500 }}>
+                        style={{ flex: 1, fontSize: 12, padding: '7px 16px', borderRadius: 7, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', color: '#a1a1aa', cursor: 'pointer', fontWeight: 500 }}>
                         شهري
                       </button>
                       <button onClick={() => handleAssignPlan(p.id, 'yearly')} disabled={saving}
-                        style={{ flex: 1, fontSize: 12, padding: '7px 16px', borderRadius: 7, background: '#18181b', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 500 }}>
+                        style={{ flex: 1, fontSize: 12, padding: '7px 16px', borderRadius: 7, background: '#6366f1', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 500 }}>
                         سنوي
                       </button>
                     </div>
@@ -296,15 +296,15 @@ export default function CompanyDetailPage() {
                 const flag = flags.find(f => f.feature_key === key);
                 const enabled = flag?.is_enabled ?? false;
                 return (
-                  <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 8, border: '1px solid', borderColor: enabled ? '#bbf7d0' : '#e5e5e5', background: enabled ? '#f0fdf4' : '#fff', transition: 'all .15s' }}>
+                  <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 10, border: '1px solid', borderColor: enabled ? 'rgba(34,197,94,.25)' : 'rgba(255,255,255,.06)', background: enabled ? 'rgba(34,197,94,.06)' : 'rgba(255,255,255,.03)', transition: 'all .15s' }}>
                     <div>
-                      <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 2px', color: '#18181b' }}>{meta.name_ar}</p>
-                      <p style={{ fontSize: 11, color: '#a1a1aa', margin: 0, direction: 'ltr', fontWeight: 500 }}>{key}</p>
-                      <p style={{ fontSize: 11, color: '#a1a1aa', margin: '2px 0 0', fontWeight: 500 }}>الحد الأدنى: {meta.tier_min}</p>
+                      <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 2px', color: '#fafafa' }}>{meta.name_ar}</p>
+                      <p style={{ fontSize: 11, color: '#52525b', margin: 0, direction: 'ltr', fontWeight: 500 }}>{key}</p>
+                      <p style={{ fontSize: 11, color: '#52525b', margin: '2px 0 0', fontWeight: 500 }}>الحد الأدنى: {meta.tier_min}</p>
                     </div>
                     <button onClick={() => handleToggleFlag(key, enabled)} disabled={saving}
-                      style={{ width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer', background: enabled ? '#15803d' : '#cbd5e1', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
-                      <span style={{ position: 'absolute', top: 2, left: enabled ? 20 : 2, width: 18, height: 18, borderRadius: '50%', background: 'white', transition: 'left .2s', boxShadow: '0 1px 2px rgba(0,0,0,.04)' }} />
+                      style={{ width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer', background: enabled ? '#22c55e' : '#3f3f46', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
+                      <span style={{ position: 'absolute', top: 2, left: enabled ? 20 : 2, width: 18, height: 18, borderRadius: '50%', background: '#fafafa', transition: 'left .2s', boxShadow: '0 1px 2px rgba(0,0,0,.2)' }} />
                     </button>
                   </div>
                 );
@@ -328,14 +328,14 @@ export default function CompanyDetailPage() {
                 ].map(m => {
                   const pct = m.max ? Math.min(Math.round((m.v / m.max) * 100), 100) : null;
                   return (
-                    <div key={m.l} style={{ padding: '14px 16px', borderRadius: 8, border: '1px solid #e5e5e5', background: '#fff' }}>
+                    <div key={m.l} className="glass" style={{ padding: '14px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,.06)', background: 'rgba(255,255,255,.03)' }}>
                       <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 6px', fontWeight: 500 }}>{m.l}</p>
-                      <p style={{ fontSize: 22, fontWeight: 600, color: '#18181b', margin: 0 }}>{m.v ?? '—'}</p>
+                      <p style={{ fontSize: 22, fontWeight: 600, color: '#fafafa', margin: 0 }}>{m.v ?? '—'}</p>
                       {pct !== null && (
                         <>
-                          <p style={{ fontSize: 11, color: '#a1a1aa', margin: '4px 0 6px', fontWeight: 500 }}>من {m.max} ({pct}%)</p>
-                          <div style={{ height: 4, borderRadius: 3, background: '#e5e5e5', overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${pct}%`, background: pct > 90 ? '#dc2626' : pct > 70 ? '#f97316' : '#15803d', borderRadius: 3, transition: 'width .4s' }} />
+                          <p style={{ fontSize: 11, color: '#52525b', margin: '4px 0 6px', fontWeight: 500 }}>من {m.max} ({pct}%)</p>
+                          <div style={{ height: 4, borderRadius: 3, background: 'rgba(255,255,255,.06)', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${pct}%`, background: pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#22c55e', borderRadius: 3, transition: 'width .4s' }} />
                           </div>
                         </>
                       )}
@@ -357,21 +357,21 @@ export default function CompanyDetailPage() {
             ) : (
               <div>
                 {audit.map((a, i) => (
-                  <div key={a.id} style={{ padding: '12px 0', borderBottom: i < audit.length - 1 ? '1px solid #f0f0f0' : 'none', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#fafafa', border: '1px solid #e5e5e5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0, color: '#a1a1aa', fontWeight: 500 }}>
+                  <div key={a.id} style={{ padding: '12px 0', borderBottom: i < audit.length - 1 ? '1px solid rgba(255,255,255,.04)' : 'none', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0, color: '#a1a1aa', fontWeight: 500 }}>
                       A
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: '#18181b' }}>{a.action?.replace(/_/g, ' ')}</span>
-                          <span style={{ fontSize: 11, color: '#a1a1aa', marginRight: 8, fontWeight: 500 }}>بواسطة {a.actor_email}</span>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: '#fafafa' }}>{a.action?.replace(/_/g, ' ')}</span>
+                          <span style={{ fontSize: 11, color: '#52525b', marginRight: 8, fontWeight: 500 }}>بواسطة {a.actor_email}</span>
                         </div>
-                        <span style={{ fontSize: 11, color: '#a1a1aa', direction: 'ltr', fontWeight: 500 }}>
+                        <span style={{ fontSize: 11, color: '#52525b', direction: 'ltr', fontWeight: 500 }}>
                           {new Date(a.created_at).toLocaleString('ar-SA')}
                         </span>
                       </div>
-                      <p style={{ fontSize: 11, color: '#71717a', margin: '4px 0 0', fontWeight: 500 }}>
+                      <p style={{ fontSize: 11, color: '#3f3f46', margin: '4px 0 0', fontWeight: 500 }}>
                         {a.actor_role} · {a.ip_address}
                       </p>
                     </div>
@@ -409,7 +409,7 @@ function LimitsForm({ companyId, current, onSave, showToast }: { companyId: stri
     setSaving(false);
   };
 
-  const inp = { padding: '7px 12px', borderRadius: 7, border: '1px solid #e5e5e5', fontSize: 13, width: 80, textAlign: 'center' as const, background: '#fff' };
+  const inp = { padding: '7px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,.08)', fontSize: 13, width: 80, textAlign: 'center' as const, background: 'rgba(255,255,255,.04)', color: '#fafafa' };
 
   return (
     <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -425,7 +425,7 @@ function LimitsForm({ companyId, current, onSave, showToast }: { companyId: stri
         </div>
       ))}
       <button onClick={save} disabled={saving}
-        style={{ padding: '7px 16px', borderRadius: 7, background: '#18181b', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500 }}>
+        style={{ padding: '7px 16px', borderRadius: 7, background: '#6366f1', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500 }}>
         {saving ? '...' : 'حفظ'}
       </button>
     </div>

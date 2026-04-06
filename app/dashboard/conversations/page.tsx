@@ -93,42 +93,42 @@ export default function ConversationsPage() {
   );
 
   function slaBadge(conv: Conversation) {
-    if (conv.sla_breached) return <span style={{ fontSize: 10, display: 'inline-flex', alignItems: 'center', gap: 4, color: '#dc2626', fontWeight: 500 }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#dc2626', display: 'inline-block' }} />SLA خرق</span>;
+    if (conv.sla_breached) return <span style={{ fontSize: 10, display: 'inline-flex', alignItems: 'center', gap: 4, color: '#dc2626', fontWeight: 500 }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#dc2626', boxShadow: '0 0 6px rgba(220,38,38,.4)', display: 'inline-block' }} />SLA خرق</span>;
     if (conv.sla_deadline) {
       const mins = (new Date(conv.sla_deadline).getTime() - Date.now()) / 60000;
-      if (mins < 30) return <span style={{ fontSize: 10, display: 'inline-flex', alignItems: 'center', gap: 4, color: '#d97706', fontWeight: 500 }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#d97706', display: 'inline-block' }} />SLA قريب</span>;
+      if (mins < 30) return <span style={{ fontSize: 10, display: 'inline-flex', alignItems: 'center', gap: 4, color: '#d97706', fontWeight: 500 }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#d97706', boxShadow: '0 0 6px rgba(217,119,6,.4)', display: 'inline-block' }} />SLA قريب</span>;
     }
     return null;
   }
 
   return (
-    <div style={{ background: '#fafafa', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ background: '#fff', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid #e5e5e5' }}>
-        <Link href="/dashboard" style={{ color: '#71717a', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
+      <div style={{ padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(255,255,255,.06)' }}>
+        <Link href="/dashboard" style={{ color: '#6366f1', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#18181b' }}>صندوق المحادثات</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#fafafa' }}>صندوق المحادثات</div>
           <div style={{ fontSize: 11, color: '#a1a1aa' }}>متعدد الشركات — واتساب</div>
         </div>
         <div style={{ marginRight: 'auto', display: 'flex', gap: 12, alignItems: 'center' }}>
-          <Link href="/dashboard/whatsapp/settings" style={{ color: '#71717a', textDecoration: 'none', fontSize: 12 }}>الإعدادات</Link>
-          <Link href="/dashboard/whatsapp/queue" style={{ color: '#71717a', textDecoration: 'none', fontSize: 12 }}>قائمة الإرسال</Link>
-          <Link href="/dashboard/whatsapp/analytics" style={{ color: '#71717a', textDecoration: 'none', fontSize: 12 }}>التحليلات</Link>
+          <Link href="/dashboard/whatsapp/settings" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: 12 }}>الإعدادات</Link>
+          <Link href="/dashboard/whatsapp/queue" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: 12 }}>قائمة الإرسال</Link>
+          <Link href="/dashboard/whatsapp/analytics" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: 12 }}>التحليلات</Link>
         </div>
       </div>
 
       {/* Company selector */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', padding: '10px 24px', display: 'flex', gap: 12, alignItems: 'center' }}>
+      <div style={{ borderBottom: '1px solid rgba(255,255,255,.06)', padding: '10px 24px', display: 'flex', gap: 12, alignItems: 'center' }}>
         <span style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>الشركة:</span>
         <select value={selectedCompany} onChange={e => setSelectedCompany(e.target.value)}
-          style={{ border: '1px solid #e5e5e5', borderRadius: 7, padding: '5px 10px', fontSize: 13, background: '#fff' }}>
+          style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, padding: '5px 10px', fontSize: 13, background: 'rgba(255,255,255,.04)', color: '#fafafa' }}>
           {companies.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
         {(['all', 'open', 'handoff', 'idle'] as ConvStatus[]).map(s => (
           <button key={s} onClick={() => setStatusFilter(s)}
-            style={{ padding: '4px 12px', borderRadius: 7, border: '1px solid #e5e5e5', fontSize: 12, cursor: 'pointer',
-              background: statusFilter === s ? '#18181b' : '#fff',
-              color: statusFilter === s ? '#fff' : '#71717a' }}>
+            style={{ padding: '4px 12px', borderRadius: 7, border: '1px solid rgba(255,255,255,.08)', fontSize: 12, cursor: 'pointer',
+              background: statusFilter === s ? '#6366f1' : 'rgba(255,255,255,.04)',
+              color: statusFilter === s ? '#fff' : '#a1a1aa' }}>
             {s === 'all' ? 'الكل' : s === 'open' ? 'مفتوحة' : s === 'handoff' ? 'للموظف' : 'خاملة'}
           </button>
         ))}
@@ -137,24 +137,24 @@ export default function ConversationsPage() {
       {/* Split view */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden', height: 'calc(100vh - 110px)' }}>
         {/* Conversation list */}
-        <div style={{ width: 300, background: '#fff', borderLeft: '1px solid #e5e5e5', overflowY: 'auto', flexShrink: 0 }}>
+        <div style={{ width: 300, background: 'rgba(255,255,255,.02)', borderLeft: '1px solid rgba(255,255,255,.06)', overflowY: 'auto', flexShrink: 0 }}>
           {loading ? (
             <div style={{ padding: 24, textAlign: 'center', color: '#a1a1aa', fontSize: 13 }}>جاري التحميل...</div>
           ) : filtered.length === 0 ? (
             <div style={{ padding: 24, textAlign: 'center', color: '#a1a1aa', fontSize: 13 }}>لا توجد محادثات</div>
           ) : filtered.map(conv => (
             <div key={conv.id} onClick={() => openConversation(conv)}
-              style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0', cursor: 'pointer',
-                background: selectedConv?.id === conv.id ? '#fafafa' : '#fff' }}>
+              style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,.04)', cursor: 'pointer',
+                background: selectedConv?.id === conv.id ? 'rgba(255,255,255,.06)' : 'transparent' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#18181b' }}>{conv.phone}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#fafafa' }}>{conv.phone}</span>
                 {conv.unread_count > 0 && (
                   <span style={{ background: '#dc2626', color: '#fff', fontSize: 10, padding: '1px 6px', borderRadius: 10, fontWeight: 600 }}>
                     {conv.unread_count}
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 11, color: '#71717a', marginTop: 3 }}>
+              <div style={{ fontSize: 11, color: '#52525b', marginTop: 3 }}>
                 {conv.current_flow || conv.status || 'IDLE'} · {new Date(conv.last_active_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
               </div>
               <div style={{ marginTop: 4 }}>{slaBadge(conv)}</div>
@@ -163,17 +163,17 @@ export default function ConversationsPage() {
         </div>
 
         {/* Chat thread */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#fafafa' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           {!selectedConv ? (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#a1a1aa', fontSize: 13 }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#52525b', fontSize: 13 }}>
               اختر محادثة للعرض
             </div>
           ) : (
             <>
               {/* Conv header */}
-              <div style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ fontWeight: 600, fontSize: 13, color: '#18181b' }}>{selectedConv.phone}</div>
-                <div style={{ fontSize: 11, color: '#71717a' }}>
+              <div style={{ borderBottom: '1px solid rgba(255,255,255,.06)', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ fontWeight: 600, fontSize: 13, color: '#fafafa' }}>{selectedConv.phone}</div>
+                <div style={{ fontSize: 11, color: '#52525b' }}>
                   {selectedConv.current_flow || 'لا يوجد تدفق نشط'} · {selectedConv.handled_by === 'human' ? 'موظف' : 'بوت'}
                 </div>
                 {slaBadge(selectedConv)}
@@ -182,14 +182,14 @@ export default function ConversationsPage() {
               {/* Messages */}
               <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {messages.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: '#a1a1aa', fontSize: 13, padding: 24 }}>لا توجد رسائل</div>
+                  <div style={{ textAlign: 'center', color: '#52525b', fontSize: 13, padding: 24 }}>لا توجد رسائل</div>
                 ) : messages.map((msg: Message) => (
                   <div key={msg.id} style={{ display: 'flex', justifyContent: msg.direction === 'inbound' ? 'flex-end' : 'flex-start' }}>
                     <div style={{
                       maxWidth: '70%', padding: '8px 12px', borderRadius: 8,
-                      background: msg.direction === 'inbound' ? '#fafafa' : '#18181b',
-                      color: msg.direction === 'inbound' ? '#18181b' : '#fff',
-                      border: msg.direction === 'inbound' ? '1px solid #e5e5e5' : 'none',
+                      background: msg.direction === 'inbound' ? 'rgba(99,102,241,.1)' : '#6366f1',
+                      color: msg.direction === 'inbound' ? '#fafafa' : '#fff',
+                      border: msg.direction === 'inbound' ? '1px solid rgba(99,102,241,.2)' : 'none',
                       fontSize: 13, lineHeight: 1.5,
                     }}>
                       <div>{msg.body}</div>
@@ -204,16 +204,16 @@ export default function ConversationsPage() {
               </div>
 
               {/* Input */}
-              <div style={{ background: '#fff', borderTop: '1px solid #e5e5e5', padding: '12px 20px', display: 'flex', gap: 8 }}>
+              <div style={{ borderTop: '1px solid rgba(255,255,255,.06)', padding: '12px 20px', display: 'flex', gap: 8 }}>
                 <input
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
                   placeholder="اكتب رسالة..."
-                  style={{ flex: 1, border: '1px solid #e5e5e5', borderRadius: 7, padding: '8px 12px', fontSize: 13, outline: 'none' }}
+                  style={{ flex: 1, border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, padding: '8px 12px', fontSize: 13, outline: 'none', background: 'rgba(255,255,255,.04)', color: '#fafafa' }}
                 />
                 <button onClick={handleSend} disabled={sending || !inputText.trim()}
-                  style={{ background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, padding: '8px 18px', fontSize: 13, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.7 : 1 }}>
+                  style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 7, padding: '8px 18px', fontSize: 13, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.7 : 1 }}>
                   {sending ? '...' : 'إرسال'}
                 </button>
               </div>

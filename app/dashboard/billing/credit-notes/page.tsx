@@ -30,9 +30,9 @@ export default function CreditNotesPage() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#18181b' }}>إشعارات دائنة</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#fafafa' }}>إشعارات دائنة</h2>
         <button onClick={() => setShowCreate(true)}
-          style={{ padding: '8px 18px', borderRadius: 7, border: 'none', background: '#18181b', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+          style={{ padding: '8px 18px', borderRadius: 7, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           + إشعار دائن جديد
         </button>
       </div>
@@ -48,16 +48,16 @@ export default function CreditNotesPage() {
       {loading ? (
         <div style={{ textAlign: 'center', padding: '60px 0', color: '#a1a1aa' }}>جاري التحميل...</div>
       ) : creditNotes.length === 0 ? (
-        <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e5e5e5', padding: '60px', textAlign: 'center', color: '#a1a1aa', fontSize: 13 }}>
+        <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, border: '1px solid rgba(255,255,255,.06)', padding: '60px', textAlign: 'center', color: '#a1a1aa', fontSize: 13 }}>
           لا توجد إشعارات دائنة
         </div>
       ) : (
-        <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e5e5e5', overflow: 'hidden' }}>
+        <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, border: '1px solid rgba(255,255,255,.06)', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#fafafa' }}>
+              <tr style={{ background: 'rgba(255,255,255,.04)' }}>
                 {['الرقم', 'الشركة', 'الفاتورة الأصلية', 'المبلغ', 'السبب', 'الحالة', 'التاريخ'].map(h => (
-                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#a1a1aa', borderBottom: '1px solid #e5e5e5' }}>{h}</th>
+                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#a1a1aa', borderBottom: '1px solid rgba(255,255,255,.06)' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -65,25 +65,25 @@ export default function CreditNotesPage() {
               {creditNotes.map((cn, i) => {
                 const sc = CN_STATUS[cn.status] || CN_STATUS.issued;
                 return (
-                  <tr key={cn.id} style={{ borderBottom: i < creditNotes.length - 1 ? '1px solid #f0f0f0' : 'none', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
+                  <tr key={cn.id} style={{ borderBottom: i < creditNotes.length - 1 ? '1px solid rgba(255,255,255,.03)' : 'none', background: i % 2 === 1 ? 'rgba(255,255,255,.02)' : 'transparent' }}>
                     <td style={{ padding: '12px 18px' }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#18181b', fontFamily: 'monospace' }}>{cn.credit_note_number}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa', fontFamily: 'monospace' }}>{cn.credit_note_number}</span>
                     </td>
-                    <td style={{ padding: '12px 18px', fontSize: 13, color: '#18181b' }}>{cn.companies?.name || '—'}</td>
-                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#71717a', fontFamily: 'monospace' }}>{cn.original_invoice_id?.slice(0, 8) || '—'}</td>
+                    <td style={{ padding: '12px 18px', fontSize: 13, color: '#fafafa' }}>{cn.companies?.name || '—'}</td>
+                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#52525b', fontFamily: 'monospace' }}>{cn.original_invoice_id?.slice(0, 8) || '—'}</td>
                     <td style={{ padding: '12px 18px' }}>
                       <span style={{ fontSize: 13, fontWeight: 600, color: '#dc2626' }}>-{fmt(cn.total_sar)} ر.س</span>
                     </td>
-                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#71717a', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#52525b', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {cn.reason}
                     </td>
                     <td style={{ padding: '12px 18px' }}>
                       <span style={{ fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 5, color: sc.color, fontWeight: 500 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block' }} />
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block', boxShadow: `0 0 6px ${sc.color}` }} />
                         {sc.label}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#71717a' }}>{fmtDate(cn.issued_at)}</td>
+                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#52525b' }}>{fmtDate(cn.issued_at)}</td>
                   </tr>
                 );
               })}
@@ -116,12 +116,12 @@ function CreateCreditNoteModal({ invoices, onClose, onDone }: { invoices: any[];
     } catch (e: any) { setErr(e.message || 'خطأ'); setLoading(false); }
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 7, border: '1px solid #e5e5e5', fontSize: 13, boxSizing: 'border-box' };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 7, border: '1px solid rgba(255,255,255,.08)', fontSize: 13, boxSizing: 'border-box', background: 'rgba(255,255,255,.04)', color: '#fafafa' };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 8, padding: '28px 32px', width: 420, border: '1px solid #e5e5e5' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#18181b' }}>إنشاء إشعار دائن</h3>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
+      <div style={{ background: '#18181b', borderRadius: 8, padding: '28px 32px', width: 420, border: '1px solid rgba(255,255,255,.1)' }} onClick={e => e.stopPropagation()}>
+        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#fafafa' }}>إنشاء إشعار دائن</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
             <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#a1a1aa' }}>الفاتورة الأصلية *</label>
@@ -158,9 +158,9 @@ function CreateCreditNoteModal({ invoices, onClose, onDone }: { invoices: any[];
         </div>
         {err && <p style={{ fontSize: 12, color: '#dc2626', margin: '12px 0 0' }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 20 }}>
-          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 7, border: '1px solid #e5e5e5', background: '#fff', cursor: 'pointer', fontSize: 13, color: '#71717a' }}>إلغاء</button>
+          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 7, border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)', cursor: 'pointer', fontSize: 13, color: '#a1a1aa' }}>إلغاء</button>
           <button onClick={submit} disabled={loading}
-            style={{ padding: '8px 18px', borderRadius: 7, border: 'none', background: '#18181b', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ padding: '8px 18px', borderRadius: 7, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             {loading ? '...' : 'إنشاء إشعار دائن'}
           </button>
         </div>
