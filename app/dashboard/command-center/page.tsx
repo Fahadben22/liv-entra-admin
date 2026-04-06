@@ -345,7 +345,7 @@ export default function CommandCenterPage() {
     <div style={{ minHeight:'100vh',background:'#060d1f',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16 }}>
       <div style={{ width:40,height:40,border:'3px solid rgba(255,255,255,.1)',borderTopColor:'#38bdf8',borderRadius:'50%',animation:'spin 1s linear infinite' }}/>
       <p style={{ color:'#64748b',fontSize:13 }}>جاري تحميل مركز القيادة...</p>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes pulse-dot{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}`}</style>
     </div>
   );
 
@@ -355,37 +355,51 @@ export default function CommandCenterPage() {
     <div style={{ minHeight:'100vh',background:C.bg,direction:'rtl',color:C.text1 }}>
       {toast && <div style={{ position:'fixed',top:16,left:'50%',transform:'translateX(-50%)',background:'#0f172a',color:'white',padding:'8px 20px',borderRadius:10,fontSize:12,zIndex:9999,border:'1px solid rgba(255,255,255,.1)' }}>{toast}</div>}
 
-      {/* ═══ ZONE 1 — LIVE PULSE ═══ */}
-      <div style={{ background:'linear-gradient(135deg,#0a1628 0%,#0d1b36 100%)',borderBottom:`1px solid ${C.border}`,padding:'12px 20px',position:'sticky',top:0,zIndex:50 }}>
-        <div style={{ display:'flex',alignItems:'center',gap:16,maxWidth:1600,margin:'0 auto' }}>
-          <HealthRing score={score} grade={grade} status={statusLabel} />
-          <div style={{ display:'flex',gap:10,flex:1 }}>
+      {/* ═══ ZONE 1 — LIVE PULSE (full-width prominent bar) ═══ */}
+      <div style={{ background:'linear-gradient(135deg,#0a1628 0%,#0d1b36 100%)',borderBottom:`1px solid ${C.border}`,padding:'20px 28px 14px',position:'sticky',top:0,zIndex:50 }}>
+        <div style={{ display:'flex',alignItems:'center',gap:24,maxWidth:1600,margin:'0 auto' }}>
+          {/* Health ring — LEFT with glow */}
+          <div style={{ filter:`drop-shadow(0 0 12px ${score>=80?'rgba(16,185,129,.4)':score>=60?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)'})` }}>
+            <HealthRing score={score} grade={grade} status={statusLabel} />
+          </div>
+
+          {/* KPIs — CENTER with colored top borders */}
+          <div style={{ display:'flex',gap:12,flex:1,justifyContent:'center' }}>
             {[
               { label:'حرج', value:summary.open_criticals||health?.criticals_1h||0, color:'#ef4444' },
               { label:'أخطاء', value:health?.errors_1h||0, color:'#f97316' },
               { label:'أحداث أمنية', value:secSummary?.total_24h||0, color:'#38bdf8' },
               { label:'شركات نشطة', value:tenants.length, color:'#10b981' },
             ].map(k => (
-              <div key={k.label} style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:'8px 14px',minWidth:90,textAlign:'center' }}>
-                <AnimCounter value={k.value} color={k.color} size={22} />
-                <div style={{ fontSize:9,color:C.text2,marginTop:2 }}>{k.label}</div>
+              <div key={k.label} style={{ background:C.card,border:`1px solid ${C.border}`,borderTop:`3px solid ${k.color}`,borderRadius:10,padding:'12px 20px',minWidth:110,textAlign:'center' }}>
+                <AnimCounter value={k.value} color={k.color} size={28} />
+                <div style={{ fontSize:10,color:C.text2,marginTop:4,fontWeight:500 }}>{k.label}</div>
               </div>
             ))}
           </div>
-          <div style={{ fontSize:13,fontWeight:700,color:score>=80?'#10b981':score>=60?'#f59e0b':'#ef4444',padding:'6px 14px',background:score>=80?'rgba(16,185,129,.1)':score>=60?'rgba(245,158,11,.1)':'rgba(239,68,68,.1)',borderRadius:20,border:`1px solid ${score>=80?'#10b981':score>=60?'#f59e0b':'#ef4444'}33` }}>
-            {statusLabel}
+
+          {/* Status badge — RIGHT */}
+          <div style={{ display:'flex',alignItems:'center',gap:10 }}>
+            <div style={{ fontSize:14,fontWeight:700,color:score>=80?'#10b981':score>=60?'#f59e0b':'#ef4444',padding:'8px 18px',background:score>=80?'rgba(16,185,129,.12)':score>=60?'rgba(245,158,11,.12)':'rgba(239,68,68,.12)',borderRadius:24,border:`1.5px solid ${score>=80?'#10b981':score>=60?'#f59e0b':'#ef4444'}44` }}>
+              {statusLabel}
+            </div>
           </div>
-          <div style={{ width:8,height:8,borderRadius:'50%',background:sseOk?'#10b981':'#ef4444',boxShadow:`0 0 6px ${sseOk?'#10b981':'#ef4444'}` }} title={sseOk?'SSE متصل':'SSE غير متصل'}/>
         </div>
-        {/* Ticker */}
-        <div style={{ overflow:'hidden',marginTop:8,height:18,position:'relative' }}>
-          <div style={{ display:'flex',gap:40,position:'absolute',whiteSpace:'nowrap',transform:`translateX(${tickerX}px)`,transition:'none' }}>
-            {ticker.length === 0 ? <span style={{ fontSize:10,color:C.text2 }}>بانتظار أحداث مباشرة...</span> :
-              ticker.map((t,i) => {
-                const lv = LVL[t.level || t.severity] || LVL.info;
-                return <span key={i} style={{ fontSize:10,color:lv.c }}>[{lv.label}] {t.source||t.event_type}: {(t.message||'').slice(0,60)}</span>;
-              })
-            }
+        {/* Ticker with animated pulse dot */}
+        <div style={{ overflow:'hidden',marginTop:10,height:20,position:'relative',display:'flex',alignItems:'center',gap:8 }}>
+          <div style={{ display:'flex',alignItems:'center',gap:6,flexShrink:0 }}>
+            <div style={{ width:7,height:7,borderRadius:'50%',background:'#10b981',animation:'pulse-dot 1.5s ease-in-out infinite' }}/>
+            <span style={{ fontSize:9,color:'#10b981',fontWeight:600,letterSpacing:'.5px' }}>LIVE</span>
+          </div>
+          <div style={{ overflow:'hidden',flex:1,position:'relative',height:20 }}>
+            <div style={{ display:'flex',gap:40,position:'absolute',whiteSpace:'nowrap',transform:`translateX(${tickerX}px)`,transition:'none',alignItems:'center',height:20 }}>
+              {ticker.length === 0 ? <span style={{ fontSize:10,color:C.text2 }}>بانتظار أحداث مباشرة...</span> :
+                ticker.map((t,i) => {
+                  const lv = LVL[t.level || t.severity] || LVL.info;
+                  return <span key={i} style={{ fontSize:10,color:lv.c }}>[{lv.label}] {t.source||t.event_type}: {(t.message||'').slice(0,60)}</span>;
+                })
+              }
+            </div>
           </div>
         </div>
       </div>
@@ -399,7 +413,7 @@ export default function CommandCenterPage() {
           <div style={{ display:'flex',gap:0,borderBottom:`1px solid ${C.border}`,padding:'0 16px',overflow:'auto' }}>
             {TABS.map(t => (
               <button key={t.id} onClick={()=>setTab(t.id)}
-                style={{ padding:'12px 16px',fontSize:12,fontWeight:tab===t.id?700:400,color:tab===t.id?C.accent:C.text2,background:'transparent',border:'none',borderBottom:tab===t.id?`2px solid ${C.accent}`:'2px solid transparent',cursor:'pointer',whiteSpace:'nowrap' }}>
+                style={{ padding:'12px 16px',fontSize:12,fontWeight:tab===t.id?700:400,color:tab===t.id?'#60a5fa':'#64748b',background:tab===t.id?'rgba(96,165,250,.04)':'transparent',border:'none',borderBottom:tab===t.id?'3px solid #60a5fa':'3px solid transparent',cursor:'pointer',whiteSpace:'nowrap',transition:'all .15s',boxShadow:tab===t.id?'0 2px 8px rgba(96,165,250,.15)':'none' }}>
                 {t.icon} {t.label}
               </button>
             ))}
@@ -671,12 +685,12 @@ export default function CommandCenterPage() {
                 ))}
               </div>
               {filteredSims.map((s,i) => (
-                <div key={i} style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 0',borderBottom:`1px solid ${C.border}`,fontSize:11 }}>
-                  <span style={{ width:20,textAlign:'center',color:C.text2 }}>{i+1}</span>
-                  <span style={{ fontSize:9,padding:'1px 6px',borderRadius:10,background:s.detected?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)',color:s.detected?'#10b981':'#ef4444' }}>{s.detected?'✓':'✗'}</span>
+                <div key={i} style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 10px',marginBottom:2,borderRadius:8,fontSize:11,background:s.detected?'rgba(16,185,129,.05)':'rgba(239,68,68,.06)',border:`1px solid ${s.detected?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)'}` }}>
+                  <span style={{ width:20,textAlign:'center',color:C.text2,fontWeight:600 }}>{i+1}</span>
+                  <span style={{ fontSize:10,padding:'2px 8px',borderRadius:10,background:s.detected?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)',color:s.detected?'#10b981':'#ef4444',fontWeight:700 }}>{s.detected?'✓ ناجح':'✗ ثغرة'}</span>
                   <span style={{ flex:1,color:C.text1 }}>{s.desc}</span>
                   <span style={{ fontSize:9,color:C.text2,fontFamily:'monospace' }}>{s.code}</span>
-                  <span style={{ fontSize:9,color:(SEV_COLORS[s.risk]||SEV_COLORS.info).c }}>{s.risk}</span>
+                  <span style={{ fontSize:9,padding:'1px 6px',borderRadius:10,background:(SEV_COLORS[s.risk]||SEV_COLORS.info).bg,color:(SEV_COLORS[s.risk]||SEV_COLORS.info).c,fontWeight:600 }}>{s.risk}</span>
                 </div>
               ))}
             </>}
@@ -684,7 +698,7 @@ export default function CommandCenterPage() {
         </div>
 
         {/* ═══ ZONE 3 — IT AGENT SIDEBAR ═══ */}
-        <div style={{ display:'flex',flexDirection:'column',borderRight:`1px solid ${C.border}`,background:'rgba(0,0,0,.15)' }}>
+        <div style={{ display:'flex',flexDirection:'column',borderRight:`2px solid #1d4ed8`,background:'rgba(0,0,0,.2)',boxShadow:'inset 2px 0 12px rgba(29,78,216,.15)' }}>
           {/* Header */}
           <div style={{ padding:'12px 14px',borderBottom:`1px solid ${C.border}`,display:'flex',alignItems:'center',gap:8 }}>
             <span style={{ fontSize:18 }}>🛡️</span>
@@ -704,7 +718,7 @@ export default function CommandCenterPage() {
           <div ref={agentScrollRef} style={{ flex:1,overflowY:'auto',padding:'10px 12px',display:'flex',flexDirection:'column',gap:8 }}>
             {agentMsgs.length === 0 && <p style={{ textAlign:'center',color:C.text2,fontSize:11,paddingTop:40 }}>اسأل وكيل IT أي سؤال</p>}
             {agentMsgs.map((m,i) => (
-              <div key={i} style={{ alignSelf:m.role==='user'?'flex-start':'flex-end',maxWidth:'90%',padding:'8px 12px',borderRadius:12,background:m.role==='user'?'rgba(255,255,255,.05)':'rgba(56,189,248,.06)',border:`1px solid ${m.role==='user'?C.border:'rgba(56,189,248,.12)'}`,fontSize:11,color:C.text1,lineHeight:1.6,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
+              <div key={i} style={{ alignSelf:m.role==='user'?'flex-start':'flex-end',maxWidth:'90%',padding:'10px 14px',borderRadius:12,background:m.role==='user'?'rgba(255,255,255,.06)':'rgba(29,78,216,.08)',border:`1px solid ${m.role==='user'?'rgba(255,255,255,.1)':'rgba(29,78,216,.2)'}`,fontSize:12,color:'#f1f5f9',lineHeight:1.7,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
                 {m.content}
               </div>
             ))}
