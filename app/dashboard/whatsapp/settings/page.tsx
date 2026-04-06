@@ -71,9 +71,9 @@ export default function WhatsAppSettingsPage() {
     setTestResult(null);
     try {
       const res: any = await adminApi.wa.testSetup(selectedCompany);
-      setTestResult({ ok: true, msg: `✅ الاتصال ناجح! ${res?.phoneInfo?.display_phone_number || ''}` });
+      setTestResult({ ok: true, msg: `الاتصال ناجح! ${res?.phoneInfo?.display_phone_number || ''}` });
     } catch (err: any) {
-      setTestResult({ ok: false, msg: `❌ فشل: ${err.message}` });
+      setTestResult({ ok: false, msg: `فشل: ${err.message}` });
     } finally { setTesting(false); }
   }
 
@@ -83,52 +83,51 @@ export default function WhatsAppSettingsPage() {
     setTimeout(() => setCopied(''), 2000);
   }
 
+  const inputStyle: React.CSSProperties = { width: '100%', border: '1px solid #e5e5e5', borderRadius: 7, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', color: '#18181b' };
+
   return (
-    <div style={{ minHeight: '100vh', background: '#f1f5f9', direction: 'rtl' }}>
+    <div style={{ background: '#fafafa' }}>
       {/* Header */}
-      <div style={{ background: '#1d4070', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16 }}>
-        <Link href="/dashboard" style={{ color: '#93c5fd', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 20 }}>⚙️</span>
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: 'white' }}>إعدادات واتساب</div>
-            <div style={{ fontSize: 11, color: '#93c5fd' }}>تكوين بيانات اعتماد واتساب لكل شركة</div>
-          </div>
+      <div style={{ background: '#fff', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid #e5e5e5' }}>
+        <Link href="/dashboard" style={{ color: '#71717a', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#18181b' }}>إعدادات واتساب</div>
+          <div style={{ fontSize: 11, color: '#a1a1aa' }}>تكوين بيانات اعتماد واتساب لكل شركة</div>
         </div>
-        <div style={{ marginRight: 'auto', display: 'flex', gap: 8 }}>
-          <Link href="/dashboard/conversations" style={{ color: '#93c5fd', textDecoration: 'none', fontSize: 12 }}>💬 المحادثات</Link>
-          <Link href="/dashboard/whatsapp/queue" style={{ color: '#93c5fd', textDecoration: 'none', fontSize: 12 }}>📤 قائمة الإرسال</Link>
-          <Link href="/dashboard/whatsapp/analytics" style={{ color: '#93c5fd', textDecoration: 'none', fontSize: 12 }}>📊 التحليلات</Link>
+        <div style={{ marginRight: 'auto', display: 'flex', gap: 12 }}>
+          <Link href="/dashboard/conversations" style={{ color: '#71717a', textDecoration: 'none', fontSize: 12 }}>المحادثات</Link>
+          <Link href="/dashboard/whatsapp/queue" style={{ color: '#71717a', textDecoration: 'none', fontSize: 12 }}>قائمة الإرسال</Link>
+          <Link href="/dashboard/whatsapp/analytics" style={{ color: '#71717a', textDecoration: 'none', fontSize: 12 }}>التحليلات</Link>
         </div>
       </div>
 
       <div style={{ padding: 24, maxWidth: 800, margin: '0 auto' }}>
         {/* Company selector */}
-        <div style={{ background: 'white', borderRadius: 12, padding: '16px 20px', marginBottom: 20, boxShadow: '0 1px 3px #0001' }}>
-          <label style={{ fontSize: 13, color: '#475569', display: 'block', marginBottom: 6 }}>اختر الشركة</label>
+        <div style={{ background: '#fff', borderRadius: 8, padding: '16px 20px', marginBottom: 20, border: '1px solid #e5e5e5' }}>
+          <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 6, fontWeight: 500 }}>اختر الشركة</label>
           <select value={selectedCompany} onChange={e => setSelectedCompany(e.target.value)}
-            style={{ border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 14, width: '100%', background: 'white' }}>
+            style={{ ...inputStyle, fontSize: 13 }}>
             {companies.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
 
         {/* Status card */}
-        <div style={{ background: 'white', borderRadius: 12, padding: '16px 20px', marginBottom: 20, boxShadow: '0 1px 3px #0001', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 28 }}>{form.wa_setup_complete ? '🟢' : '🔴'}</div>
+        <div style={{ background: '#fff', borderRadius: 8, padding: '16px 20px', marginBottom: 20, border: '1px solid #e5e5e5', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: form.wa_setup_complete ? '#16a34a' : '#dc2626' }} />
           <div>
-            <div style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>
+            <div style={{ fontWeight: 600, fontSize: 13, color: '#18181b' }}>
               {form.wa_setup_complete ? 'واتساب مُتصل' : 'واتساب غير مُكوَّن'}
             </div>
-            <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
-              {form.wa_verified ? '✅ تم التحقق من الرقم' : 'لم يتم التحقق بعد'}
+            <div style={{ fontSize: 11, color: '#71717a', marginTop: 2 }}>
+              {form.wa_verified ? 'تم التحقق من الرقم' : 'لم يتم التحقق بعد'}
               {form.wa_display_name && ` · ${form.wa_display_name}`}
             </div>
           </div>
         </div>
 
         {/* Setup form */}
-        <div style={{ background: 'white', borderRadius: 12, padding: '20px 24px', marginBottom: 20, boxShadow: '0 1px 3px #0001' }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', marginBottom: 16 }}>بيانات اعتماد Meta Business</div>
+        <div style={{ background: '#fff', borderRadius: 8, padding: '20px 24px', marginBottom: 20, border: '1px solid #e5e5e5' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#18181b', marginBottom: 16 }}>بيانات اعتماد Meta Business</div>
 
           {[
             { key: 'wa_phone_number_id', label: 'Phone Number ID', placeholder: 'مثال: 123456789012345', secret: false },
@@ -137,66 +136,66 @@ export default function WhatsAppSettingsPage() {
             { key: 'wa_display_name', label: 'اسم العرض', placeholder: 'مثال: شركة ليفنترا', secret: false },
           ].map(field => (
             <div key={field.key} style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, color: '#475569', display: 'block', marginBottom: 4 }}>{field.label}</label>
+              <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>{field.label}</label>
               <input
                 type={field.secret ? 'password' : 'text'}
                 value={(form as any)[field.key]}
                 onChange={e => setForm(prev => ({ ...prev, [field.key]: e.target.value }))}
                 placeholder={field.placeholder}
-                style={{ width: '100%', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box' }}
+                style={inputStyle}
               />
             </div>
           ))}
 
           <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
             <button onClick={save} disabled={saving}
-              style={{ background: '#1d4070', color: 'white', border: 'none', borderRadius: 8, padding: '9px 22px', fontSize: 13, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.7 : 1 }}>
-              {saving ? 'جاري الحفظ...' : '💾 حفظ الإعدادات'}
+              style={{ background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, padding: '9px 22px', fontSize: 13, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.7 : 1, fontWeight: 600 }}>
+              {saving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
             </button>
             <button onClick={testConnection} disabled={testing || !form.wa_phone_number_id}
-              style={{ background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', borderRadius: 8, padding: '9px 22px', fontSize: 13, cursor: testing ? 'default' : 'pointer', opacity: testing || !form.wa_phone_number_id ? 0.6 : 1 }}>
-              {testing ? 'جاري الاختبار...' : '🔌 اختبار الاتصال'}
+              style={{ background: '#fafafa', color: '#18181b', border: '1px solid #e5e5e5', borderRadius: 7, padding: '9px 22px', fontSize: 13, cursor: testing ? 'default' : 'pointer', opacity: testing || !form.wa_phone_number_id ? 0.6 : 1 }}>
+              {testing ? 'جاري الاختبار...' : 'اختبار الاتصال'}
             </button>
           </div>
 
-          {saved && <div style={{ marginTop: 10, fontSize: 13, color: '#16a34a' }}>✅ تم الحفظ بنجاح</div>}
+          {saved && <div style={{ marginTop: 10, fontSize: 13, color: '#16a34a' }}>تم الحفظ بنجاح</div>}
           {testResult && (
-            <div style={{ marginTop: 10, fontSize: 13, color: testResult.ok ? '#16a34a' : '#dc2626', background: testResult.ok ? '#f0fdf4' : '#fef2f2', padding: '8px 12px', borderRadius: 6 }}>
+            <div style={{ marginTop: 10, fontSize: 13, color: testResult.ok ? '#16a34a' : '#dc2626', background: '#fafafa', padding: '8px 12px', borderRadius: 7, border: '1px solid #e5e5e5' }}>
               {testResult.msg}
             </div>
           )}
         </div>
 
         {/* Webhook URL */}
-        <div style={{ background: 'white', borderRadius: 12, padding: '20px 24px', boxShadow: '0 1px 3px #0001' }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#1e293b', marginBottom: 16 }}>إعدادات Webhook في Meta Business Manager</div>
+        <div style={{ background: '#fff', borderRadius: 8, padding: '20px 24px', border: '1px solid #e5e5e5' }}>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#18181b', marginBottom: 16 }}>إعدادات Webhook في Meta Business Manager</div>
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: '#475569', display: 'block', marginBottom: 4 }}>Webhook URL</label>
+            <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>Webhook URL</label>
             <div style={{ display: 'flex', gap: 8 }}>
               <input value={WEBHOOK_URL} readOnly
-                style={{ flex: 1, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 12, background: '#f8fafc', color: '#475569', fontFamily: 'monospace' }} />
+                style={{ flex: 1, border: '1px solid #e5e5e5', borderRadius: 7, padding: '8px 12px', fontSize: 12, background: '#fafafa', color: '#71717a', fontFamily: 'monospace' }} />
               <button onClick={() => copy(WEBHOOK_URL, 'url')}
-                style={{ background: copied === 'url' ? '#dcfce7' : '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 14px', fontSize: 12, cursor: 'pointer', color: copied === 'url' ? '#16a34a' : '#64748b' }}>
-                {copied === 'url' ? '✓ نُسخ' : '📋 نسخ'}
+                style={{ background: copied === 'url' ? '#fafafa' : '#fff', border: '1px solid #e5e5e5', borderRadius: 7, padding: '8px 14px', fontSize: 12, cursor: 'pointer', color: copied === 'url' ? '#16a34a' : '#71717a' }}>
+                {copied === 'url' ? 'نُسخ' : 'نسخ'}
               </button>
             </div>
           </div>
 
           <div style={{ marginBottom: 8 }}>
-            <label style={{ fontSize: 12, color: '#475569', display: 'block', marginBottom: 4 }}>Verify Token</label>
+            <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>Verify Token</label>
             <div style={{ display: 'flex', gap: 8 }}>
               <input value={VERIFY_TOKEN} readOnly
-                style={{ flex: 1, border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 12px', fontSize: 12, background: '#f8fafc', color: '#475569', fontFamily: 'monospace' }} />
+                style={{ flex: 1, border: '1px solid #e5e5e5', borderRadius: 7, padding: '8px 12px', fontSize: 12, background: '#fafafa', color: '#71717a', fontFamily: 'monospace' }} />
               <button onClick={() => copy(VERIFY_TOKEN, 'token')}
-                style={{ background: copied === 'token' ? '#dcfce7' : '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 14px', fontSize: 12, cursor: 'pointer', color: copied === 'token' ? '#16a34a' : '#64748b' }}>
-                {copied === 'token' ? '✓ نُسخ' : '📋 نسخ'}
+                style={{ background: copied === 'token' ? '#fafafa' : '#fff', border: '1px solid #e5e5e5', borderRadius: 7, padding: '8px 14px', fontSize: 12, cursor: 'pointer', color: copied === 'token' ? '#16a34a' : '#71717a' }}>
+                {copied === 'token' ? 'نُسخ' : 'نسخ'}
               </button>
             </div>
           </div>
 
-          <div style={{ marginTop: 14, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: '#92400e' }}>
-            ⏳ <strong>بانتظار موافقة Meta:</strong> بعد الحصول على موافقة Meta Business، أضف WHATSAPP_PHONE_NUMBER_ID وWHATSAPP_ACCESS_TOKEN وWHATSAPP_APP_SECRET في Railway، ثم سجّل الـ Webhook URL أعلاه في Meta Business Manager.
+          <div style={{ marginTop: 14, background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: 7, padding: '10px 14px', fontSize: 12, color: '#71717a' }}>
+            <strong>بانتظار موافقة Meta:</strong> بعد الحصول على موافقة Meta Business، أضف WHATSAPP_PHONE_NUMBER_ID وWHATSAPP_ACCESS_TOKEN وWHATSAPP_APP_SECRET في Railway، ثم سجّل الـ Webhook URL أعلاه في Meta Business Manager.
           </div>
         </div>
       </div>

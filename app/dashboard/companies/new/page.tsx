@@ -33,24 +33,24 @@ interface FormData {
 
 // CITIES imported from @/lib/constants
 
-const PLANS: { key: Plan; label: string; labelEn: string; color: string; bg: string; border: string; desc: string; features: string[] }[] = [
+const PLANS: { key: Plan; label: string; labelEn: string; color: string; desc: string; features: string[] }[] = [
   {
-    key: 'trial', label: 'تجريبي', labelEn: 'Trial', color: '#64748b', bg: '#f8fafc', border: '#e2e8f0',
+    key: 'trial', label: 'تجريبي', labelEn: 'Trial', color: '#71717a',
     desc: '30 يوم مجاناً',
     features: ['إدارة العقود','طلبات الصيانة','تتبع المدفوعات','التقارير الأساسية'],
   },
   {
-    key: 'basic', label: 'أساسي', labelEn: 'Basic', color: '#0284c7', bg: '#f0f9ff', border: '#bae6fd',
+    key: 'basic', label: 'أساسي', labelEn: 'Basic', color: '#3b82f6',
     desc: 'للمكاتب الصغيرة',
     features: ['إدارة العقود','طلبات الصيانة','تتبع المدفوعات','التقارير الأساسية'],
   },
   {
-    key: 'professional', label: 'احترافي', labelEn: 'Professional', color: '#7c3aed', bg: '#faf5ff', border: '#ddd6fe',
+    key: 'professional', label: 'احترافي', labelEn: 'Professional', color: '#7c3aed',
     desc: 'للمكاتب المتوسطة',
     features: ['كل ميزات الأساسي','التحليل الذكي','إشعارات واتساب','تعدد الفروع','التقارير المتقدمة'],
   },
   {
-    key: 'enterprise', label: 'مؤسسي', labelEn: 'Enterprise', color: '#b45309', bg: '#fffbeb', border: '#fde68a',
+    key: 'enterprise', label: 'مؤسسي', labelEn: 'Enterprise', color: '#b45309',
     desc: 'للشركات الكبيرة',
     features: ['كل الميزات','وصول API','هوية مخصصة','إدارة دورة الوحدة','AI الإيجار (تجريبي)'],
   },
@@ -64,10 +64,10 @@ const PLAN_DEFAULTS: Record<Plan, { max_units: number; max_staff: number }> = {
 };
 
 const STEPS = [
-  { num: 1, label: 'بيانات الشركة',    icon: '🏢' },
-  { num: 2, label: 'الخطة والحدود',    icon: '📊' },
-  { num: 3, label: 'إعداد المدير',     icon: '👤' },
-  { num: 4, label: 'مراجعة وإنشاء',   icon: '✅' },
+  { num: 1, label: 'بيانات الشركة' },
+  { num: 2, label: 'الخطة والحدود' },
+  { num: 3, label: 'إعداد المدير' },
+  { num: 4, label: 'مراجعة وإنشاء' },
 ];
 
 // Convert name to URL-safe slug (Latin only — strips Arabic, falls back to timestamp)
@@ -191,43 +191,43 @@ export default function NewCompanyPage() {
   // ─── Success screen ────────────────────────────────────────────────────────
   if (success) {
     return (
-      <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
+      <div style={{ background: '#fafafa' }}>
         <Header />
         <div style={{ padding: 32, maxWidth: 560, margin: '0 auto' }}>
-          <div style={{ background: 'white', borderRadius: 16, padding: 36, border: '1px solid #e2e8f0', textAlign: 'center', boxShadow: '0 4px 24px #0001' }}>
-            <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 32 }}>✅</div>
-            <h2 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: '0 0 6px' }}>تم إنشاء الشركة بنجاح</h2>
-            <p style={{ fontSize: 13, color: '#64748b', margin: '0 0 28px' }}>
+          <div style={{ background: '#fff', borderRadius: 8, padding: 36, border: '1px solid #e5e5e5', textAlign: 'center' }}>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#fafafa', border: '1px solid #e5e5e5', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 20, color: '#16a34a' }}>✓</div>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#18181b', margin: '0 0 6px' }}>تم إنشاء الشركة بنجاح</h2>
+            <p style={{ fontSize: 13, color: '#71717a', margin: '0 0 28px' }}>
               {form.admin_email
                 ? `سيصل بريد الترحيب قريباً إلى ${form.admin_email}`
                 : 'شارك رابط الدخول ورقم الجوال مع مدير الشركة'}
             </p>
-            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '18px 22px', textAlign: 'right', marginBottom: 24 }}>
-              <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 14px', fontWeight: 700, letterSpacing: '0.05em' }}>بيانات الدخول</p>
+            <div style={{ background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: 8, padding: '18px 22px', textAlign: 'right', marginBottom: 24 }}>
+              <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 14px', fontWeight: 500, letterSpacing: '0.05em' }}>بيانات الدخول</p>
               {[
                 ['اسم الشركة',              success.company?.name || form.name],
                 ['رابط تسجيل الدخول',       success.login_url || `https://app.liv-entra.com/${form.slug}`],
                 ['اسم المستخدم',            success.staff?.phone || form.admin_phone],
                 ['طريقة الدخول',            'OTP — رمز التحقق يُرسل إلى رقم الجوال'],
                 ...(form.admin_email ? [['البريد الإلكتروني', success.staff?.email || form.admin_email]] : []),
-                ...(form.admin_email ? [['حالة البريد', '📤 جاري الإرسال في الخلفية']] : []),
+                ...(form.admin_email ? [['حالة البريد', 'جاري الإرسال في الخلفية']] : []),
               ].map(([k, v]) => (
-                <div key={k as string} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid #dbeafe' }}>
-                  <span style={{ fontSize: 12, color: '#64748b' }}>{k}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1d4070', direction: 'ltr', fontFamily: 'monospace' }}>{v as string}</span>
+                <div key={k as string} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid #f0f0f0' }}>
+                  <span style={{ fontSize: 12, color: '#71717a' }}>{k}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#18181b', direction: 'ltr', fontFamily: 'monospace' }}>{v as string}</span>
                 </div>
               ))}
             </div>
-            <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '10px 14px', textAlign: 'right', marginBottom: 24, fontSize: 12, color: '#15803d' }}>
-              ✅ الدخول عبر OTP — يُرسَل رمز التحقق إلى الجوال المسجّل عند كل تسجيل دخول
+            <div style={{ background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: 7, padding: '10px 14px', textAlign: 'right', marginBottom: 24, fontSize: 12, color: '#16a34a' }}>
+              الدخول عبر OTP — يُرسَل رمز التحقق إلى الجوال المسجّل عند كل تسجيل دخول
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => { setSuccess(null); setStep(1); setForm({ name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '', contact_phone: '', contact_email: '', plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30, billing_cycle: 'monthly', admin_name: '', admin_phone: '', admin_email: '' }); setSlugManual(false); }}
-                style={{ flex: 1, padding: '11px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 12, cursor: 'pointer', background: 'white', color: '#64748b', fontWeight: 500 }}>
+                style={{ flex: 1, padding: '11px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: '#fff', color: '#71717a', fontWeight: 500 }}>
                 إضافة شركة أخرى
               </button>
               <button onClick={() => router.push('/dashboard/companies')}
-                style={{ flex: 2, padding: '11px', background: '#1d4070', color: 'white', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                style={{ flex: 2, padding: '11px', background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                 عرض جميع الشركات
               </button>
             </div>
@@ -240,11 +240,11 @@ export default function NewCompanyPage() {
   const currentPlan = PLANS.find(p => p.key === form.plan)!;
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc', direction: 'rtl' }}>
+    <div style={{ background: '#fafafa' }}>
       <Header />
 
-      {/* Progress bar */}
-      <div style={{ background: 'white', borderBottom: '1px solid #e2e8f0', padding: '0 24px' }}>
+      {/* Progress bar — dots style */}
+      <div style={{ background: '#fff', borderBottom: '1px solid #e5e5e5', padding: '0 24px' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', display: 'flex', alignItems: 'stretch', gap: 0 }}>
           {STEPS.map((s, i) => {
             const done = step > s.num;
@@ -254,16 +254,24 @@ export default function NewCompanyPage() {
                 onClick={() => done ? setStep(s.num) : undefined}>
                 {/* Connector line */}
                 {i < STEPS.length - 1 && (
-                  <div style={{ position: 'absolute', top: 26, left: 0, width: '50%', height: 2, background: done || step > s.num ? '#1d4070' : '#e2e8f0', zIndex: 0 }} />
+                  <div style={{ position: 'absolute', top: 24, left: 0, width: '50%', height: 1, background: done || step > s.num ? '#18181b' : '#e5e5e5', zIndex: 0 }} />
                 )}
                 {i > 0 && (
-                  <div style={{ position: 'absolute', top: 26, right: 0, width: '50%', height: 2, background: done ? '#1d4070' : '#e2e8f0', zIndex: 0 }} />
+                  <div style={{ position: 'absolute', top: 24, right: 0, width: '50%', height: 1, background: done ? '#18181b' : '#e5e5e5', zIndex: 0 }} />
                 )}
-                {/* Circle */}
-                <div style={{ width: 28, height: 28, borderRadius: '50%', background: active ? '#1d4070' : done ? '#22c55e' : '#e2e8f0', color: active || done ? 'white' : '#94a3b8', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1, position: 'relative', border: active ? '2px solid #1d4070' : 'none', transition: 'all 0.2s' }}>
+                {/* Dot */}
+                <div style={{
+                  width: 20, height: 20, borderRadius: '50%',
+                  background: active ? '#18181b' : done ? '#18181b' : '#fff',
+                  color: active || done ? '#fff' : '#a1a1aa',
+                  border: active || done ? '2px solid #18181b' : '2px solid #e5e5e5',
+                  fontSize: 10, fontWeight: 600,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  zIndex: 1, position: 'relative', transition: 'all 0.2s',
+                }}>
                   {done ? '✓' : s.num}
                 </div>
-                <span style={{ fontSize: 10, color: active ? '#1d4070' : done ? '#22c55e' : '#94a3b8', marginTop: 4, fontWeight: active ? 600 : 400, whiteSpace: 'nowrap' }}>{s.label}</span>
+                <span style={{ fontSize: 10, color: active ? '#18181b' : done ? '#18181b' : '#a1a1aa', marginTop: 4, fontWeight: active ? 600 : 400, whiteSpace: 'nowrap' }}>{s.label}</span>
               </div>
             );
           })}
@@ -272,15 +280,15 @@ export default function NewCompanyPage() {
 
       <div style={{ padding: '28px 20px', maxWidth: 700, margin: '0 auto' }}>
         {err && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#dc2626', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span>⚠️</span> {err}
+          <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 7, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#dc2626' }}>
+            {err}
           </div>
         )}
 
         {/* ── STEP 1: Company Info ─────────────────────────────────────────── */}
         {step === 1 && (
-          <div style={{ background: 'white', borderRadius: 14, padding: 28, border: '1px solid #e2e8f0', boxShadow: '0 2px 12px #0001' }}>
-            <StepHeader icon="🏢" title="بيانات الشركة" sub="المعلومات الأساسية لتسجيل الشركة في النظام" />
+          <div style={{ background: '#fff', borderRadius: 8, padding: 28, border: '1px solid #e5e5e5' }}>
+            <StepHeader title="بيانات الشركة" sub="المعلومات الأساسية لتسجيل الشركة في النظام" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div style={{ gridColumn: 'span 2' }}>
                 <Field label="اسم الشركة *" hint="سيظهر في واجهة المستخدمين">
@@ -305,15 +313,15 @@ export default function NewCompanyPage() {
                       style={{ ...inp(), flex: 1, fontFamily: 'monospace', fontSize: 13 }} />
                     {slugManual && (
                       <button type="button" onClick={() => { setSlugManual(false); setForm(p => ({ ...p, slug: toSlug(form.name) })); }}
-                        style={{ padding: '7px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 11, cursor: 'pointer', background: '#f8fafc', color: '#64748b', whiteSpace: 'nowrap' }}>
+                        style={{ padding: '7px 12px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 11, cursor: 'pointer', background: '#fafafa', color: '#71717a', whiteSpace: 'nowrap' }}>
                         إعادة توليد
                       </button>
                     )}
                   </div>
                   {form.slug && (
-                    <div style={{ marginTop: 6, padding: '6px 10px', background: slugAvailable === false ? '#fef2f2' : '#eff6ff', borderRadius: 6, fontSize: 11, color: slugAvailable === false ? '#dc2626' : '#1d4070', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ marginTop: 6, padding: '6px 10px', background: slugAvailable === false ? '#fef2f2' : '#fafafa', borderRadius: 7, fontSize: 11, color: slugAvailable === false ? '#dc2626' : '#18181b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #e5e5e5' }}>
                       <span>معرّف الشركة: <strong dir="ltr">{form.slug}</strong></span>
-                      <span>{slugChecking ? '...' : slugAvailable === true ? '✅ متاح' : slugAvailable === false ? '❌ مستخدم' : ''}</span>
+                      <span>{slugChecking ? '...' : slugAvailable === true ? 'متاح' : slugAvailable === false ? 'مستخدم' : ''}</span>
                     </div>
                   )}
                 </Field>
@@ -337,8 +345,8 @@ export default function NewCompanyPage() {
 
         {/* ── STEP 2: Plan & Limits ────────────────────────────────────────── */}
         {step === 2 && (
-          <div style={{ background: 'white', borderRadius: 14, padding: 28, border: '1px solid #e2e8f0', boxShadow: '0 2px 12px #0001' }}>
-            <StepHeader icon="📊" title="الخطة والحدود" sub="اختر الخطة المناسبة وحدد حدود الاستخدام" />
+          <div style={{ background: '#fff', borderRadius: 8, padding: 28, border: '1px solid #e5e5e5' }}>
+            <StepHeader title="الخطة والحدود" sub="اختر الخطة المناسبة وحدد حدود الاستخدام" />
 
             {/* Plan cards */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
@@ -346,27 +354,27 @@ export default function NewCompanyPage() {
                 const active = form.plan === p.key;
                 return (
                   <div key={p.key} onClick={() => handlePlanChange(p.key)}
-                    style={{ border: `2px solid ${active ? p.color : '#e2e8f0'}`, borderRadius: 12, padding: '16px 18px', cursor: 'pointer', background: active ? p.bg : 'white', transition: 'all 0.15s', boxShadow: active ? `0 0 0 3px ${p.color}22` : 'none' }}>
+                    style={{ border: `1.5px solid ${active ? '#18181b' : '#e5e5e5'}`, borderRadius: 8, padding: '16px 18px', cursor: 'pointer', background: active ? '#fafafa' : '#fff', transition: 'all 0.15s' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: p.color }}>{p.label}</span>
-                      <span style={{ fontSize: 10, color: p.color, background: `${p.color}18`, padding: '2px 8px', borderRadius: 20 }}>{p.desc}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: active ? '#18181b' : '#71717a' }}>{p.label}</span>
+                      <span style={{ fontSize: 10, color: '#a1a1aa', background: '#fafafa', padding: '2px 8px', borderRadius: 7, border: '1px solid #f0f0f0' }}>{p.desc}</span>
                     </div>
                     <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                       {p.features.map(f => (
-                        <li key={f} style={{ fontSize: 11, color: '#475569', padding: '2px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span style={{ color: p.color, fontSize: 9 }}>●</span> {f}
+                        <li key={f} style={{ fontSize: 11, color: '#71717a', padding: '2px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ width: 4, height: 4, borderRadius: '50%', background: active ? '#18181b' : '#a1a1aa', display: 'inline-block' }} /> {f}
                         </li>
                       ))}
                     </ul>
-                    {active && <div style={{ marginTop: 10, fontSize: 11, fontWeight: 600, color: p.color }}>✓ محدد</div>}
+                    {active && <div style={{ marginTop: 10, fontSize: 11, fontWeight: 600, color: '#18181b' }}>✓ محدد</div>}
                   </div>
                 );
               })}
             </div>
 
             {/* Limits */}
-            <div style={{ border: '1px solid #e2e8f0', borderRadius: 10, padding: '18px 20px', marginBottom: 4 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '0 0 14px' }}>حدود الاستخدام</p>
+            <div style={{ border: '1px solid #e5e5e5', borderRadius: 8, padding: '18px 20px', marginBottom: 4 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#18181b', margin: '0 0 14px' }}>حدود الاستخدام</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <Field label="الحد الأقصى للوحدات" hint="عدد الشقق / الوحدات المسموح بها">
                   <input type="number" min={1} max={9999} value={form.max_units} onChange={set('max_units')} style={inp()} />
@@ -388,18 +396,15 @@ export default function NewCompanyPage() {
 
         {/* ── STEP 3: Admin User ───────────────────────────────────────────── */}
         {step === 3 && (
-          <div style={{ background: 'white', borderRadius: 14, padding: 28, border: '1px solid #e2e8f0', boxShadow: '0 2px 12px #0001' }}>
-            <StepHeader icon="👤" title="إعداد مدير النظام" sub="بيانات الشخص المسؤول عن إدارة الشركة في النظام" />
+          <div style={{ background: '#fff', borderRadius: 8, padding: 28, border: '1px solid #e5e5e5' }}>
+            <StepHeader title="إعداد مدير النظام" sub="بيانات الشخص المسؤول عن إدارة الشركة في النظام" />
 
             {/* Phone-login callout */}
-            <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '12px 16px', marginBottom: 22, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-              <span style={{ fontSize: 18 }}>📱</span>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#1d4070', margin: '0 0 2px' }}>رقم الجوال هو اسم المستخدم</p>
-                <p style={{ fontSize: 11, color: '#3b82f6', margin: 0 }}>
-                  يستخدم النظام رقم الجوال فقط لتسجيل الدخول في <strong>app.liv-entra.com</strong> — يُرسل رمز OTP عبر الجوال
-                </p>
-              </div>
+            <div style={{ background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: 7, padding: '12px 16px', marginBottom: 22 }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#18181b', margin: '0 0 2px' }}>رقم الجوال هو اسم المستخدم</p>
+              <p style={{ fontSize: 11, color: '#71717a', margin: 0 }}>
+                يستخدم النظام رقم الجوال فقط لتسجيل الدخول في <strong>app.liv-entra.com</strong> — يُرسل رمز OTP عبر الجوال
+              </p>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -411,7 +416,7 @@ export default function NewCompanyPage() {
               <div style={{ gridColumn: 'span 2' }}>
                 <Field label="رقم الجوال * (اسم المستخدم)" hint="يبدأ بـ 05 أو +966 أو 966">
                   <input value={form.admin_phone} onChange={set('admin_phone')} placeholder="0512345678" dir="ltr"
-                    style={{ ...inp(), border: '2px solid #bfdbfe', background: '#f8fbff' }} />
+                    style={{ ...inp(), border: '1.5px solid #18181b' }} />
                 </Field>
               </div>
               <div style={{ gridColumn: 'span 2' }}>
@@ -427,12 +432,12 @@ export default function NewCompanyPage() {
 
         {/* ── STEP 4: Review ───────────────────────────────────────────────── */}
         {step === 4 && (
-          <div style={{ background: 'white', borderRadius: 14, padding: 28, border: '1px solid #e2e8f0', boxShadow: '0 2px 12px #0001' }}>
-            <StepHeader icon="✅" title="مراجعة وإنشاء" sub="تأكد من البيانات قبل إنشاء الشركة" />
+          <div style={{ background: '#fff', borderRadius: 8, padding: 28, border: '1px solid #e5e5e5' }}>
+            <StepHeader title="مراجعة وإنشاء" sub="تأكد من البيانات قبل إنشاء الشركة" />
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}>
               {/* Company */}
-              <ReviewCard title="🏢 بيانات الشركة" onEdit={() => setStep(1)} rows={[
+              <ReviewCard title="بيانات الشركة" onEdit={() => setStep(1)} rows={[
                 ['الاسم', form.name],
                 ['الاسم بالعربي', form.name_ar || '—'],
                 ['المعرّف', form.slug],
@@ -441,14 +446,14 @@ export default function NewCompanyPage() {
                 ['هاتف الشركة', form.contact_phone || '—'],
               ]} />
               {/* Plan */}
-              <ReviewCard title={`📊 الخطة — ${currentPlan.label}`} onEdit={() => setStep(2)} rows={[
+              <ReviewCard title={`الخطة — ${currentPlan.label}`} onEdit={() => setStep(2)} rows={[
                 ['الخطة', currentPlan.label],
                 ['الحد الأقصى للوحدات', String(form.max_units)],
                 ['الحد الأقصى للموظفين', String(form.max_staff)],
                 ...(form.plan === 'trial' ? [['مدة التجربة', `${form.trial_days} يوم`] as [string, string]] : []),
-              ]} accent={currentPlan.color} />
+              ]} />
               {/* Admin */}
-              <ReviewCard title="👤 مدير النظام" onEdit={() => setStep(3)} rows={[
+              <ReviewCard title="مدير النظام" onEdit={() => setStep(3)} rows={[
                 ['الاسم', form.admin_name || '—'],
                 ['رقم الجوال (اسم المستخدم)', form.admin_phone],
                 ['البريد الإلكتروني', form.admin_email || 'غير محدد'],
@@ -456,18 +461,18 @@ export default function NewCompanyPage() {
             </div>
 
             {err && (
-              <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#dc2626' }}>
-                ⚠️ {err}
+              <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 7, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#dc2626' }}>
+                {err}
               </div>
             )}
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={back} style={{ flex: 1, padding: '12px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, cursor: 'pointer', background: 'white', color: '#64748b', fontWeight: 500 }}>
+              <button onClick={back} style={{ flex: 1, padding: '12px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13, cursor: 'pointer', background: '#fff', color: '#71717a', fontWeight: 500 }}>
                 ← رجوع
               </button>
               <button onClick={handleSubmit} disabled={saving}
-                style={{ flex: 3, padding: '12px', background: saving ? '#94a3b8' : '#1d4070', color: 'white', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                {saving ? <><Spinner /> جاري الإنشاء...</> : '🚀 إنشاء الشركة وإرسال بريد الترحيب'}
+                style={{ flex: 3, padding: '12px', background: saving ? '#a1a1aa' : '#18181b', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                {saving ? <><Spinner /> جاري الإنشاء...</> : 'إنشاء الشركة وإرسال بريد الترحيب'}
               </button>
             </div>
           </div>
@@ -481,22 +486,19 @@ export default function NewCompanyPage() {
 
 function Header() {
   return (
-    <div style={{ background: '#1d4070', padding: '12px 24px', display: 'flex', alignItems: 'center', gap: 16 }}>
-      <Link href="/dashboard/companies" style={{ color: '#93c5fd', textDecoration: 'none', fontSize: 13 }}>← الشركات</Link>
-      <span style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>إضافة شركة جديدة</span>
+    <div style={{ background: '#fff', padding: '12px 24px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid #e5e5e5' }}>
+      <Link href="/dashboard/companies" style={{ color: '#71717a', textDecoration: 'none', fontSize: 13 }}>← الشركات</Link>
+      <span style={{ fontSize: 14, fontWeight: 600, color: '#18181b' }}>إضافة شركة جديدة</span>
     </div>
   );
 }
 
-function StepHeader({ icon, title, sub }: { icon: string; title: string; sub: string }) {
+function StepHeader({ title, sub }: { title: string; sub: string }) {
   return (
     <div style={{ marginBottom: 24 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-        <span style={{ fontSize: 22 }}>{icon}</span>
-        <h2 style={{ fontSize: 17, fontWeight: 700, color: '#0f172a', margin: 0 }}>{title}</h2>
-      </div>
-      <p style={{ fontSize: 12, color: '#94a3b8', margin: 0, paddingRight: 32 }}>{sub}</p>
-      <div style={{ height: 1, background: '#f1f5f9', margin: '16px 0 0' }} />
+      <h2 style={{ fontSize: 13, fontWeight: 600, color: '#18181b', margin: '0 0 4px' }}>{title}</h2>
+      <p style={{ fontSize: 12, color: '#a1a1aa', margin: 0 }}>{sub}</p>
+      <div style={{ height: 1, background: '#f0f0f0', margin: '16px 0 0' }} />
     </div>
   );
 }
@@ -504,28 +506,28 @@ function StepHeader({ icon, title, sub }: { icon: string; title: string; sub: st
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label style={{ fontSize: 11, color: '#374151', display: 'block', marginBottom: 5, fontWeight: 600 }}>{label}</label>
-      {hint && <p style={{ fontSize: 10, color: '#94a3b8', margin: '-3px 0 5px' }}>{hint}</p>}
+      <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 5, fontWeight: 500 }}>{label}</label>
+      {hint && <p style={{ fontSize: 10, color: '#a1a1aa', margin: '-3px 0 5px' }}>{hint}</p>}
       {children}
     </div>
   );
 }
 
 function inp(extra?: React.CSSProperties): React.CSSProperties {
-  return { width: '100%', padding: '9px 11px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: 'white', color: '#0f172a', ...extra };
+  return { width: '100%', padding: '9px 11px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#18181b', ...extra };
 }
 
 function NavButtons({ onBack, onNext }: { onBack?: () => void; onNext?: () => void }) {
   return (
     <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
       {onBack && (
-        <button type="button" onClick={onBack} style={{ flex: 1, padding: '11px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, cursor: 'pointer', background: 'white', color: '#64748b', fontWeight: 500 }}>
+        <button type="button" onClick={onBack} style={{ flex: 1, padding: '11px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13, cursor: 'pointer', background: '#fff', color: '#71717a', fontWeight: 500 }}>
           ← رجوع
         </button>
       )}
       {!onBack && <div style={{ flex: 1 }} />}
       {onNext && (
-        <button type="button" onClick={onNext} style={{ flex: 2, padding: '11px', background: '#1d4070', color: 'white', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+        <button type="button" onClick={onNext} style={{ flex: 2, padding: '11px', background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
           التالي ←
         </button>
       )}
@@ -533,17 +535,17 @@ function NavButtons({ onBack, onNext }: { onBack?: () => void; onNext?: () => vo
   );
 }
 
-function ReviewCard({ title, rows, onEdit, accent = '#1d4070', style }: { title: string; rows: [string, string][]; onEdit: () => void; accent?: string; style?: React.CSSProperties }) {
+function ReviewCard({ title, rows, onEdit, style }: { title: string; rows: [string, string][]; onEdit: () => void; style?: React.CSSProperties }) {
   return (
-    <div style={{ border: `1px solid #e2e8f0`, borderRadius: 12, padding: '16px 18px', position: 'relative', ...style }}>
+    <div style={{ border: '1px solid #e5e5e5', borderRadius: 8, padding: '16px 18px', position: 'relative', ...style }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: accent }}>{title}</span>
-        <button onClick={onEdit} style={{ fontSize: 10, color: '#64748b', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 6, padding: '3px 10px', cursor: 'pointer' }}>تعديل</button>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#18181b' }}>{title}</span>
+        <button onClick={onEdit} style={{ fontSize: 10, color: '#71717a', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: 7, padding: '3px 10px', cursor: 'pointer' }}>تعديل</button>
       </div>
       {rows.map(([k, v]) => (
-        <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #f1f5f9' }}>
-          <span style={{ fontSize: 11, color: '#94a3b8' }}>{k}</span>
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#374151', direction: 'ltr', maxWidth: '60%', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v}</span>
+        <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid #f0f0f0' }}>
+          <span style={{ fontSize: 11, color: '#a1a1aa' }}>{k}</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#18181b', direction: 'ltr', maxWidth: '60%', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v}</span>
         </div>
       ))}
     </div>
@@ -552,7 +554,7 @@ function ReviewCard({ title, rows, onEdit, accent = '#1d4070', style }: { title:
 
 function Spinner() {
   return (
-    <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid #ffffff44', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }}>
+    <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid #ffffff44', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }}>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </span>
   );

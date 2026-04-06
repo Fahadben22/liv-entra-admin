@@ -19,7 +19,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   new:       { label: 'جديد',         color: '#3b82f6', bg: 'rgba(59,130,246,.12)' },
   contacted: { label: 'تم التواصل',   color: '#f59e0b', bg: 'rgba(245,158,11,.12)' },
   converted: { label: 'تحوّل عميل',   color: '#22c55e', bg: 'rgba(34,197,94,.12)'  },
-  ignored:   { label: 'تجاهل',        color: '#94a3b8', bg: 'rgba(148,163,184,.12)' },
+  ignored:   { label: 'تجاهل',        color: '#a1a1aa', bg: 'rgba(148,163,184,.12)' },
 };
 
 const ALL_STATUSES = ['new', 'contacted', 'converted', 'ignored'];
@@ -107,118 +107,79 @@ export default function DemoLeadsPage() {
     return null;
   }
 
-  const C = {
-    bg: '#05081a', card: '#0c1535', border: 'rgba(255,255,255,.07)',
-    text: '#e2e8f0', text2: '#94a3b8', accent: '#2563eb', accent2: '#0ea5e9',
-  };
-
   const displayedItems = filter ? items.filter(r => r.status === filter) : items;
 
   return (
-    <div style={{ minHeight: '100vh', background: C.bg, color: C.text, fontFamily: "'Tajawal', sans-serif", direction: 'rtl' }}>
+    <div style={{ background: '#fafafa', color: '#18181b', fontFamily: "'Tajawal', sans-serif" }}>
 
-      {/* NAV */}
-      <nav style={{ background: 'rgba(5,8,26,.95)', borderBottom: `1px solid ${C.border}`, padding: '12px 24px', position: 'sticky', top: 0, zIndex: 100, backdropFilter: 'blur(20px)' }}>
-        <div style={{ maxWidth: 1300, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 20, flexDirection: 'row' }}>
-          <Link href="/dashboard" style={{ fontWeight: 800, fontSize: 15, letterSpacing: 1.5, color: '#fff', fontFamily: 'Inter, sans-serif', textDecoration: 'none' }}>LIVENTRA OS</Link>
-          <div style={{ display: 'flex', gap: 20, marginRight: 'auto', flexDirection: 'row' }}>
-            {[
-              { href: '/dashboard/companies',       label: 'الشركات' },
-              { href: '/dashboard/billing',         label: 'الفواتير' },
-              { href: '/dashboard/audit',           label: 'التدقيق' },
-              { href: '/dashboard/features',        label: 'الميزات' },
-              { href: '/dashboard/intelligence',    label: '🧠 الذكاء' },
-              { href: '/dashboard/security-center', label: '🛡️ الأمان' },
-              { href: '/dashboard/template-center', label: '📨 القوالب' },
-              { href: '/dashboard/landing-page',    label: '🌐 الموقع' },
-              { href: '/dashboard/leads',           label: '📋 طلبات العرض' },
-              { href: '/dashboard/demo-leads',      label: '⚡ قيادات الديمو' },
-            ].map(n => (
-              <Link key={n.href} href={n.href}
-                style={{
-                  fontSize: 13,
-                  color: n.href === '/dashboard/demo-leads' ? '#fff' : C.text2,
-                  fontWeight: n.href === '/dashboard/demo-leads' ? 700 : 400,
-                  textDecoration: 'none',
-                }}>
-                {n.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </nav>
-
-      <div style={{ maxWidth: 1300, margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: 1300, margin: '0 auto', padding: '28px 24px' }}>
 
         {/* HEADER */}
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 800, marginBottom: 6 }}>قيادات الديمو المباشر ⚡</h1>
-          <p style={{ color: C.text2, fontSize: 14 }}>
+        <div style={{ marginBottom: 24 }}>
+          <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#18181b', letterSpacing: '-0.02em' }}>قيادات الديمو المباشر</h1>
+          <p style={{ color: '#71717a', fontSize: 13 }}>
             زوار استخدموا التجربة المجانية المباشرة — إجمالي {total} قيادة
           </p>
         </div>
 
         {error && (
-          <div style={{ background: 'rgba(239,68,68,.1)', border: '1px solid rgba(239,68,68,.3)', borderRadius: 12, padding: '14px 20px', marginBottom: 24, color: '#fca5a5', fontSize: 14 }}>
+          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '12px 18px', marginBottom: 20, color: '#dc2626', fontSize: 13 }}>
             {error}
           </div>
         )}
 
         {/* STATS STRIP */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12, marginBottom: 28 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 24 }}>
           {[
-            { label: 'إجمالي',      value: total,                       color: C.accent,  icon: '⚡' },
-            { label: 'جديد',        value: statusCounts.new || 0,       color: '#3b82f6', icon: '🆕' },
-            { label: 'تم التواصل', value: statusCounts.contacted || 0,  color: '#f59e0b', icon: '📞' },
-            { label: 'تحوّل عميل', value: statusCounts.converted || 0,  color: '#22c55e', icon: '🎉' },
+            { label: 'إجمالي',      value: total,                       color: '#18181b' },
+            { label: 'جديد',        value: statusCounts.new || 0,       color: '#3b82f6' },
+            { label: 'تم التواصل', value: statusCounts.contacted || 0,  color: '#f59e0b' },
+            { label: 'تحوّل عميل', value: statusCounts.converted || 0,  color: '#22c55e' },
           ].map(k => (
-            <div key={k.label} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: '16px 18px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                <span style={{ fontSize: 11, color: C.text2 }}>{k.label}</span>
-                <span style={{ fontSize: 16 }}>{k.icon}</span>
-              </div>
-              <div style={{ fontSize: 28, fontWeight: 800, color: k.color }}>{k.value}</div>
+            <div key={k.label} style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: '14px 16px' }}>
+              <div style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 6, fontWeight: 500 }}>{k.label}</div>
+              <div style={{ fontSize: 22, fontWeight: 600, color: k.color }}>{k.value}</div>
             </div>
           ))}
         </div>
 
         {/* STATUS FILTER TABS */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 28, flexDirection: 'row', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid #e5e5e5' }}>
           {[
             { key: '', label: 'الكل', count: total },
             ...ALL_STATUSES.map(s => ({ key: s, label: STATUS_CONFIG[s].label, count: statusCounts[s] || 0 })),
           ].map(tab => (
             <button key={tab.key} onClick={() => setFilter(tab.key)}
               style={{
-                padding: '8px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600,
-                cursor: 'pointer', fontFamily: 'inherit', transition: 'all .2s',
-                background: filter === tab.key ? C.accent : 'rgba(255,255,255,.05)',
-                color: filter === tab.key ? '#fff' : C.text2,
-                border: filter === tab.key ? `1px solid ${C.accent}` : `1px solid ${C.border}`,
+                padding: '10px 18px', fontSize: 13, fontWeight: filter === tab.key ? 600 : 400,
+                cursor: 'pointer', fontFamily: 'inherit',
+                background: 'none',
+                color: filter === tab.key ? '#18181b' : '#a1a1aa',
+                border: 'none',
+                borderBottom: filter === tab.key ? '2px solid #18181b' : '2px solid transparent',
               }}>
-              {tab.label} {tab.count > 0 && <span style={{ opacity: .7, marginRight: 4 }}>({tab.count})</span>}
+              {tab.label} {tab.count > 0 && <span style={{ color: '#a1a1aa', marginRight: 4 }}>({tab.count})</span>}
             </button>
           ))}
           <button onClick={load}
-            style={{ marginRight: 'auto', padding: '8px 18px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', background: 'rgba(255,255,255,.05)', border: `1px solid ${C.border}`, color: C.text2 }}>
-            تحديث ↻
+            style={{ marginRight: 'auto', padding: '7px 16px', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', background: '#fff', border: '1px solid #e5e5e5', color: '#71717a' }}>
+            تحديث
           </button>
         </div>
 
         {/* TABLE */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '80px 0', color: C.text2 }}>جاري التحميل…</div>
+          <div style={{ textAlign: 'center', padding: '80px 0', color: '#a1a1aa', fontSize: 13 }}>جاري التحميل...</div>
         ) : displayedItems.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 0', color: C.text2 }}>
-            <div style={{ fontSize: 48, marginBottom: 16, opacity: .3 }}>⚡</div>
+          <div style={{ textAlign: 'center', padding: '80px 0', color: '#a1a1aa', fontSize: 13 }}>
             <p>لا توجد قيادات {filter ? `بحالة "${STATUS_CONFIG[filter]?.label}"` : 'بعد'}</p>
           </div>
         ) : (
-          <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, overflow: 'hidden' }}>
+          <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, overflow: 'hidden' }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: 'rgba(255,255,255,.03)', borderBottom: `1px solid ${C.border}`, padding: '12px 20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: '#fafafa', borderBottom: '1px solid #e5e5e5', padding: '10px 20px' }}>
               {['التاريخ', 'الزائر', 'الجوال', 'الشركة', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
-                <div key={h} style={{ fontSize: 11, fontWeight: 700, color: C.text2, letterSpacing: 1 }}>{h}</div>
+                <div key={h} style={{ fontSize: 11, fontWeight: 500, color: '#a1a1aa' }}>{h}</div>
               ))}
             </div>
 
@@ -229,45 +190,44 @@ export default function DemoLeadsPage() {
                 <div key={item.id}
                   style={{
                     display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px',
-                    gap: 0, padding: '16px 20px', alignItems: 'center',
-                    borderBottom: i < displayedItems.length - 1 ? `1px solid ${C.border}` : 'none',
-                    transition: 'background .15s',
+                    gap: 0, padding: '14px 20px', alignItems: 'center',
+                    borderBottom: i < displayedItems.length - 1 ? '1px solid #f0f0f0' : 'none',
+                    background: i % 2 === 0 ? '#fff' : '#fafafa',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,.02)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
                   {/* Date */}
-                  <div style={{ fontSize: 12, color: C.text2 }}>{fmt(item.created_at)}</div>
+                  <div style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>{fmt(item.created_at)}</div>
 
                   {/* Name */}
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 700 }}>{item.name || '—'}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: '#18181b' }}>{item.name || '—'}</div>
                     {item.demo_session_id && (
-                      <div style={{ fontSize: 10, color: C.text2, fontFamily: 'Inter, monospace', marginTop: 2, opacity: .6 }}>
-                        {item.demo_session_id.slice(0, 8)}…
+                      <div style={{ fontSize: 11, color: '#a1a1aa', fontFamily: 'Inter, monospace', marginTop: 2, fontWeight: 500 }}>
+                        {item.demo_session_id.slice(0, 8)}...
                       </div>
                     )}
                   </div>
 
                   {/* Phone */}
                   <div>
-                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: C.accent2, textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
+                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: '#18181b', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
                       {item.phone}
                     </a>
                     <div style={{ marginTop: 4 }}>
                       <a href={`https://wa.me/${item.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener"
-                        style={{ fontSize: 11, color: '#22c55e', textDecoration: 'none', background: 'rgba(34,197,94,.1)', border: '1px solid rgba(34,197,94,.2)', borderRadius: 6, padding: '2px 8px' }}>
+                        style={{ fontSize: 11, color: '#22c55e', textDecoration: 'none', background: 'rgba(34,197,94,.08)', border: '1px solid rgba(34,197,94,.2)', borderRadius: 7, padding: '2px 8px', fontWeight: 500 }}>
                         واتساب
                       </a>
                     </div>
                   </div>
 
                   {/* Company */}
-                  <div style={{ fontSize: 13, color: C.text2 }}>{item.company_name || '—'}</div>
+                  <div style={{ fontSize: 13, color: '#3f3f46' }}>{item.company_name || '—'}</div>
 
                   {/* Status badge */}
                   <div>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: sc.color, background: sc.bg, border: `1px solid ${sc.color}33`, borderRadius: 8, padding: '4px 10px' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 500, color: sc.color }}>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block' }} />
                       {sc.label}
                     </span>
                   </div>
@@ -276,11 +236,11 @@ export default function DemoLeadsPage() {
                   <div>
                     <button onClick={() => openNotes(item)}
                       style={{
-                        fontSize: 12, cursor: 'pointer', fontFamily: 'inherit',
-                        background: item.notes ? 'rgba(245,158,11,.1)' : 'rgba(255,255,255,.05)',
-                        border: item.notes ? '1px solid rgba(245,158,11,.3)' : `1px solid ${C.border}`,
-                        color: item.notes ? '#f59e0b' : C.text2,
-                        borderRadius: 8, padding: '4px 12px',
+                        fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
+                        background: '#fff',
+                        border: '1px solid #e5e5e5',
+                        color: item.notes ? '#18181b' : '#a1a1aa',
+                        borderRadius: 7, padding: '4px 12px',
                       }}>
                       {item.notes ? 'عرض' : '+ ملاحظة'}
                     </button>
@@ -293,8 +253,8 @@ export default function DemoLeadsPage() {
                       disabled={updating === item.id}
                       onChange={e => changeStatus(item.id, e.target.value)}
                       style={{
-                        background: '#060e24', border: `1px solid ${C.border}`, color: C.text,
-                        borderRadius: 8, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
+                        background: '#fff', border: '1px solid #e5e5e5', color: '#18181b',
+                        borderRadius: 7, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
                         fontFamily: 'inherit', outline: 'none', flex: 1,
                         opacity: updating === item.id ? .5 : 1,
                       }}>
@@ -312,13 +272,13 @@ export default function DemoLeadsPage() {
                           } catch (e: any) { alert(e.message || 'فشل التحويل'); }
                         }}
                         style={{
-                          fontSize: 10, padding: '5px 8px', borderRadius: 6,
-                          background: 'rgba(5,150,105,.15)', border: '1px solid rgba(5,150,105,.3)',
-                          color: '#059669', cursor: 'pointer', fontFamily: 'inherit',
-                          whiteSpace: 'nowrap', fontWeight: 700,
+                          fontSize: 12, padding: '7px 16px', borderRadius: 7,
+                          background: '#18181b', border: 'none',
+                          color: '#fff', cursor: 'pointer', fontFamily: 'inherit',
+                          whiteSpace: 'nowrap', fontWeight: 500,
                         }}
                       >
-                        تحويل ←
+                        تحويل
                       </button>
                     )}
                   </div>
@@ -331,31 +291,31 @@ export default function DemoLeadsPage() {
 
       {/* NOTES MODAL */}
       {notesModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
           onClick={e => { if (e.target === e.currentTarget) setNotesModal(null); }}>
-          <div style={{ background: '#0c1535', border: '1px solid rgba(255,255,255,.1)', borderRadius: 18, padding: 32, width: '100%', maxWidth: 480 }}>
-            <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>ملاحظات</h3>
-            <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 20 }}>
+          <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: 24, width: '100%', maxWidth: 480, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#18181b' }}>ملاحظات</h3>
+            <p style={{ fontSize: 13, color: '#71717a', marginBottom: 20 }}>
               {notesModal.name || '—'} — {notesModal.phone}
             </p>
             <textarea
               value={notesText}
               onChange={e => setNotesText(e.target.value)}
               rows={5}
-              placeholder="أضف ملاحظات حول هذا الزائر…"
+              placeholder="أضف ملاحظات حول هذا الزائر..."
               style={{
-                width: '100%', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.1)',
-                borderRadius: 10, padding: '12px 14px', color: '#e2e8f0', fontSize: 14,
+                width: '100%', background: '#fff', border: '1px solid #e5e5e5',
+                borderRadius: 7, padding: '7px 12px', color: '#18181b', fontSize: 13,
                 fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box',
               }}
             />
-            <div style={{ display: 'flex', gap: 12, marginTop: 20, flexDirection: 'row' }}>
+            <div style={{ display: 'flex', gap: 10, marginTop: 16, flexDirection: 'row' }}>
               <button onClick={saveNotes} disabled={savingNotes}
-                style={{ flex: 1, padding: '12px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 10, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1 }}>
-                {savingNotes ? 'جاري الحفظ…' : 'حفظ'}
+                style={{ flex: 1, padding: '7px 16px', background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1 }}>
+                {savingNotes ? 'جاري الحفظ...' : 'حفظ'}
               </button>
               <button onClick={() => setNotesModal(null)}
-                style={{ padding: '12px 20px', background: 'rgba(255,255,255,.05)', color: '#94a3b8', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, fontSize: 14, cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ padding: '7px 16px', background: '#fff', color: '#71717a', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
                 إلغاء
               </button>
             </div>

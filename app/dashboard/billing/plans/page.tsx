@@ -6,10 +6,10 @@ import { request } from '@/lib/api';
 const TIER_ORDER = ['trial', 'basic', 'professional', 'enterprise'];
 const TIER_AR: Record<string, string> = { trial: 'تجريبي', basic: 'أساسي', professional: 'احترافي', enterprise: 'مؤسسي' };
 const TIER_COLORS: Record<string, { bg: string; border: string; color: string }> = {
-  trial:        { bg: '#f8fafc', border: '#e2e8f0', color: '#64748b' },
-  basic:        { bg: '#eff6ff', border: '#bfdbfe', color: '#1d4ed8' },
-  professional: { bg: '#f0fdf4', border: '#86efac', color: '#16a34a' },
-  enterprise:   { bg: '#faf5ff', border: '#c084fc', color: '#7c3aed' },
+  trial:        { bg: '#fafafa', border: '#e5e5e5', color: '#71717a' },
+  basic:        { bg: '#fafafa', border: '#e5e5e5', color: '#3b82f6' },
+  professional: { bg: '#fafafa', border: '#e5e5e5', color: '#16a34a' },
+  enterprise:   { bg: '#fafafa', border: '#e5e5e5', color: '#7c3aed' },
 };
 
 const EMPTY_PLAN = { name: '', name_ar: '', price_monthly: 0, price_yearly: 0, max_users: 5, max_properties: 5, max_units: 50, max_contracts: 100, features: [], is_active: true, sort_order: 0 };
@@ -81,15 +81,15 @@ export default function PlansPage() {
     }));
   }
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 80, color: '#94a3b8' }}>جاري التحميل...</div>;
+  if (loading) return <div style={{ textAlign: 'center', padding: 80, color: '#a1a1aa' }}>جاري التحميل...</div>;
 
   const allFeatureKeys = Object.keys(registry);
 
   return (
-    <div style={{ direction: 'rtl' }}>
+    <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, color: '#0f172a' }}>إدارة الخطط</h2>
-        <button onClick={openCreate} style={{ padding: '8px 18px', background: '#1d4070', color: 'white', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, color: '#18181b' }}>إدارة الخطط</h2>
+        <button onClick={openCreate} style={{ padding: '8px 18px', background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
           + خطة جديدة
         </button>
       </div>
@@ -99,42 +99,42 @@ export default function PlansPage() {
         {plans.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map(plan => {
           const tc = TIER_COLORS[plan.name] || TIER_COLORS.basic;
           return (
-            <div key={plan.id} style={{ background: 'white', border: `1.5px solid ${tc.border}`, borderRadius: 16, padding: 20, position: 'relative' }}>
+            <div key={plan.id} style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: 20, position: 'relative' }}>
               {!plan.is_active && (
-                <div style={{ position: 'absolute', top: 10, left: 10, fontSize: 9, padding: '2px 8px', borderRadius: 20, background: '#fef2f2', color: '#dc2626', fontWeight: 700 }}>غير نشط</div>
+                <div style={{ position: 'absolute', top: 10, left: 10, fontSize: 9, padding: '2px 8px', borderRadius: 7, background: '#fef2f2', color: '#dc2626', fontWeight: 600 }}>غير نشط</div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{ width: 10, height: 10, borderRadius: '50%', background: tc.color }} />
-                <span style={{ fontSize: 16, fontWeight: 700, color: tc.color }}>{plan.name_ar || TIER_AR[plan.name] || plan.name}</span>
-                <span style={{ fontSize: 11, color: '#94a3b8' }}>({plan.name})</span>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: tc.color }} />
+                <span style={{ fontSize: 14, fontWeight: 600, color: tc.color }}>{plan.name_ar || TIER_AR[plan.name] || plan.name}</span>
+                <span style={{ fontSize: 11, color: '#a1a1aa' }}>({plan.name})</span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
-                <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-                  <div style={{ fontSize: 9, color: '#94a3b8' }}>شهري</div>
-                  <div style={{ fontSize: 14, fontWeight: 700 }}>{Number(plan.price_monthly || 0).toLocaleString()} ر.س</div>
+                <div style={{ background: '#fafafa', borderRadius: 7, padding: '8px 10px', border: '1px solid #f0f0f0' }}>
+                  <div style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>شهري</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#18181b' }}>{Number(plan.price_monthly || 0).toLocaleString()} ر.س</div>
                 </div>
-                <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-                  <div style={{ fontSize: 9, color: '#94a3b8' }}>سنوي</div>
-                  <div style={{ fontSize: 14, fontWeight: 700 }}>{Number(plan.price_yearly || 0).toLocaleString()} ر.س</div>
+                <div style={{ background: '#fafafa', borderRadius: 7, padding: '8px 10px', border: '1px solid #f0f0f0' }}>
+                  <div style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>سنوي</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#18181b' }}>{Number(plan.price_yearly || 0).toLocaleString()} ر.س</div>
                 </div>
               </div>
 
-              <div style={{ fontSize: 11, color: '#475569', marginBottom: 12 }}>
+              <div style={{ fontSize: 11, color: '#71717a', marginBottom: 12 }}>
                 <div>الوحدات: {plan.max_units || '∞'} · العقارات: {plan.max_properties || '∞'}</div>
                 <div>الموظفين: {plan.max_users || '∞'} · العقود: {plan.max_contracts || '∞'}</div>
               </div>
 
-              <div style={{ fontSize: 10, color: '#64748b', marginBottom: 8 }}>الميزات ({(plan.features || []).length}):</div>
+              <div style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 8, fontWeight: 500 }}>الميزات ({(plan.features || []).length}):</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                 {(plan.features || []).map((f: string) => (
-                  <span key={f} style={{ fontSize: 9, padding: '2px 7px', borderRadius: 20, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}` }}>
+                  <span key={f} style={{ fontSize: 9, padding: '2px 7px', borderRadius: 7, background: '#fafafa', color: '#71717a', border: '1px solid #e5e5e5' }}>
                     {registry[f]?.name_ar || f}
                   </span>
                 ))}
               </div>
 
-              <button onClick={() => openEdit(plan)} style={{ marginTop: 14, width: '100%', padding: '7px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12, color: '#475569', cursor: 'pointer', fontWeight: 600 }}>
+              <button onClick={() => openEdit(plan)} style={{ marginTop: 14, width: '100%', padding: '7px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12, color: '#71717a', cursor: 'pointer', fontWeight: 600 }}>
                 تعديل
               </button>
             </div>
@@ -144,31 +144,31 @@ export default function PlansPage() {
 
       {/* Create/Edit Modal */}
       {modal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.4)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={e => { if (e.target === e.currentTarget) setModal(false); }}>
-          <div style={{ background: 'white', borderRadius: 20, padding: 28, width: '100%', maxWidth: 520, maxHeight: '85vh', overflow: 'auto', direction: 'rtl' }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>{editing ? 'تعديل الخطة' : 'خطة جديدة'}</h3>
+          <div style={{ background: '#fff', borderRadius: 8, padding: 28, width: '100%', maxWidth: 520, maxHeight: '85vh', overflow: 'auto', border: '1px solid #e5e5e5' }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: '#18181b' }}>{editing ? 'تعديل الخطة' : 'خطة جديدة'}</h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
               <div>
-                <label style={{ fontSize: 11, color: '#64748b', display: 'block', marginBottom: 4 }}>الاسم (EN)</label>
+                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (EN)</label>
                 <input value={form.name} onChange={e => setForm((p: any) => ({ ...p, name: e.target.value }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13 }} placeholder="basic" />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13 }} placeholder="basic" />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#64748b', display: 'block', marginBottom: 4 }}>الاسم (AR)</label>
+                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (AR)</label>
                 <input value={form.name_ar} onChange={e => setForm((p: any) => ({ ...p, name_ar: e.target.value }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13 }} placeholder="أساسي" />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13 }} placeholder="أساسي" />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#64748b', display: 'block', marginBottom: 4 }}>السعر الشهري (ر.س)</label>
+                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر الشهري (ر.س)</label>
                 <input type="number" value={form.price_monthly} onChange={e => setForm((p: any) => ({ ...p, price_monthly: Number(e.target.value) }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13 }} />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13 }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#64748b', display: 'block', marginBottom: 4 }}>السعر السنوي (ر.س)</label>
+                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر السنوي (ر.س)</label>
                 <input type="number" value={form.price_yearly} onChange={e => setForm((p: any) => ({ ...p, price_yearly: Number(e.target.value) }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 13 }} />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13 }} />
               </div>
             </div>
 
@@ -180,40 +180,40 @@ export default function PlansPage() {
                 { key: 'max_contracts', label: 'العقود' },
               ].map(f => (
                 <div key={f.key}>
-                  <label style={{ fontSize: 10, color: '#64748b', display: 'block', marginBottom: 4 }}>{f.label}</label>
+                  <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>{f.label}</label>
                   <input type="number" value={form[f.key]} onChange={e => setForm((p: any) => ({ ...p, [f.key]: Number(e.target.value) }))}
-                    style={{ width: '100%', padding: '6px 8px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} />
+                    style={{ width: '100%', padding: '6px 8px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12 }} />
                 </div>
               ))}
             </div>
 
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#0f172a', display: 'block', marginBottom: 8 }}>الميزات المضمنة</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#18181b', display: 'block', marginBottom: 8 }}>الميزات المضمنة</label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                 {allFeatureKeys.map(key => (
-                  <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', borderRadius: 8, background: form.features.includes(key) ? '#f0fdf4' : '#f8fafc', border: `1px solid ${form.features.includes(key) ? '#86efac' : '#e2e8f0'}`, cursor: 'pointer', fontSize: 11 }}>
-                    <input type="checkbox" checked={form.features.includes(key)} onChange={() => toggleFeature(key)} style={{ accentColor: '#16a34a' }} />
-                    <span>{registry[key]?.name_ar || key}</span>
+                  <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', borderRadius: 7, background: form.features.includes(key) ? '#fafafa' : '#fff', border: `1px solid ${form.features.includes(key) ? '#18181b' : '#e5e5e5'}`, cursor: 'pointer', fontSize: 11 }}>
+                    <input type="checkbox" checked={form.features.includes(key)} onChange={() => toggleFeature(key)} />
+                    <span style={{ color: '#18181b' }}>{registry[key]?.name_ar || key}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}>
-                <input type="checkbox" checked={form.is_active} onChange={e => setForm((p: any) => ({ ...p, is_active: e.target.checked }))} style={{ accentColor: '#16a34a' }} />
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#18181b' }}>
+                <input type="checkbox" checked={form.is_active} onChange={e => setForm((p: any) => ({ ...p, is_active: e.target.checked }))} />
                 نشطة
               </label>
               <div>
-                <label style={{ fontSize: 10, color: '#64748b' }}>ترتيب:</label>
+                <label style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>ترتيب:</label>
                 <input type="number" value={form.sort_order} onChange={e => setForm((p: any) => ({ ...p, sort_order: Number(e.target.value) }))}
-                  style={{ width: 50, padding: '4px 6px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: 12, marginRight: 4 }} />
+                  style={{ width: 50, padding: '4px 6px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12, marginRight: 4 }} />
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setModal(false)} style={{ flex: 1, padding: '10px', background: '#f1f5f9', border: 'none', borderRadius: 10, fontSize: 13, cursor: 'pointer', color: '#475569' }}>إلغاء</button>
-              <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: '10px', background: '#1d4070', color: 'white', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+              <button onClick={() => setModal(false)} style={{ flex: 1, padding: '10px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13, cursor: 'pointer', color: '#71717a' }}>إلغاء</button>
+              <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: '10px', background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
                 {saving ? 'جاري الحفظ...' : editing ? 'حفظ التعديل' : 'إنشاء الخطة'}
               </button>
             </div>

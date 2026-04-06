@@ -3,27 +3,27 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminApi, request, BASE } from '@/lib/api';
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// --- Types ---
 interface TimeBucket { hour: string; label: string; warning: number; error: number; critical: number }
 
-// ─── Design tokens ───────────────────────────────────────────────────────────
+// --- Design tokens ---
 const LVL: Record<string,{label:string;c:string;bg:string;dot:string}> = {
-  critical:{ label:'حرج',    c:'#ef4444', bg:'rgba(239,68,68,0.15)',  dot:'#ef4444' },
-  error:   { label:'خطأ',    c:'#f97316', bg:'rgba(249,115,22,0.15)', dot:'#f97316' },
-  warning: { label:'تحذير',  c:'#f59e0b', bg:'rgba(245,158,11,0.15)', dot:'#f59e0b' },
-  info:    { label:'معلومة', c:'#38bdf8', bg:'rgba(56,189,248,0.12)', dot:'#38bdf8' },
-  debug:   { label:'تصحيح',  c:'#64748b', bg:'rgba(100,116,139,0.1)', dot:'#64748b' },
+  critical:{ label:'حرج',    c:'#ef4444', bg:'rgba(239,68,68,0.08)',  dot:'#ef4444' },
+  error:   { label:'خطأ',    c:'#f97316', bg:'rgba(249,115,22,0.08)', dot:'#f97316' },
+  warning: { label:'تحذير',  c:'#f59e0b', bg:'rgba(245,158,11,0.08)', dot:'#f59e0b' },
+  info:    { label:'معلومة', c:'#3b82f6', bg:'rgba(59,130,246,0.08)', dot:'#3b82f6' },
+  debug:   { label:'تصحيح',  c:'#71717a', bg:'rgba(113,113,122,0.06)', dot:'#71717a' },
 };
 const TS: Record<string,{label:string;c:string;bg:string;bar:string}> = {
-  healthy:  { label:'سليم',  c:'#10b981', bg:'rgba(16,185,129,0.15)', bar:'#10b981' },
-  degraded: { label:'متدهور', c:'#38bdf8', bg:'rgba(56,189,248,0.15)', bar:'#38bdf8' },
-  warning:  { label:'تحذير', c:'#f59e0b', bg:'rgba(245,158,11,0.15)', bar:'#f59e0b' },
-  critical: { label:'حرج',  c:'#ef4444', bg:'rgba(239,68,68,0.15)',  bar:'#ef4444' },
+  healthy:  { label:'سليم',  c:'#16a34a', bg:'rgba(22,163,74,0.08)', bar:'#16a34a' },
+  degraded: { label:'متدهور', c:'#3b82f6', bg:'rgba(59,130,246,0.08)', bar:'#3b82f6' },
+  warning:  { label:'تحذير', c:'#f59e0b', bg:'rgba(245,158,11,0.08)', bar:'#f59e0b' },
+  critical: { label:'حرج',  c:'#ef4444', bg:'rgba(239,68,68,0.08)',  bar:'#ef4444' },
 };
 const PLAN: Record<string,string> = { enterprise:'مؤسسي', professional:'احترافي', basic:'أساسي', trial:'تجريبي' };
 const SEV_COLORS: Record<string,{c:string;bg:string}> = {
-  critical:{c:'#dc2626',bg:'rgba(220,38,38,.12)'}, high:{c:'#c2410c',bg:'rgba(194,65,12,.12)'}, warning:{c:'#f59e0b',bg:'rgba(245,158,11,.12)'},
-  medium:{c:'#854d0e',bg:'rgba(133,77,14,.12)'}, low:{c:'#1d4070',bg:'rgba(29,64,112,.12)'}, info:{c:'#38bdf8',bg:'rgba(56,189,248,.12)'},
+  critical:{c:'#dc2626',bg:'rgba(220,38,38,.08)'}, high:{c:'#c2410c',bg:'rgba(194,65,12,.08)'}, warning:{c:'#f59e0b',bg:'rgba(245,158,11,.08)'},
+  medium:{c:'#854d0e',bg:'rgba(133,77,14,.08)'}, low:{c:'#3b82f6',bg:'rgba(59,130,246,.08)'}, info:{c:'#71717a',bg:'rgba(113,113,122,.06)'},
 };
 const TABS = [
   { id:'overview', label:'نظرة عامة',  icon:'⬡' },
@@ -35,7 +35,7 @@ const TABS = [
   { id:'simulation',label:'المحاكاة',  icon:'🧪' },
 ];
 
-// ─── Simulation scenarios (from security-center) ─────────────────────────────
+// --- Simulation scenarios ---
 const SIM_DOMAINS = ['المصادقة','التحكم في الوصول','التحقق من المدخلات','أمان API','سلامة البيانات','الأمان المالي','إساءة الاستخدام'];
 const SCENARIOS = [
   {domain:0,desc:'OTP brute-force (5+ محاولات)',code:'otp.failed',risk:'critical',alert:'فوري',fixed:true,detected:true},
@@ -61,7 +61,7 @@ const SCENARIOS = [
   {domain:6,desc:'Demo session hijack',code:'abuse.demo_hijack',risk:'critical',alert:'فوري',fixed:true,detected:true},
 ];
 
-// ─── Mini components ─────────────────────────────────────────────────────────
+// --- Mini components ---
 function AnimCounter({ value, color, size=28 }: { value:number; color:string; size?:number }) {
   const [d, setD] = useState(value);
   const prev = useRef(value);
@@ -71,21 +71,21 @@ function AnimCounter({ value, color, size=28 }: { value:number; color:string; si
     const id = setInterval(() => { i++; setD(Math.round(prev.current+(diff*i)/steps)); if (i>=steps){clearInterval(id);prev.current=value;} }, 30);
     return () => clearInterval(id);
   }, [value]);
-  return <span style={{ fontSize:size,fontWeight:800,color,fontVariantNumeric:'tabular-nums' }}>{d}</span>;
+  return <span style={{ fontSize:size,fontWeight:600,color,fontVariantNumeric:'tabular-nums' }}>{d}</span>;
 }
 
 function HealthRing({ score, grade, status }: { score:number; grade:string; status:string }) {
   const r=38, C=2*Math.PI*r, pct=Math.min(score,100)/100;
-  const color = score>=80?'#10b981':score>=60?'#38bdf8':score>=40?'#f59e0b':'#ef4444';
+  const color = score>=80?'#16a34a':score>=60?'#3b82f6':score>=40?'#f59e0b':'#ef4444';
   return (
     <div style={{ position:'relative',width:96,height:96 }}>
       <svg width={96} height={96} style={{ transform:'rotate(-90deg)' }}>
-        <circle cx={48} cy={48} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={6}/>
+        <circle cx={48} cy={48} r={r} fill="none" stroke="#f0f0f0" strokeWidth={6}/>
         <circle cx={48} cy={48} r={r} fill="none" stroke={color} strokeWidth={6} strokeDasharray={`${C*pct} ${C*(1-pct)}`} strokeLinecap="round" style={{ transition:'stroke-dasharray .8s ease' }}/>
       </svg>
       <div style={{ position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center' }}>
-        <span style={{ fontSize:22,fontWeight:800,color }}>{score}</span>
-        <span style={{ fontSize:9,color:'rgba(255,255,255,.5)',marginTop:-2 }}>{grade}</span>
+        <span style={{ fontSize:22,fontWeight:600,color }}>{score}</span>
+        <span style={{ fontSize:9,color:'#a1a1aa',marginTop:-2 }}>{grade}</span>
       </div>
     </div>
   );
@@ -100,7 +100,7 @@ function Spark({ vals, color }: { vals:number[]; color:string }) {
 
 function AreaTimeline({ data, onSelect, selectedHour }: { data:TimeBucket[]; onSelect:(h:string|null)=>void; selectedHour:string|null }) {
   const W=900, H=80;
-  if (!data.length) return <div style={{ height:H,background:'rgba(255,255,255,0.02)',borderRadius:8 }}/>;
+  if (!data.length) return <div style={{ height:H,background:'#fafafa',borderRadius:8 }}/>;
   const maxV = Math.max(...data.map(d=>d.critical+d.error+d.warning),1);
   const n = data.length;
   const makePts = (offset:(d:TimeBucket)=>number) => data.map((d,i) => `${8+(i/(n-1||1))*(W-16)},${H-((offset(d)/maxV)*(H-10))}`);
@@ -108,25 +108,25 @@ function AreaTimeline({ data, onSelect, selectedHour }: { data:TimeBucket[]; onS
   const mkArea = (pts:string[]) => `M8,${H} L${pts.join(' L')} L${W-8},${H} Z`;
   return (
     <svg width="100%" viewBox={`0 0 ${W} ${H+14}`} style={{ display:'block',cursor:'crosshair' }}>
-      <path d={mkArea(wP)} fill="rgba(245,158,11,.2)"/><path d={mkArea(eP)} fill="rgba(249,115,22,.25)"/><path d={mkArea(cP)} fill="rgba(239,68,68,.3)"/>
+      <path d={mkArea(wP)} fill="rgba(245,158,11,.12)"/><path d={mkArea(eP)} fill="rgba(249,115,22,.15)"/><path d={mkArea(cP)} fill="rgba(239,68,68,.18)"/>
       <polyline points={cP.join(' ')} fill="none" stroke="#ef4444" strokeWidth={2} strokeLinecap="round"/>
       {data.map((d,i) => { const x=8+(i/(n-1||1))*(W-16); const isSel=selectedHour===d.hour; return (
         <g key={i} onClick={()=>onSelect(isSel?null:d.hour)} style={{ cursor:'pointer' }}>
-          <rect x={x-((W-16)/(n-1||1))/2} y={0} width={(W-16)/(n-1||1)} height={H} fill={isSel?'rgba(56,189,248,.08)':'transparent'}/>
-          {i%4===0 && <text x={x} y={H+12} fontSize={8} fill={isSel?'#38bdf8':'rgba(255,255,255,.25)'} textAnchor="middle">{d.label}</text>}
+          <rect x={x-((W-16)/(n-1||1))/2} y={0} width={(W-16)/(n-1||1)} height={H} fill={isSel?'rgba(59,130,246,.06)':'transparent'}/>
+          {i%4===0 && <text x={x} y={H+12} fontSize={8} fill={isSel?'#3b82f6':'#a1a1aa'} textAnchor="middle">{d.label}</text>}
         </g>
       );})}
     </svg>
   );
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// =============================================
 // MAIN PAGE
-// ═════════════════════════════════════════════════════════════════════════════
+// =============================================
 export default function CommandCenterPage() {
   const router = useRouter();
 
-  // ─── Data state ────────────────────────────────────────────────────────────
+  // --- Data state ---
   const [health, setHealth]     = useState<any>(null);
   const [timeline, setTimeline] = useState<TimeBucket[]>([]);
   const [tenants, setTenants]   = useState<any[]>([]);
@@ -143,7 +143,7 @@ export default function CommandCenterPage() {
   const [alerts, setAlerts]     = useState<any[]>([]);
   const [ticker, setTicker]     = useState<any[]>([]);
 
-  // ─── UI state ──────────────────────────────────────────────────────────────
+  // --- UI state ---
   const [tab, setTab]           = useState('overview');
   const [loading, setLoading]   = useState(true);
   const [sseOk, setSseOk]       = useState(false);
@@ -163,7 +163,7 @@ export default function CommandCenterPage() {
   const [simDomain, setSimDomain] = useState(-1);
   const [toast, setToast]       = useState('');
 
-  // ─── IT Agent state ────────────────────────────────────────────────────────
+  // --- IT Agent state ---
   const [agentMsgs, setAgentMsgs] = useState<{role:string;content:string}[]>([]);
   const [agentInput, setAgentInput] = useState('');
   const [agentLoading, setAgentLoading] = useState(false);
@@ -173,7 +173,7 @@ export default function CommandCenterPage() {
   const LIMIT = 25;
   const showToast = (m:string) => { setToast(m); setTimeout(()=>setToast(''),3000); };
 
-  // ─── Data loaders ──────────────────────────────────────────────────────────
+  // --- Data loaders ---
   const loadOverview = useCallback(async () => {
     const results = await Promise.allSettled([
       adminApi.getHealthScore(), adminApi.getTimeline(), adminApi.getTenantHealth(),
@@ -214,13 +214,13 @@ export default function CommandCenterPage() {
     if (alertRes.status==='fulfilled') setAlerts(Array.isArray(alertRes.value?.data) ? alertRes.value.data : []);
   }, []);
 
-  // ─── Initial load ──────────────────────────────────────────────────────────
+  // --- Initial load ---
   useEffect(() => {
     if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
     loadOverview().finally(() => setLoading(false));
   }, [loadOverview, router]);
 
-  // ─── Auto-refresh (ref-based interval, clears on unmount) ──────────────────
+  // --- Auto-refresh ---
   useEffect(() => {
     const id = setInterval(() => { loadOverview(); }, 30000);
     return () => clearInterval(id);
@@ -238,7 +238,7 @@ export default function CommandCenterPage() {
     if (tab === 'alerts') loadAlerts();
   }, [tab, loadAlerts]);
 
-  // ─── SSE real-time stream ──────────────────────────────────────────────────
+  // --- SSE real-time stream ---
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
     if (!token) return;
@@ -256,20 +256,20 @@ export default function CommandCenterPage() {
     return () => es.close();
   }, []);
 
-  // ─── Ticker scroll animation ───────────────────────────────────────────────
+  // --- Ticker scroll animation ---
   const [tickerX, setTickerX] = useState(0);
   useEffect(() => {
     const id = setInterval(() => setTickerX(prev => prev <= -2000 ? 0 : prev - 1), 30);
     return () => clearInterval(id);
   }, []);
 
-  // ─── Handlers ──────────────────────────────────────────────────────────────
+  // --- Handlers ---
   async function handleAnalyze(logId:string) {
     setAnalyzing(logId);
     try {
       const res = await adminApi.analyzeLog(logId);
       if (res?.data && selectedLog?.id === logId) setSelectedLog((p:any) => ({ ...p, ai_analyses: [res.data] }));
-      showToast('تم التحليل ✓');
+      showToast('تم التحليل');
     } catch (e:any) { showToast(`خطأ: ${e.message}`); }
     setAnalyzing('');
   }
@@ -277,7 +277,7 @@ export default function CommandCenterPage() {
     if (!resModal) return;
     try {
       await adminApi.resolveLog(resModal.id, resNote);
-      showToast('تم الحل ✓'); setResModal(null); setResNote(''); setSelectedLog(null); loadLogs();
+      showToast('تم الحل'); setResModal(null); setResNote(''); setSelectedLog(null); loadLogs();
     } catch (e:any) { showToast(`خطأ: ${e.message}`); }
   }
   async function handleIgnore(id:string) {
@@ -288,12 +288,12 @@ export default function CommandCenterPage() {
     if (status === 'resolved') note = prompt('ملاحظة الحل (اختياري):') || '';
     try {
       await adminApi.sa.updateAnomaly(id, status, note);
-      showToast('تم التحديث ✓');
+      showToast('تم التحديث');
       setAnomalies(prev => prev.map(a => a.id === id ? { ...a, status } : a));
     } catch (e:any) { showToast(`خطأ: ${e.message}`); }
   }
 
-  // ─── IT Agent ──────────────────────────────────────────────────────────────
+  // --- IT Agent ---
   async function agentSend(text?:string) {
     const msg = (text || agentInput).trim();
     if (!msg || agentLoading) return;
@@ -313,10 +313,11 @@ export default function CommandCenterPage() {
   }
   useEffect(() => { if (agentScrollRef.current) agentScrollRef.current.scrollTop = agentScrollRef.current.scrollHeight; }, [agentMsgs]);
 
-  // ─── Derived ───────────────────────────────────────────────────────────────
+  // --- Derived ---
   const score = health?.score ?? 100;
   const grade = health?.grade ?? 'A';
-  const statusLabel = score >= 80 ? '🟢 مستقر' : score >= 60 ? '🟡 تحذير' : '🔴 حرج';
+  const statusLabel = score >= 80 ? 'مستقر' : score >= 60 ? 'تحذير' : 'حرج';
+  const statusColor = score >= 80 ? '#16a34a' : score >= 60 ? '#f59e0b' : '#ef4444';
   const incidents = (() => {
     const map: Record<string,any> = {};
     for (const l of logs.filter(l => ['error','critical'].includes(l.level))) {
@@ -340,60 +341,58 @@ export default function CommandCenterPage() {
   for (const e of (secSummary?.events_24h || secEvents)) { if (e.ip_address) ipMap[e.ip_address] = (ipMap[e.ip_address]||0)+1; }
   const topIPs = Object.entries(ipMap).sort((a,b) => b[1]-a[1]).slice(0,8);
 
-  // ─── Loading ───────────────────────────────────────────────────────────────
+  // --- Loading ---
   if (loading) return (
-    <div style={{ minHeight:'100vh',background:'#060d1f',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16 }}>
-      <div style={{ width:40,height:40,border:'3px solid rgba(255,255,255,.1)',borderTopColor:'#38bdf8',borderRadius:'50%',animation:'spin 1s linear infinite' }}/>
-      <p style={{ color:'#64748b',fontSize:13 }}>جاري تحميل مركز القيادة...</p>
+    <div style={{ background:'#fafafa',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16,height:'100vh' }}>
+      <div style={{ width:40,height:40,border:'3px solid #f0f0f0',borderTopColor:'#18181b',borderRadius:'50%',animation:'spin 1s linear infinite' }}/>
+      <p style={{ color:'#a1a1aa',fontSize:13 }}>جاري تحميل مركز القيادة...</p>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes pulse-dot{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}`}</style>
     </div>
   );
 
-  const C = { bg:'#060d1f', card:'rgba(255,255,255,.03)', border:'rgba(255,255,255,.07)', text1:'#e2e8f0', text2:'#94a3b8', accent:'#38bdf8' };
+  const C = { bg:'#fafafa', card:'#fff', border:'#e5e5e5', lightBorder:'#f0f0f0', text1:'#18181b', text2:'#71717a', muted:'#a1a1aa', accent:'#3b82f6', body:'#3f3f46' };
 
   return (
-    <div style={{ minHeight:'100vh',background:C.bg,direction:'rtl',color:C.text1 }}>
-      {toast && <div style={{ position:'fixed',top:16,left:'50%',transform:'translateX(-50%)',background:'#0f172a',color:'white',padding:'8px 20px',borderRadius:10,fontSize:12,zIndex:9999,border:'1px solid rgba(255,255,255,.1)' }}>{toast}</div>}
+    <div style={{ background:C.bg,color:C.text1 }}>
+      {toast && <div style={{ position:'fixed',top:16,left:'50%',transform:'translateX(-50%)',background:C.card,color:C.text1,padding:'8px 20px',borderRadius:7,fontSize:12,zIndex:9999,border:`1px solid ${C.border}`,boxShadow:'0 4px 12px rgba(0,0,0,.06)' }}>{toast}</div>}
 
-      {/* ═══ ZONE 1 — LIVE PULSE (full-width prominent bar) ═══ */}
-      <div style={{ background:'linear-gradient(135deg,#0a1628 0%,#0d1b36 100%)',borderBottom:`1px solid ${C.border}`,padding:'20px 28px 14px',position:'sticky',top:0,zIndex:50 }}>
+      {/* === ZONE 1 -- LIVE PULSE === */}
+      <div style={{ background:'#fff',borderBottom:`1px solid ${C.border}`,padding:'20px 28px 14px',position:'sticky',top:0,zIndex:50 }}>
         <div style={{ display:'flex',alignItems:'center',gap:24,maxWidth:1600,margin:'0 auto' }}>
-          {/* Health ring — LEFT with glow */}
-          <div style={{ filter:`drop-shadow(0 0 12px ${score>=80?'rgba(16,185,129,.4)':score>=60?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)'})` }}>
-            <HealthRing score={score} grade={grade} status={statusLabel} />
-          </div>
+          {/* Health ring */}
+          <HealthRing score={score} grade={grade} status={statusLabel} />
 
-          {/* KPIs — CENTER with colored top borders */}
+          {/* KPIs */}
           <div style={{ display:'flex',gap:12,flex:1,justifyContent:'center' }}>
             {[
               { label:'حرج', value:summary.open_criticals||health?.criticals_1h||0, color:'#ef4444' },
               { label:'أخطاء', value:health?.errors_1h||0, color:'#f97316' },
-              { label:'أحداث أمنية', value:secSummary?.total_24h||0, color:'#38bdf8' },
-              { label:'شركات نشطة', value:tenants.length, color:'#10b981' },
+              { label:'أحداث أمنية', value:secSummary?.total_24h||0, color:'#3b82f6' },
+              { label:'شركات نشطة', value:tenants.length, color:'#16a34a' },
             ].map(k => (
-              <div key={k.label} style={{ background:C.card,border:`1px solid ${C.border}`,borderTop:`3px solid ${k.color}`,borderRadius:10,padding:'12px 20px',minWidth:110,textAlign:'center' }}>
+              <div key={k.label} style={{ background:C.card,border:`1px solid ${C.border}`,borderTop:`3px solid ${k.color}`,borderRadius:8,padding:'12px 20px',minWidth:110,textAlign:'center' }}>
                 <AnimCounter value={k.value} color={k.color} size={28} />
-                <div style={{ fontSize:10,color:C.text2,marginTop:4,fontWeight:500 }}>{k.label}</div>
+                <div style={{ fontSize:11,color:C.muted,marginTop:4,fontWeight:500 }}>{k.label}</div>
               </div>
             ))}
           </div>
 
-          {/* Status badge — RIGHT */}
+          {/* Status badge */}
           <div style={{ display:'flex',alignItems:'center',gap:10 }}>
-            <div style={{ fontSize:14,fontWeight:700,color:score>=80?'#10b981':score>=60?'#f59e0b':'#ef4444',padding:'8px 18px',background:score>=80?'rgba(16,185,129,.12)':score>=60?'rgba(245,158,11,.12)':'rgba(239,68,68,.12)',borderRadius:24,border:`1.5px solid ${score>=80?'#10b981':score>=60?'#f59e0b':'#ef4444'}44` }}>
+            <div style={{ fontSize:13,fontWeight:600,color:statusColor,padding:'8px 18px',background:score>=80?'rgba(22,163,74,.06)':score>=60?'rgba(245,158,11,.06)':'rgba(239,68,68,.06)',borderRadius:24,border:`1.5px solid ${statusColor}33` }}>
               {statusLabel}
             </div>
           </div>
         </div>
-        {/* Ticker with animated pulse dot */}
+        {/* Ticker */}
         <div style={{ overflow:'hidden',marginTop:10,height:20,position:'relative',display:'flex',alignItems:'center',gap:8 }}>
           <div style={{ display:'flex',alignItems:'center',gap:6,flexShrink:0 }}>
-            <div style={{ width:7,height:7,borderRadius:'50%',background:'#10b981',animation:'pulse-dot 1.5s ease-in-out infinite' }}/>
-            <span style={{ fontSize:9,color:'#10b981',fontWeight:600,letterSpacing:'.5px' }}>LIVE</span>
+            <div style={{ width:7,height:7,borderRadius:'50%',background:'#16a34a',animation:'pulse-dot 1.5s ease-in-out infinite' }}/>
+            <span style={{ fontSize:9,color:'#16a34a',fontWeight:600,letterSpacing:'.5px' }}>LIVE</span>
           </div>
           <div style={{ overflow:'hidden',flex:1,position:'relative',height:20 }}>
             <div style={{ display:'flex',gap:40,position:'absolute',whiteSpace:'nowrap',transform:`translateX(${tickerX}px)`,transition:'none',alignItems:'center',height:20 }}>
-              {ticker.length === 0 ? <span style={{ fontSize:10,color:C.text2 }}>بانتظار أحداث مباشرة...</span> :
+              {ticker.length === 0 ? <span style={{ fontSize:10,color:C.muted }}>بانتظار أحداث مباشرة...</span> :
                 ticker.map((t,i) => {
                   const lv = LVL[t.level || t.severity] || LVL.info;
                   return <span key={i} style={{ fontSize:10,color:lv.c }}>[{lv.label}] {t.source||t.event_type}: {(t.message||'').slice(0,60)}</span>;
@@ -404,16 +403,16 @@ export default function CommandCenterPage() {
         </div>
       </div>
 
-      {/* ═══ ZONE 2 + 3 GRID ═══ */}
+      {/* === ZONE 2 + 3 GRID === */}
       <div style={{ display:'grid',gridTemplateColumns:'1fr 340px',maxWidth:1600,margin:'0 auto',minHeight:'calc(100vh - 130px)' }}>
 
-        {/* ═══ ZONE 2 — INTELLIGENCE CENTER ═══ */}
+        {/* === ZONE 2 -- INTELLIGENCE CENTER === */}
         <div style={{ borderLeft:`1px solid ${C.border}`,overflow:'auto' }}>
           {/* Tab bar */}
-          <div style={{ display:'flex',gap:0,borderBottom:`1px solid ${C.border}`,padding:'0 16px',overflow:'auto' }}>
+          <div style={{ display:'flex',gap:0,borderBottom:`1px solid ${C.border}`,padding:'0 16px',overflow:'auto',background:'#fff' }}>
             {TABS.map(t => (
               <button key={t.id} onClick={()=>setTab(t.id)}
-                style={{ padding:'12px 16px',fontSize:12,fontWeight:tab===t.id?700:400,color:tab===t.id?'#60a5fa':'#64748b',background:tab===t.id?'rgba(96,165,250,.04)':'transparent',border:'none',borderBottom:tab===t.id?'3px solid #60a5fa':'3px solid transparent',cursor:'pointer',whiteSpace:'nowrap',transition:'all .15s',boxShadow:tab===t.id?'0 2px 8px rgba(96,165,250,.15)':'none' }}>
+                style={{ padding:'12px 16px',fontSize:12,fontWeight:tab===t.id?600:400,color:tab===t.id?C.text1:C.text2,background:'transparent',border:'none',borderBottom:tab===t.id?`2px solid ${C.text1}`:'2px solid transparent',cursor:'pointer',whiteSpace:'nowrap',transition:'all .15s' }}>
                 {t.icon} {t.label}
               </button>
             ))}
@@ -421,43 +420,43 @@ export default function CommandCenterPage() {
 
           <div style={{ padding:'16px 20px' }}>
 
-            {/* ─── TAB: OVERVIEW ─── */}
+            {/* --- TAB: OVERVIEW --- */}
             {tab === 'overview' && <>
               {/* Timeline */}
-              <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:'14px 16px',marginBottom:14 }}>
-                <p style={{ fontSize:12,fontWeight:600,color:C.text2,marginBottom:8 }}>الجدول الزمني — 24 ساعة</p>
+              <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:'14px 16px',marginBottom:14 }}>
+                <p style={{ fontSize:13,fontWeight:600,color:C.text1,marginBottom:8 }}>الجدول الزمني — 24 ساعة</p>
                 <AreaTimeline data={timeline} onSelect={(h) => { setHourFilter(h); if (h) setTab('logs'); }} selectedHour={hourFilter} />
               </div>
               {/* Metrics row */}
               <div style={{ display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:14 }}>
                 {(topErrors.slice(0,3)).map((e:any,i:number) => (
-                  <div key={i} style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:'12px 14px' }}>
-                    <div style={{ fontSize:10,color:C.text2,marginBottom:4 }}>{e.source}</div>
+                  <div key={i} style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:'12px 14px' }}>
+                    <div style={{ fontSize:11,color:C.muted,marginBottom:4,fontWeight:500 }}>{e.source}</div>
                     <div style={{ fontSize:13,fontWeight:600,color:C.text1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{e.message}</div>
-                    <div style={{ fontSize:18,fontWeight:800,color:(LVL[e.level]||LVL.error).c,marginTop:4 }}>{e.count}×</div>
+                    <div style={{ fontSize:18,fontWeight:600,color:(LVL[e.level]||LVL.error).c,marginTop:4 }}>{e.count}x</div>
                   </div>
                 ))}
               </div>
               {/* Open criticals + Tenant health */}
               <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:14 }}>
-                <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:'14px 16px' }}>
-                  <p style={{ fontSize:12,fontWeight:600,color:'#ef4444',marginBottom:10 }}>أخطاء حرجة مفتوحة</p>
+                <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:'14px 16px' }}>
+                  <p style={{ fontSize:13,fontWeight:600,color:'#ef4444',marginBottom:10 }}>أخطاء حرجة مفتوحة</p>
                   {(summary.open_criticals_list || []).slice(0,4).map((l:any,i:number) => (
-                    <div key={i} style={{ fontSize:11,padding:'6px 0',borderBottom:`1px solid ${C.border}`,color:C.text2 }}>
+                    <div key={i} style={{ fontSize:11,padding:'6px 0',borderBottom:`1px solid ${C.lightBorder}`,color:C.text2 }}>
                       <span style={{ color:'#ef4444',fontFamily:'monospace' }}>{l.source}</span>: {(l.message||'').slice(0,60)}
                     </div>
                   ))}
-                  {(!summary.open_criticals_list?.length) && <p style={{ fontSize:11,color:C.text2 }}>✅ لا توجد أخطاء حرجة</p>}
+                  {(!summary.open_criticals_list?.length) && <p style={{ fontSize:11,color:C.text2 }}>لا توجد أخطاء حرجة</p>}
                 </div>
-                <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:'14px 16px' }}>
-                  <p style={{ fontSize:12,fontWeight:600,color:C.text2,marginBottom:10 }}>صحة المستأجرين</p>
+                <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:'14px 16px' }}>
+                  <p style={{ fontSize:13,fontWeight:600,color:C.text1,marginBottom:10 }}>صحة المستأجرين</p>
                   {tenants.slice(0,5).map((t:any) => {
                     const ts = t.score>=80?TS.healthy:t.score>=60?TS.degraded:t.score>=40?TS.warning:TS.critical;
                     return (
-                      <div key={t.id||t.slug} style={{ display:'flex',alignItems:'center',gap:8,padding:'5px 0',borderBottom:`1px solid ${C.border}` }}>
+                      <div key={t.id||t.slug} style={{ display:'flex',alignItems:'center',gap:8,padding:'5px 0',borderBottom:`1px solid ${C.lightBorder}` }}>
                         <span style={{ fontSize:11,flex:1,color:C.text1 }}>{t.name||t.slug}</span>
-                        <span style={{ fontSize:10,color:ts.c,fontWeight:700 }}>{t.score??'—'}</span>
-                        <div style={{ width:40,height:4,borderRadius:2,background:'rgba(255,255,255,.06)' }}>
+                        <span style={{ fontSize:10,color:ts.c,fontWeight:600 }}>{t.score??'—'}</span>
+                        <div style={{ width:40,height:4,borderRadius:2,background:'#f0f0f0' }}>
                           <div style={{ height:'100%',width:`${Math.min(t.score||0,100)}%`,background:ts.bar,borderRadius:2 }}/>
                         </div>
                       </div>
@@ -467,19 +466,19 @@ export default function CommandCenterPage() {
               </div>
             </>}
 
-            {/* ─── TAB: LOGS ─── */}
+            {/* --- TAB: LOGS --- */}
             {tab === 'logs' && <>
               <div style={{ display:'flex',gap:8,marginBottom:12,flexWrap:'wrap',alignItems:'center' }}>
-                <select value={logLevel} onChange={e=>{setLogLevel(e.target.value);setLogPage(0)}} style={{ background:'rgba(255,255,255,.05)',border:`1px solid ${C.border}`,borderRadius:8,padding:'6px 10px',color:C.text1,fontSize:11 }}>
+                <select value={logLevel} onChange={e=>{setLogLevel(e.target.value);setLogPage(0)}} style={{ background:'#fff',border:`1px solid ${C.border}`,borderRadius:7,padding:'6px 10px',color:C.text1,fontSize:11 }}>
                   <option value="">كل المستويات</option>
                   {Object.keys(LVL).map(l => <option key={l} value={l}>{LVL[l].label}</option>)}
                 </select>
-                <select value={logStatus} onChange={e=>{setLogStatus(e.target.value);setLogPage(0)}} style={{ background:'rgba(255,255,255,.05)',border:`1px solid ${C.border}`,borderRadius:8,padding:'6px 10px',color:C.text1,fontSize:11 }}>
+                <select value={logStatus} onChange={e=>{setLogStatus(e.target.value);setLogPage(0)}} style={{ background:'#fff',border:`1px solid ${C.border}`,borderRadius:7,padding:'6px 10px',color:C.text1,fontSize:11 }}>
                   <option value="">كل الحالات</option>
                   <option value="open">مفتوح</option><option value="resolved">محلول</option><option value="ignored">متجاهل</option>
                 </select>
-                <span style={{ fontSize:10,color:C.text2 }}>{logCount} سجل</span>
-                <button onClick={loadLogs} style={{ background:'rgba(255,255,255,.05)',border:`1px solid ${C.border}`,borderRadius:8,padding:'6px 12px',color:C.text2,fontSize:11,cursor:'pointer' }}>↻</button>
+                <span style={{ fontSize:10,color:C.muted }}>{logCount} سجل</span>
+                <button onClick={loadLogs} style={{ background:'#fff',border:`1px solid ${C.border}`,borderRadius:7,padding:'6px 12px',color:C.text2,fontSize:11,cursor:'pointer' }}>↻</button>
               </div>
               <div style={{ display:'grid',gridTemplateColumns:selectedLog?'1fr 320px':'1fr',gap:12 }}>
                 <div>
@@ -487,37 +486,37 @@ export default function CommandCenterPage() {
                     const lv = LVL[l.level] || LVL.info;
                     return (
                       <div key={l.id} onClick={()=>setSelectedLog(selectedLog?.id===l.id?null:l)}
-                        style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 12px',borderBottom:`1px solid ${C.border}`,cursor:'pointer',background:selectedLog?.id===l.id?'rgba(56,189,248,.06)':'transparent' }}>
+                        style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 12px',borderBottom:`1px solid ${C.lightBorder}`,cursor:'pointer',background:selectedLog?.id===l.id?'#fafafa':'transparent' }}>
                         <div style={{ width:6,height:6,borderRadius:'50%',background:lv.dot,flexShrink:0 }}/>
                         <span style={{ fontSize:10,color:lv.c,fontWeight:600,minWidth:36 }}>{lv.label}</span>
                         <span style={{ fontSize:10,color:C.accent,fontFamily:'monospace',minWidth:80 }}>{l.source}</span>
                         <span style={{ fontSize:11,color:C.text2,flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{l.message}</span>
-                        {l.ai_analyses?.length > 0 && <span style={{ fontSize:8,background:'rgba(139,92,246,.15)',color:'#a78bfa',padding:'1px 6px',borderRadius:10 }}>AI</span>}
-                        <span style={{ fontSize:9,color:C.text2,flexShrink:0 }}>{new Date(l.created_at).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})}</span>
+                        {l.ai_analyses?.length > 0 && <span style={{ fontSize:8,background:'rgba(139,92,246,.08)',color:'#8b5cf6',padding:'1px 6px',borderRadius:10 }}>AI</span>}
+                        <span style={{ fontSize:9,color:C.muted,flexShrink:0 }}>{new Date(l.created_at).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})}</span>
                       </div>
                     );
                   })}
                   <div style={{ display:'flex',justifyContent:'center',gap:12,padding:'12px 0' }}>
-                    <button disabled={logPage===0} onClick={()=>setLogPage(p=>p-1)} style={{ fontSize:11,padding:'4px 12px',borderRadius:6,border:`1px solid ${C.border}`,background:'transparent',color:C.text2,cursor:'pointer' }}>السابق</button>
+                    <button disabled={logPage===0} onClick={()=>setLogPage(p=>p-1)} style={{ fontSize:11,padding:'4px 12px',borderRadius:7,border:`1px solid ${C.border}`,background:'#fff',color:C.text2,cursor:'pointer' }}>السابق</button>
                     <span style={{ fontSize:11,color:C.text2 }}>{logPage+1}/{Math.ceil(logCount/LIMIT)||1}</span>
-                    <button disabled={logs.length<LIMIT} onClick={()=>setLogPage(p=>p+1)} style={{ fontSize:11,padding:'4px 12px',borderRadius:6,border:`1px solid ${C.border}`,background:'transparent',color:C.text2,cursor:'pointer' }}>التالي</button>
+                    <button disabled={logs.length<LIMIT} onClick={()=>setLogPage(p=>p+1)} style={{ fontSize:11,padding:'4px 12px',borderRadius:7,border:`1px solid ${C.border}`,background:'#fff',color:C.text2,cursor:'pointer' }}>التالي</button>
                   </div>
                 </div>
                 {selectedLog && (
-                  <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:12,padding:'14px',fontSize:12 }}>
-                    <div style={{ fontSize:10,color:(LVL[selectedLog.level]||LVL.info).c,fontWeight:700,marginBottom:4 }}>{(LVL[selectedLog.level]||LVL.info).label} — {selectedLog.source}</div>
-                    <p style={{ color:C.text1,lineHeight:1.6,marginBottom:10,fontSize:11 }}>{selectedLog.message}</p>
+                  <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:'14px',fontSize:12 }}>
+                    <div style={{ fontSize:10,color:(LVL[selectedLog.level]||LVL.info).c,fontWeight:600,marginBottom:4 }}>{(LVL[selectedLog.level]||LVL.info).label} — {selectedLog.source}</div>
+                    <p style={{ color:C.body,lineHeight:1.6,marginBottom:10,fontSize:11 }}>{selectedLog.message}</p>
                     {selectedLog.stack_trace && <details style={{ marginBottom:10 }}><summary style={{ fontSize:10,color:C.text2,cursor:'pointer' }}>Stack trace</summary><pre style={{ fontSize:9,color:C.text2,whiteSpace:'pre-wrap',marginTop:4 }}>{selectedLog.stack_trace}</pre></details>}
                     <div style={{ display:'flex',gap:6,flexWrap:'wrap' }}>
-                      <button onClick={()=>handleAnalyze(selectedLog.id)} disabled={analyzing===selectedLog.id} style={{ fontSize:10,padding:'6px 12px',borderRadius:6,background:'linear-gradient(135deg,#7c3aed,#6366f1)',color:'white',border:'none',cursor:'pointer',flex:1 }}>{analyzing===selectedLog.id?'⏳':'🧠 تحليل AI'}</button>
-                      <button onClick={()=>{setResModal(selectedLog);setResNote('')}} style={{ fontSize:10,padding:'6px 12px',borderRadius:6,background:'rgba(16,185,129,.15)',color:'#10b981',border:`1px solid rgba(16,185,129,.3)`,cursor:'pointer' }}>حل</button>
-                      <button onClick={()=>handleIgnore(selectedLog.id)} style={{ fontSize:10,padding:'6px 12px',borderRadius:6,background:'rgba(100,116,139,.1)',color:C.text2,border:`1px solid ${C.border}`,cursor:'pointer' }}>تجاهل</button>
+                      <button onClick={()=>handleAnalyze(selectedLog.id)} disabled={analyzing===selectedLog.id} style={{ fontSize:10,padding:'6px 12px',borderRadius:7,background:'#18181b',color:'#fff',border:'none',cursor:'pointer',flex:1 }}>{analyzing===selectedLog.id?'...':'تحليل AI'}</button>
+                      <button onClick={()=>{setResModal(selectedLog);setResNote('')}} style={{ fontSize:10,padding:'6px 12px',borderRadius:7,background:'rgba(22,163,74,.06)',color:'#16a34a',border:'1px solid rgba(22,163,74,.2)',cursor:'pointer' }}>حل</button>
+                      <button onClick={()=>handleIgnore(selectedLog.id)} style={{ fontSize:10,padding:'6px 12px',borderRadius:7,background:'#fafafa',color:C.text2,border:`1px solid ${C.border}`,cursor:'pointer' }}>تجاهل</button>
                     </div>
                     {selectedLog.ai_analyses?.[0] && (
-                      <div style={{ marginTop:10,background:'rgba(139,92,246,.06)',border:'1px solid rgba(139,92,246,.15)',borderRadius:8,padding:10 }}>
-                        <p style={{ fontSize:10,fontWeight:700,color:'#a78bfa',marginBottom:4 }}>تحليل AI ({selectedLog.ai_analyses[0].confidence}%)</p>
-                        <p style={{ fontSize:10,color:C.text1,marginBottom:4 }}><strong>السبب:</strong> {selectedLog.ai_analyses[0].root_cause}</p>
-                        <p style={{ fontSize:10,color:C.text1 }}><strong>الحل:</strong> {selectedLog.ai_analyses[0].suggested_fix}</p>
+                      <div style={{ marginTop:10,background:'rgba(139,92,246,.04)',border:'1px solid rgba(139,92,246,.12)',borderRadius:8,padding:10 }}>
+                        <p style={{ fontSize:10,fontWeight:600,color:'#8b5cf6',marginBottom:4 }}>تحليل AI ({selectedLog.ai_analyses[0].confidence}%)</p>
+                        <p style={{ fontSize:10,color:C.body,marginBottom:4 }}><strong>السبب:</strong> {selectedLog.ai_analyses[0].root_cause}</p>
+                        <p style={{ fontSize:10,color:C.body }}><strong>الحل:</strong> {selectedLog.ai_analyses[0].suggested_fix}</p>
                       </div>
                     )}
                   </div>
@@ -525,17 +524,17 @@ export default function CommandCenterPage() {
               </div>
             </>}
 
-            {/* ─── TAB: INCIDENTS ─── */}
+            {/* --- TAB: INCIDENTS --- */}
             {tab === 'incidents' && <>
               <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12 }}>
-                <p style={{ fontSize:14,fontWeight:700 }}>الحوادث النشطة</p>
-                <button onClick={loadLogs} style={{ fontSize:10,padding:'4px 10px',borderRadius:6,background:C.card,border:`1px solid ${C.border}`,color:C.text2,cursor:'pointer' }}>↻</button>
+                <p style={{ fontSize:13,fontWeight:600 }}>الحوادث النشطة</p>
+                <button onClick={loadLogs} style={{ fontSize:10,padding:'4px 10px',borderRadius:7,background:C.card,border:`1px solid ${C.border}`,color:C.text2,cursor:'pointer' }}>↻</button>
               </div>
-              {incidents.length === 0 ? <p style={{ textAlign:'center',color:C.text2,padding:40 }}>✅ لا توجد حوادث</p> :
+              {incidents.length === 0 ? <p style={{ textAlign:'center',color:C.text2,padding:40 }}>لا توجد حوادث</p> :
                 incidents.map((inc:any,i:number) => (
-                  <div key={i} style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:'12px 16px',marginBottom:10 }}>
+                  <div key={i} style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:'12px 16px',marginBottom:10 }}>
                     <div style={{ display:'flex',alignItems:'center',gap:10,marginBottom:8 }}>
-                      <div style={{ width:36,height:36,borderRadius:8,background:(LVL[inc.level]||LVL.error).bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,fontWeight:800,color:(LVL[inc.level]||LVL.error).c }}>{inc.count}</div>
+                      <div style={{ width:36,height:36,borderRadius:8,background:(LVL[inc.level]||LVL.error).bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,fontWeight:600,color:(LVL[inc.level]||LVL.error).c }}>{inc.count}</div>
                       <div style={{ flex:1 }}>
                         <span style={{ fontSize:12,fontFamily:'monospace',color:C.accent }}>{inc.source}</span>
                         <span style={{ fontSize:10,color:(LVL[inc.level]||LVL.error).c,marginRight:8,padding:'1px 6px',borderRadius:10,background:(LVL[inc.level]||LVL.error).bg }}>{(LVL[inc.level]||LVL.error).label}</span>
@@ -547,7 +546,7 @@ export default function CommandCenterPage() {
               }
             </>}
 
-            {/* ─── TAB: TENANTS ─── */}
+            {/* --- TAB: TENANTS --- */}
             {tab === 'tenants' && <>
               <div style={{ display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))',gap:12 }}>
                 {tenants.map((t:any) => {
@@ -555,55 +554,55 @@ export default function CommandCenterPage() {
                   const isFiltered = companyFilter===t.id;
                   return (
                     <div key={t.id||t.slug} onClick={()=>{setCompanyFilter(isFiltered?'':t.id);if(!isFiltered)setTab('logs');}}
-                      style={{ background:C.card,border:`1px solid ${isFiltered?C.accent:C.border}`,borderRadius:12,padding:'16px',cursor:'pointer',transition:'border .15s' }}>
+                      style={{ background:C.card,border:`1px solid ${isFiltered?C.accent:C.border}`,borderRadius:8,padding:'16px',cursor:'pointer',transition:'border .15s' }}>
                       <div style={{ display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8 }}>
-                        <div><div style={{ fontSize:13,fontWeight:700 }}>{t.name}</div><div style={{ fontSize:10,color:C.text2,fontFamily:'monospace' }}>{t.slug}</div></div>
-                        <div style={{ textAlign:'center' }}><div style={{ fontSize:22,fontWeight:800,color:ts.c }}>{t.score??'—'}</div><div style={{ fontSize:9,color:ts.c }}>{ts.label}</div></div>
+                        <div><div style={{ fontSize:13,fontWeight:600 }}>{t.name}</div><div style={{ fontSize:10,color:C.muted,fontFamily:'monospace' }}>{t.slug}</div></div>
+                        <div style={{ textAlign:'center' }}><div style={{ fontSize:22,fontWeight:600,color:ts.c }}>{t.score??'—'}</div><div style={{ fontSize:9,color:ts.c }}>{ts.label}</div></div>
                       </div>
-                      <div style={{ height:4,borderRadius:2,background:'rgba(255,255,255,.06)',marginBottom:8 }}><div style={{ height:'100%',width:`${Math.min(t.score||0,100)}%`,background:ts.bar,borderRadius:2,transition:'width .5s' }}/></div>
+                      <div style={{ height:4,borderRadius:2,background:'#f0f0f0',marginBottom:8 }}><div style={{ height:'100%',width:`${Math.min(t.score||0,100)}%`,background:ts.bar,borderRadius:2,transition:'width .5s' }}/></div>
                       <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:4,fontSize:10,color:C.text2 }}>
                         <div>أخطاء 24س: <span style={{ color:C.text1,fontWeight:600 }}>{t.errors_24h||0}</span></div>
                         <div>تحذيرات: <span style={{ color:C.text1,fontWeight:600 }}>{t.warnings_24h||0}</span></div>
                         <div>7 أيام: <span style={{ color:C.text1,fontWeight:600 }}>{t.errors_7d||0}</span></div>
                       </div>
-                      <span style={{ fontSize:9,padding:'2px 8px',borderRadius:10,marginTop:6,display:'inline-block',background:t.plan==='enterprise'?'rgba(245,158,11,.12)':'rgba(56,189,248,.1)',color:t.plan==='enterprise'?'#f59e0b':'#38bdf8' }}>{PLAN[t.plan]||t.plan}</span>
+                      <span style={{ fontSize:9,padding:'2px 8px',borderRadius:10,marginTop:6,display:'inline-block',background:t.plan==='enterprise'?'rgba(245,158,11,.08)':'rgba(59,130,246,.06)',color:t.plan==='enterprise'?'#f59e0b':'#3b82f6' }}>{PLAN[t.plan]||t.plan}</span>
                     </div>
                   );
                 })}
               </div>
             </>}
 
-            {/* ─── TAB: SECURITY ─── */}
+            {/* --- TAB: SECURITY --- */}
             {tab === 'security' && <>
               {/* Filters */}
               <div style={{ display:'flex',gap:8,marginBottom:12,flexWrap:'wrap' }}>
                 {['','critical','high','medium','info'].map(s => (
-                  <button key={s} onClick={()=>{setEvtSev(s);setEvtPage(0);}} style={{ fontSize:10,padding:'4px 10px',borderRadius:20,border:`1px solid ${evtSev===s?C.accent:C.border}`,background:evtSev===s?'rgba(56,189,248,.1)':'transparent',color:evtSev===s?C.accent:C.text2,cursor:'pointer' }}>
+                  <button key={s} onClick={()=>{setEvtSev(s);setEvtPage(0);}} style={{ fontSize:10,padding:'4px 10px',borderRadius:20,border:`1px solid ${evtSev===s?C.text1:C.border}`,background:evtSev===s?'#fafafa':'#fff',color:evtSev===s?C.text1:C.text2,cursor:'pointer' }}>
                     {s?((SEV_COLORS[s]||SEV_COLORS.info) && (s==='critical'?'حرج':s==='high'?'عالي':s==='medium'?'متوسط':'معلومة')):'الكل'}
                   </button>
                 ))}
-                <select value={evtHours} onChange={e=>{setEvtHours(e.target.value);setEvtPage(0);loadSecEvents()}} style={{ background:'rgba(255,255,255,.05)',border:`1px solid ${C.border}`,borderRadius:8,padding:'4px 8px',color:C.text1,fontSize:10 }}>
+                <select value={evtHours} onChange={e=>{setEvtHours(e.target.value);setEvtPage(0);loadSecEvents()}} style={{ background:'#fff',border:`1px solid ${C.border}`,borderRadius:7,padding:'4px 8px',color:C.text1,fontSize:10 }}>
                   <option value="6">6 ساعات</option><option value="24">24 ساعة</option><option value="72">3 أيام</option><option value="168">7 أيام</option>
                 </select>
               </div>
               {/* Events table */}
               {secEvtsPaged.map((e:any,i:number) => (
-                <div key={i} style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 0',borderBottom:`1px solid ${C.border}`,fontSize:11 }}>
+                <div key={i} style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 0',borderBottom:`1px solid ${C.lightBorder}`,fontSize:11 }}>
                   <span style={{ fontSize:9,padding:'2px 6px',borderRadius:10,background:(SEV_COLORS[e.severity]||SEV_COLORS.info).bg,color:(SEV_COLORS[e.severity]||SEV_COLORS.info).c,fontWeight:600 }}>{e.severity}</span>
                   <span style={{ fontWeight:600,color:C.text1,minWidth:100 }}>{e.event_type}</span>
-                  {e.ip_address && <span style={{ fontSize:9,color:C.text2,fontFamily:'monospace',background:'rgba(255,255,255,.04)',padding:'1px 6px',borderRadius:4 }}>{e.ip_address}</span>}
+                  {e.ip_address && <span style={{ fontSize:9,color:C.muted,fontFamily:'monospace',background:'#fafafa',padding:'1px 6px',borderRadius:4 }}>{e.ip_address}</span>}
                   <span style={{ flex:1,color:C.text2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{e.description||''}</span>
-                  <span style={{ fontSize:9,color:C.text2 }}>{new Date(e.created_at).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})}</span>
+                  <span style={{ fontSize:9,color:C.muted }}>{new Date(e.created_at).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})}</span>
                 </div>
               ))}
               {/* Top IPs */}
               {topIPs.length > 0 && (
-                <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:'14px 16px',marginTop:14 }}>
-                  <p style={{ fontSize:12,fontWeight:600,color:C.text2,marginBottom:8 }}>أكثر العناوين نشاطاً</p>
+                <div style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:'14px 16px',marginTop:14 }}>
+                  <p style={{ fontSize:13,fontWeight:600,color:C.text1,marginBottom:8 }}>أكثر العناوين نشاطاً</p>
                   {topIPs.map(([ip,count]) => (
-                    <div key={ip} style={{ display:'flex',justifyContent:'space-between',padding:'4px 0',borderBottom:`1px solid ${C.border}`,fontSize:11 }}>
+                    <div key={ip} style={{ display:'flex',justifyContent:'space-between',padding:'4px 0',borderBottom:`1px solid ${C.lightBorder}`,fontSize:11 }}>
                       <span style={{ fontFamily:'monospace',color:C.accent }}>{ip}</span>
-                      <span style={{ fontWeight:700,color:Number(count)>100?'#ef4444':Number(count)>30?'#f59e0b':C.text1 }}>{count}</span>
+                      <span style={{ fontWeight:600,color:Number(count)>100?'#ef4444':Number(count)>30?'#f59e0b':C.text1 }}>{count}</span>
                     </div>
                   ))}
                 </div>
@@ -612,7 +611,7 @@ export default function CommandCenterPage() {
               <div style={{ marginTop:14 }}>
                 <div style={{ display:'flex',gap:6,marginBottom:10 }}>
                   {['','open','acknowledged','resolved'].map(s => (
-                    <button key={s} onClick={()=>setAnomFilter(s)} style={{ fontSize:10,padding:'3px 10px',borderRadius:20,border:`1px solid ${anomFilter===s?C.accent:C.border}`,background:anomFilter===s?'rgba(56,189,248,.1)':'transparent',color:anomFilter===s?C.accent:C.text2,cursor:'pointer' }}>
+                    <button key={s} onClick={()=>setAnomFilter(s)} style={{ fontSize:10,padding:'3px 10px',borderRadius:20,border:`1px solid ${anomFilter===s?C.text1:C.border}`,background:anomFilter===s?'#fafafa':'#fff',color:anomFilter===s?C.text1:C.text2,cursor:'pointer' }}>
                       {s===''?'الكل':s==='open'?'مفتوح':s==='acknowledged'?'معترف به':'محلول'}
                     </button>
                   ))}
@@ -620,18 +619,18 @@ export default function CommandCenterPage() {
                 {filteredAnoms.map((a:any) => {
                   const sc = SEV_COLORS[a.severity] || SEV_COLORS.info;
                   return (
-                    <div key={a.id} style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:10,padding:'10px 14px',marginBottom:8 }}>
+                    <div key={a.id} style={{ background:C.card,border:`1px solid ${C.border}`,borderRadius:8,padding:'10px 14px',marginBottom:8 }}>
                       <div style={{ display:'flex',alignItems:'center',gap:8,marginBottom:4 }}>
                         <span style={{ fontSize:9,padding:'2px 6px',borderRadius:10,background:sc.bg,color:sc.c,fontWeight:600 }}>{a.severity}</span>
                         <span style={{ fontSize:11,fontWeight:600,color:C.text1 }}>{a.anomaly_type}</span>
-                        <span style={{ fontSize:9,color:C.text2,marginRight:'auto' }}>{a.status}</span>
+                        <span style={{ fontSize:9,color:C.muted,marginRight:'auto' }}>{a.status}</span>
                       </div>
                       <p style={{ fontSize:10,color:C.text2,marginBottom:6 }}>{(a.description||'').slice(0,120)}</p>
                       {a.status === 'open' && (
                         <div style={{ display:'flex',gap:6 }}>
-                          <button onClick={()=>handleAnomAction(a.id,'acknowledged')} style={{ fontSize:9,padding:'3px 8px',borderRadius:6,background:'rgba(56,189,248,.1)',color:C.accent,border:`1px solid rgba(56,189,248,.2)`,cursor:'pointer' }}>اعتراف</button>
-                          <button onClick={()=>handleAnomAction(a.id,'resolved')} style={{ fontSize:9,padding:'3px 8px',borderRadius:6,background:'rgba(16,185,129,.1)',color:'#10b981',border:`1px solid rgba(16,185,129,.2)`,cursor:'pointer' }}>حل</button>
-                          <button onClick={()=>handleAnomAction(a.id,'false_positive')} style={{ fontSize:9,padding:'3px 8px',borderRadius:6,background:'rgba(100,116,139,.1)',color:C.text2,border:`1px solid ${C.border}`,cursor:'pointer' }}>إيجابي خاطئ</button>
+                          <button onClick={()=>handleAnomAction(a.id,'acknowledged')} style={{ fontSize:9,padding:'3px 8px',borderRadius:7,background:'rgba(59,130,246,.06)',color:C.accent,border:'1px solid rgba(59,130,246,.15)',cursor:'pointer' }}>اعتراف</button>
+                          <button onClick={()=>handleAnomAction(a.id,'resolved')} style={{ fontSize:9,padding:'3px 8px',borderRadius:7,background:'rgba(22,163,74,.06)',color:'#16a34a',border:'1px solid rgba(22,163,74,.15)',cursor:'pointer' }}>حل</button>
+                          <button onClick={()=>handleAnomAction(a.id,'false_positive')} style={{ fontSize:9,padding:'3px 8px',borderRadius:7,background:'#fafafa',color:C.text2,border:`1px solid ${C.border}`,cursor:'pointer' }}>إيجابي خاطئ</button>
                         </div>
                       )}
                     </div>
@@ -640,15 +639,15 @@ export default function CommandCenterPage() {
               </div>
             </>}
 
-            {/* ─── TAB: ALERTS ─── */}
+            {/* --- TAB: ALERTS --- */}
             {tab === 'alerts' && <>
               {alerts.length === 0 ? <p style={{ textAlign:'center',color:C.text2,padding:40 }}>لا توجد تنبيهات</p> :
                 alerts.map((a:any,i:number) => (
-                  <div key={i} style={{ padding:'10px 0',borderBottom:`1px solid ${C.border}` }}>
+                  <div key={i} style={{ padding:'10px 0',borderBottom:`1px solid ${C.lightBorder}` }}>
                     <div style={{ display:'flex',alignItems:'center',gap:8,marginBottom:4 }}>
                       <span style={{ fontSize:11,color:C.text1 }}>{a.recipient_phone||a.to}</span>
-                      <span style={{ fontSize:9,padding:'1px 6px',borderRadius:10,background:a.status==='sent'?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)',color:a.status==='sent'?'#10b981':'#ef4444' }}>{a.status}</span>
-                      <span style={{ fontSize:9,color:C.text2,marginRight:'auto' }}>{new Date(a.sent_at||a.created_at).toLocaleString('ar-SA')}</span>
+                      <span style={{ fontSize:9,padding:'1px 6px',borderRadius:10,background:a.status==='sent'?'rgba(22,163,74,.08)':'rgba(239,68,68,.08)',color:a.status==='sent'?'#16a34a':'#ef4444' }}>{a.status}</span>
+                      <span style={{ fontSize:9,color:C.muted,marginRight:'auto' }}>{new Date(a.sent_at||a.created_at).toLocaleString('ar-SA')}</span>
                     </div>
                     {a.message_body && <p style={{ fontSize:10,color:C.text2,whiteSpace:'pre-wrap' }}>{(a.message_body||a.body||'').slice(0,200)}</p>}
                   </div>
@@ -656,40 +655,40 @@ export default function CommandCenterPage() {
               }
             </>}
 
-            {/* ─── TAB: SIMULATION ─── */}
+            {/* --- TAB: SIMULATION --- */}
             {tab === 'simulation' && <>
               <div style={{ display:'flex',gap:10,marginBottom:12 }}>
-                <div style={{ background:'rgba(16,185,129,.1)',border:'1px solid rgba(16,185,129,.2)',borderRadius:10,padding:'10px 16px',textAlign:'center',flex:1 }}>
-                  <div style={{ fontSize:22,fontWeight:800,color:'#10b981' }}>{SCENARIOS.filter(s=>s.detected).length}</div>
+                <div style={{ background:'rgba(22,163,74,.04)',border:'1px solid rgba(22,163,74,.12)',borderRadius:8,padding:'10px 16px',textAlign:'center',flex:1 }}>
+                  <div style={{ fontSize:22,fontWeight:600,color:'#16a34a' }}>{SCENARIOS.filter(s=>s.detected).length}</div>
                   <div style={{ fontSize:10,color:C.text2 }}>مكتشف</div>
                 </div>
-                <div style={{ background:'rgba(239,68,68,.1)',border:'1px solid rgba(239,68,68,.2)',borderRadius:10,padding:'10px 16px',textAlign:'center',flex:1 }}>
-                  <div style={{ fontSize:22,fontWeight:800,color:'#ef4444' }}>{SCENARIOS.filter(s=>!s.detected).length}</div>
+                <div style={{ background:'rgba(239,68,68,.04)',border:'1px solid rgba(239,68,68,.12)',borderRadius:8,padding:'10px 16px',textAlign:'center',flex:1 }}>
+                  <div style={{ fontSize:22,fontWeight:600,color:'#ef4444' }}>{SCENARIOS.filter(s=>!s.detected).length}</div>
                   <div style={{ fontSize:10,color:C.text2 }}>ثغرات</div>
                 </div>
-                <div style={{ background:'rgba(56,189,248,.1)',border:'1px solid rgba(56,189,248,.2)',borderRadius:10,padding:'10px 16px',textAlign:'center',flex:1 }}>
-                  <div style={{ fontSize:22,fontWeight:800,color:C.accent }}>{Math.round(SCENARIOS.filter(s=>s.detected).length/SCENARIOS.length*100)}%</div>
+                <div style={{ background:'rgba(59,130,246,.04)',border:'1px solid rgba(59,130,246,.12)',borderRadius:8,padding:'10px 16px',textAlign:'center',flex:1 }}>
+                  <div style={{ fontSize:22,fontWeight:600,color:C.accent }}>{Math.round(SCENARIOS.filter(s=>s.detected).length/SCENARIOS.length*100)}%</div>
                   <div style={{ fontSize:10,color:C.text2 }}>النتيجة</div>
                 </div>
               </div>
               <div style={{ display:'flex',gap:4,marginBottom:10,flexWrap:'wrap' }}>
                 {['','pass','fail'].map(f => (
-                  <button key={f} onClick={()=>setSimFilter(f)} style={{ fontSize:10,padding:'3px 10px',borderRadius:20,border:`1px solid ${simFilter===f?C.accent:C.border}`,background:simFilter===f?'rgba(56,189,248,.1)':'transparent',color:simFilter===f?C.accent:C.text2,cursor:'pointer' }}>
+                  <button key={f} onClick={()=>setSimFilter(f)} style={{ fontSize:10,padding:'3px 10px',borderRadius:20,border:`1px solid ${simFilter===f?C.text1:C.border}`,background:simFilter===f?'#fafafa':'#fff',color:simFilter===f?C.text1:C.text2,cursor:'pointer' }}>
                     {f===''?'الكل':f==='pass'?'ناجح':'ثغرة'}
                   </button>
                 ))}
                 {SIM_DOMAINS.map((d,i) => (
-                  <button key={i} onClick={()=>setSimDomain(simDomain===i?-1:i)} style={{ fontSize:9,padding:'3px 8px',borderRadius:20,border:`1px solid ${simDomain===i?C.accent:C.border}`,background:simDomain===i?'rgba(56,189,248,.1)':'transparent',color:simDomain===i?C.accent:C.text2,cursor:'pointer' }}>
+                  <button key={i} onClick={()=>setSimDomain(simDomain===i?-1:i)} style={{ fontSize:9,padding:'3px 8px',borderRadius:20,border:`1px solid ${simDomain===i?C.text1:C.border}`,background:simDomain===i?'#fafafa':'#fff',color:simDomain===i?C.text1:C.text2,cursor:'pointer' }}>
                     {d}
                   </button>
                 ))}
               </div>
               {filteredSims.map((s,i) => (
-                <div key={i} style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 10px',marginBottom:2,borderRadius:8,fontSize:11,background:s.detected?'rgba(16,185,129,.05)':'rgba(239,68,68,.06)',border:`1px solid ${s.detected?'rgba(16,185,129,.12)':'rgba(239,68,68,.12)'}` }}>
-                  <span style={{ width:20,textAlign:'center',color:C.text2,fontWeight:600 }}>{i+1}</span>
-                  <span style={{ fontSize:10,padding:'2px 8px',borderRadius:10,background:s.detected?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)',color:s.detected?'#10b981':'#ef4444',fontWeight:700 }}>{s.detected?'✓ ناجح':'✗ ثغرة'}</span>
+                <div key={i} style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 10px',marginBottom:2,borderRadius:8,fontSize:11,background:s.detected?'rgba(22,163,74,.03)':'rgba(239,68,68,.03)',border:`1px solid ${s.detected?'rgba(22,163,74,.1)':'rgba(239,68,68,.1)'}` }}>
+                  <span style={{ width:20,textAlign:'center',color:C.muted,fontWeight:600 }}>{i+1}</span>
+                  <span style={{ fontSize:10,padding:'2px 8px',borderRadius:10,background:s.detected?'rgba(22,163,74,.08)':'rgba(239,68,68,.08)',color:s.detected?'#16a34a':'#ef4444',fontWeight:600 }}>{s.detected?'ناجح':'ثغرة'}</span>
                   <span style={{ flex:1,color:C.text1 }}>{s.desc}</span>
-                  <span style={{ fontSize:9,color:C.text2,fontFamily:'monospace' }}>{s.code}</span>
+                  <span style={{ fontSize:9,color:C.muted,fontFamily:'monospace' }}>{s.code}</span>
                   <span style={{ fontSize:9,padding:'1px 6px',borderRadius:10,background:(SEV_COLORS[s.risk]||SEV_COLORS.info).bg,color:(SEV_COLORS[s.risk]||SEV_COLORS.info).c,fontWeight:600 }}>{s.risk}</span>
                 </div>
               ))}
@@ -697,54 +696,54 @@ export default function CommandCenterPage() {
           </div>
         </div>
 
-        {/* ═══ ZONE 3 — IT AGENT SIDEBAR ═══ */}
-        <div style={{ display:'flex',flexDirection:'column',borderRight:`2px solid #1d4ed8`,background:'rgba(0,0,0,.2)',boxShadow:'inset 2px 0 12px rgba(29,78,216,.15)' }}>
+        {/* === ZONE 3 -- IT AGENT SIDEBAR === */}
+        <div style={{ display:'flex',flexDirection:'column',borderRight:'1px solid #e5e5e5',background:'#fff' }}>
           {/* Header */}
           <div style={{ padding:'12px 14px',borderBottom:`1px solid ${C.border}`,display:'flex',alignItems:'center',gap:8 }}>
             <span style={{ fontSize:18 }}>🛡️</span>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:12,fontWeight:700 }}>وكيل IT</div>
-              <div style={{ fontSize:9,color:C.text2 }}>{agentTokens>0?`${agentTokens.toLocaleString()} رمز`:'جاهز'}</div>
+              <div style={{ fontSize:13,fontWeight:600,color:C.text1 }}>وكيل IT</div>
+              <div style={{ fontSize:11,color:C.muted,fontWeight:500 }}>{agentTokens>0?`${agentTokens.toLocaleString()} رمز`:'جاهز'}</div>
             </div>
-            <button onClick={agentClear} style={{ fontSize:9,padding:'3px 8px',borderRadius:6,border:`1px solid ${C.border}`,background:'transparent',color:C.text2,cursor:'pointer' }}>مسح</button>
+            <button onClick={agentClear} style={{ fontSize:9,padding:'3px 8px',borderRadius:7,border:`1px solid ${C.border}`,background:'#fff',color:C.text2,cursor:'pointer' }}>مسح</button>
           </div>
           {/* Quick actions */}
           <div style={{ padding:'8px 10px',display:'flex',flexWrap:'wrap',gap:4,borderBottom:`1px solid ${C.border}` }}>
             {['ما حالة النظام؟','حلل آخر خطأ حرج','من أكثر المستأجرين تأثراً؟','هل يوجد تهديد أمني؟'].map(q => (
-              <button key={q} onClick={()=>agentSend(q)} style={{ fontSize:9,padding:'4px 8px',borderRadius:14,border:`1px solid ${C.border}`,background:C.card,color:C.text2,cursor:'pointer' }}>{q}</button>
+              <button key={q} onClick={()=>agentSend(q)} style={{ fontSize:9,padding:'4px 8px',borderRadius:14,border:`1px solid ${C.border}`,background:'#fafafa',color:C.text2,cursor:'pointer' }}>{q}</button>
             ))}
           </div>
           {/* Messages */}
-          <div ref={agentScrollRef} style={{ flex:1,overflowY:'auto',padding:'10px 12px',display:'flex',flexDirection:'column',gap:8 }}>
-            {agentMsgs.length === 0 && <p style={{ textAlign:'center',color:C.text2,fontSize:11,paddingTop:40 }}>اسأل وكيل IT أي سؤال</p>}
+          <div ref={agentScrollRef} style={{ flex:1,overflowY:'auto',padding:'10px 12px',display:'flex',flexDirection:'column',gap:8,background:'#fafafa' }}>
+            {agentMsgs.length === 0 && <p style={{ textAlign:'center',color:C.muted,fontSize:11,paddingTop:40 }}>اسأل وكيل IT أي سؤال</p>}
             {agentMsgs.map((m,i) => (
-              <div key={i} style={{ alignSelf:m.role==='user'?'flex-start':'flex-end',maxWidth:'90%',padding:'10px 14px',borderRadius:12,background:m.role==='user'?'rgba(255,255,255,.06)':'rgba(29,78,216,.08)',border:`1px solid ${m.role==='user'?'rgba(255,255,255,.1)':'rgba(29,78,216,.2)'}`,fontSize:12,color:'#f1f5f9',lineHeight:1.7,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
+              <div key={i} style={{ alignSelf:m.role==='user'?'flex-start':'flex-end',maxWidth:'90%',padding:'10px 14px',borderRadius:12,background:m.role==='user'?'#fff':'#fafafa',border:`1px solid ${m.role==='user'?C.border:C.lightBorder}`,fontSize:12,color:C.body,lineHeight:1.7,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
                 {m.content}
               </div>
             ))}
-            {agentLoading && <div style={{ alignSelf:'flex-end',padding:'8px 12px',borderRadius:12,background:'rgba(56,189,248,.06)',border:'1px solid rgba(56,189,248,.12)' }}><span style={{ color:C.accent,fontSize:11 }}>...</span></div>}
+            {agentLoading && <div style={{ alignSelf:'flex-end',padding:'8px 12px',borderRadius:12,background:'#fafafa',border:`1px solid ${C.lightBorder}` }}><span style={{ color:C.muted,fontSize:11 }}>...</span></div>}
           </div>
           {/* Input */}
-          <div style={{ padding:'10px 12px',borderTop:`1px solid ${C.border}`,display:'flex',gap:6 }}>
+          <div style={{ padding:'10px 12px',borderTop:`1px solid ${C.border}`,display:'flex',gap:6,background:'#fff' }}>
             <input value={agentInput} onChange={e=>setAgentInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();agentSend();}}}
               placeholder="اسأل وكيل IT..." disabled={agentLoading}
-              style={{ flex:1,padding:'8px 10px',borderRadius:8,border:`1px solid ${C.border}`,background:'rgba(255,255,255,.03)',color:C.text1,fontSize:11,outline:'none' }} />
+              style={{ flex:1,padding:'8px 10px',borderRadius:7,border:`1px solid ${C.border}`,background:'#fff',color:C.text1,fontSize:11,outline:'none' }} />
             <button onClick={()=>agentSend()} disabled={agentLoading||!agentInput.trim()}
-              style={{ padding:'8px 14px',borderRadius:8,border:'none',background:agentLoading||!agentInput.trim()?'rgba(255,255,255,.05)':'#1d4070',color:'white',cursor:'pointer',fontSize:12,fontWeight:600 }}>↑</button>
+              style={{ padding:'8px 14px',borderRadius:7,border:'none',background:agentLoading||!agentInput.trim()?'#f0f0f0':'#18181b',color:'#fff',cursor:'pointer',fontSize:12,fontWeight:600 }}>↑</button>
           </div>
         </div>
       </div>
 
       {/* Resolve modal */}
       {resModal && (
-        <div style={{ position:'fixed',inset:0,background:'rgba(0,0,0,.6)',zIndex:100,display:'flex',alignItems:'center',justifyContent:'center' }} onClick={()=>setResModal(null)}>
-          <div style={{ background:'#0c1535',borderRadius:16,padding:24,width:380,border:'1px solid rgba(255,255,255,.1)' }} onClick={e=>e.stopPropagation()}>
-            <p style={{ fontSize:14,fontWeight:700,color:C.text1,marginBottom:12 }}>حل المشكلة</p>
+        <div style={{ position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:100,display:'flex',alignItems:'center',justifyContent:'center' }} onClick={()=>setResModal(null)}>
+          <div style={{ background:'#fff',borderRadius:8,padding:24,width:380,border:`1px solid ${C.border}`,boxShadow:'0 8px 30px rgba(0,0,0,.08)' }} onClick={e=>e.stopPropagation()}>
+            <p style={{ fontSize:13,fontWeight:600,color:C.text1,marginBottom:12 }}>حل المشكلة</p>
             <textarea value={resNote} onChange={e=>setResNote(e.target.value)} rows={3} placeholder="ملاحظة الحل (اختياري)..."
-              style={{ width:'100%',padding:'8px 10px',borderRadius:8,border:`1px solid ${C.border}`,background:'rgba(255,255,255,.03)',color:C.text1,fontSize:12,resize:'vertical',boxSizing:'border-box' }} />
+              style={{ width:'100%',padding:'8px 10px',borderRadius:7,border:`1px solid ${C.border}`,background:'#fff',color:C.text1,fontSize:12,resize:'vertical',boxSizing:'border-box' }} />
             <div style={{ display:'flex',gap:8,marginTop:12 }}>
-              <button onClick={()=>setResModal(null)} style={{ flex:1,padding:'8px',borderRadius:8,border:`1px solid ${C.border}`,background:'transparent',color:C.text2,cursor:'pointer',fontSize:12 }}>إلغاء</button>
-              <button onClick={handleResolve} style={{ flex:2,padding:'8px',borderRadius:8,border:'none',background:'#10b981',color:'white',cursor:'pointer',fontSize:12,fontWeight:600 }}>تأكيد الحل</button>
+              <button onClick={()=>setResModal(null)} style={{ flex:1,padding:'8px',borderRadius:7,border:`1px solid ${C.border}`,background:'#fff',color:C.text2,cursor:'pointer',fontSize:12 }}>إلغاء</button>
+              <button onClick={handleResolve} style={{ flex:2,padding:'8px',borderRadius:7,border:'none',background:'#18181b',color:'#fff',cursor:'pointer',fontSize:12,fontWeight:600 }}>تأكيد الحل</button>
             </div>
           </div>
         </div>

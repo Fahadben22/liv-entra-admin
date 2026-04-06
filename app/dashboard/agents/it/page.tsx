@@ -7,7 +7,7 @@ export default function ITAgentPage() {
       agentType="it"
       agentName="سالم — المهندس الأول"
       agentIcon="🛡️"
-      accentColor="#1d4070"
+      accentColor="#3b82f6"
       quickActions={[
         'ما حالة النظام الآن؟',
         'هل يوجد أخطاء حرجة؟',

@@ -7,7 +7,7 @@ export default function MarketingAgentPage() {
       agentType="marketing"
       agentName="نورة — محللة التسويق"
       agentIcon="📊"
-      accentColor="#9333ea"
+      accentColor="#8b5cf6"
       quickActions={[
         'كيف أداء هذا الأسبوع؟',
         'ما نسبة التحويل؟',

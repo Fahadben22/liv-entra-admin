@@ -24,21 +24,21 @@ interface LandingContent {
 }
 
 const S = {
-  page: { minHeight: '100vh', background: '#0f172a', color: '#e2e8f0', fontFamily: 'system-ui, sans-serif', direction: 'rtl' as const },
-  topbar: { background: '#1e293b', borderBottom: '1px solid #334155', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  logo: { color: '#38bdf8', fontWeight: 700, fontSize: 16, letterSpacing: 1 },
+  page: { background: '#fafafa', color: '#18181b', fontFamily: 'system-ui, sans-serif' },
+  topbar: { background: '#fff', borderBottom: '1px solid #e5e5e5', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+  logo: { color: '#18181b', fontWeight: 600, fontSize: 18, letterSpacing: '-0.02em' as const },
   body: { maxWidth: 960, margin: '0 auto', padding: '32px 16px' },
-  card: { background: '#1e293b', border: '1px solid #334155', borderRadius: 12, padding: 24, marginBottom: 20 },
-  sectionTitle: { fontSize: 14, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' as const, letterSpacing: 1, marginBottom: 16, marginTop: 0 },
-  label: { fontSize: 12, color: '#64748b', marginBottom: 4, display: 'block' },
-  input: { width: '100%', background: '#0f172a', border: '1px solid #334155', borderRadius: 8, padding: '10px 12px', color: '#e2e8f0', fontSize: 14, outline: 'none', boxSizing: 'border-box' as const },
+  card: { background: '#fff', border: '1px solid #e5e5e5', borderRadius: 8, padding: 24, marginBottom: 20 },
+  sectionTitle: { fontSize: 13, fontWeight: 600 as const, color: '#18181b', letterSpacing: '-0.02em' as const, marginBottom: 16, marginTop: 0 },
+  label: { fontSize: 11, color: '#a1a1aa', fontWeight: 500 as const, marginBottom: 4, display: 'block' },
+  input: { width: '100%', background: '#fff', border: '1px solid #e5e5e5', borderRadius: 7, padding: '10px 12px', color: '#18181b', fontSize: 13, outline: 'none', boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  saveBtn: { background: '#0ea5e9', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 32px', fontWeight: 700, cursor: 'pointer', fontSize: 14 },
+  saveBtn: { background: '#18181b', color: '#fff', border: 'none', borderRadius: 7, padding: '12px 32px', fontWeight: 600, cursor: 'pointer', fontSize: 13 },
   saveRow: { display: 'flex', alignItems: 'center', gap: 16, marginTop: 24 },
-  badge: (ok: boolean) => ({ background: ok ? '#14532d' : '#450a0a', color: ok ? '#4ade80' : '#f87171', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600 }),
-  addBtn: { background: '#1d4070', color: '#7dd3fc', border: '1px solid #1e40af', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
-  removeBtn: { background: '#450a0a', color: '#f87171', border: '1px solid #7f1d1d', borderRadius: 6, padding: '6px 10px', cursor: 'pointer', fontSize: 12 },
-  itemCard: { background: '#0f172a', border: '1px solid #1e293b', borderRadius: 8, padding: 16, marginBottom: 10 },
+  badge: (ok: boolean) => ({ background: ok ? '#f0fdf4' : '#fef2f2', color: ok ? '#16a34a' : '#dc2626', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, border: ok ? '1px solid #bbf7d0' : '1px solid #fca5a5' }),
+  addBtn: { background: '#fafafa', color: '#18181b', border: '1px solid #e5e5e5', borderRadius: 7, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
+  removeBtn: { background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: 7, padding: '6px 10px', cursor: 'pointer', fontSize: 12 },
+  itemCard: { background: '#fafafa', border: '1px solid #f0f0f0', borderRadius: 8, padding: 16, marginBottom: 10 },
 };
 
 export default function LandingPageCMS() {
@@ -64,7 +64,7 @@ export default function LandingPageCMS() {
     setMsg('');
     try {
       await adminApi.sa.updateLanding(data);
-      setMsg('تم الحفظ بنجاح ✓');
+      setMsg('تم الحفظ بنجاح');
     } catch {
       setMsg('فشل الحفظ');
     } finally {
@@ -87,41 +87,42 @@ export default function LandingPageCMS() {
   if (!data) return (
     <div style={S.page}>
       <div style={S.topbar}><span style={S.logo}>LIVENTRA OS — CMS</span></div>
-      <div style={{ textAlign: 'center', marginTop: 80, color: '#64748b' }}>جاري التحميل...</div>
+      <div style={{ textAlign: 'center', marginTop: 80, color: '#a1a1aa' }}>جاري التحميل...</div>
     </div>
   );
 
   const tabs = [
-    { key: 'hero', label: '🏠 القسم الرئيسي' },
-    { key: 'stats', label: '📊 الإحصائيات' },
-    { key: 'features', label: '✨ المميزات' },
-    { key: 'pricing', label: '💳 الأسعار' },
-    { key: 'contact', label: '📞 التواصل' },
+    { key: 'hero', label: 'القسم الرئيسي' },
+    { key: 'stats', label: 'الإحصائيات' },
+    { key: 'features', label: 'المميزات' },
+    { key: 'pricing', label: 'الأسعار' },
+    { key: 'contact', label: 'التواصل' },
   ];
 
   return (
     <div style={S.page}>
       {/* Topbar */}
       <div style={S.topbar}>
-        <span style={S.logo}>🌐 إدارة الصفحة الرئيسية — www.liv-entra.com</span>
+        <span style={S.logo}>إدارة الصفحة الرئيسية — www.liv-entra.com</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={S.badge(data.is_published)}>{data.is_published ? 'منشور' : 'مسودة'}</span>
-          <span style={{ fontSize: 11, color: '#475569' }}>آخر تحديث: {data.updated_at ? new Date(data.updated_at).toLocaleString('ar-SA') : '—'} بواسطة: {data.updated_by || '—'}</span>
+          <span style={{ fontSize: 11, color: '#a1a1aa' }}>آخر تحديث: {data.updated_at ? new Date(data.updated_at).toLocaleString('ar-SA') : '—'} بواسطة: {data.updated_by || '—'}</span>
         </div>
       </div>
 
       <div style={S.body}>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' as const }}>
+        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid #e5e5e5' }}>
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key as any)} style={{
-              padding: '8px 18px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-              background: tab === t.key ? '#0ea5e9' : '#1e293b',
-              color: tab === t.key ? '#fff' : '#94a3b8',
+              padding: '12px 18px', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: tab === t.key ? 600 : 400,
+              background: 'transparent',
+              color: tab === t.key ? '#18181b' : '#71717a',
+              borderBottom: tab === t.key ? '2px solid #18181b' : '2px solid transparent',
             }}>{t.label}</button>
           ))}
         </div>
 
-        {/* ── HERO ── */}
+        {/* -- HERO -- */}
         {tab === 'hero' && (
           <div style={S.card}>
             <p style={S.sectionTitle}>القسم الرئيسي (Hero)</p>
@@ -171,12 +172,12 @@ export default function LandingPageCMS() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
               <input type="checkbox" id="pub" checked={data.is_published} onChange={e => set('is_published', e.target.checked)} style={{ width: 16, height: 16 }} />
-              <label htmlFor="pub" style={{ color: '#94a3b8', fontSize: 14, cursor: 'pointer' }}>نشر الصفحة (مرئية على الموقع)</label>
+              <label htmlFor="pub" style={{ color: '#71717a', fontSize: 13, cursor: 'pointer' }}>نشر الصفحة (مرئية على الموقع)</label>
             </div>
           </div>
         )}
 
-        {/* ── STATS ── */}
+        {/* -- STATS -- */}
         {tab === 'stats' && (
           <div style={S.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -213,22 +214,22 @@ export default function LandingPageCMS() {
           </div>
         )}
 
-        {/* ── FEATURES ── */}
+        {/* -- FEATURES -- */}
         {tab === 'features' && (
           <div style={S.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <p style={{ ...S.sectionTitle, marginBottom: 0 }}>المميزات</p>
               <button style={S.addBtn} onClick={() =>
-                setData(d => d ? { ...d, features: [...d.features, { title_ar: '', title_en: '', desc_ar: '', desc_en: '', icon: '⭐' }] } : d)
+                setData(d => d ? { ...d, features: [...d.features, { title_ar: '', title_en: '', desc_ar: '', desc_en: '', icon: '' }] } : d)
               }>+ إضافة</button>
             </div>
             {data.features.map((f, i) => (
               <div key={i} style={S.itemCard}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <span style={{ color: '#94a3b8', fontSize: 12 }}>ميزة #{i + 1}</span>
+                  <span style={{ color: '#a1a1aa', fontSize: 11, fontWeight: 500 }}>ميزة #{i + 1}</span>
                   <button style={S.removeBtn} onClick={() =>
                     setData(d => d ? { ...d, features: d.features.filter((_, j) => j !== i) } : d)
-                  }>✕ حذف</button>
+                  }>حذف</button>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr 1fr', gap: 8, marginBottom: 8 }}>
                   <div>
@@ -259,7 +260,7 @@ export default function LandingPageCMS() {
           </div>
         )}
 
-        {/* ── PRICING ── */}
+        {/* -- PRICING -- */}
         {tab === 'pricing' && (
           <div style={S.card}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
@@ -269,11 +270,11 @@ export default function LandingPageCMS() {
               }>+ خطة جديدة</button>
             </div>
             {data.pricing_plans.map((p, i) => (
-              <div key={i} style={{ ...S.itemCard, borderColor: p.highlighted ? '#1d4ed8' : '#1e293b' }}>
+              <div key={i} style={{ ...S.itemCard, borderColor: p.highlighted ? '#18181b' : '#f0f0f0' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ color: '#94a3b8', fontSize: 12 }}>خطة #{i + 1} {p.highlighted ? '⭐ مميزة' : ''}</span>
+                  <span style={{ color: '#a1a1aa', fontSize: 11, fontWeight: 500 }}>خطة #{i + 1} {p.highlighted ? 'مميزة' : ''}</span>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <label style={{ fontSize: 12, color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <label style={{ fontSize: 12, color: '#71717a', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                       <input type="checkbox" checked={!!p.highlighted} onChange={e => updatePlan(i, 'highlighted', e.target.checked)} />
                       تمييز
                     </label>
@@ -323,7 +324,7 @@ export default function LandingPageCMS() {
           </div>
         )}
 
-        {/* ── CONTACT ── */}
+        {/* -- CONTACT -- */}
         {tab === 'contact' && (
           <div style={S.card}>
             <p style={S.sectionTitle}>معلومات التواصل وزر واتساب</p>
@@ -331,22 +332,22 @@ export default function LandingPageCMS() {
               <div>
                 <label style={S.label}>رقم واتساب (بدون + — مثال: 966501234567)</label>
                 <input style={{ ...S.input, direction: 'ltr' }} value={data.contact_whatsapp} onChange={e => set('contact_whatsapp', e.target.value)} placeholder="966501234567" />
-                <div style={{ fontSize: 11, color: '#475569', marginTop: 4 }}>هذا الرقم يُستخدم في زر واتساب الطائر على الموقع</div>
+                <div style={{ fontSize: 11, color: '#a1a1aa', marginTop: 4 }}>هذا الرقم يُستخدم في زر واتساب الطائر على الموقع</div>
               </div>
               <div>
                 <label style={S.label}>البريد الإلكتروني</label>
                 <input style={{ ...S.input, direction: 'ltr' }} value={data.contact_email} onChange={e => set('contact_email', e.target.value)} />
               </div>
             </div>
-            <div style={{ background: '#0f172a', borderRadius: 8, padding: 16, border: '1px solid #1e293b' }}>
-              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 8 }}>معاينة زر واتساب:</div>
+            <div style={{ background: '#fafafa', borderRadius: 8, padding: 16, border: '1px solid #e5e5e5' }}>
+              <div style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 8, fontWeight: 500 }}>معاينة زر واتساب:</div>
               <a
                 href={`https://wa.me/${data.contact_whatsapp}`}
                 target="_blank"
                 rel="noreferrer"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#16a34a', color: '#fff', borderRadius: 50, padding: '10px 20px', textDecoration: 'none', fontWeight: 600, fontSize: 14 }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#22c55e', color: '#fff', borderRadius: 50, padding: '10px 20px', textDecoration: 'none', fontWeight: 600, fontSize: 13 }}
               >
-                <span style={{ fontSize: 20 }}>💬</span> تواصل معنا واتساب
+                تواصل معنا واتساب
               </a>
             </div>
           </div>
@@ -355,16 +356,16 @@ export default function LandingPageCMS() {
         {/* Save row */}
         <div style={S.saveRow}>
           <button style={S.saveBtn} onClick={save} disabled={saving}>
-            {saving ? 'جاري الحفظ...' : '💾 حفظ التغييرات'}
+            {saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
           </button>
           {msg && (
-            <span style={{ fontSize: 14, color: msg.includes('نجاح') || msg.includes('✓') ? '#4ade80' : '#f87171' }}>
+            <span style={{ fontSize: 13, color: msg.includes('نجاح') || msg.includes('تم') ? '#16a34a' : '#dc2626' }}>
               {msg}
             </span>
           )}
           <a href="https://www.liv-entra.com" target="_blank" rel="noreferrer"
-            style={{ fontSize: 13, color: '#38bdf8', textDecoration: 'none', marginRight: 'auto' }}>
-            🔗 عرض الموقع
+            style={{ fontSize: 13, color: '#18181b', textDecoration: 'underline', marginRight: 'auto' }}>
+            عرض الموقع
           </a>
         </div>
       </div>

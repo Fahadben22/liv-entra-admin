@@ -7,7 +7,7 @@ export default function SalesAgentPage() {
       agentType="sales"
       agentName="خالد — مستشار المبيعات"
       agentIcon="💼"
-      accentColor="#15803d"
+      accentColor="#22c55e"
       quickActions={[
         'اعرض خط أنابيب المبيعات',
         'من يحتاج متابعة عاجلة؟',

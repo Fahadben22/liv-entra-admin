@@ -21,43 +21,43 @@ export default function MonitoringPage() {
   }, []);
 
   return (
-    <div style={{minHeight:'100vh',background:'#f8fafc'}}>
-      <div style={{background:'#1d4070',padding:'12px 24px',display:'flex',alignItems:'center',gap:16}}>
-        <Link href="/dashboard" style={{color:'#93c5fd',textDecoration:'none',fontSize:13}}>← الرئيسية</Link>
-        <span style={{fontSize:14,fontWeight:700,color:'white'}}>مراقبة النظام</span>
+    <div style={{background:'#fafafa'}}>
+      <div style={{background:'#fff',padding:'12px 24px',display:'flex',alignItems:'center',gap:16,borderBottom:'1px solid #e5e5e5'}}>
+        <Link href="/dashboard" style={{color:'#71717a',textDecoration:'none',fontSize:13}}>← الرئيسية</Link>
+        <span style={{fontSize:18,fontWeight:600,color:'#18181b',letterSpacing:'-0.02em'}}>مراقبة النظام</span>
       </div>
-      <div style={{padding:24}}>
+      <div style={{padding:24,maxWidth:1200,margin:'0 auto'}}>
         {/* System health */}
-        <div style={{background:'white',borderRadius:12,padding:20,border:'1px solid #e2e8f0',marginBottom:20}}>
-          <h2 style={{fontSize:14,fontWeight:600,margin:'0 0 16px'}}>حالة النظام</h2>
+        <div style={{background:'#fff',borderRadius:8,padding:20,border:'1px solid #e5e5e5',marginBottom:20}}>
+          <h2 style={{fontSize:13,fontWeight:600,color:'#18181b',margin:'0 0 16px'}}>حالة النظام</h2>
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
             {[
-              {l:'API Backend', v:health?.status==='ok'?'يعمل':'توقف', c:health?.status==='ok'?'#15803d':'#dc2626', bg:health?.status==='ok'?'#f0fdf4':'#fef2f2'},
-              {l:'Supabase DB', v:stats?'يعمل':'غير معروف', c:stats?'#15803d':'#94a3b8', bg:stats?'#f0fdf4':'#f8fafc'},
-              {l:'Vercel Frontend', v:'يعمل', c:'#15803d', bg:'#f0fdf4'},
+              {l:'API Backend', v:health?.status==='ok'?'يعمل':'توقف', c:health?.status==='ok'?'#16a34a':'#dc2626', bg:health?.status==='ok'?'#f0fdf4':'#fef2f2'},
+              {l:'Supabase DB', v:stats?'يعمل':'غير معروف', c:stats?'#16a34a':'#a1a1aa', bg:stats?'#f0fdf4':'#fafafa'},
+              {l:'Vercel Frontend', v:'يعمل', c:'#16a34a', bg:'#f0fdf4'},
             ].map(s=>(
-              <div key={s.l} style={{background:s.bg,borderRadius:8,padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <span style={{fontSize:12,color:'#374151',fontWeight:500}}>{s.l}</span>
-                <span style={{fontSize:11,fontWeight:700,color:s.c}}>{s.v}</span>
+              <div key={s.l} style={{background:s.bg,borderRadius:8,padding:'12px 16px',display:'flex',justifyContent:'space-between',alignItems:'center',border:'1px solid #f0f0f0'}}>
+                <span style={{fontSize:13,color:'#3f3f46',fontWeight:500}}>{s.l}</span>
+                <span style={{fontSize:11,fontWeight:600,color:s.c}}>{s.v}</span>
               </div>
             ))}
           </div>
         </div>
         {/* Stats */}
         <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16}}>
-          {loading ? <p style={{color:'#94a3b8'}}>جاري التحميل...</p> : [
-            {l:'إجمالي الشركات', v:stats?.total_companies||0, c:'#1d4070'},
-            {l:'إجمالي الوحدات', v:stats?.total_units||0, c:'#7c3aed'},
-            {l:'عقود نشطة', v:stats?.active_contracts||0, c:'#15803d'},
+          {loading ? <p style={{color:'#a1a1aa',fontSize:13}}>جاري التحميل...</p> : [
+            {l:'إجمالي الشركات', v:stats?.total_companies||0, c:'#18181b'},
+            {l:'إجمالي الوحدات', v:stats?.total_units||0, c:'#18181b'},
+            {l:'عقود نشطة', v:stats?.active_contracts||0, c:'#18181b'},
           ].map(k=>(
-            <div key={k.l} style={{background:'white',borderRadius:12,padding:'16px 20px',border:'1px solid #e2e8f0'}}>
-              <p style={{fontSize:12,color:'#64748b',margin:'0 0 8px'}}>{k.l}</p>
-              <p style={{fontSize:28,fontWeight:700,color:k.c,margin:0}}>{k.v}</p>
+            <div key={k.l} style={{background:'#fff',borderRadius:8,padding:'16px 20px',border:'1px solid #e5e5e5'}}>
+              <p style={{fontSize:11,color:'#a1a1aa',margin:'0 0 8px',fontWeight:500}}>{k.l}</p>
+              <p style={{fontSize:28,fontWeight:600,color:k.c,margin:0}}>{k.v}</p>
             </div>
           ))}
         </div>
         {/* Last check */}
-        <p style={{fontSize:11,color:'#94a3b8',marginTop:16,direction:'ltr'}}>
+        <p style={{fontSize:11,color:'#a1a1aa',marginTop:16,direction:'ltr'}}>
           Last checked: {health?.ts ? new Date(health.ts).toLocaleString('ar-SA') : 'N/A'}
         </p>
       </div>
