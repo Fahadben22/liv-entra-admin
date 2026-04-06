@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getAdminUser, getAdminToken, clearAdminSession } from '@/lib/auth';
 import { ToastProvider } from '@/components/Toast';
-import { NAV_ITEMS } from '@/lib/constants';
+import { NAV_ITEMS, NAV_SECTIONS } from '@/lib/constants';
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -20,77 +20,102 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     setReady(true);
   }, [router]);
 
-  function handleLogout() {
-    clearAdminSession();
-    router.push('/login');
-  }
-
   if (!ready) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
-      <div style={{ fontSize: 14, color: '#94a3b8' }}>جاري التحميل...</div>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
+      <div style={{ fontSize: 13, color: '#9ca3af', fontWeight: 500 }}>جاري التحميل...</div>
     </div>
   );
 
-  const sideW = collapsed ? 64 : 220;
+  const sideW = collapsed ? 56 : 200;
+  const sections = ['main', 'ops', 'growth', 'settings'];
 
   return (
     <ToastProvider>
-      <div style={{ display: 'flex', minHeight: '100vh', direction: 'rtl', background: '#f1f5f9' }}>
-        {/* Sidebar */}
+      <div style={{ display: 'flex', minHeight: '100vh', direction: 'rtl', background: '#fafafa' }}>
+        {/* Sidebar — Figma-clean */}
         <aside style={{
-          width: sideW, background: '#0f172a', transition: 'width .2s',
+          width: sideW, background: '#fff', transition: 'width .2s ease',
           display: 'flex', flexDirection: 'column', position: 'fixed', top: 0, right: 0,
-          height: '100vh', zIndex: 100, overflow: 'hidden',
+          height: '100vh', zIndex: 100, borderLeft: '1px solid #e5e5e5', overflow: 'hidden',
         }}>
           {/* Logo */}
           <div style={{
-            padding: collapsed ? '20px 0' : '20px 18px', borderBottom: '1px solid rgba(255,255,255,.06)',
-            display: 'flex', alignItems: 'center', gap: 10, justifyContent: collapsed ? 'center' : 'flex-start',
+            height: 56, display: 'flex', alignItems: 'center', gap: 10,
+            padding: collapsed ? '0' : '0 16px', justifyContent: collapsed ? 'center' : 'flex-start',
+            borderBottom: '1px solid #f0f0f0', flexShrink: 0,
           }}>
             <div style={{
-              width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #22c55e, #15803d)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 800, color: '#fff',
-              flexShrink: 0,
+              width: 28, height: 28, borderRadius: 7,
+              background: '#18181b', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 13, fontWeight: 700, color: '#fff', flexShrink: 0, letterSpacing: '-0.02em',
             }}>L</div>
-            {!collapsed && <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Liventra Admin</span>}
+            {!collapsed && (
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#18181b', letterSpacing: '-0.01em' }}>
+                Liventra
+              </span>
+            )}
           </div>
 
           {/* Nav */}
-          <nav style={{ flex: 1, padding: '12px 8px', overflowY: 'auto' }}>
-            {NAV_ITEMS.map(item => {
-              const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+          <nav style={{ flex: 1, padding: collapsed ? '8px 6px' : '8px 10px', overflowY: 'auto' }}>
+            {sections.map(section => {
+              const items = NAV_ITEMS.filter(i => i.section === section);
+              if (!items.length) return null;
               return (
-                <Link key={item.href} href={item.href} style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: collapsed ? '10px 0' : '10px 12px',
-                  justifyContent: collapsed ? 'center' : 'flex-start',
-                  borderRadius: 10, marginBottom: 2, textDecoration: 'none',
-                  background: active ? 'rgba(255,255,255,.08)' : 'transparent',
-                  color: active ? '#fff' : '#94a3b8',
-                  fontSize: 13, fontWeight: active ? 600 : 400,
-                  transition: 'all .15s',
-                }}>
-                  <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
-                  {!collapsed && <span>{item.label}</span>}
-                </Link>
+                <div key={section} style={{ marginBottom: 16 }}>
+                  {!collapsed && (
+                    <div style={{
+                      fontSize: 10, fontWeight: 600, color: '#a1a1aa', textTransform: 'uppercase',
+                      letterSpacing: '0.06em', padding: '6px 8px 4px', userSelect: 'none',
+                    }}>
+                      {NAV_SECTIONS[section]}
+                    </div>
+                  )}
+                  {items.map(item => {
+                    const active = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+                    return (
+                      <Link key={item.href} href={item.href} style={{
+                        display: 'flex', alignItems: 'center',
+                        padding: collapsed ? '8px 0' : '7px 10px',
+                        justifyContent: collapsed ? 'center' : 'flex-start',
+                        borderRadius: 7, marginBottom: 1, textDecoration: 'none',
+                        background: active ? '#f4f4f5' : 'transparent',
+                        color: active ? '#18181b' : '#71717a',
+                        fontSize: 13, fontWeight: active ? 600 : 400,
+                        transition: 'all .12s ease',
+                        letterSpacing: '-0.005em',
+                      }}>
+                        {collapsed ? (
+                          <div style={{
+                            width: 6, height: 6, borderRadius: '50%',
+                            background: active ? '#18181b' : '#d4d4d8',
+                          }} />
+                        ) : (
+                          <span>{item.label}</span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
               );
             })}
           </nav>
 
-          {/* Collapse toggle + user */}
-          <div style={{ padding: '12px 8px', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+          {/* Footer */}
+          <div style={{ borderTop: '1px solid #f0f0f0', padding: collapsed ? '10px 6px' : '12px 14px' }}>
             {!collapsed && (
-              <div style={{ padding: '8px 12px', marginBottom: 8 }}>
-                <div style={{ fontSize: 11, color: '#64748b' }}>{userName}</div>
+              <div style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 8, padding: '0 2px' }}>
+                {userName}
               </div>
             )}
-            <div style={{ display: 'flex', gap: 4, justifyContent: collapsed ? 'center' : 'flex-start', padding: '0 4px' }}>
-              <button onClick={() => setCollapsed(!collapsed)} title={collapsed ? 'توسيع' : 'طي'}
-                style={{ ...iconBtn, fontSize: 14 }}>
-                {collapsed ? '»' : '«'}
+            <div style={{ display: 'flex', gap: 6, justifyContent: collapsed ? 'center' : 'flex-start' }}>
+              <button onClick={() => setCollapsed(!collapsed)}
+                style={footerBtn}>
+                {collapsed ? '›' : '‹'}
               </button>
               {!collapsed && (
-                <button onClick={handleLogout} title="تسجيل خروج" style={{ ...iconBtn, fontSize: 12 }}>
+                <button onClick={() => { clearAdminSession(); router.push('/login'); }}
+                  style={footerBtn}>
                   خروج
                 </button>
               )}
@@ -98,8 +123,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
         </aside>
 
-        {/* Main content */}
-        <main style={{ flex: 1, marginRight: sideW, transition: 'margin .2s', padding: '24px 28px', minHeight: '100vh' }}>
+        {/* Main */}
+        <main style={{
+          flex: 1, marginRight: sideW, transition: 'margin .2s ease',
+          padding: '28px 32px', minHeight: '100vh',
+        }}>
           {children}
         </main>
       </div>
@@ -107,7 +135,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   );
 }
 
-const iconBtn: React.CSSProperties = {
-  padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,.1)',
-  background: 'transparent', color: '#94a3b8', cursor: 'pointer', fontSize: 12,
+const footerBtn: React.CSSProperties = {
+  padding: '5px 10px', borderRadius: 6, border: '1px solid #e5e5e5',
+  background: '#fff', color: '#71717a', cursor: 'pointer', fontSize: 11,
+  fontWeight: 500, transition: 'all .12s',
 };

@@ -30,15 +30,22 @@ export const PLAN_COLORS: Record<string, string> = {
 };
 
 export const NAV_ITEMS = [
-  { href: '/dashboard',                label: 'لوحة التحكم',    icon: '📊' },
-  { href: '/dashboard/companies',      label: 'الشركات',        icon: '🏢' },
-  { href: '/dashboard/features',       label: 'الميزات',        icon: '⚙️' },
-  { href: '/dashboard/billing',        label: 'الفواتير',       icon: '💰' },
-  { href: '/dashboard/command-center', label: 'مركز القيادة',   icon: '🎯' },
-  { href: '/dashboard/agents',         label: 'الوكلاء',        icon: '🤖' },
-  { href: '/dashboard/template-center',label: 'القوالب',        icon: '📨' },
-  { href: '/dashboard/landing-page',   label: 'الموقع',         icon: '🌐' },
-  { href: '/dashboard/leads',          label: 'طلبات العرض',    icon: '📋' },
-  { href: '/dashboard/demo-leads',     label: 'قيادات الديمو',  icon: '⚡' },
-  { href: '/dashboard/audit',          label: 'التدقيق',        icon: '📝' },
+  { href: '/dashboard',                label: 'لوحة التحكم',    section: 'main' },
+  { href: '/dashboard/companies',      label: 'الشركات',        section: 'main' },
+  { href: '/dashboard/features',       label: 'الميزات',        section: 'main' },
+  { href: '/dashboard/billing',        label: 'الفواتير',       section: 'main' },
+  { href: '/dashboard/command-center', label: 'مركز القيادة',   section: 'ops' },
+  { href: '/dashboard/agents',         label: 'الوكلاء',        section: 'ops' },
+  { href: '/dashboard/leads',          label: 'طلبات العرض',    section: 'growth' },
+  { href: '/dashboard/demo-leads',     label: 'قيادات الديمو',  section: 'growth' },
+  { href: '/dashboard/template-center',label: 'القوالب',        section: 'settings' },
+  { href: '/dashboard/landing-page',   label: 'الموقع',         section: 'settings' },
+  { href: '/dashboard/audit',          label: 'التدقيق',        section: 'settings' },
 ];
+
+export const NAV_SECTIONS: Record<string, string> = {
+  main: 'إدارة',
+  ops: 'العمليات',
+  growth: 'النمو',
+  settings: 'الإعدادات',
+};

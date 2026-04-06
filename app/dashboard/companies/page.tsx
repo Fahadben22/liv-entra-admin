@@ -13,8 +13,8 @@ import type { Company } from '@/lib/types';
 function daysSince(d: string) { return Math.floor((Date.now() - new Date(d).getTime()) / 86400000); }
 
 const TABS = [
-  { key: 'pipeline', label: 'خط الأنابيب', icon: '📊' },
-  { key: 'matrix',   label: 'مصفوفة الميزات', icon: '🔧' },
+  { key: 'pipeline', label: 'خط الأنابيب' },
+  { key: 'matrix',   label: 'مصفوفة الميزات' },
 ];
 
 export default function OnboardingCommandCenter() {
@@ -131,28 +131,28 @@ export default function OnboardingCommandCenter() {
   if (loading) return <KanbanSkeleton />;
 
   return (
-    <div style={{ direction: 'rtl', minHeight: '100vh' }}>
+    <div style={{ direction: 'rtl' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>مركز القيادة</h1>
-          <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{companies.length} شركة · {companies.filter(c => lcOf(c) === 'active').length} نشطة</p>
+          <h1 style={{ fontSize: 18, fontWeight: 600, color: '#18181b', margin: 0, letterSpacing: '-0.02em' }}>الشركات</h1>
+          <p style={{ fontSize: 12, color: '#a1a1aa', marginTop: 3 }}>{companies.length} شركة · {companies.filter(c => lcOf(c) === 'active').length} نشطة</p>
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
-              padding: '8px 18px', borderRadius: 10, border: tab === t.key ? '2px solid #1d4070' : '1px solid #e2e8f0',
-              background: tab === t.key ? '#1d4070' : 'white', color: tab === t.key ? 'white' : '#475569',
-              fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all .15s',
+              padding: '6px 14px', borderRadius: 7, border: '1px solid ' + (tab === t.key ? '#18181b' : '#e5e5e5'),
+              background: tab === t.key ? '#18181b' : '#fff', color: tab === t.key ? '#fff' : '#71717a',
+              fontSize: 12, fontWeight: 500, cursor: 'pointer', transition: 'all .12s',
             }}>
-              {t.icon} {t.label}
+              {t.label}
             </button>
           ))}
           <button onClick={() => router.push('/dashboard/companies/new')} style={{
-            padding: '8px 18px', borderRadius: 10, border: '2px solid #22c55e',
-            background: '#22c55e', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            padding: '6px 16px', borderRadius: 7, border: 'none',
+            background: '#18181b', color: '#fff', fontSize: 12, fontWeight: 500, cursor: 'pointer',
           }}>
-            ➕ إنشاء شركة
+            + إنشاء شركة
           </button>
         </div>
       </div>
@@ -161,44 +161,44 @@ export default function OnboardingCommandCenter() {
       {tab === 'pipeline' && (
         <div>
           {/* Search + Filter */}
-          <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالاسم أو الرابط..."
-              style={{ flex: 1, padding: '8px 14px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, outline: 'none' }} />
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث..."
+              style={{ flex: 1, padding: '7px 12px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13, outline: 'none', background: '#fff', color: '#18181b' }} />
             <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
-              style={{ padding: '8px 14px', border: '1px solid #e2e8f0', borderRadius: 10, fontSize: 13, background: 'white' }}>
+              style={{ padding: '7px 12px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12, background: '#fff', color: '#71717a' }}>
               <option value="all">كل الخطط</option>
               {['trial', 'basic', 'professional', 'enterprise'].map(p => <option key={p} value={p}>{PLAN_AR[p]}</option>)}
             </select>
           </div>
 
           {/* Kanban Board */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
             {STAGES.map(stage => {
               const stageCompanies = filtered.filter(c => lcOf(c) === stage.key);
               return (
                 <div key={stage.key}
-                  onDragOver={e => { e.preventDefault(); e.currentTarget.style.background = stage.bg; }}
-                  onDragLeave={e => { e.currentTarget.style.background = 'white'; }}
-                  onDrop={e => { e.preventDefault(); e.currentTarget.style.background = 'white'; const id = e.dataTransfer.getData('companyId'); if (id) handleDrop(id, stage.key); }}
-                  style={{ background: 'white', border: `1.5px solid ${stage.border}`, borderRadius: 14, padding: 12, minHeight: 200, transition: 'background .2s' }}>
+                  onDragOver={e => { e.preventDefault(); e.currentTarget.style.background = '#fafafa'; }}
+                  onDragLeave={e => { e.currentTarget.style.background = '#fff'; }}
+                  onDrop={e => { e.preventDefault(); e.currentTarget.style.background = '#fff'; const id = e.dataTransfer.getData('companyId'); if (id) handleDrop(id, stage.key); }}
+                  style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, padding: 12, minHeight: 200, transition: 'background .15s' }}>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, padding: '0 4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, padding: '0 2px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span>{stage.icon}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: stage.color }}>{stage.label}</span>
+                      <div style={{ width: 7, height: 7, borderRadius: '50%', background: stage.color }} />
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#3f3f46' }}>{stage.label}</span>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 10px', borderRadius: 20, background: stage.bg, color: stage.color, border: `1px solid ${stage.border}` }}>
+                    <span style={{ fontSize: 11, fontWeight: 500, color: '#a1a1aa' }}>
                       {stageCompanies.length}
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {stageCompanies.map(c => (
                       <CompanyCard key={c.id} company={c} isSelected={selected?.id === c.id}
                         onSelect={() => { const next = selected?.id === c.id ? null : c; setSelected(next); if (next) loadDetail(next.id); else setDetailData(null); }}
                         onAction={handleAction} />
                     ))}
-                    {stageCompanies.length === 0 && <p style={{ fontSize: 11, color: '#94a3b8', textAlign: 'center', padding: 16 }}>لا توجد شركات</p>}
+                    {stageCompanies.length === 0 && <p style={{ fontSize: 11, color: '#d4d4d8', textAlign: 'center', padding: 20 }}>فارغ</p>}
                   </div>
                 </div>
               );
@@ -229,7 +229,6 @@ export default function OnboardingCommandCenter() {
 
 // ─── Company Card ────────────────────────────────────────────────────────────
 function CompanyCard({ company: c, isSelected, onSelect, onAction }: { company: Company; isSelected: boolean; onSelect: () => void; onAction: (id: string, action: string, extra?: any) => void }) {
-  const pc = PLAN_C[c.plan] || PLAN_C.basic;
   const trialDays = c.trial_ends_at ? daysUntil(c.trial_ends_at) : null;
   const unitPct = c.max_units > 0 ? Math.min(100, Math.round(((c as any).unit_count || 0) / c.max_units * 100)) : 0;
   const status = lcOf(c);
@@ -237,43 +236,52 @@ function CompanyCard({ company: c, isSelected, onSelect, onAction }: { company: 
   return (
     <div draggable onDragStart={e => e.dataTransfer.setData('companyId', c.id)} onClick={onSelect}
       style={{
-        background: isSelected ? '#eff6ff' : '#fafafa', border: isSelected ? '2px solid #1d4070' : '1px solid #f1f5f9',
-        borderRadius: 10, padding: '10px 12px', cursor: 'pointer', transition: 'all .15s',
+        background: '#fff', border: isSelected ? '1.5px solid #18181b' : '1px solid #f0f0f0',
+        borderRadius: 8, padding: '10px 12px', cursor: 'pointer', transition: 'all .12s',
       }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{c.name_ar || c.name}</span>
-        <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 20, background: pc.bg, color: pc.color, fontWeight: 700, border: `1px solid ${pc.border || '#e2e8f0'}` }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: '#18181b' }}>{c.name_ar || c.name}</span>
+        <span style={{ fontSize: 10, color: '#a1a1aa', fontWeight: 500 }}>
           {PLAN_AR[c.plan] || c.plan}
         </span>
       </div>
-      <p style={{ fontSize: 10, color: '#94a3b8', margin: '0 0 6px' }}>{c.slug || '—'} · {daysSince(c.created_at)} يوم</p>
+      <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 6px' }}>{c.slug || '—'} · {daysSince(c.created_at)}d</p>
 
-      <div style={{ height: 4, background: '#f1f5f9', borderRadius: 2, overflow: 'hidden', marginBottom: 4 }}>
-        <div style={{ height: '100%', width: `${unitPct}%`, background: unitPct > 90 ? '#ef4444' : unitPct > 70 ? '#f59e0b' : '#22c55e', borderRadius: 2, transition: 'width .3s' }} />
+      <div style={{ height: 3, background: '#f4f4f5', borderRadius: 2, overflow: 'hidden', marginBottom: 4 }}>
+        <div style={{ height: '100%', width: `${unitPct}%`, background: unitPct > 90 ? '#ef4444' : unitPct > 70 ? '#f59e0b' : '#18181b', borderRadius: 2, transition: 'width .3s' }} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#94a3b8' }}>
-        <span>{(c as any).unit_count || 0}/{c.max_units || '∞'} وحدة</span>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#a1a1aa' }}>
+        <span>{(c as any).unit_count || 0}/{c.max_units || '∞'}</span>
         {trialDays !== null && trialDays <= 7 && (
-          <span style={{ color: trialDays <= 3 ? '#ef4444' : '#f59e0b', fontWeight: 700 }}>
-            {trialDays > 0 ? `${trialDays} يوم` : 'منتهي'}
+          <span style={{ color: trialDays <= 3 ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>
+            {trialDays > 0 ? `${trialDays}d` : 'expired'}
           </span>
         )}
       </div>
 
-      {/* Quick actions — includes suspend for BOTH trial and active */}
-      <div style={{ display: 'flex', gap: 4, marginTop: 6 }} onClick={e => e.stopPropagation()}>
-        {status === 'trial' && <MiniBtn label="تفعيل" color="#22c55e" onClick={() => onAction(c.id, 'activate')} />}
-        {status === 'trial' && <MiniBtn label="+7 أيام" color="#3b82f6" onClick={() => onAction(c.id, 'extend', 7)} />}
-        {(status === 'trial' || status === 'active') && <MiniBtn label="إيقاف" color="#ef4444" onClick={() => onAction(c.id, 'suspend')} />}
-        {status === 'suspended' && <MiniBtn label="تفعيل" color="#22c55e" onClick={() => onAction(c.id, 'activate')} />}
-        {status === 'overdue' && <MiniBtn label="تفعيل" color="#22c55e" onClick={() => onAction(c.id, 'activate')} />}
+      {/* Quick actions */}
+      <div style={{ display: 'flex', gap: 4, marginTop: 8 }} onClick={e => e.stopPropagation()}>
+        {status === 'trial' && <MiniBtn label="تفعيل" variant="default" onClick={() => onAction(c.id, 'activate')} />}
+        {status === 'trial' && <MiniBtn label="+7" variant="default" onClick={() => onAction(c.id, 'extend', 7)} />}
+        {(status === 'trial' || status === 'active') && <MiniBtn label="إيقاف" variant="danger" onClick={() => onAction(c.id, 'suspend')} />}
+        {status === 'suspended' && <MiniBtn label="تفعيل" variant="default" onClick={() => onAction(c.id, 'activate')} />}
+        {status === 'overdue' && <MiniBtn label="تفعيل" variant="default" onClick={() => onAction(c.id, 'activate')} />}
       </div>
     </div>
   );
 }
 
-function MiniBtn({ label, color, onClick }: { label: string; color: string; onClick: () => void }) {
-  return <button onClick={onClick} style={{ fontSize: 9, padding: '2px 8px', borderRadius: 6, border: `1px solid ${color}33`, background: `${color}11`, color, fontWeight: 600, cursor: 'pointer' }}>{label}</button>;
+function MiniBtn({ label, variant, onClick }: { label: string; variant: 'default' | 'danger'; onClick: () => void }) {
+  const isDanger = variant === 'danger';
+  return (
+    <button onClick={onClick} style={{
+      fontSize: 10, padding: '3px 8px', borderRadius: 5,
+      border: `1px solid ${isDanger ? '#fecaca' : '#e5e5e5'}`,
+      background: isDanger ? '#fef2f2' : '#fff',
+      color: isDanger ? '#dc2626' : '#3f3f46',
+      fontWeight: 500, cursor: 'pointer', transition: 'all .1s',
+    }}>{label}</button>
+  );
 }
 
 // ─── Detail Panel ────────────────────────────────────────────────────────────
@@ -291,29 +299,31 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
   ];
 
   return (
-    <div style={{ background: 'white', border: '2px solid #1d4070', borderRadius: 16, padding: 20, marginTop: 8, position: 'relative' }}>
-      <button onClick={onClose} style={{ position: 'absolute', top: 12, left: 12, background: '#f1f5f9', border: 'none', borderRadius: 8, width: 28, height: 28, cursor: 'pointer', fontSize: 14 }}>✕</button>
+    <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, padding: 20, marginTop: 10, position: 'relative' }}>
+      <button onClick={onClose} style={{ position: 'absolute', top: 14, left: 14, background: '#f4f4f5', border: 'none', borderRadius: 6, width: 26, height: 26, cursor: 'pointer', fontSize: 12, color: '#71717a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: '#1d4070', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 16, fontWeight: 800 }}>{(c.name_ar || c.name || '?').charAt(0)}</div>
+        <div style={{ width: 36, height: 36, borderRadius: 8, background: '#18181b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 600 }}>{(c.name_ar || c.name || '?').charAt(0)}</div>
         <div>
-          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0 }}>{c.name_ar || c.name}</h2>
-          <p style={{ fontSize: 11, color: '#94a3b8', margin: 0 }}>{c.slug} · {PLAN_AR[c.plan] || c.plan} · {lcOf(c)}</p>
+          <h2 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: '#18181b' }}>{c.name_ar || c.name}</h2>
+          <p style={{ fontSize: 11, color: '#a1a1aa', margin: 0 }}>{c.slug} · {PLAN_AR[c.plan] || c.plan} · {lcOf(c)}</p>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 4, marginBottom: 16, borderBottom: '1px solid #f1f5f9', paddingBottom: 8 }}>
+      <div style={{ display: 'flex', gap: 2, marginBottom: 16, borderBottom: '1px solid #f0f0f0', paddingBottom: 0 }}>
         {DTABS.map(t => (
           <button key={t.key} onClick={() => setDtab(t.key)} style={{
-            padding: '6px 14px', borderRadius: 8, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer',
-            background: dtab === t.key ? '#1d4070' : '#f8fafc', color: dtab === t.key ? 'white' : '#64748b',
+            padding: '8px 14px', borderRadius: 0, border: 'none', fontSize: 12, fontWeight: 500, cursor: 'pointer',
+            background: 'transparent', color: dtab === t.key ? '#18181b' : '#a1a1aa',
+            borderBottom: dtab === t.key ? '2px solid #18181b' : '2px solid transparent',
+            transition: 'all .12s',
           }}>{t.label}</button>
         ))}
       </div>
 
       {dtab === 'overview' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
-          <StatCard label="الوحدات" value={`${usage?.units?.used ?? (c as any).unit_count ?? 0} / ${c.max_units || '∞'}`} color="#3b82f6" />
+          <StatCard label="الوحدات" value={`${usage?.units?.used ?? (c as any).unit_count ?? 0} / ${c.max_units || '∞'}`} />
           <StatCard label="الموظفين" value={`${usage?.staff?.used ?? 0} / ${c.max_staff || '∞'}`} color="#8b5cf6" />
           <StatCard label="العقارات" value={`${usage?.properties?.used ?? 0} / ${c.max_properties || '∞'}`} color="#f59e0b" />
           <StatCard label="العقود" value={`${usage?.contracts?.used ?? 0} / ${c.max_contracts || '∞'}`} color="#22c55e" />
@@ -339,8 +349,8 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
             ))}
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-            {lcOf(c) === 'trial' && <MiniBtn label="تمديد 7 أيام" color="#3b82f6" onClick={() => onAction(c.id, 'extend', 7)} />}
-            {lcOf(c) === 'trial' && <MiniBtn label="تمديد 30 يوم" color="#3b82f6" onClick={() => onAction(c.id, 'extend', 30)} />}
+            {lcOf(c) === 'trial' && <MiniBtn label="تمديد 7 أيام" variant="default" onClick={() => onAction(c.id, 'extend', 7)} />}
+            {lcOf(c) === 'trial' && <MiniBtn label="تمديد 30 يوم" variant="default" onClick={() => onAction(c.id, 'extend', 30)} />}
           </div>
         </div>
       )}
@@ -409,11 +419,11 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
   );
 }
 
-function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
+function StatCard({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div style={{ background: '#f8fafc', borderRadius: 10, padding: '10px 14px' }}>
-      <div style={{ fontSize: 9, color: '#94a3b8', marginBottom: 2 }}>{label}</div>
-      <div style={{ fontSize: 14, fontWeight: 700, color }}>{value}</div>
+    <div style={{ background: '#fafafa', borderRadius: 8, padding: '10px 14px', border: '1px solid #f0f0f0' }}>
+      <div style={{ fontSize: 10, color: '#a1a1aa', marginBottom: 3, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: color || '#18181b' }}>{value}</div>
     </div>
   );
 }
@@ -433,41 +443,40 @@ function MatrixTab({ companies, matrix, registry, onToggle, reload }: any) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <p style={{ fontSize: 14, fontWeight: 700 }}>مصفوفة الميزات — {filtered.length} شركة × {featureKeys.length} ميزة</p>
-        <select value={filterPlan} onChange={e => setFilterPlan(e.target.value)} style={{ padding: '6px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#18181b' }}>مصفوفة الميزات — {filtered.length} شركة × {featureKeys.length} ميزة</p>
+        <select value={filterPlan} onChange={e => setFilterPlan(e.target.value)} style={{ padding: '6px 12px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12, background: '#fff', color: '#71717a' }}>
           <option value="all">كل الخطط</option>
           {['trial', 'basic', 'professional', 'enterprise'].map(p => <option key={p} value={p}>{PLAN_AR[p]}</option>)}
         </select>
       </div>
 
-      <div style={{ overflow: 'auto', maxHeight: 600 }}>
+      <div style={{ overflow: 'auto', maxHeight: 600, border: '1px solid #e5e5e5', borderRadius: 8 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
           <thead>
             <tr>
-              <th style={{ position: 'sticky', top: 0, right: 0, background: '#0f172a', color: 'white', padding: '8px 12px', textAlign: 'right', zIndex: 2, minWidth: 150 }}>الشركة</th>
+              <th style={{ position: 'sticky', top: 0, right: 0, background: '#fafafa', color: '#3f3f46', padding: '10px 12px', textAlign: 'right', zIndex: 2, minWidth: 150, borderBottom: '1px solid #e5e5e5', fontWeight: 600, fontSize: 11 }}>الشركة</th>
               {featureKeys.map(key => (
-                <th key={key} style={{ position: 'sticky', top: 0, background: '#0f172a', color: 'white', padding: '8px 6px', textAlign: 'center', fontSize: 9, minWidth: 70, zIndex: 1 }}>
+                <th key={key} style={{ position: 'sticky', top: 0, background: '#fafafa', color: '#71717a', padding: '10px 6px', textAlign: 'center', fontSize: 9, minWidth: 70, zIndex: 1, borderBottom: '1px solid #e5e5e5', fontWeight: 500 }}>
                   {registry[key]?.name_ar || key}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {filtered.map((c: any) => {
-              const pc = PLAN_C[c.plan] || PLAN_C.basic;
+            {filtered.map((c: any, idx: number) => {
               return (
-                <tr key={c.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '6px 12px', fontWeight: 600, position: 'sticky', right: 0, background: 'white', zIndex: 1 }}>
+                <tr key={c.id} style={{ borderBottom: '1px solid #f4f4f5', background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
+                  <td style={{ padding: '8px 12px', fontWeight: 500, position: 'sticky', right: 0, background: idx % 2 === 0 ? '#fff' : '#fafafa', zIndex: 1, fontSize: 12, color: '#18181b' }}>
                     <span>{c.name_ar || c.name}</span>
-                    <span style={{ fontSize: 8, marginRight: 6, padding: '1px 6px', borderRadius: 20, background: pc.bg, color: pc.color }}>{PLAN_AR[c.plan]}</span>
+                    <span style={{ fontSize: 10, marginRight: 6, color: '#a1a1aa' }}>{PLAN_AR[c.plan]}</span>
                   </td>
                   {featureKeys.map(key => {
                     const enabled = flagMap[c.id]?.[key] || false;
                     return (
                       <td key={key} style={{ textAlign: 'center', padding: 4 }}>
                         <button onClick={() => { onToggle(c.id, key, !enabled); setTimeout(reload, 500); }}
-                          style={{ width: 24, height: 24, borderRadius: 6, border: 'none', cursor: 'pointer', fontSize: 12,
-                            background: enabled ? '#dcfce7' : '#f1f5f9', color: enabled ? '#16a34a' : '#cbd5e1' }}>
+                          style={{ width: 22, height: 22, borderRadius: 5, border: '1px solid ' + (enabled ? '#d1fae5' : '#f0f0f0'), cursor: 'pointer', fontSize: 11,
+                            background: enabled ? '#ecfdf5' : '#fff', color: enabled ? '#059669' : '#d4d4d8', fontWeight: 500, transition: 'all .1s' }}>
                           {enabled ? '✓' : '—'}
                         </button>
                       </td>
