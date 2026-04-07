@@ -3,6 +3,8 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { adminApi } from '../../../lib/api';
 
+type BehaviorEvent = { type: string; page: string; detail: string; timestamp: string; dwell_ms: number };
+
 type DemoLead = {
   id: string;
   name: string | null;
@@ -13,6 +15,11 @@ type DemoLead = {
   status: string;
   notes: string | null;
   created_at: string;
+  city?: string | null;
+  property_count?: string | null;
+  unit_count?: string | null;
+  pain_points?: string[] | null;
+  behavioral_data?: BehaviorEvent[] | null;
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -24,10 +31,107 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
 
 const ALL_STATUSES = ['new', 'contacted', 'converted', 'ignored'];
 
+function BehaviorInsights({ lead }: { lead: DemoLead }) {
+  const events = lead.behavioral_data || [];
+  if (events.length === 0 && !lead.city && !lead.pain_points?.length) return <p style={{ fontSize: 11, color: '#9ca3af', padding: '12px 0' }}>لا توجد بيانات سلوكية</p>;
+
+  // Compute insights
+  const pageVisits = events.filter(e => e.type === 'page_visit');
+  const scenarioStarts = events.filter(e => e.type === 'scenario_start');
+  const scenarioCompletes = events.filter(e => e.type === 'scenario_complete');
+  const spotlights = events.filter(e => e.type === 'spotlight_view');
+  const conversionOpens = events.filter(e => e.type === 'conversion_panel_open');
+  const totalDwell = events.reduce((s, e) => s + (e.dwell_ms || 0), 0);
+
+  // Pages visited with time
+  const pageMap: Record<string, { count: number; totalDwell: number }> = {};
+  for (const e of pageVisits) {
+    const p = e.page || 'unknown';
+    if (!pageMap[p]) pageMap[p] = { count: 0, totalDwell: 0 };
+    pageMap[p].count++;
+    pageMap[p].totalDwell += e.dwell_ms || 0;
+  }
+  const topPages = Object.entries(pageMap).sort((a, b) => b[1].totalDwell - a[1].totalDwell).slice(0, 8);
+
+  const PAGE_AR: Record<string, string> = {
+    '/dashboard': 'لوحة التحكم', '/dashboard/payments': 'المدفوعات', '/dashboard/portfolio': 'المحفظة',
+    '/dashboard/contracts': 'العقود', '/dashboard/financial': 'المالية', '/dashboard/intelligence': 'الذكاء الاصطناعي',
+    '/dashboard/analytics': 'التحليلات', '/dashboard/lifecycle': 'دورة الحياة', '/dashboard/properties': 'العقارات',
+    '/dashboard/units': 'الوحدات', '/dashboard/maintenance': 'الصيانة', '/dashboard/owners': 'الملاك',
+    '/dashboard/renewal': 'التجديد', '/dashboard/tenants': 'المستأجرين',
+  };
+
+  return (
+    <div style={{ padding: '16px 20px', background: '#f8f7fc', borderTop: '1px solid rgba(0,0,0,.06)' }}>
+      {/* Context from intake */}
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+        {lead.city && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#eff6ff', color: '#1d4070', fontWeight: 600 }}>📍 {lead.city}</span>}
+        {lead.property_count && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#f0fdf4', color: '#15803d', fontWeight: 600 }}>🏢 {lead.property_count} عقار</span>}
+        {lead.unit_count && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#fef3c7', color: '#92400e', fontWeight: 600 }}>🏠 {lead.unit_count} وحدة</span>}
+        {(lead.pain_points || []).map(p => <span key={p} style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#fef2f2', color: '#dc2626', fontWeight: 600 }}>⚡ {p}</span>)}
+      </div>
+
+      {/* Behavioral stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 12 }}>
+        {[
+          { label: 'صفحات زارها', value: pageVisits.length, color: '#3b82f6' },
+          { label: 'سيناريوهات بدأها', value: scenarioStarts.length, color: '#7c5cfc' },
+          { label: 'سيناريوهات أكملها', value: scenarioCompletes.length, color: '#10b981' },
+          { label: 'لحظات إعجاب', value: spotlights.length, color: '#f59e0b' },
+          { label: 'فتح صفحة الاشتراك', value: conversionOpens.length, color: '#dc2626' },
+        ].map(s => (
+          <div key={s.label} style={{ textAlign: 'center', padding: '8px', borderRadius: 10, background: '#fff', border: '1px solid rgba(0,0,0,.06)' }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: s.color }}>{s.value}</div>
+            <div style={{ fontSize: 9, color: '#9ca3af', fontWeight: 500 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Heatmap — top pages by dwell time */}
+      {topPages.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e', marginBottom: 6 }}>خريطة الاهتمام (حسب وقت التصفح)</p>
+          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            {topPages.map(([page, data]) => {
+              const pct = Math.min(100, Math.round((data.totalDwell / Math.max(totalDwell, 1)) * 100));
+              const intensity = Math.min(1, pct / 30);
+              return (
+                <div key={page} style={{
+                  padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 600,
+                  background: `rgba(124,92,252,${0.08 + intensity * 0.25})`,
+                  color: intensity > 0.5 ? '#7c5cfc' : '#6b7280',
+                  border: `1px solid rgba(124,92,252,${intensity * 0.3})`,
+                }}>
+                  {PAGE_AR[page] || page.split('/').pop()} · {Math.round(data.totalDwell / 1000)}ث
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* AI Agent summary — for sales agent to read */}
+      {events.length > 0 && (
+        <div style={{ padding: '10px 14px', borderRadius: 10, background: 'linear-gradient(135deg, rgba(124,92,252,0.05), rgba(37,99,235,0.05))', border: '1px solid rgba(124,92,252,0.15)' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: '#7c5cfc', marginBottom: 4 }}>🧠 ملخص للوكيل الذكي</p>
+          <p style={{ fontSize: 11, color: '#6b7280', lineHeight: 1.6, margin: 0 }}>
+            الزائر من {lead.city || '—'} · {lead.property_count || '—'} عقار · {lead.unit_count || '—'} وحدة ·
+            تحدياته: {(lead.pain_points || []).join('، ') || 'لم يحدد'} ·
+            زار {pageVisits.length} صفحة · أكمل {scenarioCompletes.length}/{scenarioStarts.length} سيناريو ·
+            {conversionOpens.length > 0 ? 'فتح صفحة الاشتراك ✓' : 'لم يفتح صفحة الاشتراك'} ·
+            إجمالي وقت التصفح: {Math.round(totalDwell / 60000)} دقيقة
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function DemoLeadsPage() {
   const [items, setItems]             = useState<DemoLead[]>([]);
   const [total, setTotal]             = useState(0);
   const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
+  const [expandedLead, setExpandedLead] = useState<string | null>(null);
   const [loading, setLoading]         = useState(true);
   const [filter, setFilter]           = useState('');
   const [updating, setUpdating]       = useState<string | null>(null);
@@ -186,13 +290,18 @@ export default function DemoLeadsPage() {
             {/* Rows */}
             {displayedItems.map((item, i) => {
               const sc = STATUS_CONFIG[item.status] || STATUS_CONFIG.new;
+              const hasData = (item.behavioral_data?.length || 0) > 0 || item.city || (item.pain_points?.length || 0) > 0;
+              const isExpanded = expandedLead === item.id;
               return (
-                <div key={item.id}
+                <div key={item.id} style={{ borderBottom: i < displayedItems.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none' }}>
+                <div
+                  onClick={() => hasData && setExpandedLead(isExpanded ? null : item.id)}
                   style={{
                     display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px',
                     gap: 0, padding: '14px 20px', alignItems: 'center',
-                    borderBottom: i < displayedItems.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none',
-                    background: i % 2 === 0 ? '#fff' : '#fafafa',
+                    background: isExpanded ? '#f8f7fc' : i % 2 === 0 ? '#fff' : '#fafafa',
+                    cursor: hasData ? 'pointer' : 'default',
+                    transition: 'background 0.15s',
                   }}
                 >
                   {/* Date */}
@@ -200,7 +309,10 @@ export default function DemoLeadsPage() {
 
                   {/* Name */}
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a2e' }}>{item.name || '—'}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 13, fontWeight: 500, color: '#1a1a2e' }}>{item.name || '—'}</span>
+                      {hasData && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 6, background: isExpanded ? '#7c5cfc' : 'rgba(124,92,252,0.1)', color: isExpanded ? '#fff' : '#7c5cfc', fontWeight: 700 }}>📊</span>}
+                    </div>
                     {item.demo_session_id && (
                       <div style={{ fontSize: 11, color: '#6b7280', fontFamily: 'Inter, monospace', marginTop: 2, fontWeight: 500 }}>
                         {item.demo_session_id.slice(0, 8)}...
@@ -282,6 +394,8 @@ export default function DemoLeadsPage() {
                       </button>
                     )}
                   </div>
+                </div>
+                {isExpanded && <BehaviorInsights lead={item} />}
                 </div>
               );
             })}
