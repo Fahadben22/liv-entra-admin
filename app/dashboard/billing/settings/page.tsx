@@ -36,14 +36,14 @@ export default function BillingSettingsPage() {
     setSaving(false);
   };
 
-  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0', color: '#a1a1aa' }}>جاري التحميل...</div>;
+  if (loading) return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0', color: '#6b7280' }}>جاري التحميل...</div>;
 
   return (
     <div>
-      {toast && <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#18181b', color: '#fafafa', padding: '10px 28px', borderRadius: 7, fontSize: 13, zIndex: 9999, border: '1px solid rgba(255,255,255,.1)' }}>{toast}</div>}
+      {toast && <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#fff', color: '#1a1a2e', padding: '10px 28px', borderRadius: 10, fontSize: 13, zIndex: 9999, boxShadow: '0 4px 16px rgba(0,0,0,.1)', border: '1px solid rgba(0,0,0,.08)' }}>{toast}</div>}
 
-      <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: '#fafafa' }}>إعدادات الفوترة والفواتير</h1>
-      <p style={{ color: '#a1a1aa', fontSize: 13, marginBottom: 28 }}>خصّص بيانات الشركة، الضريبة، البنك، وتنسيق الفواتير</p>
+      <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 8, color: '#1a1a2e' }}>إعدادات الفوترة والفواتير</h1>
+      <p style={{ color: '#6b7280', fontSize: 13, marginBottom: 28 }}>خصّص بيانات الشركة، الضريبة، البنك، وتنسيق الفواتير</p>
 
       {/* Section: Company Identity */}
       <Section title="هوية الشركة">
@@ -99,8 +99,8 @@ export default function BillingSettingsPage() {
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 28 }}>
         <button onClick={save} disabled={saving}
           style={{
-            padding: '10px 32px', borderRadius: 7, border: 'none', fontSize: 13, fontWeight: 600,
-            background: '#6366f1', color: '#fff',
+            padding: '10px 32px', borderRadius: 10, border: 'none', fontSize: 13, fontWeight: 600,
+            background: '#7c5cfc', color: '#fff',
             cursor: 'pointer', fontFamily: 'inherit', opacity: saving ? 0.7 : 1,
           }}>
           {saving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
@@ -114,8 +114,8 @@ export default function BillingSettingsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 8, padding: '24px 28px', marginBottom: 20 }}>
-      <h2 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: '#fafafa' }}>
+    <div className="card" style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)', borderRadius: 14, padding: '24px 28px', marginBottom: 20 }}>
+      <h2 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: '#1a1a2e' }}>
         {title}
       </h2>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>{children}</div>
@@ -127,15 +127,15 @@ function Row({ label, value, onChange, type = 'text', placeholder, multiline }: 
   label: string; value: any; onChange: (v: string) => void; type?: string; placeholder?: string; multiline?: boolean;
 }) {
   const style: React.CSSProperties = {
-    width: '100%', padding: '9px 12px', borderRadius: 7, fontSize: 13,
-    border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)',
-    color: '#fafafa', fontFamily: 'inherit', boxSizing: 'border-box',
+    width: '100%', padding: '9px 12px', borderRadius: 10, fontSize: 13,
+    border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc',
+    color: '#1a1a2e', fontFamily: 'inherit', boxSizing: 'border-box',
     outline: 'none',
   };
 
   return (
     <div>
-      <label style={{ fontSize: 11, fontWeight: 500, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>{label}</label>
+      <label style={{ fontSize: 11, fontWeight: 500, color: '#6b7280', display: 'block', marginBottom: 4 }}>{label}</label>
       {type === 'color' ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <input type="color" value={value || '#000000'} onChange={e => onChange(e.target.value)} style={{ width: 40, height: 36, border: 'none', background: 'none', cursor: 'pointer' }} />

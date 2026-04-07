@@ -46,32 +46,32 @@ export default function QuotationsPage() {
     } catch (e: any) { showToast(e.message || 'خطأ'); }
   };
 
-  const ghostBtn: React.CSSProperties = { fontSize: 10, padding: '5px 8px', borderRadius: 7, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', textDecoration: 'none' };
+  const ghostBtn: React.CSSProperties = { fontSize: 10, padding: '5px 8px', borderRadius: 7, background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', textDecoration: 'none' };
 
   return (
     <div>
-      {toast && <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#18181b', color: '#fafafa', padding: '10px 28px', borderRadius: 7, fontSize: 13, zIndex: 9999, border: '1px solid rgba(255,255,255,.1)' }}>{toast}</div>}
+      {toast && <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#fff', color: '#1a1a2e', padding: '10px 28px', borderRadius: 10, fontSize: 13, zIndex: 9999, boxShadow: '0 4px 16px rgba(0,0,0,.1)', border: '1px solid rgba(0,0,0,.08)' }}>{toast}</div>}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#fafafa' }}>عروض الأسعار</h2>
-        <button onClick={() => setShowCreate(true)} style={{ fontSize: 13, padding: '8px 18px', borderRadius: 7, background: '#6366f1', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>عروض الأسعار</h2>
+        <button onClick={() => setShowCreate(true)} style={{ fontSize: 13, padding: '8px 18px', borderRadius: 10, background: '#7c5cfc', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
           + عرض سعر جديد
         </button>
       </div>
 
       {loading ? (
-        <p style={{ color: '#a1a1aa', textAlign: 'center', padding: 60 }}>جاري التحميل...</p>
+        <p style={{ color: '#6b7280', textAlign: 'center', padding: 60 }}>جاري التحميل...</p>
       ) : items.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 80, color: '#a1a1aa', background: 'rgba(255,255,255,.03)', borderRadius: 8, border: '1px solid rgba(255,255,255,.06)' }}>
+        <div style={{ textAlign: 'center', padding: 80, color: '#6b7280', background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
           <p style={{ fontSize: 13 }}>لا توجد عروض أسعار بعد</p>
         </div>
       ) : (
-        <div style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 8, overflow: 'hidden' }}>
+        <div className="card" style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)', borderRadius: 14, overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: 'rgba(255,255,255,.04)' }}>
+              <tr style={{ background: '#f8f7fc' }}>
                 {['الرقم', 'الشركة', 'المبلغ', 'الحالة', 'صالح حتى', 'إجراء'].map(h => (
-                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#a1a1aa', borderBottom: '1px solid rgba(255,255,255,.06)' }}>{h}</th>
+                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#6b7280', borderBottom: '1px solid rgba(0,0,0,.06)' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -79,21 +79,21 @@ export default function QuotationsPage() {
               {items.map((q, i) => {
                 const sc = STATUS_CONFIG[q.status] || STATUS_CONFIG.draft;
                 return (
-                  <tr key={q.id} style={{ borderBottom: i < items.length - 1 ? '1px solid rgba(255,255,255,.03)' : 'none', background: i % 2 === 1 ? 'rgba(255,255,255,.02)' : 'transparent' }}>
-                    <td style={{ padding: '12px 18px', fontSize: 12, fontWeight: 600, fontFamily: 'monospace', color: '#fafafa' }}>{q.quotation_number}</td>
-                    <td style={{ padding: '12px 18px', fontSize: 13, color: '#fafafa' }}>{q.company?.name || q.company?.name_ar || '—'}</td>
-                    <td style={{ padding: '12px 18px', fontSize: 13, fontWeight: 600, color: '#fafafa' }}>{Number(q.total_sar || 0).toLocaleString()} ر.س</td>
+                  <tr key={q.id} style={{ borderBottom: i < items.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
+                    <td style={{ padding: '12px 18px', fontSize: 12, fontWeight: 600, fontFamily: 'monospace', color: '#1a1a2e' }}>{q.quotation_number}</td>
+                    <td style={{ padding: '12px 18px', fontSize: 13, color: '#1a1a2e' }}>{q.company?.name || q.company?.name_ar || '—'}</td>
+                    <td style={{ padding: '12px 18px', fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{Number(q.total_sar || 0).toLocaleString()} ر.س</td>
                     <td style={{ padding: '12px 18px' }}>
                       <span style={{ fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 5, color: sc.color, fontWeight: 500 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block', boxShadow: `0 0 6px ${sc.color}` }} />
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block' }} />
                         {sc.label}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#52525b' }}>{q.valid_until || '—'}</td>
+                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#9ca3af' }}>{q.valid_until || '—'}</td>
                     <td style={{ padding: '12px 18px' }}>
                       <div style={{ display: 'flex', gap: 4 }}>
                         <a href={`${BASE}/admin/billing/quotations/${q.id}/pdf`} target="_blank" rel="noopener"
-                          style={{ ...ghostBtn, color: '#a1a1aa' }}>
+                          style={{ ...ghostBtn, color: '#6b7280' }}>
                           PDF
                         </a>
                         {q.status === 'draft' && (
@@ -152,45 +152,45 @@ function CreateQuotationModal({ companies, onClose, onDone }: { companies: any[]
     setLoading(false);
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 7, border: '1px solid rgba(255,255,255,.08)', fontSize: 13, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', background: 'rgba(255,255,255,.04)', color: '#fafafa' };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none', background: '#f8f7fc', color: '#1a1a2e' };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.6)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ background: '#18181b', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, padding: '32px 28px', width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#fafafa' }}>عرض سعر جديد</h3>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
+      <div style={{ background: '#fff', boxShadow: '0 20px 60px rgba(0,0,0,.12)', borderRadius: 16, padding: '32px 28px', width: '100%', maxWidth: 600, maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1a1a2e' }}>عرض سعر جديد</h3>
 
-        <label style={{ fontSize: 11, fontWeight: 500, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>الشركة *</label>
+        <label style={{ fontSize: 11, fontWeight: 500, color: '#6b7280', display: 'block', marginBottom: 4 }}>الشركة *</label>
         <select value={companyId} onChange={e => setCompanyId(e.target.value)} style={{ ...inputStyle, marginBottom: 16 }}>
           <option value="">اختر شركة...</option>
           {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
 
-        <label style={{ fontSize: 11, fontWeight: 500, color: '#a1a1aa', display: 'block', marginBottom: 8 }}>البنود</label>
+        <label style={{ fontSize: 11, fontWeight: 500, color: '#6b7280', display: 'block', marginBottom: 8 }}>البنود</label>
         {items.map((item, i) => (
           <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 100px 30px', gap: 8, marginBottom: 8 }}>
             <input placeholder="الوصف" value={item.description} onChange={e => updateItem(i, 'description', e.target.value)} style={inputStyle} />
             <input type="number" placeholder="الكمية" value={item.quantity} onChange={e => updateItem(i, 'quantity', Number(e.target.value))} style={inputStyle} />
             <input type="number" placeholder="السعر" value={item.unit_price || ''} onChange={e => updateItem(i, 'unit_price', Number(e.target.value))} style={inputStyle} />
             {items.length > 1 && (
-              <button onClick={() => removeItem(i)} style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', color: '#dc2626', borderRadius: 7, cursor: 'pointer', fontSize: 14 }}>×</button>
+              <button onClick={() => removeItem(i)} style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', color: '#dc2626', borderRadius: 7, cursor: 'pointer', fontSize: 14 }}>×</button>
             )}
           </div>
         ))}
-        <button onClick={addItem} style={{ fontSize: 12, color: '#a1a1aa', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', marginBottom: 16 }}>+ إضافة بند</button>
+        <button onClick={addItem} style={{ fontSize: 12, color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', marginBottom: 16 }}>+ إضافة بند</button>
 
         {/* Totals */}
         {subtotal > 0 && (
-          <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 8, padding: '12px 16px', marginBottom: 16 }}>
+          <div style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-              <span style={{ color: '#a1a1aa' }}>المجموع الفرعي</span>
-              <span style={{ color: '#fafafa' }}>{subtotal.toLocaleString()} ر.س</span>
+              <span style={{ color: '#6b7280' }}>المجموع الفرعي</span>
+              <span style={{ color: '#1a1a2e' }}>{subtotal.toLocaleString()} ر.س</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-              <span style={{ color: '#a1a1aa' }}>ضريبة 15%</span>
-              <span style={{ color: '#fafafa' }}>{vat.toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
+              <span style={{ color: '#6b7280' }}>ضريبة 15%</span>
+              <span style={{ color: '#1a1a2e' }}>{vat.toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, borderTop: '1px solid rgba(255,255,255,.06)', paddingTop: 6 }}>
-              <span style={{ color: '#fafafa' }}>الإجمالي</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, borderTop: '1px solid rgba(0,0,0,.06)', paddingTop: 6 }}>
+              <span style={{ color: '#1a1a2e' }}>الإجمالي</span>
               <span style={{ color: '#16a34a' }}>{total.toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
             </div>
           </div>
@@ -198,20 +198,20 @@ function CreateQuotationModal({ companies, onClose, onDone }: { companies: any[]
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>صلاحية العرض (أيام)</label>
+            <label style={{ fontSize: 11, fontWeight: 500, color: '#6b7280', display: 'block', marginBottom: 4 }}>صلاحية العرض (أيام)</label>
             <select value={validDays} onChange={e => setValidDays(Number(e.target.value))} style={inputStyle}>
               {[7, 15, 30, 45, 60, 90].map(d => <option key={d} value={d}>{d} يوم</option>)}
             </select>
           </div>
         </div>
 
-        <label style={{ fontSize: 11, fontWeight: 500, color: '#a1a1aa', display: 'block', marginBottom: 4 }}>ملاحظات</label>
+        <label style={{ fontSize: 11, fontWeight: 500, color: '#6b7280', display: 'block', marginBottom: 4 }}>ملاحظات</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} style={{ ...inputStyle, resize: 'vertical', marginBottom: 16 }} />
 
         {err && <p style={{ fontSize: 12, color: '#dc2626', marginBottom: 12 }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '10px 20px', borderRadius: 7, border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)', color: '#a1a1aa', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>إلغاء</button>
-          <button onClick={submit} disabled={loading} style={{ padding: '10px 24px', borderRadius: 7, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', opacity: loading ? .7 : 1 }}>
+          <button onClick={onClose} style={{ padding: '10px 20px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc', color: '#6b7280', cursor: 'pointer', fontSize: 13, fontFamily: 'inherit' }}>إلغاء</button>
+          <button onClick={submit} disabled={loading} style={{ padding: '10px 24px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, fontFamily: 'inherit', opacity: loading ? .7 : 1 }}>
             {loading ? '...' : 'إنشاء عرض السعر'}
           </button>
         </div>

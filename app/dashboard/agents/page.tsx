@@ -42,16 +42,18 @@ export default function AgentsPage() {
     <div style={{ padding: '40px 24px' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h1 style={{ fontSize: 18, fontWeight: 600, color: '#fafafa', margin: '0 0 8px', letterSpacing: '-0.02em' }}>وكلاء الذكاء الاصطناعي</h1>
-          <p style={{ fontSize: 13, color: '#a1a1aa', margin: 0 }}>ثلاثة وكلاء متخصصين يعملون على بيانات Liventra الحية</p>
+          <h1 style={{ fontSize: 18, fontWeight: 600, color: '#1a1a2e', margin: '0 0 8px', letterSpacing: '-0.02em' }}>وكلاء الذكاء الاصطناعي</h1>
+          <p style={{ fontSize: 13, color: '#6b7280', margin: 0 }}>ثلاثة وكلاء متخصصين يعملون على بيانات Liventra الحية</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
           {AGENTS.map(agent => (
             <Link key={agent.type} href={`/dashboard/agents/${agent.type}`}
+              className="card"
               style={{
-                background: 'rgba(255,255,255,.03)', borderRadius: 10, padding: '32px 24px',
-                border: '1px solid rgba(255,255,255,.06)', textDecoration: 'none',
+                background: '#fff', borderRadius: 14, padding: '32px 24px',
+                border: 'none', textDecoration: 'none',
+                boxShadow: '0 1px 3px rgba(0,0,0,.06)',
                 transition: 'all .15s',
               }}>
               <div style={{
@@ -61,10 +63,10 @@ export default function AgentsPage() {
               }}>
                 {agent.icon}
               </div>
-              <h3 style={{ fontSize: 13, fontWeight: 600, color: '#fafafa', margin: '0 0 4px' }}>{agent.name}</h3>
-              <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 12px', fontWeight: 500 }}>{agent.nameEn}</p>
-              <p style={{ fontSize: 13, color: '#a1a1aa', lineHeight: 1.6, margin: '0 0 8px' }}>{agent.desc}</p>
-              <p style={{ fontSize: 11, color: '#52525b', fontStyle: 'italic', margin: 0 }}>{agent.motto}</p>
+              <h3 style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: '0 0 4px' }}>{agent.name}</h3>
+              <p style={{ fontSize: 11, color: '#6b7280', margin: '0 0 12px', fontWeight: 500 }}>{agent.nameEn}</p>
+              <p style={{ fontSize: 13, color: '#6b7280', lineHeight: 1.6, margin: '0 0 8px' }}>{agent.desc}</p>
+              <p style={{ fontSize: 11, color: '#9ca3af', fontStyle: 'italic', margin: 0 }}>{agent.motto}</p>
             </Link>
           ))}
         </div>

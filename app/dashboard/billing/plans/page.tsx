@@ -6,10 +6,10 @@ import { request } from '@/lib/api';
 const TIER_ORDER = ['trial', 'basic', 'professional', 'enterprise'];
 const TIER_AR: Record<string, string> = { trial: 'تجريبي', basic: 'أساسي', professional: 'احترافي', enterprise: 'مؤسسي' };
 const TIER_COLORS: Record<string, { bg: string; border: string; color: string }> = {
-  trial:        { bg: 'rgba(255,255,255,.04)', border: 'rgba(255,255,255,.08)', color: '#71717a' },
-  basic:        { bg: 'rgba(255,255,255,.04)', border: 'rgba(255,255,255,.08)', color: '#3b82f6' },
-  professional: { bg: 'rgba(255,255,255,.04)', border: 'rgba(255,255,255,.08)', color: '#16a34a' },
-  enterprise:   { bg: 'rgba(255,255,255,.04)', border: 'rgba(255,255,255,.08)', color: '#7c3aed' },
+  trial:        { bg: '#f8f7fc', border: 'rgba(0,0,0,.08)', color: '#71717a' },
+  basic:        { bg: '#f8f7fc', border: 'rgba(0,0,0,.08)', color: '#3b82f6' },
+  professional: { bg: '#f8f7fc', border: 'rgba(0,0,0,.08)', color: '#16a34a' },
+  enterprise:   { bg: '#f8f7fc', border: 'rgba(0,0,0,.08)', color: '#7c3aed' },
 };
 
 const EMPTY_PLAN = { name: '', name_ar: '', price_monthly: 0, price_yearly: 0, max_users: 5, max_properties: 5, max_units: 50, max_contracts: 100, features: [], is_active: true, sort_order: 0 };
@@ -81,15 +81,15 @@ export default function PlansPage() {
     }));
   }
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 80, color: '#a1a1aa' }}>جاري التحميل...</div>;
+  if (loading) return <div style={{ textAlign: 'center', padding: 80, color: '#6b7280' }}>جاري التحميل...</div>;
 
   const allFeatureKeys = Object.keys(registry);
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, color: '#fafafa' }}>إدارة الخطط</h2>
-        <button onClick={openCreate} style={{ padding: '8px 18px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, color: '#1a1a2e' }}>إدارة الخطط</h2>
+        <button onClick={openCreate} style={{ padding: '8px 18px', background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
           + خطة جديدة
         </button>
       </div>
@@ -99,42 +99,42 @@ export default function PlansPage() {
         {plans.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map(plan => {
           const tc = TIER_COLORS[plan.name] || TIER_COLORS.basic;
           return (
-            <div key={plan.id} style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 8, padding: 20, position: 'relative' }}>
+            <div key={plan.id} className="card" style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)', borderRadius: 14, padding: 20, position: 'relative' }}>
               {!plan.is_active && (
-                <div style={{ position: 'absolute', top: 10, left: 10, fontSize: 9, padding: '2px 8px', borderRadius: 7, background: 'rgba(239,68,68,.15)', color: '#dc2626', fontWeight: 600 }}>غير نشط</div>
+                <div style={{ position: 'absolute', top: 10, left: 10, fontSize: 9, padding: '2px 8px', borderRadius: 7, background: 'rgba(239,68,68,.1)', color: '#dc2626', fontWeight: 600 }}>غير نشط</div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: tc.color, boxShadow: `0 0 6px ${tc.color}` }} />
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: tc.color }} />
                 <span style={{ fontSize: 14, fontWeight: 600, color: tc.color }}>{plan.name_ar || TIER_AR[plan.name] || plan.name}</span>
-                <span style={{ fontSize: 11, color: '#52525b' }}>({plan.name})</span>
+                <span style={{ fontSize: 11, color: '#9ca3af' }}>({plan.name})</span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
-                <div style={{ background: 'rgba(255,255,255,.04)', borderRadius: 7, padding: '8px 10px', border: '1px solid rgba(255,255,255,.06)' }}>
-                  <div style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>شهري</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#fafafa' }}>{Number(plan.price_monthly || 0).toLocaleString()} ر.س</div>
+                <div style={{ background: '#f8f7fc', borderRadius: 7, padding: '8px 10px', border: '1px solid rgba(0,0,0,.06)' }}>
+                  <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>شهري</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>{Number(plan.price_monthly || 0).toLocaleString()} ر.س</div>
                 </div>
-                <div style={{ background: 'rgba(255,255,255,.04)', borderRadius: 7, padding: '8px 10px', border: '1px solid rgba(255,255,255,.06)' }}>
-                  <div style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>سنوي</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#fafafa' }}>{Number(plan.price_yearly || 0).toLocaleString()} ر.س</div>
+                <div style={{ background: '#f8f7fc', borderRadius: 7, padding: '8px 10px', border: '1px solid rgba(0,0,0,.06)' }}>
+                  <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>سنوي</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>{Number(plan.price_yearly || 0).toLocaleString()} ر.س</div>
                 </div>
               </div>
 
-              <div style={{ fontSize: 11, color: '#52525b', marginBottom: 12 }}>
+              <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 12 }}>
                 <div>الوحدات: {plan.max_units || '∞'} · العقارات: {plan.max_properties || '∞'}</div>
                 <div>الموظفين: {plan.max_users || '∞'} · العقود: {plan.max_contracts || '∞'}</div>
               </div>
 
-              <div style={{ fontSize: 11, color: '#a1a1aa', marginBottom: 8, fontWeight: 500 }}>الميزات ({(plan.features || []).length}):</div>
+              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 8, fontWeight: 500 }}>الميزات ({(plan.features || []).length}):</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                 {(plan.features || []).map((f: string) => (
-                  <span key={f} style={{ fontSize: 9, padding: '2px 7px', borderRadius: 7, background: 'rgba(255,255,255,.04)', color: '#a1a1aa', border: '1px solid rgba(255,255,255,.06)' }}>
+                  <span key={f} style={{ fontSize: 9, padding: '2px 7px', borderRadius: 7, background: '#f8f7fc', color: '#6b7280', border: '1px solid rgba(0,0,0,.06)' }}>
                     {registry[f]?.name_ar || f}
                   </span>
                 ))}
               </div>
 
-              <button onClick={() => openEdit(plan)} style={{ marginTop: 14, width: '100%', padding: '7px', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 12, color: '#a1a1aa', cursor: 'pointer', fontWeight: 600 }}>
+              <button onClick={() => openEdit(plan)} style={{ marginTop: 14, width: '100%', padding: '7px', background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, color: '#6b7280', cursor: 'pointer', fontWeight: 600 }}>
                 تعديل
               </button>
             </div>
@@ -144,31 +144,31 @@ export default function PlansPage() {
 
       {/* Create/Edit Modal */}
       {modal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={e => { if (e.target === e.currentTarget) setModal(false); }}>
-          <div style={{ background: '#18181b', borderRadius: 8, padding: 28, width: '100%', maxWidth: 520, maxHeight: '85vh', overflow: 'auto', border: '1px solid rgba(255,255,255,.1)' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: '#fafafa' }}>{editing ? 'تعديل الخطة' : 'خطة جديدة'}</h3>
+          <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: '100%', maxWidth: 520, maxHeight: '85vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,.12)' }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: '#1a1a2e' }}>{editing ? 'تعديل الخطة' : 'خطة جديدة'}</h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
               <div>
-                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (EN)</label>
+                <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (EN)</label>
                 <input value={form.name} onChange={e => setForm((p: any) => ({ ...p, name: e.target.value }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 13, background: 'rgba(255,255,255,.04)', color: '#fafafa' }} placeholder="basic" />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, background: '#f8f7fc', color: '#1a1a2e' }} placeholder="basic" />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (AR)</label>
+                <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (AR)</label>
                 <input value={form.name_ar} onChange={e => setForm((p: any) => ({ ...p, name_ar: e.target.value }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 13, background: 'rgba(255,255,255,.04)', color: '#fafafa' }} placeholder="أساسي" />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, background: '#f8f7fc', color: '#1a1a2e' }} placeholder="أساسي" />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر الشهري (ر.س)</label>
+                <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر الشهري (ر.س)</label>
                 <input type="number" value={form.price_monthly} onChange={e => setForm((p: any) => ({ ...p, price_monthly: Number(e.target.value) }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 13, background: 'rgba(255,255,255,.04)', color: '#fafafa' }} />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, background: '#f8f7fc', color: '#1a1a2e' }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر السنوي (ر.س)</label>
+                <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر السنوي (ر.س)</label>
                 <input type="number" value={form.price_yearly} onChange={e => setForm((p: any) => ({ ...p, price_yearly: Number(e.target.value) }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 13, background: 'rgba(255,255,255,.04)', color: '#fafafa' }} />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, background: '#f8f7fc', color: '#1a1a2e' }} />
               </div>
             </div>
 
@@ -180,40 +180,40 @@ export default function PlansPage() {
                 { key: 'max_contracts', label: 'العقود' },
               ].map(f => (
                 <div key={f.key}>
-                  <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 4, fontWeight: 500 }}>{f.label}</label>
+                  <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>{f.label}</label>
                   <input type="number" value={form[f.key]} onChange={e => setForm((p: any) => ({ ...p, [f.key]: Number(e.target.value) }))}
-                    style={{ width: '100%', padding: '6px 8px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 12, background: 'rgba(255,255,255,.04)', color: '#fafafa' }} />
+                    style={{ width: '100%', padding: '6px 8px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, background: '#f8f7fc', color: '#1a1a2e' }} />
                 </div>
               ))}
             </div>
 
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#fafafa', display: 'block', marginBottom: 8 }}>الميزات المضمنة</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', display: 'block', marginBottom: 8 }}>الميزات المضمنة</label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                 {allFeatureKeys.map(key => (
-                  <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', borderRadius: 7, background: form.features.includes(key) ? 'rgba(99,102,241,.1)' : 'rgba(255,255,255,.03)', border: `1px solid ${form.features.includes(key) ? '#6366f1' : 'rgba(255,255,255,.06)'}`, cursor: 'pointer', fontSize: 11 }}>
+                  <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', borderRadius: 7, background: form.features.includes(key) ? 'rgba(124,92,252,.08)' : '#fafafa', border: `1px solid ${form.features.includes(key) ? '#7c5cfc' : 'rgba(0,0,0,.06)'}`, cursor: 'pointer', fontSize: 11 }}>
                     <input type="checkbox" checked={form.features.includes(key)} onChange={() => toggleFeature(key)} />
-                    <span style={{ color: '#fafafa' }}>{registry[key]?.name_ar || key}</span>
+                    <span style={{ color: '#1a1a2e' }}>{registry[key]?.name_ar || key}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#fafafa' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#1a1a2e' }}>
                 <input type="checkbox" checked={form.is_active} onChange={e => setForm((p: any) => ({ ...p, is_active: e.target.checked }))} />
                 نشطة
               </label>
               <div>
-                <label style={{ fontSize: 11, color: '#a1a1aa', fontWeight: 500 }}>ترتيب:</label>
+                <label style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>ترتيب:</label>
                 <input type="number" value={form.sort_order} onChange={e => setForm((p: any) => ({ ...p, sort_order: Number(e.target.value) }))}
-                  style={{ width: 50, padding: '4px 6px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 12, marginRight: 4, background: 'rgba(255,255,255,.04)', color: '#fafafa' }} />
+                  style={{ width: 50, padding: '4px 6px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 7, fontSize: 12, marginRight: 4, background: '#f8f7fc', color: '#1a1a2e' }} />
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setModal(false)} style={{ flex: 1, padding: '10px', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 13, cursor: 'pointer', color: '#a1a1aa' }}>إلغاء</button>
-              <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: '10px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+              <button onClick={() => setModal(false)} style={{ flex: 1, padding: '10px', background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, cursor: 'pointer', color: '#6b7280' }}>إلغاء</button>
+              <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: '10px', background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
                 {saving ? 'جاري الحفظ...' : editing ? 'حفظ التعديل' : 'إنشاء الخطة'}
               </button>
             </div>

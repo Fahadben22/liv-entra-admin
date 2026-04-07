@@ -101,18 +101,18 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 60px)', background: 'transparent' }}>
       {/* Header */}
-      <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,.06)', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(255,255,255,.03)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, border: '1px solid rgba(255,255,255,.06)' }}>
+      <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(0,0,0,.08)', display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: '#f8f7fc', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, border: '1px solid rgba(0,0,0,.08)' }}>
           {agentIcon}
         </div>
         <div style={{ flex: 1 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 600, color: '#fafafa', margin: 0 }}>{agentName}</h2>
-          <p style={{ fontSize: 11, color: '#a1a1aa', margin: 0, fontWeight: 500 }}>
+          <h2 style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>{agentName}</h2>
+          <p style={{ fontSize: 11, color: '#6b7280', margin: 0, fontWeight: 500 }}>
             {tokens > 0 ? `${tokens.toLocaleString()} رمز مستخدم` : 'جاهز للمساعدة'}
           </p>
         </div>
         <button onClick={clearChat}
-          style={{ fontSize: 11, padding: '6px 14px', borderRadius: 7, border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)', color: '#a1a1aa', cursor: 'pointer' }}>
+          style={{ fontSize: 11, padding: '6px 14px', borderRadius: 7, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', color: '#6b7280', cursor: 'pointer' }}>
           مسح المحادثة
         </button>
       </div>
@@ -122,14 +122,14 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
         {messages.length === 0 && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
             <div style={{ fontSize: 48 }}>{agentIcon}</div>
-            <p style={{ fontSize: 13, color: '#a1a1aa', textAlign: 'center' }}>اسأل {agentName} أي سؤال</p>
+            <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center' }}>اسأل {agentName} أي سؤال</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 500 }}>
               {quickActions.map((q, i) => (
                 <button key={i} onClick={() => send(q)}
                   style={{
                     fontSize: 12, padding: '8px 16px', borderRadius: 20,
-                    border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)',
-                    color: '#a1a1aa', cursor: 'pointer',
+                    border: '1px solid rgba(0,0,0,.08)', background: 'transparent',
+                    color: '#6b7280', cursor: 'pointer',
                   }}>
                   {q}
                 </button>
@@ -142,9 +142,9 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
           <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-start' : 'flex-end', gap: 8 }}>
             <div style={{
               maxWidth: '80%', padding: '12px 16px', borderRadius: 16,
-              background: msg.role === 'user' ? 'rgba(99,102,241,.1)' : 'rgba(255,255,255,.03)',
-              border: msg.role === 'user' ? '1px solid rgba(99,102,241,.2)' : '1px solid rgba(255,255,255,.06)',
-              color: '#fafafa', fontSize: 13, lineHeight: 1.7,
+              background: msg.role === 'user' ? '#ede9fe' : '#f8f7fc',
+              border: msg.role === 'user' ? '1px solid rgba(124,92,252,.15)' : '1px solid rgba(0,0,0,.06)',
+              color: '#1a1a2e', fontSize: 13, lineHeight: 1.7,
               whiteSpace: 'pre-wrap', wordBreak: 'break-word',
             }}>
               {msg.content}
@@ -154,11 +154,11 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
 
         {loading && (
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={{ padding: '12px 16px', borderRadius: 16, background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)' }}>
+            <div style={{ padding: '12px 16px', borderRadius: 16, background: '#f8f7fc', border: '1px solid rgba(0,0,0,.06)' }}>
               <div style={{ display: 'flex', gap: 4 }}>
                 {[0, 1, 2].map(i => (
                   <div key={i} style={{
-                    width: 6, height: 6, borderRadius: '50%', background: '#a1a1aa',
+                    width: 6, height: 6, borderRadius: '50%', background: '#9ca3af',
                     animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
                     opacity: 0.5,
                   }} />
@@ -171,24 +171,24 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
 
       {/* Draft Email Approval Panel */}
       {draft && (
-        <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,.06)', background: 'rgba(255,255,255,.03)' }}>
+        <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc' }}>
           <div style={{ maxWidth: 600, margin: '0 auto' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#fafafa' }}>مسودة بريد — {draft.lead_name}</span>
-              <span style={{ fontSize: 11, color: '#a1a1aa', marginRight: 'auto' }}>{draft.lead_email}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>مسودة بريد — {draft.lead_name}</span>
+              <span style={{ fontSize: 11, color: '#6b7280', marginRight: 'auto' }}>{draft.lead_email}</span>
             </div>
             <input value={editSubject} onChange={e => setEditSubject(e.target.value)}
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 7, border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)', color: '#fafafa', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc', color: '#1a1a2e', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }}
               placeholder="الموضوع" />
             <textarea value={editBody} onChange={e => setEditBody(e.target.value)} rows={6}
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 7, border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)', color: '#fafafa', fontSize: 13, lineHeight: 1.7, resize: 'vertical', boxSizing: 'border-box' }} />
+              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc', color: '#1a1a2e', fontSize: 13, lineHeight: 1.7, resize: 'vertical', boxSizing: 'border-box' }} />
             <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
               <button onClick={sendDraftEmail} disabled={sending}
-                style={{ flex: 2, padding: '10px', borderRadius: 7, border: 'none', background: '#6366f1', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: sending ? 0.5 : 1 }}>
+                style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: sending ? 0.5 : 1 }}>
                 {sending ? 'جاري الإرسال...' : 'إرسال'}
               </button>
               <button onClick={() => setDraft(null)}
-                style={{ flex: 1, padding: '10px', borderRadius: 7, border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)', color: '#a1a1aa', cursor: 'pointer', fontSize: 13 }}>
+                style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', color: '#6b7280', cursor: 'pointer', fontSize: 13 }}>
                 إلغاء
               </button>
             </div>
@@ -197,7 +197,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       )}
 
       {/* Input */}
-      <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,.06)' }}>
+      <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(0,0,0,.08)' }}>
         <div style={{ display: 'flex', gap: 10, maxWidth: 700, margin: '0 auto' }}>
           <input
             value={input}
@@ -206,15 +206,15 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
             placeholder={`اسأل ${agentName}...`}
             disabled={loading}
             style={{
-              flex: 1, padding: '12px 16px', borderRadius: 7,
-              border: '1px solid rgba(255,255,255,.08)', background: 'rgba(255,255,255,.04)',
-              color: '#fafafa', fontSize: 13, outline: 'none',
+              flex: 1, padding: '12px 16px', borderRadius: 10,
+              border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc',
+              color: '#1a1a2e', fontSize: 13, outline: 'none',
             }}
           />
           <button onClick={() => send()} disabled={loading || !input.trim()}
             style={{
-              padding: '12px 24px', borderRadius: 7, border: 'none',
-              background: loading ? '#3f3f46' : '#6366f1',
+              padding: '12px 24px', borderRadius: 10, border: 'none',
+              background: loading ? '#d1d5db' : '#7c5cfc',
               color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600,
               opacity: loading || !input.trim() ? 0.5 : 1,
             }}>

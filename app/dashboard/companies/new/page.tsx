@@ -191,19 +191,19 @@ export default function NewCompanyPage() {
   // ─── Success screen ────────────────────────────────────────────────────────
   if (success) {
     return (
-      <div style={{ background: '#09090b' }}>
+      <div style={{ background: '#fff', minHeight: '100vh' }}>
         <Header />
         <div style={{ padding: 32, maxWidth: 560, margin: '0 auto' }}>
-          <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: 36, border: '1px solid rgba(255,255,255,.06)', textAlign: 'center' }}>
-            <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(99,102,241,.15)', border: '1px solid rgba(99,102,241,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 20, color: '#6366f1' }}>✓</div>
-            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#fafafa', margin: '0 0 6px' }}>تم إنشاء الشركة بنجاح</h2>
-            <p style={{ fontSize: 13, color: '#52525b', margin: '0 0 28px' }}>
+          <div className="card" style={{ background: '#fff', borderRadius: 14, padding: 36, boxShadow: '0 1px 3px rgba(0,0,0,.06)', textAlign: 'center' }}>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(124,92,252,.1)', border: '1px solid rgba(124,92,252,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 20, color: '#7c5cfc' }}>✓</div>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: '#1a1a2e', margin: '0 0 6px' }}>تم إنشاء الشركة بنجاح</h2>
+            <p style={{ fontSize: 13, color: '#9ca3af', margin: '0 0 28px' }}>
               {form.admin_email
                 ? `سيصل بريد الترحيب قريباً إلى ${form.admin_email}`
                 : 'شارك رابط الدخول ورقم الجوال مع مدير الشركة'}
             </p>
-            <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 8, padding: '18px 22px', textAlign: 'right', marginBottom: 24 }}>
-              <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 14px', fontWeight: 500, letterSpacing: '0.05em' }}>بيانات الدخول</p>
+            <div style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '18px 22px', textAlign: 'right', marginBottom: 24 }}>
+              <p style={{ fontSize: 11, color: '#6b7280', margin: '0 0 14px', fontWeight: 500, letterSpacing: '0.05em' }}>بيانات الدخول</p>
               {[
                 ['اسم الشركة',              success.company?.name || form.name],
                 ['رابط تسجيل الدخول',       success.login_url || `https://app.liv-entra.com/${form.slug}`],
@@ -212,22 +212,22 @@ export default function NewCompanyPage() {
                 ...(form.admin_email ? [['البريد الإلكتروني', success.staff?.email || form.admin_email]] : []),
                 ...(form.admin_email ? [['حالة البريد', 'جاري الإرسال في الخلفية']] : []),
               ].map(([k, v]) => (
-                <div key={k as string} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,.03)' }}>
-                  <span style={{ fontSize: 12, color: '#52525b' }}>{k}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#fafafa', direction: 'ltr', fontFamily: 'monospace' }}>{v as string}</span>
+                <div key={k as string} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
+                  <span style={{ fontSize: 12, color: '#9ca3af' }}>{k}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e', direction: 'ltr', fontFamily: 'monospace' }}>{v as string}</span>
                 </div>
               ))}
             </div>
-            <div style={{ background: 'rgba(99,102,241,.1)', border: '1px solid rgba(99,102,241,.2)', borderRadius: 7, padding: '10px 14px', textAlign: 'right', marginBottom: 24, fontSize: 12, color: '#6366f1' }}>
+            <div style={{ background: 'rgba(124,92,252,.06)', border: '1px solid rgba(124,92,252,.15)', borderRadius: 10, padding: '10px 14px', textAlign: 'right', marginBottom: 24, fontSize: 12, color: '#7c5cfc' }}>
               الدخول عبر OTP — يُرسَل رمز التحقق إلى الجوال المسجّل عند كل تسجيل دخول
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => { setSuccess(null); setStep(1); setForm({ name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '', contact_phone: '', contact_email: '', plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30, billing_cycle: 'monthly', admin_name: '', admin_phone: '', admin_email: '' }); setSlugManual(false); }}
-                style={{ flex: 1, padding: '11px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 12, cursor: 'pointer', background: 'rgba(255,255,255,.04)', color: '#a1a1aa', fontWeight: 500 }}>
+                style={{ flex: 1, padding: '11px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, cursor: 'pointer', background: '#f8f7fc', color: '#6b7280', fontWeight: 500 }}>
                 إضافة شركة أخرى
               </button>
               <button onClick={() => router.push('/dashboard/companies')}
-                style={{ flex: 2, padding: '11px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                style={{ flex: 2, padding: '11px', background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                 عرض جميع الشركات
               </button>
             </div>
@@ -240,11 +240,11 @@ export default function NewCompanyPage() {
   const currentPlan = PLANS.find(p => p.key === form.plan)!;
 
   return (
-    <div style={{ background: '#09090b' }}>
+    <div style={{ background: '#fff', minHeight: '100vh' }}>
       <Header />
 
       {/* Progress bar — dots style */}
-      <div style={{ background: 'rgba(255,255,255,.03)', borderBottom: '1px solid rgba(255,255,255,.06)', padding: '0 24px' }}>
+      <div style={{ background: '#f8f7fc', borderBottom: '1px solid rgba(0,0,0,.06)', padding: '0 24px' }}>
         <div style={{ maxWidth: 700, margin: '0 auto', display: 'flex', alignItems: 'stretch', gap: 0 }}>
           {STEPS.map((s, i) => {
             const done = step > s.num;
@@ -254,24 +254,24 @@ export default function NewCompanyPage() {
                 onClick={() => done ? setStep(s.num) : undefined}>
                 {/* Connector line */}
                 {i < STEPS.length - 1 && (
-                  <div style={{ position: 'absolute', top: 24, left: 0, width: '50%', height: 1, background: done || step > s.num ? '#6366f1' : 'rgba(255,255,255,.06)', zIndex: 0 }} />
+                  <div style={{ position: 'absolute', top: 24, left: 0, width: '50%', height: 1, background: done || step > s.num ? '#7c5cfc' : 'rgba(0,0,0,.08)', zIndex: 0 }} />
                 )}
                 {i > 0 && (
-                  <div style={{ position: 'absolute', top: 24, right: 0, width: '50%', height: 1, background: done ? '#6366f1' : 'rgba(255,255,255,.06)', zIndex: 0 }} />
+                  <div style={{ position: 'absolute', top: 24, right: 0, width: '50%', height: 1, background: done ? '#7c5cfc' : 'rgba(0,0,0,.08)', zIndex: 0 }} />
                 )}
                 {/* Dot */}
                 <div style={{
                   width: 20, height: 20, borderRadius: '50%',
-                  background: active ? '#6366f1' : done ? '#6366f1' : 'transparent',
-                  color: active || done ? '#fff' : '#52525b',
-                  border: active || done ? '2px solid #6366f1' : '2px solid rgba(255,255,255,.08)',
+                  background: active ? '#7c5cfc' : done ? '#7c5cfc' : 'transparent',
+                  color: active || done ? '#fff' : '#9ca3af',
+                  border: active || done ? '2px solid #7c5cfc' : '2px solid rgba(0,0,0,.12)',
                   fontSize: 10, fontWeight: 600,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   zIndex: 1, position: 'relative', transition: 'all 0.2s',
                 }}>
                   {done ? '✓' : s.num}
                 </div>
-                <span style={{ fontSize: 10, color: active ? '#fafafa' : done ? '#fafafa' : '#52525b', marginTop: 4, fontWeight: active ? 600 : 400, whiteSpace: 'nowrap' }}>{s.label}</span>
+                <span style={{ fontSize: 10, color: active ? '#1a1a2e' : done ? '#1a1a2e' : '#9ca3af', marginTop: 4, fontWeight: active ? 600 : 400, whiteSpace: 'nowrap' }}>{s.label}</span>
               </div>
             );
           })}
@@ -280,14 +280,14 @@ export default function NewCompanyPage() {
 
       <div style={{ padding: '28px 20px', maxWidth: 700, margin: '0 auto' }}>
         {err && (
-          <div style={{ background: 'rgba(239,68,68,.15)', border: '1px solid rgba(239,68,68,.3)', borderRadius: 7, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#dc2626' }}>
+          <div style={{ background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.2)', borderRadius: 10, padding: '12px 16px', marginBottom: 20, fontSize: 13, color: '#dc2626' }}>
             {err}
           </div>
         )}
 
         {/* ── STEP 1: Company Info ─────────────────────────────────────────── */}
         {step === 1 && (
-          <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: 28, border: '1px solid rgba(255,255,255,.06)' }}>
+          <div className="card" style={{ background: '#fff', borderRadius: 14, padding: 28, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <StepHeader title="بيانات الشركة" sub="المعلومات الأساسية لتسجيل الشركة في النظام" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div style={{ gridColumn: 'span 2' }}>
@@ -313,13 +313,13 @@ export default function NewCompanyPage() {
                       style={{ ...inp(), flex: 1, fontFamily: 'monospace', fontSize: 13 }} />
                     {slugManual && (
                       <button type="button" onClick={() => { setSlugManual(false); setForm(p => ({ ...p, slug: toSlug(form.name) })); }}
-                        style={{ padding: '7px 12px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 11, cursor: 'pointer', background: 'rgba(255,255,255,.04)', color: '#a1a1aa', whiteSpace: 'nowrap' }}>
+                        style={{ padding: '7px 12px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 11, cursor: 'pointer', background: '#f8f7fc', color: '#6b7280', whiteSpace: 'nowrap' }}>
                         إعادة توليد
                       </button>
                     )}
                   </div>
                   {form.slug && (
-                    <div style={{ marginTop: 6, padding: '6px 10px', background: slugAvailable === false ? 'rgba(239,68,68,.15)' : 'rgba(255,255,255,.04)', borderRadius: 7, fontSize: 11, color: slugAvailable === false ? '#dc2626' : '#fafafa', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid rgba(255,255,255,.06)' }}>
+                    <div style={{ marginTop: 6, padding: '6px 10px', background: slugAvailable === false ? 'rgba(239,68,68,.08)' : '#f8f7fc', borderRadius: 10, fontSize: 11, color: slugAvailable === false ? '#dc2626' : '#1a1a2e', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid rgba(0,0,0,.06)' }}>
                       <span>معرّف الشركة: <strong dir="ltr">{form.slug}</strong></span>
                       <span>{slugChecking ? '...' : slugAvailable === true ? 'متاح' : slugAvailable === false ? 'مستخدم' : ''}</span>
                     </div>
@@ -345,7 +345,7 @@ export default function NewCompanyPage() {
 
         {/* ── STEP 2: Plan & Limits ────────────────────────────────────────── */}
         {step === 2 && (
-          <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: 28, border: '1px solid rgba(255,255,255,.06)' }}>
+          <div className="card" style={{ background: '#fff', borderRadius: 14, padding: 28, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <StepHeader title="الخطة والحدود" sub="اختر الخطة المناسبة وحدد حدود الاستخدام" />
 
             {/* Plan cards */}
@@ -354,27 +354,27 @@ export default function NewCompanyPage() {
                 const active = form.plan === p.key;
                 return (
                   <div key={p.key} onClick={() => handlePlanChange(p.key)}
-                    style={{ border: `1.5px solid ${active ? '#6366f1' : 'rgba(255,255,255,.06)'}`, borderRadius: 8, padding: '16px 18px', cursor: 'pointer', background: active ? 'rgba(99,102,241,.1)' : 'rgba(255,255,255,.03)', transition: 'all 0.15s' }}>
+                    style={{ border: `1.5px solid ${active ? '#7c5cfc' : 'rgba(0,0,0,.08)'}`, borderRadius: 14, padding: '16px 18px', cursor: 'pointer', background: active ? 'rgba(124,92,252,.05)' : '#fff', transition: 'all 0.15s' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: active ? '#fafafa' : '#a1a1aa' }}>{p.label}</span>
-                      <span style={{ fontSize: 10, color: '#52525b', background: 'rgba(255,255,255,.04)', padding: '2px 8px', borderRadius: 7, border: '1px solid rgba(255,255,255,.06)' }}>{p.desc}</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: active ? '#1a1a2e' : '#6b7280' }}>{p.label}</span>
+                      <span style={{ fontSize: 10, color: '#9ca3af', background: '#f8f7fc', padding: '2px 8px', borderRadius: 7, border: '1px solid rgba(0,0,0,.06)' }}>{p.desc}</span>
                     </div>
                     <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
                       {p.features.map(f => (
-                        <li key={f} style={{ fontSize: 11, color: '#52525b', padding: '2px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span style={{ width: 4, height: 4, borderRadius: '50%', background: active ? '#6366f1' : '#52525b', display: 'inline-block' }} /> {f}
+                        <li key={f} style={{ fontSize: 11, color: '#9ca3af', padding: '2px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ width: 4, height: 4, borderRadius: '50%', background: active ? '#7c5cfc' : '#9ca3af', display: 'inline-block' }} /> {f}
                         </li>
                       ))}
                     </ul>
-                    {active && <div style={{ marginTop: 10, fontSize: 11, fontWeight: 600, color: '#6366f1' }}>✓ محدد</div>}
+                    {active && <div style={{ marginTop: 10, fontSize: 11, fontWeight: 600, color: '#7c5cfc' }}>✓ محدد</div>}
                   </div>
                 );
               })}
             </div>
 
             {/* Limits */}
-            <div style={{ border: '1px solid rgba(255,255,255,.06)', borderRadius: 8, padding: '18px 20px', marginBottom: 4 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#fafafa', margin: '0 0 14px' }}>حدود الاستخدام</p>
+            <div style={{ border: '1px solid rgba(0,0,0,.06)', borderRadius: 14, padding: '18px 20px', marginBottom: 4 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: '0 0 14px' }}>حدود الاستخدام</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                 <Field label="الحد الأقصى للوحدات" hint="عدد الشقق / الوحدات المسموح بها">
                   <input type="number" min={1} max={9999} value={form.max_units} onChange={set('max_units')} style={inp()} />
@@ -396,13 +396,13 @@ export default function NewCompanyPage() {
 
         {/* ── STEP 3: Admin User ───────────────────────────────────────────── */}
         {step === 3 && (
-          <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: 28, border: '1px solid rgba(255,255,255,.06)' }}>
+          <div className="card" style={{ background: '#fff', borderRadius: 14, padding: 28, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <StepHeader title="إعداد مدير النظام" sub="بيانات الشخص المسؤول عن إدارة الشركة في النظام" />
 
             {/* Phone-login callout */}
-            <div style={{ background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 7, padding: '12px 16px', marginBottom: 22 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: '#fafafa', margin: '0 0 2px' }}>رقم الجوال هو اسم المستخدم</p>
-              <p style={{ fontSize: 11, color: '#52525b', margin: 0 }}>
+            <div style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '12px 16px', marginBottom: 22 }}>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e', margin: '0 0 2px' }}>رقم الجوال هو اسم المستخدم</p>
+              <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>
                 يستخدم النظام رقم الجوال فقط لتسجيل الدخول في <strong>app.liv-entra.com</strong> — يُرسل رمز OTP عبر الجوال
               </p>
             </div>
@@ -416,7 +416,7 @@ export default function NewCompanyPage() {
               <div style={{ gridColumn: 'span 2' }}>
                 <Field label="رقم الجوال * (اسم المستخدم)" hint="يبدأ بـ 05 أو +966 أو 966">
                   <input value={form.admin_phone} onChange={set('admin_phone')} placeholder="0512345678" dir="ltr"
-                    style={{ ...inp(), border: '1.5px solid #6366f1' }} />
+                    style={{ ...inp(), border: '1.5px solid #7c5cfc' }} />
                 </Field>
               </div>
               <div style={{ gridColumn: 'span 2' }}>
@@ -432,7 +432,7 @@ export default function NewCompanyPage() {
 
         {/* ── STEP 4: Review ───────────────────────────────────────────────── */}
         {step === 4 && (
-          <div style={{ background: 'rgba(255,255,255,.03)', borderRadius: 8, padding: 28, border: '1px solid rgba(255,255,255,.06)' }}>
+          <div className="card" style={{ background: '#fff', borderRadius: 14, padding: 28, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <StepHeader title="مراجعة وإنشاء" sub="تأكد من البيانات قبل إنشاء الشركة" />
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}>
@@ -461,17 +461,17 @@ export default function NewCompanyPage() {
             </div>
 
             {err && (
-              <div style={{ background: 'rgba(239,68,68,.15)', border: '1px solid rgba(239,68,68,.3)', borderRadius: 7, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#dc2626' }}>
+              <div style={{ background: 'rgba(239,68,68,.08)', border: '1px solid rgba(239,68,68,.2)', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#dc2626' }}>
                 {err}
               </div>
             )}
 
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={back} style={{ flex: 1, padding: '12px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 13, cursor: 'pointer', background: 'rgba(255,255,255,.04)', color: '#a1a1aa', fontWeight: 500 }}>
+              <button onClick={back} style={{ flex: 1, padding: '12px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, cursor: 'pointer', background: '#f8f7fc', color: '#6b7280', fontWeight: 500 }}>
                 ← رجوع
               </button>
               <button onClick={handleSubmit} disabled={saving}
-                style={{ flex: 3, padding: '12px', background: saving ? '#52525b' : '#6366f1', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                style={{ flex: 3, padding: '12px', background: saving ? '#9ca3af' : '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 {saving ? <><Spinner /> جاري الإنشاء...</> : 'إنشاء الشركة وإرسال بريد الترحيب'}
               </button>
             </div>
@@ -486,9 +486,9 @@ export default function NewCompanyPage() {
 
 function Header() {
   return (
-    <div style={{ background: 'rgba(255,255,255,.03)', padding: '12px 24px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(255,255,255,.06)', backdropFilter: 'blur(12px)' }}>
-      <Link href="/dashboard/companies" style={{ color: '#a1a1aa', textDecoration: 'none', fontSize: 13 }}>← الشركات</Link>
-      <span style={{ fontSize: 14, fontWeight: 600, color: '#fafafa' }}>إضافة شركة جديدة</span>
+    <div style={{ background: '#fff', padding: '12px 24px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(0,0,0,.06)' }}>
+      <Link href="/dashboard/companies" style={{ color: '#6b7280', textDecoration: 'none', fontSize: 13 }}>← الشركات</Link>
+      <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>إضافة شركة جديدة</span>
     </div>
   );
 }
@@ -496,9 +496,9 @@ function Header() {
 function StepHeader({ title, sub }: { title: string; sub: string }) {
   return (
     <div style={{ marginBottom: 24 }}>
-      <h2 style={{ fontSize: 13, fontWeight: 600, color: '#fafafa', margin: '0 0 4px' }}>{title}</h2>
-      <p style={{ fontSize: 12, color: '#52525b', margin: 0 }}>{sub}</p>
-      <div style={{ height: 1, background: 'rgba(255,255,255,.06)', margin: '16px 0 0' }} />
+      <h2 style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: '0 0 4px' }}>{title}</h2>
+      <p style={{ fontSize: 12, color: '#9ca3af', margin: 0 }}>{sub}</p>
+      <div style={{ height: 1, background: 'rgba(0,0,0,.06)', margin: '16px 0 0' }} />
     </div>
   );
 }
@@ -506,28 +506,28 @@ function StepHeader({ title, sub }: { title: string; sub: string }) {
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label style={{ fontSize: 11, color: '#a1a1aa', display: 'block', marginBottom: 5, fontWeight: 500 }}>{label}</label>
-      {hint && <p style={{ fontSize: 10, color: '#52525b', margin: '-3px 0 5px' }}>{hint}</p>}
+      <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 5, fontWeight: 500 }}>{label}</label>
+      {hint && <p style={{ fontSize: 10, color: '#9ca3af', margin: '-3px 0 5px' }}>{hint}</p>}
       {children}
     </div>
   );
 }
 
 function inp(extra?: React.CSSProperties): React.CSSProperties {
-  return { width: '100%', padding: '9px 11px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: 'rgba(255,255,255,.04)', color: '#fafafa', ...extra };
+  return { width: '100%', padding: '9px 11px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#f8f7fc', color: '#1a1a2e', ...extra };
 }
 
 function NavButtons({ onBack, onNext }: { onBack?: () => void; onNext?: () => void }) {
   return (
     <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
       {onBack && (
-        <button type="button" onClick={onBack} style={{ flex: 1, padding: '11px', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, fontSize: 13, cursor: 'pointer', background: 'rgba(255,255,255,.04)', color: '#a1a1aa', fontWeight: 500 }}>
+        <button type="button" onClick={onBack} style={{ flex: 1, padding: '11px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, cursor: 'pointer', background: '#f8f7fc', color: '#6b7280', fontWeight: 500 }}>
           ← رجوع
         </button>
       )}
       {!onBack && <div style={{ flex: 1 }} />}
       {onNext && (
-        <button type="button" onClick={onNext} style={{ flex: 2, padding: '11px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+        <button type="button" onClick={onNext} style={{ flex: 2, padding: '11px', background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
           التالي ←
         </button>
       )}
@@ -537,15 +537,15 @@ function NavButtons({ onBack, onNext }: { onBack?: () => void; onNext?: () => vo
 
 function ReviewCard({ title, rows, onEdit, style }: { title: string; rows: [string, string][]; onEdit: () => void; style?: React.CSSProperties }) {
   return (
-    <div style={{ border: '1px solid rgba(255,255,255,.06)', borderRadius: 8, padding: '16px 18px', position: 'relative', ...style }}>
+    <div style={{ border: '1px solid rgba(0,0,0,.06)', borderRadius: 14, padding: '16px 18px', position: 'relative', ...style }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#fafafa' }}>{title}</span>
-        <button onClick={onEdit} style={{ fontSize: 10, color: '#a1a1aa', background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 7, padding: '3px 10px', cursor: 'pointer' }}>تعديل</button>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{title}</span>
+        <button onClick={onEdit} style={{ fontSize: 10, color: '#6b7280', background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', borderRadius: 7, padding: '3px 10px', cursor: 'pointer' }}>تعديل</button>
       </div>
       {rows.map(([k, v]) => (
-        <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,.03)' }}>
-          <span style={{ fontSize: 11, color: '#52525b' }}>{k}</span>
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#fafafa', direction: 'ltr', maxWidth: '60%', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v}</span>
+        <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
+          <span style={{ fontSize: 11, color: '#9ca3af' }}>{k}</span>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e', direction: 'ltr', maxWidth: '60%', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v}</span>
         </div>
       ))}
     </div>
