@@ -13,6 +13,30 @@ function StatCard({ label, value, sub, color = '#1a1a2e' }: { label: string; val
   );
 }
 
+const MONTH_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+function buildRevenueChart(invoices: any[]) {
+  const now = new Date();
+  const months: { key: string; label: string; paid: number; pending: number }[] = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    months.push({ key, label: MONTH_AR[d.getMonth()], paid: 0, pending: 0 });
+  }
+  for (const inv of invoices) {
+    const dt = inv.paid_at || inv.issued_at || inv.created_at;
+    if (!dt) continue;
+    const d = new Date(dt);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const m = months.find(x => x.key === key);
+    if (!m) continue;
+    const amt = Number(inv.total_sar || inv.total_amount_sar || 0);
+    if (inv.status === 'paid') m.paid += amt;
+    else if (['issued', 'sent', 'overdue', 'pending'].includes(inv.status)) m.pending += amt;
+  }
+  return months;
+}
+
 export default function BillingOverview() {
   const { companies, stats, invoices, loading } = useBilling();
 
@@ -29,16 +53,57 @@ export default function BillingOverview() {
   const planDist: Record<string, number> = {};
   for (const c of safeCompanies) planDist[c.plan] = (planDist[c.plan] || 0) + 1;
 
+  // Revenue chart data
+  const chartData = buildRevenueChart(safeInvoices);
+  const maxRev = Math.max(...chartData.map(m => m.paid + m.pending), 1);
+
+  // Churn: suspended / (active + suspended) last 30 days
+  const activeCount = safeCompanies.filter(c => c.is_active && c.plan !== 'trial').length;
+  const suspCount   = suspendedCompanies.length;
+  const churnRate   = activeCount + suspCount > 0 ? Math.round((suspCount / (activeCount + suspCount)) * 100) : 0;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>نظرة عامة</h2>
 
       {/* Stats row */}
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-        <StatCard label="إجمالي محصّل"  value={`${fmt(stats?.total_paid_sar || 0)} ر.س`} color="#16a34a" />
-        <StatCard label="فواتير معلقة"  value={`${fmt(stats?.total_pending_sar || 0)} ر.س`} sub={`${safeInvoices.filter(i => ['draft','sent','issued'].includes(i.status)).length} فاتورة`} color="#c2410c" />
-        <StatCard label="شركات نشطة"    value={safeCompanies.filter(c => c.is_active && c.plan !== 'trial').length} />
-        <StatCard label="في التجربة"     value={trialCompanies.length} sub={trialsExpiringSoon.length > 0 ? `${trialsExpiringSoon.length} تنتهي هذا الأسبوع` : undefined} color={trialsExpiringSoon.length > 0 ? '#c2410c' : undefined} />
+        <StatCard label="MRR" value={`${fmt(stats?.mrr || 0)} ر.س`} sub="الإيرادات الشهرية المتكررة" color="#16a34a" />
+        <StatCard label="إجمالي محصّل" value={`${fmt(stats?.total_paid_sar || 0)} ر.س`} color="#16a34a" />
+        <StatCard label="فواتير معلقة" value={`${fmt(stats?.total_pending_sar || 0)} ر.س`} sub={`${safeInvoices.filter(i => ['draft','sent','issued'].includes(i.status)).length} فاتورة`} color="#c2410c" />
+        <StatCard label="معدل الانسحاب" value={`${churnRate}%`} sub={`${suspCount} موقوفة من ${activeCount + suspCount}`} color={churnRate > 5 ? '#dc2626' : '#1a1a2e'} />
+      </div>
+
+      {/* Revenue chart */}
+      <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '22px 26px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>الإيرادات (آخر 12 شهر)</h3>
+          <div style={{ display: 'flex', gap: 14, fontSize: 11 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#6b7280' }}>
+              <span style={{ width: 10, height: 10, borderRadius: 2, background: '#16a34a', display: 'inline-block' }} /> محصّل
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#6b7280' }}>
+              <span style={{ width: 10, height: 10, borderRadius: 2, background: '#c2410c', opacity: .4, display: 'inline-block' }} /> معلق
+            </span>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 160 }}>
+          {chartData.map(m => {
+            const paidH = Math.round((m.paid / maxRev) * 140);
+            const pendH = Math.round((m.pending / maxRev) * 140);
+            return (
+              <div key={m.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: 140, width: '100%', gap: 1 }}>
+                  {m.pending > 0 && (
+                    <div style={{ height: pendH, background: '#c2410c', opacity: .35, borderRadius: '4px 4px 0 0', minHeight: pendH > 0 ? 3 : 0 }} title={`معلق: ${fmt(Math.round(m.pending))} ر.س`} />
+                  )}
+                  <div style={{ height: paidH, background: '#16a34a', borderRadius: m.pending > 0 ? '0 0 4px 4px' : '4px', minHeight: paidH > 0 ? 3 : 0 }} title={`محصّل: ${fmt(Math.round(m.paid))} ر.س`} />
+                </div>
+                <span style={{ fontSize: 9, color: '#9ca3af', marginTop: 6, fontWeight: 500 }}>{m.label.slice(0, 3)}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24 }}>
@@ -100,7 +165,7 @@ export default function BillingOverview() {
                 <div key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
                   <div>
                     <p style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>{inv.companies?.name || inv.company?.name}</p>
-                    <p style={{ fontSize: 10, color: '#6b7280', margin: 0 }}>{inv.invoice_number}</p>
+                    <p style={{ fontSize: 10, color: '#6b7280', margin: 0 }}>{inv.invoice_number} &middot; {fmt(inv.total_sar)} ر.س</p>
                   </div>
                   <Link href="/dashboard/billing/invoices" style={{ fontSize: 10, padding: '4px 8px', borderRadius: 7, background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', color: '#6b7280', textDecoration: 'none' }}>
                     عرض
