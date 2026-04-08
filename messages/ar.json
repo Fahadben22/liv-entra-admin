@@ -1,0 +1,90 @@
+{
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "search": "بحث",
+    "noData": "لا توجد بيانات",
+    "all": "الكل",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "export": "تصدير",
+    "filter": "تصفية",
+    "actions": "إجراءات"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "companies": "الشركات",
+    "features": "الميزات",
+    "billing": "الفواتير",
+    "commandCenter": "مركز القيادة",
+    "agents": "الوكلاء",
+    "leads": "طلبات العرض",
+    "demoLeads": "قيادات الديمو",
+    "templates": "القوالب",
+    "website": "الموقع",
+    "audit": "التدقيق"
+  },
+  "plans": {
+    "trial": "تجريبي",
+    "basic": "أساسي",
+    "professional": "احترافي",
+    "enterprise": "مؤسسي"
+  },
+  "lifecycle": {
+    "trial": "تجريبي",
+    "active": "نشط",
+    "overdue": "متأخر",
+    "suspended": "موقوف",
+    "deleted": "محذوف"
+  },
+  "billing": {
+    "invoices": "الفواتير",
+    "quotations": "عروض الأسعار",
+    "creditNotes": "إشعارات دائنة",
+    "coupons": "الكوبونات",
+    "gateways": "بوابات الدفع",
+    "settings": "إعدادات الفوترة",
+    "plans": "الخطط",
+    "subscriptions": "الاشتراكات",
+    "totalRevenue": "إجمالي الإيرادات",
+    "mrr": "الإيرادات الشهرية",
+    "arr": "الإيرادات السنوية",
+    "churnRate": "معدل الإلغاء",
+    "draft": "مسودة",
+    "issued": "مُصدرة",
+    "sent": "مُرسلة",
+    "paid": "مدفوعة",
+    "overdue": "متأخرة",
+    "waived": "معفاة",
+    "void": "ملغاة"
+  },
+  "companies": {
+    "totalCompanies": "إجمالي الشركات",
+    "activeCompanies": "شركات نشطة",
+    "inTrial": "في التجربة",
+    "suspended": "موقوفة",
+    "addCompany": "إضافة شركة",
+    "companyName": "اسم الشركة",
+    "country": "الدولة",
+    "city": "المدينة",
+    "plan": "الخطة",
+    "status": "الحالة"
+  },
+  "countries": {
+    "SA": "السعودية",
+    "AE": "الإمارات",
+    "KW": "الكويت",
+    "BH": "البحرين",
+    "QA": "قطر",
+    "OM": "عُمان",
+    "EG": "مصر",
+    "JO": "الأردن"
+  }
+}

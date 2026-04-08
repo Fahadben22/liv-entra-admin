@@ -1,0 +1,90 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "noData": "No data available",
+    "all": "All",
+    "close": "Close",
+    "back": "Back",
+    "create": "Create",
+    "update": "Update",
+    "export": "Export",
+    "filter": "Filter",
+    "actions": "Actions"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "companies": "Companies",
+    "features": "Features",
+    "billing": "Billing",
+    "commandCenter": "Command Center",
+    "agents": "Agents",
+    "leads": "Demo Requests",
+    "demoLeads": "Demo Leads",
+    "templates": "Templates",
+    "website": "Website",
+    "audit": "Audit"
+  },
+  "plans": {
+    "trial": "Trial",
+    "basic": "Basic",
+    "professional": "Professional",
+    "enterprise": "Enterprise"
+  },
+  "lifecycle": {
+    "trial": "Trial",
+    "active": "Active",
+    "overdue": "Overdue",
+    "suspended": "Suspended",
+    "deleted": "Deleted"
+  },
+  "billing": {
+    "invoices": "Invoices",
+    "quotations": "Quotations",
+    "creditNotes": "Credit Notes",
+    "coupons": "Coupons",
+    "gateways": "Payment Gateways",
+    "settings": "Billing Settings",
+    "plans": "Plans",
+    "subscriptions": "Subscriptions",
+    "totalRevenue": "Total Revenue",
+    "mrr": "Monthly Recurring Revenue",
+    "arr": "Annual Recurring Revenue",
+    "churnRate": "Churn Rate",
+    "draft": "Draft",
+    "issued": "Issued",
+    "sent": "Sent",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "waived": "Waived",
+    "void": "Voided"
+  },
+  "companies": {
+    "totalCompanies": "Total Companies",
+    "activeCompanies": "Active Companies",
+    "inTrial": "In Trial",
+    "suspended": "Suspended",
+    "addCompany": "Add Company",
+    "companyName": "Company Name",
+    "country": "Country",
+    "city": "City",
+    "plan": "Plan",
+    "status": "Status"
+  },
+  "countries": {
+    "SA": "Saudi Arabia",
+    "AE": "UAE",
+    "KW": "Kuwait",
+    "BH": "Bahrain",
+    "QA": "Qatar",
+    "OM": "Oman",
+    "EG": "Egypt",
+    "JO": "Jordan"
+  }
+}
