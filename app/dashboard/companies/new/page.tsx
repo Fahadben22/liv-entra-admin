@@ -7,11 +7,45 @@ import { CITIES } from '@/lib/constants';
 import { useDebounce } from '@/lib/hooks';
 import { useToast } from '@/components/Toast';
 
+// ─── Country config type ─────────────────────────────────────────────────────
+interface CountryConfig {
+  country_code: string;
+  country_name_ar: string;
+  country_name_en: string;
+  currency_code: string;
+  currency_symbol: string;
+  default_tax_rate: number;
+  tax_label: string;
+  phone_code: string;
+  phone_local_length: number;
+  phone_placeholder: string;
+  default_trial_days: number;
+  default_gateway: string;
+}
+
+// ─── Cities per country ──────────────────────────────────────────────────────
+const COUNTRY_CITIES: Record<string, string[]> = {
+  SA: ['الرياض', 'جدة', 'مكة المكرمة', 'المدينة المنورة', 'الدمام', 'الخبر', 'الأحساء', 'تبوك', 'أبها', 'القصيم', 'حائل', 'جازان', 'نجران', 'الطائف', 'بريدة', 'ينبع'],
+  AE: ['دبي', 'أبوظبي', 'الشارقة', 'عجمان', 'رأس الخيمة', 'الفجيرة', 'أم القيوين', 'العين'],
+  KW: ['مدينة الكويت', 'حولي', 'السالمية', 'الأحمدي', 'الجهراء', 'الفروانية'],
+  BH: ['المنامة', 'المحرق', 'الرفاع', 'مدينة عيسى', 'مدينة حمد', 'سترة'],
+  QA: ['الدوحة', 'الوكرة', 'الخور', 'الريان', 'أم صلال'],
+  OM: ['مسقط', 'صلالة', 'نزوى', 'صحار', 'صور', 'البريمي'],
+  EG: ['القاهرة', 'الإسكندرية', 'الجيزة', 'المنصورة', 'طنطا', 'أسوان', 'الأقصر', 'شرم الشيخ', 'الغردقة'],
+  JO: ['عمّان', 'إربد', 'الزرقاء', 'العقبة', 'مادبا', 'جرش', 'السلط'],
+};
+
+// Country flag emojis
+const FLAGS: Record<string, string> = {
+  SA: '🇸🇦', AE: '🇦🇪', KW: '🇰🇼', BH: '🇧🇭', QA: '🇶🇦', OM: '🇴🇲', EG: '🇪🇬', JO: '🇯🇴',
+};
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Plan = 'trial' | 'basic' | 'professional' | 'enterprise';
 
 interface FormData {
   // Step 1 — Company Info
+  country_code: string;
   name: string;
   name_ar: string;
   slug: string;
@@ -95,13 +129,35 @@ export default function NewCompanyPage() {
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [slugChecking, setSlugChecking] = useState(false);
 
+  const [countries, setCountries] = useState<CountryConfig[]>([]);
+
   const [form, setForm] = useState<FormData>({
+    country_code: 'SA',
     name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '',
     contact_phone: '', contact_email: '',
     plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30,
     billing_cycle: 'monthly',
     admin_name: '', admin_phone: '', admin_email: '',
   });
+
+  // Fetch available countries on mount
+  useEffect(() => {
+    adminApi.sa.getCountryConfigs?.()
+      .then((res: any) => { if (res?.data) setCountries(res.data); })
+      .catch(() => {});
+  }, []);
+
+  // When country changes, update city dropdown default + trial days
+  function handleCountryChange(code: string) {
+    const cc = countries.find(c => c.country_code === code);
+    const cities = COUNTRY_CITIES[code] || CITIES;
+    setForm(p => ({
+      ...p,
+      country_code: code,
+      city: cities[0] || '',
+      trial_days: cc?.default_trial_days || 30,
+    }));
+  }
 
   // Debounced slug check
   const debouncedSlug = useDebounce(form.slug, 500);
@@ -182,6 +238,7 @@ export default function NewCompanyPage() {
         admin_email: form.admin_email,
         trial_days: form.plan === 'trial' ? form.trial_days : undefined,
         billing_cycle: form.billing_cycle,
+        country_code: form.country_code,
       };
       const res: any = await adminApi.createCompany(payload);
       setSuccess(res?.data);
@@ -222,7 +279,7 @@ export default function NewCompanyPage() {
               الدخول عبر OTP — يُرسَل رمز التحقق إلى الجوال المسجّل عند كل تسجيل دخول
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => { setSuccess(null); setStep(1); setForm({ name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '', contact_phone: '', contact_email: '', plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30, billing_cycle: 'monthly', admin_name: '', admin_phone: '', admin_email: '' }); setSlugManual(false); }}
+              <button onClick={() => { setSuccess(null); setStep(1); setForm({ country_code: 'SA', name: '', name_ar: '', slug: '', city: 'الرياض', cr_number: '', contact_phone: '', contact_email: '', plan: 'trial', max_units: 50, max_staff: 5, trial_days: 30, billing_cycle: 'monthly', admin_name: '', admin_phone: '', admin_email: '' }); setSlugManual(false); }}
                 style={{ flex: 1, padding: '11px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, cursor: 'pointer', background: '#f8f7fc', color: '#6b7280', fontWeight: 500 }}>
                 إضافة شركة أخرى
               </button>
@@ -290,6 +347,35 @@ export default function NewCompanyPage() {
           <div className="card" style={{ background: '#fff', borderRadius: 14, padding: 28, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             <StepHeader title="بيانات الشركة" sub="المعلومات الأساسية لتسجيل الشركة في النظام" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+
+              {/* Country selector — drives all locale defaults */}
+              <div style={{ gridColumn: 'span 2' }}>
+                <Field label="الدولة" hint="تحدد العملة والضريبة والمنطقة الزمنية تلقائياً">
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 8 }}>
+                    {(countries.length > 0 ? countries : [{ country_code: 'SA', country_name_ar: 'السعودية' }]).map((c: any) => {
+                      const active = form.country_code === c.country_code;
+                      return (
+                        <div key={c.country_code} onClick={() => handleCountryChange(c.country_code)}
+                          style={{ border: `1.5px solid ${active ? '#7c5cfc' : 'rgba(0,0,0,.08)'}`, borderRadius: 10, padding: '10px 14px', cursor: 'pointer', background: active ? 'rgba(124,92,252,.05)' : '#fff', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: 18 }}>{FLAGS[c.country_code] || '🏳️'}</span>
+                          <span style={{ fontSize: 12, fontWeight: active ? 600 : 400, color: active ? '#1a1a2e' : '#6b7280' }}>{c.country_name_ar}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {(() => {
+                    const cc = countries.find(c => c.country_code === form.country_code);
+                    return cc ? (
+                      <div style={{ marginTop: 8, padding: '6px 12px', background: '#f8f7fc', borderRadius: 8, fontSize: 11, color: '#6b7280', display: 'flex', gap: 16, border: '1px solid rgba(0,0,0,.06)' }}>
+                        <span>العملة: <strong>{cc.currency_code}</strong></span>
+                        <span>الضريبة: <strong>{Math.round(cc.default_tax_rate * 100)}%</strong></span>
+                        <span>الهاتف: <strong dir="ltr">{cc.phone_code}</strong></span>
+                      </div>
+                    ) : null;
+                  })()}
+                </Field>
+              </div>
+
               <div style={{ gridColumn: 'span 2' }}>
                 <Field label="اسم الشركة *" hint="سيظهر في واجهة المستخدمين">
                   <input value={form.name} onChange={set('name')} placeholder="مثال: شركة الأفق للعقارات" style={inp()} />
@@ -300,7 +386,7 @@ export default function NewCompanyPage() {
               </Field>
               <Field label="المدينة">
                 <select value={form.city} onChange={set('city')} style={inp()}>
-                  {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  {(COUNTRY_CITIES[form.country_code] || CITIES).map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </Field>
 

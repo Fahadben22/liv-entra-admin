@@ -101,6 +101,9 @@ export const adminApi = {
     // Platform stats
     platformStats:   ()             => request<any>('GET',  '/superadmin/stats'),
 
+    // Country configs (for company creation form)
+    getCountryConfigs: () => request<any>('GET', '/admin/country-configs'),
+
     // Tenant / Company control
     checkSlug:       (slug: string)  => request<any>('GET', `/superadmin/companies/check-slug?slug=${encodeURIComponent(slug)}`),
     listCompanies:   (params?: Record<string, string>) => {
