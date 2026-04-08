@@ -167,6 +167,33 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Country breakdown — shows only when multi-country companies exist */}
+      {(() => {
+        const FLAGS: Record<string,string> = { SA:'🇸🇦', AE:'🇦🇪', KW:'🇰🇼', BH:'🇧🇭', QA:'🇶🇦', OM:'🇴🇲', EG:'🇪🇬', JO:'🇯🇴' };
+        const COUNTRY_AR: Record<string,string> = { SA:'السعودية', AE:'الإمارات', KW:'الكويت', BH:'البحرين', QA:'قطر', OM:'عُمان', EG:'مصر', JO:'الأردن' };
+        const byCountry = companies.reduce((acc: Record<string,number>, c: any) => {
+          const cc = c.country_code || 'SA';
+          acc[cc] = (acc[cc] || 0) + 1;
+          return acc;
+        }, {});
+        const countryKeys = Object.keys(byCountry).sort((a, b) => byCountry[b] - byCountry[a]);
+        if (countryKeys.length <= 1) return null; // Don't show if only one country
+        return (
+          <div className="card" style={{ padding: '16px 22px', marginBottom: 16 }}>
+            <h2 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 12px', color: '#1a1a2e' }}>التوزيع حسب الدولة</h2>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {countryKeys.map(cc => (
+                <div key={cc} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', background: '#f8f7fc', borderRadius: 10, border: '1px solid rgba(0,0,0,.06)' }}>
+                  <span style={{ fontSize: 16 }}>{FLAGS[cc] || '🏳️'}</span>
+                  <span style={{ fontSize: 12, color: '#6b7280' }}>{COUNTRY_AR[cc] || cc}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1a1a2e' }}>{byCountry[cc]}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 16 }}>
         {/* Recent companies */}
         <div className="card" style={{ overflow: 'hidden' }}>

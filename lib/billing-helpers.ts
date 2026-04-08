@@ -10,12 +10,16 @@ export function daysUntil(d: string) {
   return Math.ceil((new Date(d).getTime() - Date.now()) / 86400000);
 }
 
-export function fmt(n: any) {
-  return Number(n || 0).toLocaleString('ar-SA');
+export function fmt(n: any, locale = 'ar-SA') {
+  return Number(n || 0).toLocaleString(locale);
 }
 
-export function fmtDate(iso: string) {
-  return iso ? new Date(iso).toLocaleDateString('ar-SA') : '—';
+export function fmtCurrency(n: any, currencyCode = 'SAR', locale = 'ar-SA') {
+  return new Intl.NumberFormat(locale, { style: 'currency', currency: currencyCode, maximumFractionDigits: 0 }).format(Number(n || 0));
+}
+
+export function fmtDate(iso: string, locale = 'ar-SA') {
+  return iso ? new Date(iso).toLocaleDateString(locale) : '—';
 }
 
 export const PLAN_AR: Record<string, string> = {
