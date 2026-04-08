@@ -104,6 +104,13 @@ export const adminApi = {
     // Country configs (for company creation form)
     getCountryConfigs: () => request<any>('GET', '/admin/country-configs'),
 
+    // Landing page analytics
+    landingLive:       ()              => request<any>('GET', '/admin/analytics/landing/live'),
+    landingStats:      (period = '7d') => request<any>('GET', `/admin/analytics/landing/stats?period=${period}`),
+    landingScrollDepth:()              => request<any>('GET', '/admin/analytics/landing/scroll-depth'),
+    landingTopClicks:  ()              => request<any>('GET', '/admin/analytics/landing/top-clicks'),
+    landingStreamUrl:  ()              => `${BASE}/admin/analytics/landing/stream`,
+
     // Tenant / Company control
     checkSlug:       (slug: string)  => request<any>('GET', `/superadmin/companies/check-slug?slug=${encodeURIComponent(slug)}`),
     listCompanies:   (params?: Record<string, string>) => {

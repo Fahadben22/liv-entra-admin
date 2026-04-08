@@ -38,6 +38,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/agents',         label: 'الوكلاء',        section: 'ops' },
   { href: '/dashboard/leads',          label: 'طلبات العرض',    section: 'growth' },
   { href: '/dashboard/demo-leads',     label: 'قيادات الديمو',  section: 'growth' },
+  { href: '/dashboard/landing-page/analytics', label: 'تحليلات الموقع', section: 'growth' },
   { href: '/dashboard/template-center',label: 'القوالب',        section: 'settings' },
   { href: '/dashboard/landing-page',   label: 'الموقع',         section: 'settings' },
   { href: '/dashboard/audit',          label: 'التدقيق',        section: 'settings' },
