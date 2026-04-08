@@ -110,15 +110,60 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
         </div>
       )}
 
-      {/* AI Agent summary — for sales agent to read */}
+      {/* Engagement score */}
+      {events.length > 0 && (() => {
+        const score = Math.min(100,
+          pageVisits.length * 2 +
+          Math.floor(totalDwell / 30000) +
+          scenarioStarts.length * 5 +
+          scenarioCompletes.length * 10 +
+          conversionOpens.length * 15 +
+          spotlights.length * 3
+        );
+        const level = score >= 60 ? { label: 'مرتفع', color: '#10b981', bg: '#ecfdf5' } : score >= 30 ? { label: 'متوسط', color: '#f59e0b', bg: '#fffbeb' } : { label: 'منخفض', color: '#6b7280', bg: '#f3f4f6' };
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#1a1a2e' }}>مستوى الاهتمام:</span>
+            <div style={{ flex: 1, height: 6, background: 'rgba(0,0,0,.06)', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${score}%`, background: level.color, borderRadius: 3, transition: 'width .3s' }} />
+            </div>
+            <span style={{ fontSize: 10, fontWeight: 700, color: level.color, padding: '2px 8px', borderRadius: 6, background: level.bg }}>{score}/100 {level.label}</span>
+          </div>
+        );
+      })()}
+
+      {/* Scenario funnel */}
+      {scenarioStarts.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e', marginBottom: 6 }}>مسار السيناريوهات</p>
+          <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+            <div style={{ flex: 1, textAlign: 'center', padding: '6px', borderRadius: 8, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.15)' }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#7c5cfc' }}>{scenarioStarts.length}</div>
+              <div style={{ fontSize: 9, color: '#9ca3af' }}>بدأ</div>
+            </div>
+            <span style={{ color: '#d1d5db', fontSize: 14 }}>→</span>
+            <div style={{ flex: 1, textAlign: 'center', padding: '6px', borderRadius: 8, background: scenarioCompletes.length > 0 ? 'rgba(16,185,129,.08)' : 'rgba(0,0,0,.03)', border: `1px solid ${scenarioCompletes.length > 0 ? 'rgba(16,185,129,.15)' : 'rgba(0,0,0,.06)'}` }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: scenarioCompletes.length > 0 ? '#10b981' : '#9ca3af' }}>{scenarioCompletes.length}</div>
+              <div style={{ fontSize: 9, color: '#9ca3af' }}>أكمل</div>
+            </div>
+            <span style={{ color: '#d1d5db', fontSize: 14 }}>→</span>
+            <div style={{ flex: 1, textAlign: 'center', padding: '6px', borderRadius: 8, background: conversionOpens.length > 0 ? 'rgba(245,158,11,.08)' : 'rgba(0,0,0,.03)', border: `1px solid ${conversionOpens.length > 0 ? 'rgba(245,158,11,.15)' : 'rgba(0,0,0,.06)'}` }}>
+              <div style={{ fontSize: 16, fontWeight: 700, color: conversionOpens.length > 0 ? '#f59e0b' : '#9ca3af' }}>{conversionOpens.length}</div>
+              <div style={{ fontSize: 9, color: '#9ca3af' }}>فتح الاشتراك</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Agent summary */}
       {events.length > 0 && (
         <div style={{ padding: '10px 14px', borderRadius: 10, background: 'linear-gradient(135deg, rgba(124,92,252,0.05), rgba(37,99,235,0.05))', border: '1px solid rgba(124,92,252,0.15)' }}>
-          <p style={{ fontSize: 10, fontWeight: 700, color: '#7c5cfc', marginBottom: 4 }}>🧠 ملخص للوكيل الذكي</p>
+          <p style={{ fontSize: 10, fontWeight: 700, color: '#7c5cfc', marginBottom: 4 }}>ملخص للوكيل الذكي</p>
           <p style={{ fontSize: 11, color: '#6b7280', lineHeight: 1.6, margin: 0 }}>
             الزائر من {lead.city || '—'} · {lead.property_count || '—'} عقار · {lead.unit_count || '—'} وحدة ·
             تحدياته: {(lead.pain_points || []).join('، ') || 'لم يحدد'} ·
             زار {pageVisits.length} صفحة · أكمل {scenarioCompletes.length}/{scenarioStarts.length} سيناريو ·
-            {conversionOpens.length > 0 ? 'فتح صفحة الاشتراك ✓' : 'لم يفتح صفحة الاشتراك'} ·
+            {conversionOpens.length > 0 ? 'فتح صفحة الاشتراك' : 'لم يفتح صفحة الاشتراك'} ·
             إجمالي وقت التصفح: {Math.round(totalDwell / 60000)} دقيقة
           </p>
         </div>
