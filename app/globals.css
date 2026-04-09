@@ -190,3 +190,123 @@ body {
 @supports (padding: env(safe-area-inset-bottom)) {
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 }
+
+/* ─── Phase 6: Accessibility ─── */
+
+/* Focus visible ring for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Remove focus ring for mouse clicks */
+:focus:not(:focus-visible) { outline: none; }
+
+/* Skip to main content link (screen reader) */
+.skip-link {
+  position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: white; padding: 8px 20px;
+  border-radius: 0 0 8px 8px; font-weight: 600; z-index: 10000;
+  transition: top .2s;
+}
+.skip-link:focus { top: 0; }
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .fade-in, .slide-in { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card { border: 2px solid var(--text-primary) !important; }
+  button { border: 2px solid currentColor !important; }
+}
+
+/* ─── Phase 7: Micro-Interactions ─── */
+
+/* Card hover lift */
+.card-lift {
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.1);
+}
+
+/* Button press effect */
+button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Success checkmark animation */
+@keyframes checkmark {
+  0% { stroke-dashoffset: 24; opacity: 0; }
+  50% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+.animate-check path {
+  stroke-dasharray: 24;
+  animation: checkmark .4s ease forwards;
+}
+
+/* Number count-up animation */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.count-up { animation: countUp .3s ease forwards; }
+
+/* Stagger children entrance */
+.stagger-enter > * {
+  opacity: 0; animation: fadeIn .3s ease forwards;
+}
+.stagger-enter > *:nth-child(1) { animation-delay: 0s; }
+.stagger-enter > *:nth-child(2) { animation-delay: .05s; }
+.stagger-enter > *:nth-child(3) { animation-delay: .1s; }
+.stagger-enter > *:nth-child(4) { animation-delay: .15s; }
+.stagger-enter > *:nth-child(5) { animation-delay: .2s; }
+.stagger-enter > *:nth-child(6) { animation-delay: .25s; }
+
+/* Drag and drop zone feedback */
+.drop-zone {
+  transition: all .15s ease;
+  border: 2px dashed transparent;
+}
+.drop-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  transform: scale(1.01);
+}
+
+/* Smooth tab transitions */
+.tab-content-enter { animation: fadeIn .2s ease; }
+
+/* Toast progress bar */
+@keyframes toastProgress {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+/* Skeleton shimmer */
+@keyframes skeletonShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f0eef6 25%, #e8e6f0 50%, #f0eef6 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s ease infinite;
+  border-radius: 8px;
+}
+
+/* Status icons paired with colors (accessibility — never color alone) */
+.status-icon::before { margin-left: 4px; }
+.status-success::before { content: '✓'; color: var(--success); }
+.status-error::before { content: '✗'; color: var(--danger); }
+.status-warning::before { content: '⚠'; color: var(--warning); }
+.status-info::before { content: 'ℹ'; color: var(--info); }
