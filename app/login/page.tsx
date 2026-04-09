@@ -1,6 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { FormField } from '@/components/ui/FormField';
+import { ButtonSpinner } from '@/components/ui/ButtonSpinner';
+import { colors, fontSize, fontWeight, radius, spacing, shadow } from '@/lib/design-tokens';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://liv-entra-api-production.up.railway.app/api/v1';
 
@@ -12,6 +15,7 @@ export default function AdminLogin() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    if (!secret.trim()) { setErr('المفتاح السري مطلوب'); return; }
     setLoading(true); setErr('');
     try {
       const res = await fetch(`${BASE}/admin/login`, {
@@ -23,7 +27,7 @@ export default function AdminLogin() {
       if (!res.ok) throw new Error(json.message || 'فشل تسجيل الدخول');
       localStorage.setItem('admin_token', json.data?.token);
       if (json.data?.refresh_token) localStorage.setItem('admin_refresh_token', json.data.refresh_token);
-      localStorage.setItem('admin_user',  JSON.stringify(json.data?.user || { name: 'Admin', role: 'super_admin' }));
+      localStorage.setItem('admin_user', JSON.stringify(json.data?.user || { name: 'Admin', role: 'super_admin' }));
       router.push('/dashboard');
     } catch (e: any) {
       setErr(e.message);
@@ -33,34 +37,38 @@ export default function AdminLogin() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%)' }}>
-      <div style={{ background: 'white', borderRadius: 16, padding: 40, width: '100%', maxWidth: 360, boxShadow: '0 20px 60px rgba(0,0,0,.4)' }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 14, background: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 24 }}>⚡</div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#0f172a', margin: 0 }}>Liventra OS</h1>
-          <p style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>لوحة التحكم — Super Admin</p>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, ${colors.bg.dark} 0%, #1e3a5f 100%)` }}>
+      <div style={{ background: colors.bg.card, borderRadius: radius.xl, padding: spacing.xxxl + 8, width: '100%', maxWidth: 380, boxShadow: shadow.lg }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: spacing.xxxl }}>
+          <div style={{ width: 56, height: 56, borderRadius: radius.lg, background: colors.bg.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 24 }}>⚡</div>
+          <h1 style={{ fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text.primary, margin: 0 }}>Liventra OS</h1>
+          <p style={{ fontSize: fontSize.sm, color: colors.text.muted, marginTop: spacing.xs }}>لوحة التحكم — Super Admin</p>
         </div>
+
         <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: 20 }}>
-            <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>المفتاح السري</label>
-            <input
-              type="password"
-              value={secret}
-              onChange={e => setSecret(e.target.value)}
-              placeholder="أدخل المفتاح السري"
-              autoFocus
-              style={{ width: '100%', padding: '11px 14px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 13, outline: 'none', boxSizing: 'border-box', direction: 'ltr' }}
-            />
-          </div>
-          {err && (
-            <p style={{ fontSize: 12, color: '#ef4444', marginBottom: 14, textAlign: 'center', padding: '8px 12px', background: '#fef2f2', borderRadius: 8 }}>
-              {err}
-            </p>
-          )}
-          <button type="submit" disabled={loading || !secret}
-            style={{ width: '100%', padding: '12px', background: '#0f172a', color: 'white', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer', opacity: loading || !secret ? 0.6 : 1 }}>
-            {loading ? 'جاري الدخول...' : 'دخول'}
-          </button>
+          <FormField
+            label="المفتاح السري"
+            type="password"
+            value={secret}
+            onChange={e => setSecret(e.target.value)}
+            placeholder="أدخل المفتاح السري"
+            required
+            autocomplete="current-password"
+            dir="ltr"
+            error={err || undefined}
+          />
+
+          <ButtonSpinner
+            type="submit"
+            label="دخول"
+            loadingLabel="جاري الدخول..."
+            loading={loading}
+            disabled={!secret.trim()}
+            variant="primary"
+            fullWidth
+            style={{ background: colors.bg.dark, marginTop: spacing.sm }}
+          />
         </form>
       </div>
     </div>

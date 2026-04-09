@@ -118,3 +118,75 @@ body {
 @media (max-width: 600px) {
   .grid-responsive { grid-template-columns: 1fr !important; }
 }
+
+/* ─── Mobile UX Enhancements (Phase 5) ─── */
+
+/* Touch targets — minimum 44px */
+@media (max-width: 768px) {
+  button, a[role="button"], input[type="submit"], .btn-touch {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  input, select, textarea {
+    min-height: 44px;
+    font-size: 16px !important; /* Prevent iOS zoom on focus */
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 768px) {
+  /* Stack 2-column forms to single column */
+  .form-grid { grid-template-columns: 1fr !important; }
+  /* Kanban columns stack */
+  .kanban-grid { grid-template-columns: 1fr !important; }
+  /* KPI cards 2 per row */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* Agent list becomes horizontal scroll */
+  .agent-list-vertical {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    width: auto !important;
+    border-left: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 8px !important;
+    gap: 4px !important;
+  }
+  .agent-list-vertical button {
+    flex-direction: column !important;
+    min-width: 70px !important;
+    padding: 8px !important;
+    font-size: 10px !important;
+  }
+  /* Sidebar collapses */
+  .sidebar-panel { display: none !important; }
+  .sidebar-panel.open { display: block !important; position: fixed !important; inset: 0 !important; z-index: 500 !important; }
+}
+
+/* Phone adjustments */
+@media (max-width: 480px) {
+  .kpi-grid { grid-template-columns: 1fr !important; }
+  /* Compact padding */
+  .page-content { padding: 12px !important; }
+  /* Full-width buttons */
+  .btn-group { flex-direction: column !important; }
+  .btn-group button, .btn-group a { width: 100% !important; }
+  /* Hide non-essential sidebar info */
+  .hide-on-mobile { display: none !important; }
+}
+
+/* Horizontal scroll for tabs on mobile */
+@media (max-width: 768px) {
+  .tabs-scroll {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs-scroll::-webkit-scrollbar { display: none; }
+  .tabs-scroll > * { flex-shrink: 0 !important; }
+}
+
+/* Safe area insets for notched phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+}
