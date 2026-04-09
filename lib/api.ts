@@ -111,6 +111,13 @@ export const adminApi = {
     landingTopClicks:  ()              => request<any>('GET', '/admin/analytics/landing/top-clicks'),
     landingStreamUrl:  ()              => `${BASE}/admin/analytics/landing/stream`,
 
+    // Meeting room
+    getMeetingReports:    ()              => request<any>('GET', '/admin/agents/meeting-room/reports'),
+    getMeetingActions:    (status = 'all')=> request<any>('GET', `/admin/agents/meeting-room/action-items?status=${status}`),
+    approveAction:        (id: string)    => request<any>('POST', `/admin/agents/meeting-room/approve-action/${id}`),
+    rejectAction:         (id: string, reason?: string) => request<any>('POST', `/admin/agents/meeting-room/reject-action/${id}`, { reason }),
+    approveReport:        (id: string)    => request<any>('POST', `/admin/agents/meeting-room/approve-report/${id}`),
+
     // Tenant / Company control
     checkSlug:       (slug: string)  => request<any>('GET', `/superadmin/companies/check-slug?slug=${encodeURIComponent(slug)}`),
     listCompanies:   (params?: Record<string, string>) => {
