@@ -206,7 +206,7 @@ export default function CompanyDetailPage() {
           <>
             {/* Health Score Card */}
             {company.health && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 20 }}>
+              <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 20 }}>
                 {[
                   { label: 'صحة الشركة', value: `${company.health.score}%`, sub: `تقييم ${company.health.grade}`, color: company.health.grade === 'A' ? '#22c55e' : company.health.grade === 'B' ? '#3b82f6' : company.health.grade === 'C' ? '#f59e0b' : '#ef4444' },
                   { label: 'نسبة الإشغال', value: `${company.health.occupancy}%`, sub: 'الوحدات المشغولة', color: '#3b82f6' },

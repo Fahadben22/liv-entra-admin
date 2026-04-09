@@ -172,7 +172,7 @@ export default function OnboardingCommandCenter() {
           </div>
 
           {/* Kanban Board */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
+          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 16 }}>
             {STAGES.map(stage => {
               const stageCompanies = filtered.filter(c => lcOf(c) === stage.key);
               return (

@@ -99,7 +99,7 @@ export default function LandingAnalyticsPage() {
       </div>
 
       {/* Live indicator + KPIs */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 24 }}>
+      <div className="grid-responsive stagger-enter" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 24 }}>
         {/* Live now — special card */}
         <div className="card fade-in" style={{ padding: '20px 22px', background: activeCount > 0 ? 'rgba(16,185,129,.04)' : undefined, border: activeCount > 0 ? '1px solid rgba(16,185,129,.2)' : undefined }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>

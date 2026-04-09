@@ -119,7 +119,7 @@ export default function LeadsPage() {
 
         {/* STATS STRIP */}
         {stats && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, marginBottom: 24 }}>
+          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, marginBottom: 24 }}>
             {[
               { label: 'إجمالي الطلبات',   value: stats.total,                         color: '#1a1a2e' },
               { label: 'جديد',              value: stats.statusCounts?.new || 0,        color: '#3b82f6' },
@@ -127,7 +127,7 @@ export default function LeadsPage() {
               { label: 'تحوّل عميل',        value: stats.statusCounts?.converted || 0,  color: '#10b981' },
               { label: 'معدل التحويل',      value: `${stats.conversionRate || 0}%`,     color: '#a78bfa' },
             ].map(k => (
-              <div key={k.label} className="card" style={{ background: '#fff', border: '1px solid rgba(0,0,0,.06)', borderRadius: 14, padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+              <div key={k.label} className="card card-lift" style={{ background: '#fff', border: '1px solid rgba(0,0,0,.06)', borderRadius: 14, padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
                 <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 6, fontWeight: 500 }}>{k.label}</div>
                 <div style={{ fontSize: 22, fontWeight: 600, color: k.color }}>{k.value}</div>
               </div>

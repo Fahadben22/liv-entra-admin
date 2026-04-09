@@ -83,7 +83,7 @@ export default function QueuePage() {
 
       <div style={{ padding: 24, maxWidth: 1200, margin: '0 auto' }}>
         {/* Stats bar */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+        <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
           {[
             { label: 'أُرسل اليوم', value: stats.sentToday, color: '#16a34a' },
             { label: 'نسبة التسليم', value: `${stats.deliveryRate}%`, color: '#1a1a2e' },

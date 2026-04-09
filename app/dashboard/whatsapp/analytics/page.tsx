@@ -75,7 +75,7 @@ export default function AnalyticsPage() {
         ) : (
           <>
             {/* KPI Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+            <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
               {[
                 { label: 'إجمالي الرسائل هذا الشهر', value: data.totalMessages.toLocaleString(), color: '#1a1a2e' },
                 { label: 'معالجة بالذكاء الاصطناعي', value: `${data.aiHandledPct}%`, color: '#16a34a' },

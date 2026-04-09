@@ -109,14 +109,14 @@ export default function AdminDashboard() {
       </div>
 
       {/* KPI row */}
-      <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
+      <div className="grid-responsive stagger-enter" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
         {[
           { label: 'إجمالي الشركات', value: companies.length, trend: '+12%', up: true, color: '#7c5cfc' },
           { label: 'شركات نشطة', value: byStage.active.length, trend: '+8%', up: true, color: '#10b981' },
           { label: 'في التجربة', value: byStage.trial.length, trend: `${byStage.trial.length}`, up: true, color: '#f59e0b' },
           { label: 'موقوفة / متأخرة', value: byStage.suspended.length + byStage.overdue.length, trend: byStage.suspended.length + byStage.overdue.length > 0 ? 'تنبيه' : '0', up: false, color: '#ef4444' },
         ].map((k, i) => (
-          <div key={k.label} className="card fade-in" style={{ padding: '22px 24px', animationDelay: `${i * 0.06}s` }}>
+          <div key={k.label} className="card card-lift fade-in" style={{ padding: '22px 24px', animationDelay: `${i * 0.06}s` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
               <p style={{ fontSize: 12, color: '#9ca3af', margin: 0, fontWeight: 500 }}>{k.label}</p>
               {/* Mini sparkline SVG */}
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Lifecycle pipeline */}
-      <div className="card" style={{ padding: '22px 26px', marginBottom: 28 }}>
+      <div className="card card-lift" style={{ padding: '22px 26px', marginBottom: 28 }}>
         <h2 style={{ fontSize: 14, fontWeight: 600, margin: '0 0 16px', color: '#1a1a2e' }}>دورة حياة الشركات</h2>
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
           {[
@@ -179,7 +179,7 @@ export default function AdminDashboard() {
         const countryKeys = Object.keys(byCountry).sort((a, b) => byCountry[b] - byCountry[a]);
         if (countryKeys.length <= 1) return null; // Don't show if only one country
         return (
-          <div className="card" style={{ padding: '16px 22px', marginBottom: 16 }}>
+          <div className="card card-lift" style={{ padding: '16px 22px', marginBottom: 16 }}>
             <h2 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 12px', color: '#1a1a2e' }}>التوزيع حسب الدولة</h2>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {countryKeys.map(cc => (
@@ -196,7 +196,7 @@ export default function AdminDashboard() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 16 }}>
         {/* Recent companies */}
-        <div className="card" style={{ overflow: 'hidden' }}>
+        <div className="card card-lift" style={{ overflow: 'hidden' }}>
           <div style={{ padding: '16px 22px', borderBottom: '1px solid rgba(0,0,0,.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ fontSize: 14, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>
               جميع الشركات
@@ -251,7 +251,7 @@ export default function AdminDashboard() {
           {/* Right column */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Revenue card */}
-            <div className="card" style={{ background: 'linear-gradient(135deg, #7c5cfc, #a78bfa)', padding: '22px 24px', color: '#fff' }}>
+            <div className="card card-lift" style={{ background: 'linear-gradient(135deg, #7c5cfc, #a78bfa)', padding: '22px 24px', color: '#fff' }}>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,.7)', margin: '0 0 8px', fontWeight: 500 }}>إجمالي الإيرادات المُحصَّلة</p>
               <p style={{ fontSize: 28, fontWeight: 700, margin: '0 0 18px', letterSpacing: '-0.03em' }}>
                 {totalRevenue.toLocaleString('ar-SA')} ر.س
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Needs attention */}
-            <div className="card" style={{ overflow: 'hidden', flex: 1 }}>
+            <div className="card card-lift" style={{ overflow: 'hidden', flex: 1 }}>
               <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(0,0,0,.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>يحتاج انتباهاً</h3>
                 {needsAttention.length > 0 && (
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
 
             {/* Anomalies */}
             {anomalies.length > 0 && (
-              <div className="card" style={{ background: '#fef2f2', overflow: 'hidden', border: '1px solid #fecaca' }}>
+              <div className="card card-lift" style={{ background: '#fef2f2', overflow: 'hidden', border: '1px solid #fecaca' }}>
                 <div style={{ padding: '12px 20px', borderBottom: '1px solid #fecaca' }}>
                   <p style={{ fontSize: 13, fontWeight: 600, color: '#ef4444', margin: 0 }}>تنبيهات ذكية ({anomalies.length})</p>
                 </div>
