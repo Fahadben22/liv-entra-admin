@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { request } from '@/lib/api';
 
 interface AgentChatProps {
-  agentType: 'it' | 'sales' | 'marketing';
+  agentType: string;
   agentName: string;
   agentIcon: string;
   accentColor: string;
