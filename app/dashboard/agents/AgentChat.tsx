@@ -2,17 +2,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { request } from '@/lib/api';
 
+export interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 interface AgentChatProps {
   agentType: string;
   agentName: string;
   agentIcon: string;
   accentColor: string;
   quickActions: string[];
-}
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
+  // Lifted state mode — parent controls messages
+  messages?: Message[];
+  onMessagesChange?: (msgs: Message[]) => void;
+  compact?: boolean; // hide header when parent provides its own
 }
 
 interface DraftEmail {
@@ -23,8 +27,12 @@ interface DraftEmail {
   body: string;
 }
 
-export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions }: AgentChatProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions, messages: externalMessages, onMessagesChange, compact }: AgentChatProps) {
+  // Use external state if provided, otherwise internal
+  const [internalMessages, setInternalMessages] = useState<Message[]>([]);
+  const messages = externalMessages ?? internalMessages;
+  const setMessages = onMessagesChange ?? setInternalMessages;
+
   const [input, setInput]       = useState('');
   const [loading, setLoading]   = useState(false);
   const [tokens, setTokens]     = useState(0);
@@ -42,14 +50,15 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
     const msg = (text || input).trim();
     if (!msg || loading) return;
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: msg }]);
+    const updated = [...messages, { role: 'user' as const, content: msg }];
+    setMessages(updated);
     setLoading(true);
 
     try {
       const res = await request<any>('POST', `/admin/agents/${agentType}/chat`, { message: msg });
       const reply = res?.data?.reply || 'لم أتمكن من الرد.';
       setTokens(prev => prev + (res?.data?.tokens_used || 0));
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      setMessages([...updated, { role: 'assistant', content: reply }]);
 
       // Check if agent drafted an email outreach
       const draftAction = (res?.data?.actions || []).find((a: any) => {
@@ -58,7 +67,6 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       if (draftAction) {
         try {
           const draftData = typeof draftAction.result === 'string' ? JSON.parse(draftAction.result) : draftAction.result;
-          // Extract subject/body from the agent's reply text
           const subjectMatch = reply.match(/(?:الموضوع|Subject)[:\s]*(.+)/i);
           const bodyStart = reply.indexOf('\n\n');
           const emailSubject = subjectMatch?.[1]?.trim() || `Liventra OS — ${draftData.lead_name}`;
@@ -66,10 +74,10 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
           setDraft({ lead_id: draftData.lead_id, lead_name: draftData.lead_name, lead_email: draftData.lead_email, subject: emailSubject, body: emailBody });
           setEditSubject(emailSubject);
           setEditBody(emailBody);
-        } catch { /* draft parse failed — show reply only */ }
+        } catch {}
       }
     } catch (e: any) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `خطأ: ${e.message}` }]);
+      setMessages([...updated, { role: 'assistant', content: `خطأ: ${e.message}` }]);
     }
     setLoading(false);
   }
@@ -78,13 +86,11 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
     if (!draft) return;
     setSending(true);
     try {
-      const res = await request<any>('POST', '/admin/agents/sales/send-outreach', {
-        lead_id: draft.lead_id, subject: editSubject, body: editBody,
-      });
-      setMessages(prev => [...prev, { role: 'assistant', content: res?.message || 'تم الإرسال' }]);
+      const res = await request<any>('POST', '/admin/agents/sales/send-outreach', { lead_id: draft.lead_id, subject: editSubject, body: editBody });
+      setMessages([...messages, { role: 'assistant', content: res?.message || 'تم الإرسال' }]);
       setDraft(null);
     } catch (e: any) {
-      setMessages(prev => [...prev, { role: 'assistant', content: `فشل: ${e.message}` }]);
+      setMessages([...messages, { role: 'assistant', content: `فشل: ${e.message}` }]);
     }
     setSending(false);
   }
@@ -95,135 +101,76 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       setMessages([]);
       setTokens(0);
       setDraft(null);
-    } catch { }
+    } catch {}
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 60px)', background: 'transparent' }}>
-      {/* Header */}
-      <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(0,0,0,.08)', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: '#f8f7fc', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, border: '1px solid rgba(0,0,0,.08)' }}>
-          {agentIcon}
+    <div style={{ display: 'flex', flexDirection: 'column', height: compact ? '100%' : 'calc(100vh - 60px)', background: 'transparent' }}>
+      {/* Header — hidden in compact mode */}
+      {!compact && (
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+          <span style={{ fontSize: 20 }}>{agentIcon}</span>
+          <div style={{ flex: 1 }}>
+            <h2 style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>{agentName}</h2>
+            <p style={{ fontSize: 10, color: '#9ca3af', margin: 0 }}>{tokens > 0 ? `${tokens.toLocaleString()} رمز` : 'جاهز'}</p>
+          </div>
+          <button onClick={clearChat} style={{ fontSize: 10, padding: '5px 12px', borderRadius: 6, border: '1px solid rgba(0,0,0,.06)', background: 'transparent', color: '#9ca3af', cursor: 'pointer' }}>مسح</button>
         </div>
-        <div style={{ flex: 1 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>{agentName}</h2>
-          <p style={{ fontSize: 11, color: '#6b7280', margin: 0, fontWeight: 500 }}>
-            {tokens > 0 ? `${tokens.toLocaleString()} رمز مستخدم` : 'جاهز للمساعدة'}
-          </p>
-        </div>
-        <button onClick={clearChat}
-          style={{ fontSize: 11, padding: '6px 14px', borderRadius: 7, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', color: '#6b7280', cursor: 'pointer' }}>
-          مسح المحادثة
-        </button>
-      </div>
+      )}
 
       {/* Messages */}
-      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.length === 0 && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
-            <div style={{ fontSize: 48 }}>{agentIcon}</div>
-            <p style={{ fontSize: 13, color: '#6b7280', textAlign: 'center' }}>اسأل {agentName} أي سؤال</p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 500 }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+            <div style={{ fontSize: 40 }}>{agentIcon}</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center', maxWidth: 480 }}>
               {quickActions.map((q, i) => (
-                <button key={i} onClick={() => send(q)}
-                  style={{
-                    fontSize: 12, padding: '8px 16px', borderRadius: 20,
-                    border: '1px solid rgba(0,0,0,.08)', background: 'transparent',
-                    color: '#6b7280', cursor: 'pointer',
-                  }}>
-                  {q}
-                </button>
+                <button key={i} onClick={() => send(q)} style={{ fontSize: 11, padding: '7px 14px', borderRadius: 18, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', color: '#6b7280', cursor: 'pointer' }}>{q}</button>
               ))}
             </div>
           </div>
         )}
-
         {messages.map((msg, i) => (
-          <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-start' : 'flex-end', gap: 8 }}>
-            <div style={{
-              maxWidth: '80%', padding: '12px 16px', borderRadius: 16,
-              background: msg.role === 'user' ? '#ede9fe' : '#f8f7fc',
-              border: msg.role === 'user' ? '1px solid rgba(124,92,252,.15)' : '1px solid rgba(0,0,0,.06)',
-              color: '#1a1a2e', fontSize: 13, lineHeight: 1.7,
-              whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-            }}>
+          <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-start' : 'flex-end', gap: 6 }}>
+            <div style={{ maxWidth: '85%', padding: '10px 14px', borderRadius: 14, background: msg.role === 'user' ? '#ede9fe' : '#f8f7fc', border: msg.role === 'user' ? '1px solid rgba(124,92,252,.12)' : '1px solid rgba(0,0,0,.04)', color: '#1a1a2e', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
               {msg.content}
             </div>
           </div>
         ))}
-
         {loading && (
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={{ padding: '12px 16px', borderRadius: 16, background: '#f8f7fc', border: '1px solid rgba(0,0,0,.06)' }}>
+            <div style={{ padding: '10px 14px', borderRadius: 14, background: '#f8f7fc', border: '1px solid rgba(0,0,0,.04)' }}>
               <div style={{ display: 'flex', gap: 4 }}>
-                {[0, 1, 2].map(i => (
-                  <div key={i} style={{
-                    width: 6, height: 6, borderRadius: '50%', background: '#9ca3af',
-                    animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
-                    opacity: 0.5,
-                  }} />
-                ))}
+                {[0, 1, 2].map(i => (<div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: '#9ca3af', animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`, opacity: 0.5 }} />))}
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Draft Email Approval Panel */}
+      {/* Draft Email */}
       {draft && (
-        <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc' }}>
-          <div style={{ maxWidth: 600, margin: '0 auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>مسودة بريد — {draft.lead_name}</span>
-              <span style={{ fontSize: 11, color: '#6b7280', marginRight: 'auto' }}>{draft.lead_email}</span>
-            </div>
-            <input value={editSubject} onChange={e => setEditSubject(e.target.value)}
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc', color: '#1a1a2e', fontSize: 13, marginBottom: 8, boxSizing: 'border-box' }}
-              placeholder="الموضوع" />
-            <textarea value={editBody} onChange={e => setEditBody(e.target.value)} rows={6}
-              style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc', color: '#1a1a2e', fontSize: 13, lineHeight: 1.7, resize: 'vertical', boxSizing: 'border-box' }} />
-            <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-              <button onClick={sendDraftEmail} disabled={sending}
-                style={{ flex: 2, padding: '10px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: sending ? 0.5 : 1 }}>
-                {sending ? 'جاري الإرسال...' : 'إرسال'}
-              </button>
-              <button onClick={() => setDraft(null)}
-                style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', color: '#6b7280', cursor: 'pointer', fontSize: 13 }}>
-                إلغاء
-              </button>
+        <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(0,0,0,.06)', background: '#f8f7fc' }}>
+          <div style={{ maxWidth: 550, margin: '0 auto' }}>
+            <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e', margin: '0 0 8px' }}>مسودة بريد — {draft.lead_name} ({draft.lead_email})</p>
+            <input value={editSubject} onChange={e => setEditSubject(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(0,0,0,.06)', fontSize: 12, marginBottom: 6, boxSizing: 'border-box' }} placeholder="الموضوع" />
+            <textarea value={editBody} onChange={e => setEditBody(e.target.value)} rows={4} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(0,0,0,.06)', fontSize: 12, lineHeight: 1.6, resize: 'vertical', boxSizing: 'border-box' }} />
+            <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
+              <button onClick={sendDraftEmail} disabled={sending} style={{ flex: 2, padding: '8px', borderRadius: 8, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, opacity: sending ? .5 : 1 }}>{sending ? 'جاري...' : 'إرسال'}</button>
+              <button onClick={() => setDraft(null)} style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid rgba(0,0,0,.06)', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 12 }}>إلغاء</button>
             </div>
           </div>
         </div>
       )}
 
       {/* Input */}
-      <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(0,0,0,.08)' }}>
-        <div style={{ display: 'flex', gap: 10, maxWidth: 700, margin: '0 auto' }}>
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
-            placeholder={`اسأل ${agentName}...`}
-            disabled={loading}
-            style={{
-              flex: 1, padding: '12px 16px', borderRadius: 10,
-              border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc',
-              color: '#1a1a2e', fontSize: 13, outline: 'none',
-            }}
-          />
-          <button onClick={() => send()} disabled={loading || !input.trim()}
-            style={{
-              padding: '12px 24px', borderRadius: 10, border: 'none',
-              background: loading ? '#d1d5db' : '#7c5cfc',
-              color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-              opacity: loading || !input.trim() ? 0.5 : 1,
-            }}>
-            إرسال
-          </button>
+      <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(0,0,0,.06)', flexShrink: 0 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }} placeholder={`اسأل ${agentName}...`} disabled={loading} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.06)', background: '#f8f7fc', color: '#1a1a2e', fontSize: 13, outline: 'none' }} />
+          <button onClick={() => send()} disabled={loading || !input.trim()} style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: loading ? '#d1d5db' : '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: loading || !input.trim() ? .5 : 1 }}>إرسال</button>
         </div>
       </div>
-
-      <style>{`@keyframes pulse { 0%,100% { opacity:.3 } 50% { opacity:1 } }`}</style>
+      <style>{`@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}`}</style>
     </div>
   );
 }
