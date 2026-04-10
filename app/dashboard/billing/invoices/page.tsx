@@ -264,7 +264,7 @@ export default function InvoicesPage() {
     setActioning(null);
   };
 
-  const ghostBtn: React.CSSProperties = { fontSize: 10, padding: '5px 8px', borderRadius: 7, background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', cursor: 'pointer', whiteSpace: 'nowrap' };
+  const ghostBtn: React.CSSProperties = { fontSize: 12, padding: '8px 14px', borderRadius: 10, background: '#fafafa', border: '1.5px solid rgba(0,0,0,.08)', cursor: 'pointer', whiteSpace: 'nowrap', minHeight: 36, fontWeight: 500, transition: 'all .12s' };
 
   return (
     <>

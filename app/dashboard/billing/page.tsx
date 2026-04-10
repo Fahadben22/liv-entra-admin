@@ -3,16 +3,6 @@ import Link from 'next/link';
 import { useBilling } from './layout';
 import { fmt, fmtDate, lcOf, daysUntil, PLAN_AR, PLAN_PRICE, PLAN_C, INV_STATUS } from '@/lib/billing-helpers';
 
-function StatCard({ label, value, sub, color = '#1a1a2e' }: { label: string; value: string | number; sub?: string; color?: string }) {
-  return (
-    <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '18px 22px', flex: 1 }}>
-      <p style={{ fontSize: 11, color: '#6b7280', margin: '0 0 6px', fontWeight: 500 }}>{label}</p>
-      <p style={{ fontSize: 22, fontWeight: 600, color, margin: 0 }}>{value}</p>
-      {sub && <p style={{ fontSize: 11, color: '#9ca3af', margin: '4px 0 0' }}>{sub}</p>}
-    </div>
-  );
-}
-
 const MONTH_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
 function buildRevenueChart(invoices: any[]) {
@@ -44,38 +34,40 @@ export default function BillingOverview() {
 
   const safeCompanies = Array.isArray(companies) ? companies : [];
   const safeInvoices  = Array.isArray(invoices) ? invoices : [];
+  const m = metrics || {};
 
-  const trialCompanies     = safeCompanies.filter(c => lcOf(c) === 'trial');
-  const trialsExpiringSoon = trialCompanies.filter(c => c.trial_ends_at && daysUntil(c.trial_ends_at) <= 7);
+  const trialsExpiringSoon = safeCompanies.filter(c => lcOf(c) === 'trial' && c.trial_ends_at && daysUntil(c.trial_ends_at) <= 7);
   const suspendedCompanies = safeCompanies.filter(c => lcOf(c) === 'suspended');
   const overdueInvoices    = safeInvoices.filter(i => i.status === 'overdue');
 
   const planDist: Record<string, number> = {};
   for (const c of safeCompanies) planDist[c.plan] = (planDist[c.plan] || 0) + 1;
 
-  // Revenue chart data
   const chartData = buildRevenueChart(safeInvoices);
-  const maxRev = Math.max(...chartData.map(m => m.paid + m.pending), 1);
-
-  // Churn: suspended / (active + suspended) last 30 days
-  const activeCount = safeCompanies.filter(c => c.is_active && c.plan !== 'trial').length;
-  const suspCount   = suspendedCompanies.length;
-  const churnRate   = activeCount + suspCount > 0 ? Math.round((suspCount / (activeCount + suspCount)) * 100) : 0;
+  const maxRev = Math.max(...chartData.map(mo => mo.paid + mo.pending), 1);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>نظرة عامة</h2>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#1a1a2e' }}>نظرة عامة</h2>
 
-      {/* Stats row */}
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-        <StatCard label="MRR" value={`${fmt(stats?.mrr || 0)} ر.س`} sub="الإيرادات الشهرية المتكررة" color="#16a34a" />
-        <StatCard label="إجمالي محصّل" value={`${fmt(stats?.total_paid_sar || 0)} ر.س`} color="#16a34a" />
-        <StatCard label="فواتير معلقة" value={`${fmt(stats?.total_pending_sar || 0)} ر.س`} sub={`${safeInvoices.filter(i => ['draft','sent','issued'].includes(i.status)).length} فاتورة`} color="#c2410c" />
-        <StatCard label="معدل الانسحاب" value={`${churnRate}%`} sub={`${suspCount} موقوفة من ${activeCount + suspCount}`} color={churnRate > 5 ? '#dc2626' : '#1a1a2e'} />
+      {/* ── KPI Row (4 cards with colored left border) ────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+        {[
+          { label: 'MRR', value: `${fmt(m.mrr || stats?.mrr || 0)} ر.س`, color: '#7c5cfc', sub: `ARR: ${fmt(m.arr || 0)}` },
+          { label: 'إجمالي محصّل', value: `${fmt(m.collected_this_month || stats?.total_paid_sar || 0)} ر.س`, color: '#16a34a', sub: 'هذا الشهر' },
+          { label: 'فواتير معلقة', value: `${fmt(stats?.total_pending_sar || 0)} ر.س`, color: '#c2410c', sub: `${safeInvoices.filter(i => ['draft','sent','issued'].includes(i.status)).length} فاتورة` },
+          { label: 'معدل الانسحاب', value: `${m.churn_rate || 0}%`, color: (m.churn_rate||0) > 5 ? '#dc2626' : '#1a1a2e', sub: `NRR: ${m.nrr || 100}%` },
+        ].map(k => (
+          <div key={k.label} className="card" style={{ padding: '18px 20px', borderRight: `3px solid ${k.color}` }}>
+            <p style={{ fontSize: 10, color: '#9ca3af', margin: '0 0 8px', fontWeight: 600, letterSpacing: '.04em' }}>{k.label}</p>
+            <p style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', margin: 0, lineHeight: 1 }}>{k.value}</p>
+            {k.sub && <p style={{ fontSize: 10, color: '#9ca3af', margin: '6px 0 0' }}>{k.sub}</p>}
+          </div>
+        ))}
       </div>
 
-      {/* Revenue chart */}
-      <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '22px 26px' }}>
+      {/* ── Revenue Chart (full width) ───────────────────────────── */}
+      <div className="card" style={{ padding: '22px 26px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h3 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>الإيرادات (آخر 12 شهر)</h3>
           <div style={{ display: 'flex', gap: 14, fontSize: 11 }}>
@@ -87,181 +79,134 @@ export default function BillingOverview() {
             </span>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 160 }}>
-          {chartData.map(m => {
-            const paidH = Math.round((m.paid / maxRev) * 140);
-            const pendH = Math.round((m.pending / maxRev) * 140);
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6, height: 180 }}>
+          {chartData.map(mo => {
+            const paidH = Math.round((mo.paid / maxRev) * 160);
+            const pendH = Math.round((mo.pending / maxRev) * 160);
             return (
-              <div key={m.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: 140, width: '100%', gap: 1 }}>
-                  {m.pending > 0 && (
-                    <div style={{ height: pendH, background: '#c2410c', opacity: .35, borderRadius: '4px 4px 0 0', minHeight: pendH > 0 ? 3 : 0 }} title={`معلق: ${fmt(Math.round(m.pending))} ر.س`} />
-                  )}
-                  <div style={{ height: paidH, background: '#16a34a', borderRadius: m.pending > 0 ? '0 0 4px 4px' : '4px', minHeight: paidH > 0 ? 3 : 0 }} title={`محصّل: ${fmt(Math.round(m.paid))} ر.س`} />
+              <div key={mo.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: 160, width: '100%', gap: 1 }}>
+                  {mo.pending > 0 && <div style={{ height: pendH, background: '#c2410c', opacity: .35, borderRadius: '4px 4px 0 0', minHeight: 3 }} title={`معلق: ${fmt(Math.round(mo.pending))} ر.س`} />}
+                  <div style={{ height: paidH, background: '#16a34a', borderRadius: mo.pending > 0 ? '0 0 4px 4px' : '4px', minHeight: paidH > 0 ? 3 : 0 }} title={`محصّل: ${fmt(Math.round(mo.paid))} ر.س`} />
                 </div>
-                <span style={{ fontSize: 9, color: '#9ca3af', marginTop: 6, fontWeight: 500 }}>{m.label.slice(0, 3)}</span>
+                <span style={{ fontSize: 9, color: '#9ca3af', marginTop: 6, fontWeight: 500 }}>{mo.label.slice(0, 3)}</span>
               </div>
             );
           })}
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24 }}>
-        {/* Plan distribution */}
-        <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '22px 26px' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1a1a2e' }}>توزيع الشركات حسب الخطة</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            {['enterprise', 'professional', 'basic', 'trial'].map(plan => {
-              const count = planDist[plan] || 0;
-              const pct   = Math.round((count / Math.max(safeCompanies.length, 1)) * 100);
-              const pc    = PLAN_C[plan] || PLAN_C.basic;
-              const mrr   = count * (PLAN_PRICE[plan] || 0);
-              return (
-                <div key={plan}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 12, padding: '2px 8px', borderRadius: 7, background: pc.bg, color: pc.color, fontWeight: 600, border: `1px solid ${pc.border}` }}>
-                        {PLAN_AR[plan]}
-                      </span>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{count} شركة</span>
-                    </div>
-                    <div style={{ textAlign: 'left' }}>
-                      {mrr > 0 && <span style={{ fontSize: 12, fontWeight: 600, color: '#16a34a' }}>{fmt(mrr)} ر.س/شهر</span>}
-                      <span style={{ fontSize: 11, color: '#6b7280', display: 'block', textAlign: 'left' }}>{pct}%</span>
-                    </div>
-                  </div>
-                  <div style={{ height: 6, borderRadius: 3, background: '#f0f0f0' }}>
-                    <div style={{ height: '100%', width: `${pct}%`, background: pc.color, borderRadius: 3, opacity: 0.7, transition: 'width .5s' }} />
-                  </div>
+      {/* ── Three-column insights ────────────────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+        {/* Plan Distribution */}
+        <div className="card" style={{ padding: '22px' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1a1a2e' }}>توزيع الخطط</h3>
+          {['enterprise', 'professional', 'basic', 'trial'].map(plan => {
+            const count = planDist[plan] || 0;
+            const pct = Math.round((count / Math.max(safeCompanies.length, 1)) * 100);
+            const pc = PLAN_C[plan] || PLAN_C.basic;
+            return (
+              <div key={plan} style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <span style={{ fontSize: 12, padding: '2px 8px', borderRadius: 7, background: pc.bg, color: pc.color, fontWeight: 600, border: `1px solid ${pc.border}` }}>{PLAN_AR[plan]}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e' }}>{count}</span>
                 </div>
-              );
-            })}
-          </div>
+                <div style={{ height: 6, borderRadius: 3, background: '#f0f0f0' }}>
+                  <div style={{ height: '100%', width: `${pct}%`, background: pc.color, borderRadius: 3, opacity: 0.7, transition: 'width .5s' }} />
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Alerts */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {trialsExpiringSoon.length > 0 && (
-            <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '18px 20px' }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#854d0e', margin: '0 0 12px' }}>تجارب تنتهي قريبا ({trialsExpiringSoon.length})</p>
-              {trialsExpiringSoon.map(c => (
-                <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>{c.name}</p>
-                  <div style={{ textAlign: 'left' }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: daysUntil(c.trial_ends_at) <= 2 ? '#dc2626' : '#854d0e' }}>
-                      {daysUntil(c.trial_ends_at)} يوم
-                    </span>
-                    <Link href={`/dashboard/companies/${c.id}`} style={{ display: 'block', fontSize: 10, color: '#6b7280', textDecoration: 'none', marginTop: 2 }}>ادارة</Link>
-                  </div>
+        {/* A/R Aging */}
+        <div className="card" style={{ padding: '22px' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1a1a2e' }}>تقادم الذمم</h3>
+          {(() => {
+            const aging = m.aging || {};
+            const buckets = [
+              { label: 'حالي', value: aging.current || 0, color: '#16a34a' },
+              { label: '1-30 يوم', value: aging.d30 || 0, color: '#f59e0b' },
+              { label: '31-60', value: aging.d60 || 0, color: '#f97316' },
+              { label: '61-90', value: aging.d90 || 0, color: '#ef4444' },
+              { label: '+90', value: aging.d90plus || 0, color: '#dc2626' },
+            ];
+            const total = buckets.reduce((s, b) => s + b.value, 0);
+            return (
+              <>
+                {buckets.map(b => {
+                  const pct = total > 0 ? Math.round((b.value / total) * 100) : 0;
+                  return (
+                    <div key={b.label} style={{ marginBottom: 10 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                        <span style={{ fontSize: 11, color: '#6b7280' }}>{b.label}</span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: b.color }}>{fmt(Math.round(b.value))}</span>
+                      </div>
+                      <div style={{ height: 5, borderRadius: 3, background: '#f0f0f0' }}>
+                        <div style={{ height: '100%', width: `${pct}%`, background: b.color, borderRadius: 3 }} />
+                      </div>
+                    </div>
+                  );
+                })}
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px solid rgba(0,0,0,.06)', marginTop: 4 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600 }}>الإجمالي</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1a1a2e' }}>{fmt(Math.round(total))} ر.س</span>
                 </div>
-              ))}
-            </div>
-          )}
+              </>
+            );
+          })()}
+        </div>
 
-          {overdueInvoices.length > 0 && (
-            <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '18px 20px' }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#c2410c', margin: '0 0 12px' }}>فواتير متأخرة ({overdueInvoices.length})</p>
-              {overdueInvoices.slice(0, 5).map(inv => (
-                <div key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 0', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
-                  <div>
-                    <p style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>{inv.companies?.name || inv.company?.name}</p>
-                    <p style={{ fontSize: 10, color: '#6b7280', margin: 0 }}>{inv.invoice_number} &middot; {fmt(inv.total_sar)} ر.س</p>
-                  </div>
-                  <Link href="/dashboard/billing/invoices" style={{ fontSize: 10, padding: '4px 8px', borderRadius: 7, background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', color: '#6b7280', textDecoration: 'none' }}>
-                    عرض
-                  </Link>
-                </div>
-              ))}
-              {overdueInvoices.length > 5 && (
-                <Link href="/dashboard/billing/invoices" style={{ marginTop: 8, display: 'block', fontSize: 11, color: '#6b7280', textDecoration: 'none' }}>
-                  عرض الكل ({overdueInvoices.length})
-                </Link>
-              )}
+        {/* SaaS Metrics */}
+        <div className="card" style={{ padding: '22px' }}>
+          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1a1a2e' }}>مقاييس SaaS</h3>
+          {[
+            { label: 'ARPU', value: `${fmt(m.arpu || 0)} ر.س`, desc: 'متوسط الإيراد / عميل' },
+            { label: 'LTV', value: `${fmt(m.ltv || 0)} ر.س`, desc: 'القيمة الدائمة' },
+            { label: 'NRR', value: `${m.nrr || 100}%`, desc: 'صافي الاحتفاظ' },
+            { label: 'عملاء يدفعون', value: `${m.total_paying || 0}`, desc: `من ${safeCompanies.length} شركة` },
+          ].map(item => (
+            <div key={item.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
+              <div>
+                <p style={{ fontSize: 11, color: '#6b7280', margin: 0 }}>{item.label}</p>
+                <p style={{ fontSize: 9, color: '#9ca3af', margin: '2px 0 0' }}>{item.desc}</p>
+              </div>
+              <p style={{ fontSize: 16, fontWeight: 700, color: '#1a1a2e', margin: 0 }}>{item.value}</p>
             </div>
-          )}
-
-          {suspendedCompanies.length > 0 && (
-            <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '18px 20px' }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#dc2626', margin: '0 0 12px' }}>موقوفة ({suspendedCompanies.length})</p>
-              {suspendedCompanies.slice(0, 4).map(c => (
-                <div key={c.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>{c.name}</p>
-                  <Link href={`/dashboard/companies/${c.id}`} style={{ fontSize: 11, color: '#dc2626', textDecoration: 'none' }}>مراجعة</Link>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {trialsExpiringSoon.length === 0 && overdueInvoices.length === 0 && suspendedCompanies.length === 0 && (
-            <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '24px 20px', textAlign: 'center' }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#16a34a', margin: '0 0 4px' }}>لا توجد تنبيهات</p>
-              <p style={{ fontSize: 11, color: '#9ca3af', margin: 0 }}>كل شيء يعمل بشكل طبيعي</p>
-            </div>
-          )}
+          ))}
         </div>
       </div>
 
-      {/* Advanced Metrics — ARPU, LTV, Aging */}
-      {metrics && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
-          {/* Key SaaS Metrics */}
-          <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '22px 26px' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1a1a2e' }}>مؤشرات الأداء</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              {[
-                { label: 'ARPU', value: `${fmt(metrics.arpu || 0)} ر.س`, desc: 'متوسط الإيراد لكل عميل' },
-                { label: 'LTV', value: `${fmt(metrics.ltv || 0)} ر.س`, desc: 'القيمة الدائمة للعميل' },
-                { label: 'NRR', value: `${metrics.nrr || 100}%`, desc: 'صافي معدل الاحتفاظ بالإيرادات' },
-                { label: 'عملاء يدفعون', value: metrics.total_paying || 0, desc: `من أصل ${(metrics.active_count || 0) + (metrics.trial_count || 0)}` },
-              ].map(m => (
-                <div key={m.label} style={{ padding: '14px', background: '#fafafa', borderRadius: 10, border: '1px solid rgba(0,0,0,.04)' }}>
-                  <p style={{ fontSize: 10, color: '#6b7280', margin: '0 0 4px', fontWeight: 600 }}>{m.label}</p>
-                  <p style={{ fontSize: 20, fontWeight: 700, color: '#1a1a2e', margin: 0 }}>{m.value}</p>
-                  <p style={{ fontSize: 10, color: '#9ca3af', margin: '4px 0 0' }}>{m.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Accounts Receivable Aging */}
-          <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '22px 26px' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1a1a2e' }}>تقادم الذمم المدينة</h3>
-            {(() => {
-              const aging = metrics.aging || {};
-              const buckets = [
-                { label: 'حالي (غير مستحق)', value: aging.current || 0, color: '#16a34a' },
-                { label: '1-30 يوم', value: aging.d30 || 0, color: '#f59e0b' },
-                { label: '31-60 يوم', value: aging.d60 || 0, color: '#f97316' },
-                { label: '61-90 يوم', value: aging.d90 || 0, color: '#ef4444' },
-                { label: '+90 يوم', value: aging.d90plus || 0, color: '#dc2626' },
-              ];
-              const total = buckets.reduce((s, b) => s + b.value, 0);
-              return (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {buckets.map(b => {
-                    const pct = total > 0 ? Math.round((b.value / total) * 100) : 0;
-                    return (
-                      <div key={b.label}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                          <span style={{ fontSize: 12, color: '#1a1a2e', fontWeight: 500 }}>{b.label}</span>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: b.color }}>{fmt(Math.round(b.value))} ر.س</span>
-                        </div>
-                        <div style={{ height: 6, borderRadius: 3, background: '#f0f0f0' }}>
-                          <div style={{ height: '100%', width: `${pct}%`, background: b.color, borderRadius: 3, transition: 'width .5s' }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px solid rgba(0,0,0,.06)' }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e' }}>الإجمالي</span>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1a1a2e' }}>{fmt(Math.round(total))} ر.س</span>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
+      {/* ── Compact Alerts Row ────────────────────────────────────── */}
+      {(trialsExpiringSoon.length > 0 || overdueInvoices.length > 0 || suspendedCompanies.length > 0) && (
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          {trialsExpiringSoon.length > 0 && (
+            <Link href="/dashboard/billing/subscriptions?status=trial" className="card" style={{ flex: 1, minWidth: 200, padding: '14px 18px', textDecoration: 'none', borderRight: '3px solid #f59e0b' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#854d0e', margin: 0 }}>⚠️ {trialsExpiringSoon.length} تجربة تنتهي قريباً</p>
+            </Link>
+          )}
+          {overdueInvoices.length > 0 && (
+            <Link href="/dashboard/billing/invoices?status=overdue" className="card" style={{ flex: 1, minWidth: 200, padding: '14px 18px', textDecoration: 'none', borderRight: '3px solid #f97316' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#c2410c', margin: 0 }}>🔴 {overdueInvoices.length} فاتورة متأخرة</p>
+            </Link>
+          )}
+          {suspendedCompanies.length > 0 && (
+            <Link href="/dashboard/companies?status=suspended" className="card" style={{ flex: 1, minWidth: 200, padding: '14px 18px', textDecoration: 'none', borderRight: '3px solid #ef4444' }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#dc2626', margin: 0 }}>⛔ {suspendedCompanies.length} موقوفة</p>
+            </Link>
+          )}
         </div>
       )}
+
+      <style>{`
+        @media (max-width: 900px) {
+          div[style*="repeat(4"] { grid-template-columns: repeat(2, 1fr) !important; }
+          div[style*="1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 600px) {
+          div[style*="repeat(2"] { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }
