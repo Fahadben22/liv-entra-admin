@@ -18,8 +18,8 @@ interface MatrixData { companies: Company[]; features: Record<string, any>; matr
 const TIER_ORDER: Tier[] = ['trial', 'basic', 'professional', 'enterprise'];
 const TIER_COLOR: Record<string, { bg: string; color: string; border: string }> = {
   trial:        { bg: 'rgba(34,197,94,.08)', color: '#22c55e', border: 'rgba(34,197,94,.2)' },
-  basic:        { bg: '#f8f7fc', color: '#9ca3af', border: 'rgba(0,0,0,.08)' },
-  professional: { bg: 'rgba(124,92,252,.08)', color: '#7c5cfc', border: 'rgba(124,92,252,.2)' },
+  basic:        { bg: '#F1F5F9', color: '#9ca3af', border: 'rgba(0,0,0,.08)' },
+  professional: { bg: 'rgba(124,92,252,.08)', color: '#2563EB', border: 'rgba(124,92,252,.2)' },
   enterprise:   { bg: 'rgba(245,158,11,.08)', color: '#f59e0b', border: 'rgba(245,158,11,.2)' },
 };
 
@@ -205,7 +205,7 @@ export default function FeaturesPage() {
     <div className="fade-in" style={{ fontFamily: 'system-ui, sans-serif' }}>
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#7c5cfc', color: '#fff', padding: '7px 20px', borderRadius: 7, fontSize: 12, zIndex: 9999, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+        <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#2563EB', color: '#fff', padding: '7px 20px', borderRadius: 7, fontSize: 12, zIndex: 9999, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
           {toast}
         </div>
       )}
@@ -214,17 +214,17 @@ export default function FeaturesPage() {
       {noteModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: 24, width: 400, boxShadow: '0 20px 60px rgba(0,0,0,.12)' }}>
-            <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 14, color: '#1a1a2e' }}>ملاحظة على الميزة</div>
+            <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 14, color: '#1E293B' }}>ملاحظة على الميزة</div>
             <textarea value={noteText} onChange={e => setNoteText(e.target.value)} rows={4}
               placeholder="سبب التفعيل، اتفاقية مع العميل، وغيرها..."
-              style={{ width: '100%', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '7px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box', background: '#f8f7fc', color: '#1a1a2e' }} />
+              style={{ width: '100%', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '7px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' }} />
             <div style={{ display: 'flex', gap: 8, marginTop: 14, justifyContent: 'flex-end' }}>
               <button onClick={() => setNoteModal(null)} style={{ padding: '7px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', cursor: 'pointer', fontSize: 12, fontWeight: 500, color: '#6b7280' }}>إلغاء</button>
               <button onClick={async () => {
                 const f = companyFlags.find(fl => fl.feature_key === noteModal.featureKey);
                 await toggle(noteModal.companyId, noteModal.featureKey, !(f?.is_enabled ?? false), f?.rollout_pct, noteText);
                 setNoteModal(null);
-              }} style={{ padding: '7px 16px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>حفظ وتفعيل</button>
+              }} style={{ padding: '7px 16px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>حفظ وتفعيل</button>
             </div>
           </div>
         </div>
@@ -234,16 +234,16 @@ export default function FeaturesPage() {
       {rolloutModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: '#fff', borderRadius: 16, padding: 24, width: 380, boxShadow: '0 20px 60px rgba(0,0,0,.12)' }}>
-            <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6, color: '#1a1a2e' }}>نسبة الطرح التدريجي</div>
+            <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6, color: '#1E293B' }}>نسبة الطرح التدريجي</div>
             <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 16, fontWeight: 500 }}>تحديد نسبة المستخدمين الذين يرون هذه الميزة</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <input type="range" min={0} max={100} value={rolloutValue} onChange={e => setRolloutValue(Number(e.target.value))} style={{ flex: 1 }} />
-              <span style={{ fontWeight: 600, fontSize: 18, color: '#1a1a2e', width: 50, textAlign: 'center' }}>{rolloutValue}%</span>
+              <span style={{ fontWeight: 600, fontSize: 18, color: '#1E293B', width: 50, textAlign: 'center' }}>{rolloutValue}%</span>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               {[25, 50, 75, 100].map(v => (
                 <button key={v} onClick={() => setRolloutValue(v)}
-                  style={{ flex: 1, padding: '5px 0', borderRadius: 10, border: `1px solid ${rolloutValue === v ? '#7c5cfc' : 'rgba(0,0,0,.08)'}`, background: rolloutValue === v ? 'rgba(124,92,252,.1)' : '#fff', color: rolloutValue === v ? '#7c5cfc' : '#9ca3af', fontSize: 12, cursor: 'pointer' }}>
+                  style={{ flex: 1, padding: '5px 0', borderRadius: 10, border: `1px solid ${rolloutValue === v ? '#2563EB' : 'rgba(0,0,0,.08)'}`, background: rolloutValue === v ? 'rgba(124,92,252,.1)' : '#fff', color: rolloutValue === v ? '#2563EB' : '#9ca3af', fontSize: 12, cursor: 'pointer' }}>
                   {v}%
                 </button>
               ))}
@@ -254,7 +254,7 @@ export default function FeaturesPage() {
                 const f = companyFlags.find(fl => fl.feature_key === rolloutModal.featureKey);
                 await toggle(rolloutModal.companyId, rolloutModal.featureKey, f?.is_enabled ?? false, rolloutValue);
                 setRolloutModal(null);
-              }} style={{ padding: '7px 16px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>تطبيق النسبة</button>
+              }} style={{ padding: '7px 16px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>تطبيق النسبة</button>
             </div>
           </div>
         </div>
@@ -262,13 +262,13 @@ export default function FeaturesPage() {
 
       {/* Header */}
       <div style={{ borderBottom: '1px solid rgba(0,0,0,.06)', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16 }}>
-        <span style={{ fontSize: 18, fontWeight: 600, color: '#1a1a2e', letterSpacing: '-0.02em' }}>مدير الميزات</span>
+        <span style={{ fontSize: 18, fontWeight: 600, color: '#1E293B', letterSpacing: '-0.02em' }}>مدير الميزات</span>
         <div style={{ marginRight: 'auto', display: 'flex', gap: 0, borderBottom: '1px solid rgba(0,0,0,.06)' }}>
           {([['company', 'شركة'], ['feature', 'ميزة'], ['matrix', 'مصفوفة']] as [View, string][]).map(([v, label]) => (
             <button key={v} onClick={() => setView(v)}
               style={{ padding: '8px 16px', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, background: 'none',
-                color: view === v ? '#1a1a2e' : '#9ca3af',
-                borderBottom: view === v ? '2px solid #7c5cfc' : '2px solid transparent' }}>
+                color: view === v ? '#1E293B' : '#9ca3af',
+                borderBottom: view === v ? '2px solid #2563EB' : '2px solid transparent' }}>
               {label}
             </button>
           ))}
@@ -306,13 +306,13 @@ export default function FeaturesPage() {
           <div style={{ background: '#fff', borderLeft: '1px solid rgba(0,0,0,.06)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             <div style={{ padding: '12px 14px', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث عن شركة..."
-                style={{ width: '100%', padding: '7px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#f8f7fc', color: '#1a1a2e' }} />
+                style={{ width: '100%', padding: '7px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' }} />
               <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
                 {['all', ...TIER_ORDER].map(t => (
                   <button key={t} onClick={() => setTierFilter(t)}
                     style={{ fontSize: 11, padding: '2px 8px', borderRadius: 7, border: '1px solid', cursor: 'pointer', fontWeight: 500,
-                      background: tierFilter === t ? '#7c5cfc' : '#fff', color: tierFilter === t ? '#fff' : '#9ca3af',
-                      borderColor: tierFilter === t ? '#7c5cfc' : 'rgba(0,0,0,.08)' }}>
+                      background: tierFilter === t ? '#2563EB' : '#fff', color: tierFilter === t ? '#fff' : '#9ca3af',
+                      borderColor: tierFilter === t ? '#2563EB' : 'rgba(0,0,0,.08)' }}>
                     {t === 'all' ? 'الكل' : t}
                   </button>
                 ))}
@@ -333,7 +333,7 @@ export default function FeaturesPage() {
                       {c.name?.charAt(0)}
                     </div>
                     <div style={{ flex: 1, overflow: 'hidden' }}>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: '#1E293B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
                       <div style={{ display: 'flex', gap: 4, alignItems: 'center', marginTop: 2 }}>
                         <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 7, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, fontWeight: 500 }}>{c.plan}</span>
                         {selectedCompany === c.id && <span style={{ fontSize: 11, color: '#22c55e', fontWeight: 500 }}>{enabledCount} مُفعَّل</span>}
@@ -358,7 +358,7 @@ export default function FeaturesPage() {
                 {/* Company header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                   <div>
-                    <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a2e', letterSpacing: '-0.02em' }}>{selectedCo?.name}</div>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: '#1E293B', letterSpacing: '-0.02em' }}>{selectedCo?.name}</div>
                     <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2, fontWeight: 500 }}>
                       {companyFlags.filter(f => f.is_enabled).length} / {companyFlags.length} ميزة مفعّلة
                       {selectedCo?.plan && <span style={{ marginRight: 8, ...TIER_COLOR[selectedCo.plan] && { color: TIER_COLOR[selectedCo.plan].color } }}>خطة {selectedCo.plan}</span>}
@@ -410,7 +410,7 @@ export default function FeaturesPage() {
                               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
                                 <div style={{ flex: 1 }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{stat?.name_ar || key}</span>
+                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1E293B' }}>{stat?.name_ar || key}</span>
                                     {stat?.beta && <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: 'rgba(245,158,11,.1)', color: '#f59e0b', fontWeight: 500 }}>BETA</span>}
                                     {flag?.plan_includes === false && enabled && (
                                       <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: '#fffbeb', color: '#f59e0b', border: '1px solid rgba(245,158,11,.2)', fontWeight: 500 }}>خارج الخطة</span>
@@ -421,7 +421,7 @@ export default function FeaturesPage() {
                                     <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 3, fontWeight: 500 }}>آخر تعديل: {timeAgo(flag.set_at)}</div>
                                   )}
                                   {flag?.notes && (
-                                    <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 3, background: '#f8f7fc', padding: '3px 6px', borderRadius: 4 }}>{flag.notes}</div>
+                                    <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 3, background: '#F1F5F9', padding: '3px 6px', borderRadius: 4 }}>{flag.notes}</div>
                                   )}
                                 </div>
                                 <Toggle on={enabled} disabled={saving} onClick={() => toggle(selectedCompany!, key, enabled, rollout)} />
@@ -466,7 +466,7 @@ export default function FeaturesPage() {
               const tc = TIER_COLOR[tier];
               return (
                 <div key={tier}>
-                  <div style={{ padding: '8px 14px', background: '#f8f7fc', borderBottom: '1px solid rgba(0,0,0,.04)', fontSize: 11, fontWeight: 600, color: tc.color }}>
+                  <div style={{ padding: '8px 14px', background: '#F1F5F9', borderBottom: '1px solid rgba(0,0,0,.04)', fontSize: 11, fontWeight: 600, color: tc.color }}>
                     {tier.toUpperCase()}
                   </div>
                   {features.map(key => {
@@ -476,7 +476,7 @@ export default function FeaturesPage() {
                       <button key={key} onClick={() => { setSelectedFeature(key); loadFeatureCompanies(key); }}
                         style={{ width: '100%', padding: '10px 14px', border: 'none', background: active ? 'rgba(124,92,252,.08)' : 'transparent', cursor: 'pointer', textAlign: 'right', borderBottom: '1px solid rgba(0,0,0,.04)', display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: active ? 600 : 500, color: '#1a1a2e' }}>{s?.name_ar || key}</div>
+                          <div style={{ fontSize: 13, fontWeight: active ? 600 : 500, color: '#1E293B' }}>{s?.name_ar || key}</div>
                           <div style={{ fontSize: 11, color: '#9ca3af', fontFamily: 'monospace', marginTop: 1, fontWeight: 500 }}>{key}</div>
                         </div>
                         <div style={{ textAlign: 'left' }}>
@@ -504,7 +504,7 @@ export default function FeaturesPage() {
                 {/* Feature header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
                   <div>
-                    <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a2e', letterSpacing: '-0.02em' }}>{stats[selectedFeature]?.name_ar}</div>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: '#1E293B', letterSpacing: '-0.02em' }}>{stats[selectedFeature]?.name_ar}</div>
                     <div style={{ fontSize: 11, color: '#6b7280', fontFamily: 'monospace', fontWeight: 500 }}>{selectedFeature}</div>
                     <div style={{ fontSize: 13, color: '#9ca3af', marginTop: 4 }}>
                       {featureRows.filter(r => r.is_enabled).length} / {featureRows.length} شركة مُفعَّلة
@@ -536,7 +536,7 @@ export default function FeaturesPage() {
                 <div style={{ borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: '#f8f7fc', borderBottom: '1px solid rgba(0,0,0,.06)' }}>
+                      <tr style={{ background: '#F1F5F9', borderBottom: '1px solid rgba(0,0,0,.06)' }}>
                         {['الشركة', 'الخطة', 'الحالة', 'نسبة الطرح', 'آخر تعديل', 'ملاحظات', ''].map(h => (
                           <th key={h} style={{ padding: '9px 14px', fontSize: 11, color: '#6b7280', fontWeight: 500, textAlign: 'right' }}>{h}</th>
                         ))}
@@ -547,7 +547,7 @@ export default function FeaturesPage() {
                         const tc = TIER_COLOR[row.plan] || TIER_COLOR.trial;
                         return (
                           <tr key={row.company_id} style={{ borderBottom: '1px solid rgba(0,0,0,.04)', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
-                            <td style={{ padding: '10px 14px', fontSize: 13, fontWeight: 500, color: '#1a1a2e' }}>{row.name}</td>
+                            <td style={{ padding: '10px 14px', fontSize: 13, fontWeight: 500, color: '#1E293B' }}>{row.name}</td>
                             <td style={{ padding: '10px 14px' }}>
                               <span style={{ fontSize: 11, padding: '2px 7px', borderRadius: 7, background: tc.bg, color: tc.color, border: `1px solid ${tc.border}`, fontWeight: 500 }}>{row.plan}</span>
                             </td>
@@ -557,7 +557,7 @@ export default function FeaturesPage() {
                             <td style={{ padding: '10px 14px', fontSize: 13, color: '#9ca3af' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                                 <div style={{ width: 50, height: 4, background: 'rgba(0,0,0,.06)', borderRadius: 2 }}>
-                                  <div style={{ width: `${row.rollout_pct}%`, height: 4, background: '#7c5cfc', borderRadius: 2 }} />
+                                  <div style={{ width: `${row.rollout_pct}%`, height: 4, background: '#2563EB', borderRadius: 2 }} />
                                 </div>
                                 <span>{row.rollout_pct}%</span>
                               </div>
@@ -603,8 +603,8 @@ export default function FeaturesPage() {
               <div style={{ borderRadius: 14, overflow: 'auto', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
                 <table style={{ borderCollapse: 'collapse', minWidth: 'max-content' }}>
                   <thead>
-                    <tr style={{ background: '#f8f7fc' }}>
-                      <th style={{ padding: '10px 16px', fontSize: 11, color: '#6b7280', fontWeight: 500, textAlign: 'right', borderBottom: '1px solid rgba(0,0,0,.06)', borderLeft: '1px solid rgba(0,0,0,.06)', position: 'sticky', right: 0, background: '#f8f7fc', zIndex: 2, minWidth: 160 }}>الشركة / الخطة</th>
+                    <tr style={{ background: '#F1F5F9' }}>
+                      <th style={{ padding: '10px 16px', fontSize: 11, color: '#6b7280', fontWeight: 500, textAlign: 'right', borderBottom: '1px solid rgba(0,0,0,.06)', borderLeft: '1px solid rgba(0,0,0,.06)', position: 'sticky', right: 0, background: '#F1F5F9', zIndex: 2, minWidth: 160 }}>الشركة / الخطة</th>
                       {Object.entries(matrixData.features).map(([key, meta]: [string, any]) => (
                         <th key={key} style={{ padding: '6px 8px', fontSize: 11, color: '#6b7280', fontWeight: 500, textAlign: 'center', borderBottom: '1px solid rgba(0,0,0,.06)', borderLeft: '1px solid rgba(0,0,0,.04)', maxWidth: 80, minWidth: 70 }}>
                           <div style={{ writingMode: 'vertical-lr', transform: 'rotate(180deg)', whiteSpace: 'nowrap', color: TIER_COLOR[meta.tier_min]?.color }}>
@@ -623,7 +623,7 @@ export default function FeaturesPage() {
                       return (
                         <tr key={company.id} style={{ borderBottom: '1px solid rgba(0,0,0,.04)', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
                           <td style={{ padding: '8px 14px', borderLeft: '1px solid rgba(0,0,0,.06)', position: 'sticky', right: 0, background: i % 2 === 0 ? '#fff' : '#fafafa', zIndex: 1 }}>
-                            <div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a2e' }}>{company.name}</div>
+                            <div style={{ fontSize: 13, fontWeight: 500, color: '#1E293B' }}>{company.name}</div>
                             <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 7, background: tc.bg, color: tc.color, fontWeight: 500 }}>{company.plan}</span>
                           </td>
                           {Object.keys(matrixData.features).map(key => {
@@ -655,8 +655,8 @@ export default function FeaturesPage() {
                       );
                     })}
                     {/* Column totals */}
-                    <tr style={{ background: '#f8f7fc', borderTop: '2px solid rgba(0,0,0,.08)' }}>
-                      <td style={{ padding: '8px 14px', fontSize: 11, fontWeight: 600, color: '#1a1a2e', position: 'sticky', right: 0, background: '#f8f7fc' }}>مجموع الانتشار</td>
+                    <tr style={{ background: '#F1F5F9', borderTop: '2px solid rgba(0,0,0,.08)' }}>
+                      <td style={{ padding: '8px 14px', fontSize: 11, fontWeight: 600, color: '#1E293B', position: 'sticky', right: 0, background: '#F1F5F9' }}>مجموع الانتشار</td>
                       {Object.keys(matrixData.features).map(key => {
                         const s = stats[key];
                         return (

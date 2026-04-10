@@ -39,14 +39,14 @@ export default function CouponsPage() {
     } catch (e: any) { showToast(`خطأ: ${e.message}`); }
   };
 
-  const ghostBtn: React.CSSProperties = { fontSize: 10, padding: '5px 8px', borderRadius: 7, background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', cursor: 'pointer' };
+  const ghostBtn: React.CSSProperties = { fontSize: 10, padding: '5px 8px', borderRadius: 7, background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', cursor: 'pointer' };
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>أكواد الخصم</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1E293B' }}>أكواد الخصم</h2>
         <button onClick={() => setShowCreate(true)}
-          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           + كود جديد
         </button>
       </div>
@@ -63,7 +63,7 @@ export default function CouponsPage() {
         <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#f8f7fc' }}>
+              <tr style={{ background: '#F1F5F9' }}>
                 {['الكود', 'الخصم', 'الاستخدام', 'صالح حتى', 'الحالة', 'إجراء'].map(h => (
                   <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#6b7280', borderBottom: '1px solid rgba(0,0,0,.06)' }}>{h}</th>
                 ))}
@@ -73,10 +73,10 @@ export default function CouponsPage() {
               {coupons.map((c, i) => (
                 <tr key={c.id} style={{ borderBottom: i < coupons.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
                   <td style={{ padding: '12px 18px' }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', fontFamily: 'monospace', background: '#f8f7fc', padding: '3px 8px', borderRadius: 7, border: '1px solid rgba(0,0,0,.06)' }}>{c.code}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', fontFamily: 'monospace', background: '#F1F5F9', padding: '3px 8px', borderRadius: 7, border: '1px solid rgba(0,0,0,.06)' }}>{c.code}</span>
                     {c.description_ar && <p style={{ fontSize: 10, color: '#9ca3af', margin: '4px 0 0' }}>{c.description_ar}</p>}
                   </td>
-                  <td style={{ padding: '12px 18px', fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>
+                  <td style={{ padding: '12px 18px', fontSize: 13, fontWeight: 600, color: '#1E293B' }}>
                     {c.discount_type === 'percentage' ? `${c.discount_value}%` : `${c.discount_value} ر.س`}
                   </td>
                   <td style={{ padding: '12px 18px', fontSize: 12, color: '#9ca3af' }}>
@@ -137,12 +137,12 @@ function CreateCouponModal({ onClose, onDone }: { onClose: () => void; onDone: (
     } catch (e: any) { setErr(e.message || 'خطأ'); setLoading(false); }
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', background: '#f8f7fc', color: '#1a1a2e' };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' };
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
       <div style={{ background: '#fff', borderRadius: 16, padding: '28px 32px', width: 400, boxShadow: '0 20px 60px rgba(0,0,0,.12)' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1a1a2e' }}>إنشاء كود خصم</h3>
+        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1E293B' }}>إنشاء كود خصم</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
             <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>الكود *</label>
@@ -194,9 +194,9 @@ function CreateCouponModal({ onClose, onDone }: { onClose: () => void; onDone: (
         </div>
         {err && <p style={{ fontSize: 12, color: '#dc2626', margin: '12px 0 0' }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 20 }}>
-          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
+          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#F1F5F9', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
           <button onClick={submit} disabled={loading}
-            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             {loading ? '...' : 'إنشاء'}
           </button>
         </div>

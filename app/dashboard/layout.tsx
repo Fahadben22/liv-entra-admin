@@ -21,8 +21,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }, [router]);
 
   if (!ready) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f7fc' }}>
-      <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #ede9fe', borderTopColor: '#7c5cfc', animation: 'spin .7s linear infinite' }} />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
+      <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #DBEAFE', borderTopColor: '#2563EB', animation: 'spin .7s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
@@ -32,7 +32,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <ToastProvider>
-      <div style={{ display: 'flex', minHeight: '100vh', direction: 'rtl', background: '#f8f7fc' }}>
+      <div style={{ display: 'flex', minHeight: '100vh', direction: 'rtl', background: '#F8FAFC' }}>
 
         {/* Sidebar overlay on mobile — click to close */}
         {sidebarOpen && (
@@ -59,7 +59,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           }}>
             <div style={{
               width: 30, height: 30, borderRadius: 8,
-              background: 'linear-gradient(135deg, #7c5cfc, #a78bfa)',
+              background: 'linear-gradient(135deg, #2563EB, #60A5FA)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 13, fontWeight: 700, color: '#fff', flexShrink: 0,
               boxShadow: '0 2px 8px rgba(124,92,252,.2)',
@@ -95,15 +95,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                         display: 'flex', alignItems: 'center',
                         padding: '8px 12px', borderRadius: 8,
                         marginBottom: 2, textDecoration: 'none',
-                        background: active ? '#ede9fe' : 'transparent',
-                        color: active ? '#7c5cfc' : '#6b7280',
+                        background: active ? '#DBEAFE' : 'transparent',
+                        color: active ? '#2563EB' : '#6b7280',
                         fontSize: 13, fontWeight: active ? 600 : 400,
                         transition: 'all .12s ease',
                       }}>
                         {active && (
                           <div style={{
                             width: 3, height: 16, borderRadius: 2,
-                            background: '#7c5cfc', marginLeft: 8, flexShrink: 0,
+                            background: '#2563EB', marginLeft: 8, flexShrink: 0,
                           }} />
                         )}
                         <span>{item.label}</span>
@@ -119,9 +119,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <div style={{ borderTop: '1px solid rgba(0,0,0,.04)', padding: '14px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
               <div style={{
-                width: 32, height: 32, borderRadius: 8, background: '#ede9fe',
+                width: 32, height: 32, borderRadius: 8, background: '#DBEAFE',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 13, fontWeight: 600, color: '#7c5cfc',
+                fontSize: 13, fontWeight: 600, color: '#2563EB',
               }}>
                 {userName.charAt(0)}
               </div>

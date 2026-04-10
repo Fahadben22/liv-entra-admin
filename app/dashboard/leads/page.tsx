@@ -19,7 +19,7 @@ type DemoRequest = {
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
   new:         { label: 'جديد',         color: '#3b82f6', bg: '#eff6ff' },
   contacted:   { label: 'تم التواصل',   color: '#f59e0b', bg: '#fffbeb' },
-  demo_done:   { label: 'تم العرض',     color: '#a78bfa', bg: '#f5f3ff' },
+  demo_done:   { label: 'تم العرض',     color: '#60A5FA', bg: '#f5f3ff' },
   converted:   { label: 'تحوّل عميل',   color: '#10b981', bg: '#ecfdf5' },
   lost:        { label: 'خسارة',        color: '#ef4444', bg: '#fef2f2' },
 };
@@ -103,13 +103,13 @@ export default function LeadsPage() {
   ALL_STATUSES.forEach(s => { filteredCount[s] = items.filter(r => r.status === s).length; });
 
   return (
-    <div className="fade-in" style={{ color: '#1a1a2e', fontFamily: "'Tajawal', sans-serif" }}>
+    <div className="fade-in" style={{ color: '#1E293B', fontFamily: "'Tajawal', sans-serif" }}>
 
       <div style={{ maxWidth: 1300, margin: '0 auto', padding: '28px 24px' }}>
 
         {/* HEADER */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#1a1a2e', letterSpacing: '-0.02em' }}>طلبات حجز العرض</h1>
+          <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#1E293B', letterSpacing: '-0.02em' }}>طلبات حجز العرض</h1>
           <p style={{ color: '#9ca3af', fontSize: 13 }}>العملاء المحتملون الذين تقدموا من الموقع — إجمالي {total} طلب</p>
         </div>
 
@@ -121,11 +121,11 @@ export default function LeadsPage() {
         {stats && (
           <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, marginBottom: 24 }}>
             {[
-              { label: 'إجمالي الطلبات',   value: stats.total,                         color: '#1a1a2e' },
+              { label: 'إجمالي الطلبات',   value: stats.total,                         color: '#1E293B' },
               { label: 'جديد',              value: stats.statusCounts?.new || 0,        color: '#3b82f6' },
               { label: 'تم التواصل',        value: stats.statusCounts?.contacted || 0,  color: '#f59e0b' },
               { label: 'تحوّل عميل',        value: stats.statusCounts?.converted || 0,  color: '#10b981' },
-              { label: 'معدل التحويل',      value: `${stats.conversionRate || 0}%`,     color: '#a78bfa' },
+              { label: 'معدل التحويل',      value: `${stats.conversionRate || 0}%`,     color: '#60A5FA' },
             ].map(k => (
               <div key={k.label} className="card card-lift" style={{ background: '#fff', border: '1px solid rgba(0,0,0,.06)', borderRadius: 14, padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
                 <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 6, fontWeight: 500 }}>{k.label}</div>
@@ -143,9 +143,9 @@ export default function LeadsPage() {
                 padding: '10px 18px', fontSize: 13, fontWeight: filter === tab.key ? 600 : 400,
                 cursor: 'pointer', fontFamily: 'inherit',
                 background: 'none',
-                color: filter === tab.key ? '#1a1a2e' : '#9ca3af',
+                color: filter === tab.key ? '#1E293B' : '#9ca3af',
                 border: 'none',
-                borderBottom: filter === tab.key ? '2px solid #7c5cfc' : '2px solid transparent',
+                borderBottom: filter === tab.key ? '2px solid #2563EB' : '2px solid transparent',
               }}
             >
               {tab.label} {tab.count > 0 && <span style={{ color: '#6b7280', marginRight: 4 }}>({tab.count})</span>}
@@ -166,7 +166,7 @@ export default function LeadsPage() {
         ) : (
           <div style={{ borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr 180px 130px 80px 110px 140px 80px', gap: 0, background: '#f8f7fc', borderBottom: '1px solid rgba(0,0,0,.06)', padding: '10px 20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr 180px 130px 80px 110px 140px 80px', gap: 0, background: '#F1F5F9', borderBottom: '1px solid rgba(0,0,0,.06)', padding: '10px 20px' }}>
               {['التاريخ', 'العميل', 'البريد', 'الجوال', 'الوحدات', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
                 <div key={h} style={{ fontSize: 11, fontWeight: 500, color: '#6b7280' }}>{h}</div>
               ))}
@@ -189,14 +189,14 @@ export default function LeadsPage() {
 
                   {/* Name */}
                   <div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: '#1a1a2e' }}>{item.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: '#1E293B' }}>{item.name}</div>
                     {item.message && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2, fontWeight: 500, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.message}</div>}
                   </div>
 
                   {/* Email */}
                   <div>
                     {item.email ? (
-                      <a href={`mailto:${item.email}`} style={{ fontSize: 13, color: '#7c5cfc', textDecoration: 'none', direction: 'ltr', display: 'block' }}>{item.email}</a>
+                      <a href={`mailto:${item.email}`} style={{ fontSize: 13, color: '#2563EB', textDecoration: 'none', direction: 'ltr', display: 'block' }}>{item.email}</a>
                     ) : (
                       <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>—</span>
                     )}
@@ -204,7 +204,7 @@ export default function LeadsPage() {
 
                   {/* Phone */}
                   <div>
-                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: '#1a1a2e', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>{item.phone}</a>
+                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: '#1E293B', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>{item.phone}</a>
                     <div style={{ marginTop: 4 }}>
                       <a href={`https://wa.me/${item.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener"
                         style={{ fontSize: 11, color: '#22c55e', textDecoration: 'none', background: 'rgba(34,197,94,.1)', border: '1px solid rgba(34,197,94,.2)', borderRadius: 7, padding: '2px 8px', fontWeight: 500 }}>
@@ -230,7 +230,7 @@ export default function LeadsPage() {
                         fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
                         background: 'transparent',
                         border: '1px solid rgba(0,0,0,.08)',
-                        color: item.notes ? '#1a1a2e' : '#6b7280',
+                        color: item.notes ? '#1E293B' : '#6b7280',
                         borderRadius: 10, padding: '4px 12px',
                       }}>
                       {item.notes ? 'عرض الملاحظات' : '+ ملاحظة'}
@@ -244,14 +244,14 @@ export default function LeadsPage() {
                       disabled={updating === item.id}
                       onChange={e => changeStatus(item.id, e.target.value)}
                       style={{
-                        background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', color: '#1a1a2e',
+                        background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', color: '#1E293B',
                         borderRadius: 10, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
                         fontFamily: 'inherit', outline: 'none', flex: 1,
                         opacity: updating === item.id ? .5 : 1,
                       }}
                     >
                       {ALL_STATUSES.map(s => (
-                        <option key={s} value={s} style={{ background: '#fff', color: '#1a1a2e' }}>{STATUS_CONFIG[s].label}</option>
+                        <option key={s} value={s} style={{ background: '#fff', color: '#1E293B' }}>{STATUS_CONFIG[s].label}</option>
                       ))}
                     </select>
                     {item.status !== 'converted' && (
@@ -265,7 +265,7 @@ export default function LeadsPage() {
                         }}
                         style={{
                           fontSize: 12, padding: '7px 16px', borderRadius: 10,
-                          background: '#7c5cfc', border: 'none',
+                          background: '#2563EB', border: 'none',
                           color: '#fff', cursor: 'pointer', fontFamily: 'inherit',
                           whiteSpace: 'nowrap', fontWeight: 500,
                           boxShadow: '0 2px 8px rgba(124,92,252,.2)',
@@ -287,7 +287,7 @@ export default function LeadsPage() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
           onClick={e => { if (e.target === e.currentTarget) setNotesModal(null); }}>
           <div style={{ background: '#fff', boxShadow: '0 20px 60px rgba(0,0,0,.12)', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#1a1a2e' }}>ملاحظات</h3>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#1E293B' }}>ملاحظات</h3>
             <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 20 }}>{notesModal.name} — {notesModal.phone}</p>
             <textarea
               value={notesText}
@@ -295,14 +295,14 @@ export default function LeadsPage() {
               rows={5}
               placeholder="أضف ملاحظات حول هذا العميل..."
               style={{
-                width: '100%', background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)',
-                borderRadius: 10, padding: '7px 12px', color: '#1a1a2e', fontSize: 13,
+                width: '100%', background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)',
+                borderRadius: 10, padding: '7px 12px', color: '#1E293B', fontSize: 13,
                 fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box',
               }}
             />
             <div style={{ display: 'flex', gap: 10, marginTop: 16, flexDirection: 'row' }}>
               <button onClick={saveNotes} disabled={savingNotes}
-                style={{ flex: 1, padding: '7px 16px', background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+                style={{ flex: 1, padding: '7px 16px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
                 {savingNotes ? 'جاري الحفظ...' : 'حفظ'}
               </button>
               <button onClick={() => setNotesModal(null)}

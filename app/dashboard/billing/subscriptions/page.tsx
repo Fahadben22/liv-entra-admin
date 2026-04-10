@@ -44,7 +44,7 @@ function ChangePlanModal({ company, onClose, onDone }: { company: any; onClose: 
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.35)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={onClose}>
       <div style={{ background: '#fff', borderRadius: 18, padding: '32px', width: 420, maxWidth: '92vw', boxShadow: '0 24px 60px rgba(0,0,0,.15)' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px', color: '#1a1a2e' }}>تغيير الخطة</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px', color: '#1E293B' }}>تغيير الخطة</h3>
         <p style={{ fontSize: 12, color: '#9ca3af', margin: '0 0 24px' }}>{company.name} — {PLAN_AR[company.plan] || company.plan}</p>
 
         {fetching ? <p style={{ color: '#9ca3af', textAlign: 'center' }}>جاري التحميل...</p> : (
@@ -58,16 +58,16 @@ function ChangePlanModal({ company, onClose, onDone }: { company: any; onClose: 
                     style={{
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                       padding: '14px 16px', borderRadius: 12, cursor: 'pointer',
-                      background: selected ? '#ede9fe' : '#fafafa',
-                      border: selected ? '2px solid #7c5cfc' : '1.5px solid rgba(0,0,0,.06)',
+                      background: selected ? '#DBEAFE' : '#fafafa',
+                      border: selected ? '2px solid #2563EB' : '1.5px solid rgba(0,0,0,.06)',
                       transition: 'all .15s',
                     }}>
                     <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: '#1a1a2e', margin: 0 }}>{p.name_ar || PLAN_AR[p.name] || p.name}</p>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: '#1E293B', margin: 0 }}>{p.name_ar || PLAN_AR[p.name] || p.name}</p>
                       <p style={{ fontSize: 11, color: '#9ca3af', margin: '2px 0 0' }}>{p.max_units} وحدة · {p.max_users || p.max_staff} موظف</p>
                     </div>
                     <div style={{ textAlign: 'left' }}>
-                      <p style={{ fontSize: 16, fontWeight: 700, color: '#7c5cfc', margin: 0 }}>{fmt(p.price_monthly)} <span style={{ fontSize: 10, fontWeight: 400, color: '#9ca3af' }}>ر.س/شهر</span></p>
+                      <p style={{ fontSize: 16, fontWeight: 700, color: '#2563EB', margin: 0 }}>{fmt(p.price_monthly)} <span style={{ fontSize: 10, fontWeight: 400, color: '#9ca3af' }}>ر.س/شهر</span></p>
                     </div>
                   </button>
                 );
@@ -80,7 +80,7 @@ function ChangePlanModal({ company, onClose, onDone }: { company: any; onClose: 
                 <button key={c.key} onClick={() => setCycle(c.key)}
                   style={{
                     flex: 1, padding: '10px', borderRadius: 10, cursor: 'pointer',
-                    background: cycle === c.key ? '#7c5cfc' : '#fafafa',
+                    background: cycle === c.key ? '#2563EB' : '#fafafa',
                     color: cycle === c.key ? '#fff' : '#6b7280',
                     border: cycle === c.key ? 'none' : '1.5px solid rgba(0,0,0,.06)',
                     fontSize: 13, fontWeight: 600,
@@ -93,7 +93,7 @@ function ChangePlanModal({ company, onClose, onDone }: { company: any; onClose: 
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={onClose} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid rgba(0,0,0,.08)', background: '#fff', cursor: 'pointer', fontSize: 13, color: '#6b7280', fontWeight: 500 }}>إلغاء</button>
               <button onClick={submit} disabled={loading || !planId}
-                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700, opacity: loading || !planId ? .5 : 1 }}>
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 700, opacity: loading || !planId ? .5 : 1 }}>
                 {loading ? 'جاري التغيير...' : 'تأكيد التغيير'}
               </button>
             </div>
@@ -124,7 +124,7 @@ function ExtendModal({ company, onClose, onDone }: { company: any; onClose: () =
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.35)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={onClose}>
       <div style={{ background: '#fff', borderRadius: 18, padding: '32px', width: 360, maxWidth: '92vw', boxShadow: '0 24px 60px rgba(0,0,0,.15)' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px', color: '#1a1a2e' }}>تمديد التجربة</h3>
+        <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 6px', color: '#1E293B' }}>تمديد التجربة</h3>
         <p style={{ fontSize: 12, color: '#9ca3af', margin: '0 0 20px' }}>{company.name}</p>
         <p style={{ fontSize: 11, fontWeight: 600, color: '#6b7280', marginBottom: 8 }}>عدد أيام التمديد</p>
         <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
@@ -194,13 +194,13 @@ export default function SubscriptionsPage() {
       {extendCo && <ExtendModal company={extendCo} onClose={() => setExtendCo(null)} onDone={async () => { setExtendCo(null); await reload(); }} />}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#1a1a2e' }}>الاشتراكات</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#1E293B' }}>الاشتراكات</h2>
       </div>
 
       {/* Filter pills */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
         {[
-          { key: 'all', label: 'الكل', count: safeCompanies.length, color: '#7c5cfc' },
+          { key: 'all', label: 'الكل', count: safeCompanies.length, color: '#2563EB' },
           { key: 'active', label: 'نشطة', count: active, color: '#16a34a' },
           { key: 'trial', label: 'تجريبية', count: trial, color: '#3b82f6' },
           { key: 'overdue', label: 'متأخرة', count: overdue, color: '#c2410c' },
@@ -230,7 +230,7 @@ export default function SubscriptionsPage() {
       {/* Search */}
       <input value={search} onChange={e => setSearch(e.target.value)}
         placeholder="بحث بالاسم أو البريد..."
-        style={{ padding: '11px 18px', borderRadius: 12, border: '1.5px solid rgba(0,0,0,.08)', fontSize: 14, width: '100%', maxWidth: 360, background: '#fafafa', color: '#1a1a2e', marginBottom: 20, minHeight: 44 }}
+        style={{ padding: '11px 18px', borderRadius: 12, border: '1.5px solid rgba(0,0,0,.08)', fontSize: 14, width: '100%', maxWidth: 360, background: '#fafafa', color: '#1E293B', marginBottom: 20, minHeight: 44 }}
       />
 
       {/* Subscription cards */}
@@ -251,7 +251,7 @@ export default function SubscriptionsPage() {
                 {/* Company info */}
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-                    <Link href={`/dashboard/companies/${c.id}`} style={{ fontSize: 15, fontWeight: 700, color: '#1a1a2e', textDecoration: 'none' }}>{c.name}</Link>
+                    <Link href={`/dashboard/companies/${c.id}`} style={{ fontSize: 15, fontWeight: 700, color: '#1E293B', textDecoration: 'none' }}>{c.name}</Link>
                     <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: ss.bg, color: ss.color, fontWeight: 600, border: `1px solid ${ss.border}` }}>{ss.label}</span>
                     <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: pc.bg, color: pc.color, fontWeight: 600, border: `1px solid ${pc.border}` }}>{PLAN_AR[c.plan] || c.plan}</span>
                   </div>
@@ -273,7 +273,7 @@ export default function SubscriptionsPage() {
                 {/* Actions */}
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                   <button onClick={() => setChangePlanCo(c)}
-                    style={{ padding: '8px 16px', borderRadius: 10, background: '#ede9fe', border: '1px solid #c4b5fd', color: '#7c5cfc', cursor: 'pointer', fontSize: 12, fontWeight: 600, minHeight: 40 }}>
+                    style={{ padding: '8px 16px', borderRadius: 10, background: '#DBEAFE', border: '1px solid #c4b5fd', color: '#2563EB', cursor: 'pointer', fontSize: 12, fontWeight: 600, minHeight: 40 }}>
                     تغيير الخطة
                   </button>
                   {status === 'trial' && (

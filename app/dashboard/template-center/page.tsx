@@ -51,7 +51,7 @@ const CHANNEL_COLORS: Record<Channel, { bg: string; border: string; text: string
 // Render {{var}} in a string with sample values
 function preview(tpl: string, vars: TemplateVar[]): string {
   let out = tpl;
-  vars.forEach(v => { out = out.replace(new RegExp(`\\{\\{${v.key}\\}\\}`, 'g'), `<mark style="background:rgba(124,92,252,.12);color:#7c5cfc;padding:0 2px;border-radius:3px">${v.example}</mark>`); });
+  vars.forEach(v => { out = out.replace(new RegExp(`\\{\\{${v.key}\\}\\}`, 'g'), `<mark style="background:rgba(124,92,252,.12);color:#2563EB;padding:0 2px;border-radius:3px">${v.example}</mark>`); });
   return out;
 }
 
@@ -81,9 +81,9 @@ export default function TemplateCenterPage() {
       {/* Header */}
       <div style={{ padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(0,0,0,.08)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Link href="/dashboard" style={{ color: '#7c5cfc', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
+          <Link href="/dashboard" style={{ color: '#2563EB', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 600, color: '#1a1a2e', letterSpacing: '-0.02em' }}>مركز القوالب</div>
+            <div style={{ fontSize: 18, fontWeight: 600, color: '#1E293B', letterSpacing: '-0.02em' }}>مركز القوالب</div>
             <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>إدارة قوالب البريد والإشعارات</div>
           </div>
         </div>
@@ -99,9 +99,9 @@ export default function TemplateCenterPage() {
           const active = tab === ch;
           return (
             <button key={ch} onClick={() => setTab(ch)}
-              style={{ padding: '14px 22px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 13, fontWeight: active ? 600 : 400, color: active ? '#1a1a2e' : '#9ca3af', borderBottom: active ? '2px solid #7c5cfc' : '2px solid transparent', display: 'flex', alignItems: 'center', gap: 6 }}>
+              style={{ padding: '14px 22px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 13, fontWeight: active ? 600 : 400, color: active ? '#1E293B' : '#9ca3af', borderBottom: active ? '2px solid #2563EB' : '2px solid transparent', display: 'flex', alignItems: 'center', gap: 6 }}>
               {CHANNEL_ICONS[ch]} {CHANNEL_LABELS[ch]}
-              <span style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', color: active ? '#1a1a2e' : '#9ca3af', fontSize: 10, padding: '1px 7px', borderRadius: 10, fontWeight: 500 }}>
+              <span style={{ background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', color: active ? '#1E293B' : '#9ca3af', fontSize: 10, padding: '1px 7px', borderRadius: 10, fontWeight: 500 }}>
                 {counts[ch]}
               </span>
             </button>
@@ -154,9 +154,9 @@ function TemplateCard({ template: t, onEdit, onToggle }: { template: Template; o
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <span style={{ fontSize: 16 }}>{CHANNEL_ICONS[t.channel]}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{t.name_ar}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#1E293B' }}>{t.name_ar}</span>
           </div>
-          <code style={{ fontSize: 10, color: '#9ca3af', background: '#f8f7fc', padding: '2px 7px', borderRadius: 5 }}>{t.key}</code>
+          <code style={{ fontSize: 10, color: '#9ca3af', background: '#F1F5F9', padding: '2px 7px', borderRadius: 5 }}>{t.key}</code>
         </div>
         {/* Active toggle */}
         <div onClick={onToggle} title={t.is_active ? 'تعطيل' : 'تفعيل'}
@@ -186,7 +186,7 @@ function TemplateCard({ template: t, onEdit, onToggle }: { template: Template; o
           {t.updated_by ? `${t.updated_by} · ` : ''}{updatedDate}
         </span>
         <button onClick={onEdit}
-          style={{ padding: '6px 14px', background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+          style={{ padding: '6px 14px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
           تعديل
         </button>
       </div>
@@ -258,13 +258,13 @@ function EditorModal({ template, onClose, onSaved }: { template: Template; onClo
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 18 }}>{CHANNEL_ICONS[template.channel]}</span>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{template.name_ar}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#1E293B' }}>{template.name_ar}</div>
               <code style={{ fontSize: 10, color: '#9ca3af' }}>{template.key}</code>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={() => setPreview(p => !p)}
-              style={{ padding: '7px 14px', background: previewMode ? '#7c5cfc' : 'transparent', color: previewMode ? '#fff' : '#6b7280', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, cursor: 'pointer' }}>
+              style={{ padding: '7px 14px', background: previewMode ? '#2563EB' : 'transparent', color: previewMode ? '#fff' : '#6b7280', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, cursor: 'pointer' }}>
               {previewMode ? 'تعديل' : 'معاينة'}
             </button>
             <button onClick={onClose}
@@ -284,7 +284,7 @@ function EditorModal({ template, onClose, onSaved }: { template: Template; onClo
               <div style={{ marginBottom: 16 }}>
                 <label style={{ fontSize: 11, fontWeight: 500, color: '#6b7280', display: 'block', marginBottom: 5 }}>سطر الموضوع</label>
                 <input value={subject} onChange={e => setSubject(e.target.value)}
-                  style={{ width: '100%', padding: '9px 12px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#f8f7fc', color: '#1a1a2e' }} />
+                  style={{ width: '100%', padding: '9px 12px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' }} />
                 {subject && <div style={{ marginTop: 5, fontSize: 11, color: '#9ca3af' }}>معاينة: <span dangerouslySetInnerHTML={{ __html: previewSubj }} /></div>}
               </div>
             )}
@@ -294,15 +294,15 @@ function EditorModal({ template, onClose, onSaved }: { template: Template; onClo
               <div>
                 {isEmail && (
                   <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 8, overflow: 'hidden' }}>
-                    <div style={{ background: '#f8f7fc', padding: '8px 14px', fontSize: 11, color: '#6b7280', borderBottom: '1px solid rgba(0,0,0,.08)' }}>
+                    <div style={{ background: '#F1F5F9', padding: '8px 14px', fontSize: 11, color: '#6b7280', borderBottom: '1px solid rgba(0,0,0,.08)' }}>
                       الموضوع: <span dangerouslySetInnerHTML={{ __html: previewSubj }} />
                     </div>
-                    <div style={{ padding: 16, maxHeight: 480, overflowY: 'auto', color: '#1a1a2e' }}
+                    <div style={{ padding: 16, maxHeight: 480, overflowY: 'auto', color: '#1E293B' }}
                       dangerouslySetInnerHTML={{ __html: previewHtml }} />
                   </div>
                 )}
                 {isWA && (
-                  <div style={{ background: 'rgba(34,197,94,.08)', border: '1px solid rgba(34,197,94,.15)', borderRadius: 12, padding: 16, fontFamily: 'sans-serif', fontSize: 13, lineHeight: 1.7, maxWidth: 360, color: '#1a1a2e', whiteSpace: 'pre-wrap' }}
+                  <div style={{ background: 'rgba(34,197,94,.08)', border: '1px solid rgba(34,197,94,.15)', borderRadius: 12, padding: 16, fontFamily: 'sans-serif', fontSize: 13, lineHeight: 1.7, maxWidth: 360, color: '#1E293B', whiteSpace: 'pre-wrap' }}
                     dangerouslySetInnerHTML={{ __html: previewText.replace(/\*(.*?)\*/g, '<strong>$1</strong>') }} />
                 )}
               </div>
@@ -316,7 +316,7 @@ function EditorModal({ template, onClose, onSaved }: { template: Template; onClo
                   value={isEmail ? htmlBody : textBody}
                   onChange={e => isEmail ? setHtmlBody(e.target.value) : setTextBody(e.target.value)}
                   rows={isEmail ? 18 : 12}
-                  style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, outline: 'none', boxSizing: 'border-box', resize: 'vertical', fontFamily: isEmail ? 'monospace' : 'inherit', lineHeight: 1.6, direction: 'ltr', background: '#f8f7fc', color: '#1a1a2e' }}
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, outline: 'none', boxSizing: 'border-box', resize: 'vertical', fontFamily: isEmail ? 'monospace' : 'inherit', lineHeight: 1.6, direction: 'ltr', background: '#F1F5F9', color: '#1E293B' }}
                 />
                 {isWA && (
                   <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 4 }}>
@@ -331,14 +331,14 @@ function EditorModal({ template, onClose, onSaved }: { template: Template; onClo
           <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* Variables */}
             <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', marginBottom: 10 }}>المتغيرات المتاحة</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', marginBottom: 10 }}>المتغيرات المتاحة</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {template.variables.map(v => (
                   <div key={v.key} onClick={() => insertVar(v.key)}
-                    style={{ cursor: 'pointer', padding: '8px 10px', border: '1px solid rgba(0,0,0,.06)', borderRadius: 8, background: '#f8f7fc', transition: 'all 0.1s' }}
+                    style={{ cursor: 'pointer', padding: '8px 10px', border: '1px solid rgba(0,0,0,.06)', borderRadius: 8, background: '#F1F5F9', transition: 'all 0.1s' }}
                     title={`مثال: ${v.example}`}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <code style={{ fontSize: 11, color: '#1a1a2e', fontWeight: 600 }}>{`{{${v.key}}}`}</code>
+                      <code style={{ fontSize: 11, color: '#1E293B', fontWeight: 600 }}>{`{{${v.key}}}`}</code>
                       <span style={{ fontSize: 9, color: '#9ca3af' }}>انقر للإدراج</span>
                     </div>
                     <div style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>{v.label_ar}</div>
@@ -351,12 +351,12 @@ function EditorModal({ template, onClose, onSaved }: { template: Template; onClo
             {/* Test send (email only) */}
             {isEmail && (
               <div style={{ borderTop: '1px solid rgba(0,0,0,.06)', paddingTop: 16 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', marginBottom: 10 }}>إرسال تجريبي</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', marginBottom: 10 }}>إرسال تجريبي</div>
                 <input type="email" value={testEmail} onChange={e => setTestEmail(e.target.value)}
                   placeholder="test@example.com" dir="ltr"
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, outline: 'none', marginBottom: 8, boxSizing: 'border-box', background: '#f8f7fc', color: '#1a1a2e' }} />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, outline: 'none', marginBottom: 8, boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' }} />
                 <button onClick={handleTest} disabled={testing}
-                  style={{ width: '100%', padding: '9px', background: testing ? '#d1d5db' : '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, cursor: testing ? 'not-allowed' : 'pointer', fontWeight: 600 }}>
+                  style={{ width: '100%', padding: '9px', background: testing ? '#d1d5db' : '#2563EB', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, cursor: testing ? 'not-allowed' : 'pointer', fontWeight: 600 }}>
                   {testing ? 'جاري الإرسال...' : 'إرسال تجريبي'}
                 </button>
                 {testMsg && <div style={{ marginTop: 8, fontSize: 11, color: testMsg.includes('تم') ? '#16a34a' : '#dc2626' }}>{testMsg}</div>}
@@ -372,7 +372,7 @@ function EditorModal({ template, onClose, onSaved }: { template: Template; onClo
             إلغاء
           </button>
           <button onClick={handleSave} disabled={saving}
-            style={{ padding: '10px 24px', background: saving ? '#d1d5db' : '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
+            style={{ padding: '10px 24px', background: saving ? '#d1d5db' : '#2563EB', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer' }}>
             {saving ? 'جاري الحفظ...' : 'حفظ القالب'}
           </button>
         </div>
@@ -401,10 +401,10 @@ function SmtpModal({ onClose }: { onClose: () => void }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ background: '#fff', borderRadius: 16, padding: 32, width: 420, boxShadow: '0 20px 60px rgba(0,0,0,.12)', border: 'none' }}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: '0 0 6px' }}>اختبار اتصال SMTP</h3>
+        <h3 style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: '0 0 6px' }}>اختبار اتصال SMTP</h3>
         <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 20px' }}>يرسل بريدًا تجريبيًا للتحقق من إعدادات GoDaddy SMTP</p>
 
-        <div style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', borderRadius: 8, padding: '12px 14px', marginBottom: 16, fontSize: 11, fontFamily: 'monospace', color: '#6b7280', direction: 'ltr' }}>
+        <div style={{ background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', borderRadius: 8, padding: '12px 14px', marginBottom: 16, fontSize: 11, fontFamily: 'monospace', color: '#6b7280', direction: 'ltr' }}>
           <div>HOST: {process?.env?.NEXT_PUBLIC_SMTP_HOST || 'smtpout.secureserver.net'}</div>
           <div>PORT: 465 (SSL)</div>
         </div>
@@ -412,7 +412,7 @@ function SmtpModal({ onClose }: { onClose: () => void }) {
         <label style={{ fontSize: 11, fontWeight: 500, color: '#6b7280', display: 'block', marginBottom: 6 }}>إرسال بريد الاختبار إلى</label>
         <input type="email" value={email} onChange={e => setEmail(e.target.value)}
           placeholder="your@email.com" dir="ltr"
-          style={{ width: '100%', padding: '9px 12px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, outline: 'none', marginBottom: 14, boxSizing: 'border-box', background: '#f8f7fc', color: '#1a1a2e' }} />
+          style={{ width: '100%', padding: '9px 12px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, outline: 'none', marginBottom: 14, boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' }} />
 
         {result && (
           <div style={{ background: result.ok ? 'rgba(22,163,74,.08)' : 'rgba(220,38,38,.08)', border: `1px solid ${result.ok ? 'rgba(22,163,74,.2)' : 'rgba(220,38,38,.2)'}`, borderRadius: 8, padding: '10px 14px', marginBottom: 14, fontSize: 12, color: result.ok ? '#16a34a' : '#dc2626' }}>
@@ -424,7 +424,7 @@ function SmtpModal({ onClose }: { onClose: () => void }) {
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={onClose} style={{ flex: 1, padding: '10px', background: 'transparent', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, cursor: 'pointer', color: '#6b7280' }}>إغلاق</button>
           <button onClick={test} disabled={loading || !email}
-            style={{ flex: 2, padding: '10px', background: loading ? '#d1d5db' : '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: loading || !email ? 'not-allowed' : 'pointer' }}>
+            style={{ flex: 2, padding: '10px', background: loading ? '#d1d5db' : '#2563EB', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: loading || !email ? 'not-allowed' : 'pointer' }}>
             {loading ? 'جاري الاختبار...' : 'اختبار الآن'}
           </button>
         </div>

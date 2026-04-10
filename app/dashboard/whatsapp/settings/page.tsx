@@ -83,7 +83,7 @@ export default function WhatsAppSettingsPage() {
     setTimeout(() => setCopied(''), 2000);
   }
 
-  const inputStyle: React.CSSProperties = { width: '100%', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', color: '#1a1a2e', background: '#f8f7fc' };
+  const inputStyle: React.CSSProperties = { width: '100%', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 12px', fontSize: 13, boxSizing: 'border-box', color: '#1E293B', background: '#F1F5F9' };
 
   return (
     <div style={{ background: '#fff', minHeight: '100vh' }}>
@@ -91,7 +91,7 @@ export default function WhatsAppSettingsPage() {
       <div style={{ background: '#fff', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(0,0,0,.06)' }}>
         <Link href="/dashboard" style={{ color: '#6b7280', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>إعدادات واتساب</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1E293B' }}>إعدادات واتساب</div>
           <div style={{ fontSize: 11, color: '#9ca3af' }}>تكوين بيانات اعتماد واتساب لكل شركة</div>
         </div>
         <div style={{ marginRight: 'auto', display: 'flex', gap: 12 }}>
@@ -115,7 +115,7 @@ export default function WhatsAppSettingsPage() {
         <div className="card" style={{ background: '#fff', borderRadius: 14, padding: '16px 20px', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 10, height: 10, borderRadius: '50%', background: form.wa_setup_complete ? '#16a34a' : '#dc2626' }} />
           <div>
-            <div style={{ fontWeight: 600, fontSize: 13, color: '#1a1a2e' }}>
+            <div style={{ fontWeight: 600, fontSize: 13, color: '#1E293B' }}>
               {form.wa_setup_complete ? 'واتساب مُتصل' : 'واتساب غير مُكوَّن'}
             </div>
             <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>
@@ -127,7 +127,7 @@ export default function WhatsAppSettingsPage() {
 
         {/* Setup form */}
         <div className="card" style={{ background: '#fff', borderRadius: 14, padding: '20px 24px', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', marginBottom: 16 }}>بيانات اعتماد Meta Business</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', marginBottom: 16 }}>بيانات اعتماد Meta Business</div>
 
           {[
             { key: 'wa_phone_number_id', label: 'Phone Number ID', placeholder: 'مثال: 123456789012345', secret: false },
@@ -149,18 +149,18 @@ export default function WhatsAppSettingsPage() {
 
           <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
             <button onClick={save} disabled={saving}
-              style={{ background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 22px', fontSize: 13, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.7 : 1, fontWeight: 600 }}>
+              style={{ background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, padding: '9px 22px', fontSize: 13, cursor: saving ? 'default' : 'pointer', opacity: saving ? 0.7 : 1, fontWeight: 600 }}>
               {saving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
             </button>
             <button onClick={testConnection} disabled={testing || !form.wa_phone_number_id}
-              style={{ background: '#f8f7fc', color: '#6b7280', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '9px 22px', fontSize: 13, cursor: testing ? 'default' : 'pointer', opacity: testing || !form.wa_phone_number_id ? 0.6 : 1 }}>
+              style={{ background: '#F1F5F9', color: '#6b7280', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '9px 22px', fontSize: 13, cursor: testing ? 'default' : 'pointer', opacity: testing || !form.wa_phone_number_id ? 0.6 : 1 }}>
               {testing ? 'جاري الاختبار...' : 'اختبار الاتصال'}
             </button>
           </div>
 
           {saved && <div style={{ marginTop: 10, fontSize: 13, color: '#16a34a' }}>تم الحفظ بنجاح</div>}
           {testResult && (
-            <div style={{ marginTop: 10, fontSize: 13, color: testResult.ok ? '#16a34a' : '#dc2626', background: '#f8f7fc', padding: '8px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.06)' }}>
+            <div style={{ marginTop: 10, fontSize: 13, color: testResult.ok ? '#16a34a' : '#dc2626', background: '#F1F5F9', padding: '8px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.06)' }}>
               {testResult.msg}
             </div>
           )}
@@ -168,15 +168,15 @@ export default function WhatsAppSettingsPage() {
 
         {/* Webhook URL */}
         <div className="card" style={{ background: '#fff', borderRadius: 14, padding: '20px 24px', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', marginBottom: 16 }}>إعدادات Webhook في Meta Business Manager</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', marginBottom: 16 }}>إعدادات Webhook في Meta Business Manager</div>
 
           <div style={{ marginBottom: 14 }}>
             <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>Webhook URL</label>
             <div style={{ display: 'flex', gap: 8 }}>
               <input value={WEBHOOK_URL} readOnly
-                style={{ flex: 1, border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 12px', fontSize: 12, background: '#f8f7fc', color: '#9ca3af', fontFamily: 'monospace' }} />
+                style={{ flex: 1, border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 12px', fontSize: 12, background: '#F1F5F9', color: '#9ca3af', fontFamily: 'monospace' }} />
               <button onClick={() => copy(WEBHOOK_URL, 'url')}
-                style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 14px', fontSize: 12, cursor: 'pointer', color: copied === 'url' ? '#16a34a' : '#6b7280' }}>
+                style={{ background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 14px', fontSize: 12, cursor: 'pointer', color: copied === 'url' ? '#16a34a' : '#6b7280' }}>
                 {copied === 'url' ? 'نُسخ' : 'نسخ'}
               </button>
             </div>
@@ -186,15 +186,15 @@ export default function WhatsAppSettingsPage() {
             <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>Verify Token</label>
             <div style={{ display: 'flex', gap: 8 }}>
               <input value={VERIFY_TOKEN} readOnly
-                style={{ flex: 1, border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 12px', fontSize: 12, background: '#f8f7fc', color: '#9ca3af', fontFamily: 'monospace' }} />
+                style={{ flex: 1, border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 12px', fontSize: 12, background: '#F1F5F9', color: '#9ca3af', fontFamily: 'monospace' }} />
               <button onClick={() => copy(VERIFY_TOKEN, 'token')}
-                style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 14px', fontSize: 12, cursor: 'pointer', color: copied === 'token' ? '#16a34a' : '#6b7280' }}>
+                style={{ background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 14px', fontSize: 12, cursor: 'pointer', color: copied === 'token' ? '#16a34a' : '#6b7280' }}>
                 {copied === 'token' ? 'نُسخ' : 'نسخ'}
               </button>
             </div>
           </div>
 
-          <div style={{ marginTop: 14, background: '#f8f7fc', border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: '#6b7280' }}>
+          <div style={{ marginTop: 14, background: '#F1F5F9', border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '10px 14px', fontSize: 12, color: '#6b7280' }}>
             <strong>بانتظار موافقة Meta:</strong> بعد الحصول على موافقة Meta Business، أضف WHATSAPP_PHONE_NUMBER_ID وWHATSAPP_ACCESS_TOKEN وWHATSAPP_APP_SECRET في Railway، ثم سجّل الـ Webhook URL أعلاه في Meta Business Manager.
           </div>
         </div>

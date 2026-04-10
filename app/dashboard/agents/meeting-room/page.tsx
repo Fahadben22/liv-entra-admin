@@ -77,7 +77,7 @@ export default function MeetingRoomPage() {
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
       {/* Left: Chat */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <AgentChat agentType="meeting_room" agentName="غرفة الاجتماعات" agentIcon="🏛️" accentColor="#7c5cfc"
+        <AgentChat agentType="meeting_room" agentName="غرفة الاجتماعات" agentIcon="🏛️" accentColor="#2563EB"
           quickActions={['أعطيني نظرة شاملة على كل الأقسام', 'وش KPIs اليوم؟', 'أنشئ تقرير تنفيذي', 'وش الخطط النشطة؟', 'فيه مشاكل تحتاج انتباهي؟']} />
       </div>
 
@@ -86,14 +86,14 @@ export default function MeetingRoomPage() {
         {/* Sidebar header */}
         <div style={{ padding: '16px 18px', borderBottom: '1px solid rgba(0,0,0,.06)', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
           <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-            <button onClick={() => setTab('actions')} style={{ flex: 1, padding: '8px', borderRadius: 8, fontSize: 12, fontWeight: tab === 'actions' ? 700 : 400, border: `1px solid ${tab === 'actions' ? '#7c5cfc' : 'rgba(0,0,0,.08)'}`, background: tab === 'actions' ? 'rgba(124,92,252,.06)' : '#fff', color: tab === 'actions' ? '#7c5cfc' : '#6b7280', cursor: 'pointer' }}>
+            <button onClick={() => setTab('actions')} style={{ flex: 1, padding: '8px', borderRadius: 8, fontSize: 12, fontWeight: tab === 'actions' ? 700 : 400, border: `1px solid ${tab === 'actions' ? '#2563EB' : 'rgba(0,0,0,.08)'}`, background: tab === 'actions' ? 'rgba(124,92,252,.06)' : '#fff', color: tab === 'actions' ? '#2563EB' : '#6b7280', cursor: 'pointer' }}>
               المهام {pendingActions.length > 0 && <span style={{ marginRight: 4, background: '#ef4444', color: '#fff', borderRadius: '50%', padding: '1px 6px', fontSize: 10 }}>{pendingActions.length}</span>}
             </button>
-            <button onClick={() => setTab('reports')} style={{ flex: 1, padding: '8px', borderRadius: 8, fontSize: 12, fontWeight: tab === 'reports' ? 700 : 400, border: `1px solid ${tab === 'reports' ? '#7c5cfc' : 'rgba(0,0,0,.08)'}`, background: tab === 'reports' ? 'rgba(124,92,252,.06)' : '#fff', color: tab === 'reports' ? '#7c5cfc' : '#6b7280', cursor: 'pointer' }}>
+            <button onClick={() => setTab('reports')} style={{ flex: 1, padding: '8px', borderRadius: 8, fontSize: 12, fontWeight: tab === 'reports' ? 700 : 400, border: `1px solid ${tab === 'reports' ? '#2563EB' : 'rgba(0,0,0,.08)'}`, background: tab === 'reports' ? 'rgba(124,92,252,.06)' : '#fff', color: tab === 'reports' ? '#2563EB' : '#6b7280', cursor: 'pointer' }}>
               التقارير ({reports.length})
             </button>
           </div>
-          <button onClick={load} style={{ width: '100%', padding: '6px', borderRadius: 6, fontSize: 11, border: '1px solid rgba(0,0,0,.06)', background: '#f8f7fc', color: '#6b7280', cursor: 'pointer' }}>تحديث</button>
+          <button onClick={load} style={{ width: '100%', padding: '6px', borderRadius: 6, fontSize: 11, border: '1px solid rgba(0,0,0,.06)', background: '#F1F5F9', color: '#6b7280', cursor: 'pointer' }}>تحديث</button>
         </div>
 
         {loading && <p style={{ padding: 20, textAlign: 'center', fontSize: 12, color: '#9ca3af' }}>جاري التحميل...</p>}
@@ -113,18 +113,18 @@ export default function MeetingRoomPage() {
                     </div>
                     <span style={{ fontSize: 10, color: '#d1d5db' }}>{timeAgo(a.created_at)}</span>
                   </div>
-                  <h4 style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: '0 0 4px' }}>{a.title}</h4>
+                  <h4 style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: '0 0 4px' }}>{a.title}</h4>
                   {a.description && <p style={{ fontSize: 11, color: '#6b7280', margin: '0 0 8px', lineHeight: 1.5 }}>{a.description}</p>}
                   {a.result && (
                     <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '8px 10px', marginBottom: 8 }}>
                       <p style={{ fontSize: 10, fontWeight: 600, color: '#15803d', margin: '0 0 2px' }}>نتيجة التنفيذ:</p>
-                      <p style={{ fontSize: 11, color: '#1a1a2e', margin: 0 }}>{a.result}</p>
+                      <p style={{ fontSize: 11, color: '#1E293B', margin: 0 }}>{a.result}</p>
                     </div>
                   )}
                   {a.blocked_reason && (
                     <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '8px 10px', marginBottom: 8 }}>
                       <p style={{ fontSize: 10, fontWeight: 600, color: '#dc2626', margin: '0 0 2px' }}>سبب الرفض:</p>
-                      <p style={{ fontSize: 11, color: '#1a1a2e', margin: 0 }}>{a.blocked_reason}</p>
+                      <p style={{ fontSize: 11, color: '#1E293B', margin: 0 }}>{a.blocked_reason}</p>
                     </div>
                   )}
                   {a.status === 'pending_approval' && (
@@ -157,13 +157,13 @@ export default function MeetingRoomPage() {
                     <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: st.bg, color: st.color, fontWeight: 600 }}>{st.label}</span>
                     <span style={{ fontSize: 10, color: '#d1d5db' }}>{timeAgo(r.created_at)}</span>
                   </div>
-                  <h4 style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: '0 0 6px' }}>{r.title}</h4>
+                  <h4 style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: '0 0 6px' }}>{r.title}</h4>
                   <p style={{ fontSize: 11, color: '#6b7280', margin: '0 0 10px', lineHeight: 1.6, maxHeight: 80, overflow: 'hidden' }}>{r.summary}</p>
                   {Array.isArray(r.action_items) && r.action_items.length > 0 && (
                     <div style={{ marginBottom: 10 }}>
                       <p style={{ fontSize: 10, fontWeight: 600, color: '#9ca3af', margin: '0 0 4px' }}>إجراءات ({r.action_items.length}):</p>
                       {r.action_items.slice(0, 3).map((ai: any, i: number) => (
-                        <p key={i} style={{ fontSize: 11, color: '#6b7280', margin: '2px 0', paddingRight: 8, borderRight: '2px solid #7c5cfc' }}>
+                        <p key={i} style={{ fontSize: 11, color: '#6b7280', margin: '2px 0', paddingRight: 8, borderRight: '2px solid #2563EB' }}>
                           {ai.department}: {ai.action}
                         </p>
                       ))}
@@ -171,7 +171,7 @@ export default function MeetingRoomPage() {
                   )}
                   {r.status === 'pending' && (
                     <button onClick={() => handleApproveReport(r.id)} disabled={acting === r.id}
-                      style={{ width: '100%', padding: '8px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', opacity: acting === r.id ? 0.5 : 1 }}>
+                      style={{ width: '100%', padding: '8px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', opacity: acting === r.id ? 0.5 : 1 }}>
                       اعتماد التقرير ✓
                     </button>
                   )}

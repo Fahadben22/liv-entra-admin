@@ -5,7 +5,7 @@ import { adminApi } from '@/lib/api';
 
 // ─── Agent Registry (fixed order = spatial memory) ───────────────────────────
 const AGENTS = [
-  { type: 'meeting_room', name: 'الاجتماعات', icon: '🏛️', color: '#7c5cfc', role: 'غرفة الاجتماعات', quickActions: ['نظرة شاملة على كل الأقسام', 'KPIs اليوم', 'أنشئ تقرير تنفيذي', 'الخطط النشطة', 'مشاكل تحتاج انتباهي'] },
+  { type: 'meeting_room', name: 'الاجتماعات', icon: '🏛️', color: '#2563EB', role: 'غرفة الاجتماعات', quickActions: ['نظرة شاملة على كل الأقسام', 'KPIs اليوم', 'أنشئ تقرير تنفيذي', 'الخطط النشطة', 'مشاكل تحتاج انتباهي'] },
   { type: 'it', name: 'سالم', icon: '🛡️', color: '#3b82f6', role: 'IT', spec: 'it_specialist', specName: 'طارق', specIcon: '🔧', quickActions: ['حالة النظام', 'Cloudflare', 'أنماط الأخطاء', 'أحداث أمنية', 'SSL'] },
   { type: 'sales', name: 'خالد', icon: '💼', color: '#22c55e', role: 'مبيعات', spec: 'sales_specialist', specName: 'عمر', specIcon: '📞', quickActions: ['أفضل عميل', 'MRR', 'التجارب المنتهية', 'ملخص الأسبوع', 'خط الأنابيب'] },
   { type: 'marketing', name: 'نورة', icon: '📊', color: '#8b5cf6', role: 'تسويق', spec: 'marketing_specialist', specName: 'سارة', specIcon: '📱', quickActions: ['KPIs الأسبوع', 'الحملات', 'الزوار', 'التحويل', 'المصادر'] },
@@ -73,7 +73,7 @@ export default function AgentsWorkspace() {
       {/* LEFT: Agent list panel */}
       <div style={{ width: 220, borderLeft: '1px solid rgba(0,0,0,.06)', background: '#fff', overflowY: 'auto', flexShrink: 0 }}>
         <div style={{ padding: '14px 12px 8px', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
-          <h2 style={{ fontSize: 12, fontWeight: 700, color: '#1a1a2e', margin: 0 }}>الفريق</h2>
+          <h2 style={{ fontSize: 12, fontWeight: 700, color: '#1E293B', margin: 0 }}>الفريق</h2>
         </div>
         {AGENTS.map(a => {
           const isActive = activeAgent === a.type;
@@ -88,7 +88,7 @@ export default function AgentsWorkspace() {
                 <span style={{ fontSize: 18, flexShrink: 0 }}>{a.icon}</span>
                 <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? a.color : '#1a1a2e' }}>{a.name}</span>
+                    <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? a.color : '#1E293B' }}>{a.name}</span>
                     <span style={{ fontSize: 9, color: '#9ca3af' }}>{a.role}</span>
                     {msgs.length > 0 && !isActive && <div style={{ width: 5, height: 5, borderRadius: '50%', background: a.color, marginRight: 'auto', flexShrink: 0 }} />}
                     {a.type === 'meeting_room' && pendingCount > 0 && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: 14, height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, marginRight: 'auto', flexShrink: 0 }}>{pendingCount}</span>}
@@ -128,10 +128,10 @@ export default function AgentsWorkspace() {
         <div style={{ width: 300, borderRight: '1px solid rgba(0,0,0,.06)', background: '#fafafa', overflowY: 'auto', flexShrink: 0 }}>
           <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(0,0,0,.04)', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
             <div style={{ display: 'flex', gap: 4 }}>
-              <button onClick={() => setSidebarTab('actions')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'actions' ? 700 : 400, border: `1px solid ${sidebarTab === 'actions' ? '#7c5cfc' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'actions' ? 'rgba(124,92,252,.06)' : '#fff', color: sidebarTab === 'actions' ? '#7c5cfc' : '#9ca3af', cursor: 'pointer' }}>
+              <button onClick={() => setSidebarTab('actions')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'actions' ? 700 : 400, border: `1px solid ${sidebarTab === 'actions' ? '#2563EB' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'actions' ? 'rgba(124,92,252,.06)' : '#fff', color: sidebarTab === 'actions' ? '#2563EB' : '#9ca3af', cursor: 'pointer' }}>
                 مهام {pendingCount > 0 && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', padding: '0 4px', fontSize: 8, marginRight: 2 }}>{pendingCount}</span>}
               </button>
-              <button onClick={() => setSidebarTab('reports')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'reports' ? 700 : 400, border: `1px solid ${sidebarTab === 'reports' ? '#7c5cfc' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'reports' ? 'rgba(124,92,252,.06)' : '#fff', color: sidebarTab === 'reports' ? '#7c5cfc' : '#9ca3af', cursor: 'pointer' }}>
+              <button onClick={() => setSidebarTab('reports')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'reports' ? 700 : 400, border: `1px solid ${sidebarTab === 'reports' ? '#2563EB' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'reports' ? 'rgba(124,92,252,.06)' : '#fff', color: sidebarTab === 'reports' ? '#2563EB' : '#9ca3af', cursor: 'pointer' }}>
                 تقارير ({reports.length})
               </button>
             </div>
@@ -145,7 +145,7 @@ export default function AgentsWorkspace() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                     <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 4, background: st.bg, color: st.color, fontWeight: 600 }}>{st.label}</span>
                   </div>
-                  <p style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e', margin: '0 0 2px' }}>{a.title}</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: '#1E293B', margin: '0 0 2px' }}>{a.title}</p>
                   {a.result && <p style={{ fontSize: 9, color: '#059669', margin: '2px 0' }}>{a.result?.slice(0, 80)}</p>}
                   {a.status === 'pending_approval' && (
                     <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
@@ -163,10 +163,10 @@ export default function AgentsWorkspace() {
               return (
                 <div key={r.id} style={{ background: '#fff', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)' }}>
                   <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 4, background: st.bg, color: st.color, fontWeight: 600 }}>{st.label}</span>
-                  <h4 style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e', margin: '4px 0 2px' }}>{r.title}</h4>
+                  <h4 style={{ fontSize: 11, fontWeight: 600, color: '#1E293B', margin: '4px 0 2px' }}>{r.title}</h4>
                   <p style={{ fontSize: 9, color: '#6b7280', margin: '0 0 6px', maxHeight: 40, overflow: 'hidden' }}>{r.summary?.slice(0, 120)}</p>
                   {r.status === 'pending' && (
-                    <button onClick={() => handleApproveReport(r.id)} disabled={acting === r.id} style={{ width: '100%', padding: '5px', borderRadius: 5, fontSize: 10, fontWeight: 600, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer' }}>اعتماد</button>
+                    <button onClick={() => handleApproveReport(r.id)} disabled={acting === r.id} style={{ width: '100%', padding: '5px', borderRadius: 5, fontSize: 10, fontWeight: 600, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer' }}>اعتماد</button>
                   )}
                 </div>
               );
@@ -178,7 +178,7 @@ export default function AgentsWorkspace() {
 
       {/* Sidebar toggle (floating) */}
       <button onClick={() => setSidebarOpen(!sidebarOpen)}
-        style={{ position: 'fixed', bottom: 16, left: 16, width: 32, height: 32, borderRadius: '50%', background: '#7c5cfc', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(124,92,252,.3)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        style={{ position: 'fixed', bottom: 16, left: 16, width: 32, height: 32, borderRadius: '50%', background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(124,92,252,.3)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {sidebarOpen ? '→' : '←'}
       </button>
     </div>

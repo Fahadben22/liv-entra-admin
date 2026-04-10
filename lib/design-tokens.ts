@@ -1,91 +1,104 @@
 // lib/design-tokens.ts
 // Single source of truth for all visual design decisions.
-// Import and use instead of inline hex colors.
+// SaaS Blue theme — trust, professionalism, clarity.
+// Inspired by: Stripe, Linear, Vercel
 
 // ─── Colors ──────────────────────────────────────────────────────────────────
 export const colors = {
-  // Brand
+  // Brand — SaaS Blue
   accent: {
-    primary:   '#7c5cfc',  // Purple — buttons, links, highlights
-    light:     '#ede9fe',  // Light purple — hover backgrounds
-    bg:        '#f8f7fc',  // Very light purple — page backgrounds
-    hover:     '#6b4ce0',  // Darker purple — hover state
+    primary:   '#2563EB',  // Blue — primary buttons, links, active states
+    light:     '#DBEAFE',  // Light blue — hover backgrounds, badges
+    bg:        '#F8FAFC',  // Slate-50 — page backgrounds
+    hover:     '#1D4ED8',  // Darker blue — hover state
+    subtle:    '#EFF6FF',  // Very light blue — subtle highlights
+  },
+
+  // CTA / Action
+  cta: {
+    primary:   '#F97316',  // Orange — primary CTAs, important actions
+    hover:     '#EA580C',  // Darker orange
+    bg:        '#FFF7ED',  // Light orange bg
   },
 
   // Semantic status
   status: {
-    success:   '#10b981',  // Green — active, paid, confirmed
-    successBg: '#ecfdf5',
-    error:     '#ef4444',  // Red — suspended, failed, critical
-    errorBg:   '#fef2f2',
-    warning:   '#f59e0b',  // Amber — trial, overdue, caution
-    warningBg: '#fffbeb',
-    info:      '#3b82f6',  // Blue — info, links, IT
-    infoBg:    '#eff6ff',
+    success:   '#16A34A',  // Green — active, paid, confirmed
+    successBg: '#F0FDF4',
+    error:     '#DC2626',  // Red — suspended, failed, critical
+    errorBg:   '#FEF2F2',
+    warning:   '#D97706',  // Amber — trial, overdue, caution
+    warningBg: '#FFFBEB',
+    info:      '#2563EB',  // Blue — info (same as accent)
+    infoBg:    '#EFF6FF',
   },
 
   // Text hierarchy (3 levels only)
   text: {
-    primary:   '#1a1a2e',  // Darkest — headings, primary content
-    secondary: '#6b7280',  // Medium — labels, descriptions
-    muted:     '#9ca3af',  // Lightest — timestamps, hints
+    primary:   '#1E293B',  // Slate-800 — headings, primary content
+    secondary: '#64748B',  // Slate-500 — labels, descriptions
+    muted:     '#94A3B8',  // Slate-400 — timestamps, hints
+    inverse:   '#F8FAFC',  // White text on dark backgrounds
   },
 
   // Backgrounds
   bg: {
-    page:      '#f8f7fc',  // Page background
-    card:      '#ffffff',  // Card/panel background
-    input:     '#f8f7fc',  // Input field background
-    hover:     '#f3f4f6',  // Hover state background
-    dark:      '#1a1a2e',  // Dark sections (footer, dark cards)
+    page:      '#F8FAFC',  // Slate-50 — page background
+    card:      '#FFFFFF',  // White — card/panel background
+    input:     '#F1F5F9',  // Slate-100 — input field background
+    hover:     '#F1F5F9',  // Slate-100 — hover state
+    dark:      '#1E293B',  // Slate-800 — dark sections
+    surface:   '#F8FAFC',  // Slate-50 — elevated surface
   },
 
   // Borders
   border: {
-    default:   'rgba(0,0,0,.06)',  // Default border
-    medium:    'rgba(0,0,0,.1)',   // Slightly visible border
-    focus:     '#7c5cfc',          // Focus ring (accent)
-    error:     '#ef4444',          // Error border
-    success:   '#10b981',          // Valid/success border
+    default:   '#E2E8F0',  // Slate-200 — default border
+    medium:    '#CBD5E1',  // Slate-300 — stronger border
+    focus:     '#2563EB',  // Blue — focus ring
+    error:     '#DC2626',  // Error border
+    success:   '#16A34A',  // Success border
+    subtle:    '#F1F5F9',  // Almost invisible border
   },
 
-  // Agent colors (fixed per agent — spatial memory)
+  // Agent colors (fixed per agent)
   agent: {
-    meeting:   '#7c5cfc',
-    it:        '#3b82f6',
-    sales:     '#22c55e',
-    marketing: '#8b5cf6',
-    finance:   '#f59e0b',
-    product:   '#06b6d4',
+    meeting:   '#2563EB',
+    it:        '#7C3AED',
+    sales:     '#16A34A',
+    marketing: '#EC4899',
+    finance:   '#D97706',
+    product:   '#0891B2',
   },
 
   // Plan colors
   plan: {
-    trial:        '#64748b',
-    basic:        '#0284c7',
-    professional: '#7c3aed',
-    enterprise:   '#b45309',
+    trial:        '#64748B',
+    basic:        '#2563EB',
+    professional: '#7C3AED',
+    enterprise:   '#D97706',
   },
 
   // Lifecycle
   lifecycle: {
-    trial:     '#f59e0b',
-    active:    '#10b981',
-    overdue:   '#f97316',
-    suspended: '#ef4444',
-    deleted:   '#94a3b8',
+    trial:     '#D97706',
+    active:    '#16A34A',
+    overdue:   '#EA580C',
+    suspended: '#DC2626',
+    deleted:   '#94A3B8',
   },
 } as const;
 
 // ─── Typography ──────────────────────────────────────────────────────────────
 export const fontSize = {
-  xs:  10,   // Badges, tiny labels
-  sm:  12,   // Secondary text, meta
-  md:  13,   // Body text, nav items, labels
-  lg:  16,   // Sub-headings
-  xl:  20,   // Page titles
-  xxl: 28,   // KPI values, large numbers
-  hero: 32,  // Dashboard hero numbers
+  xs:   10,   // Badges, tiny labels
+  sm:   12,   // Secondary text, meta
+  md:   13,   // Body text, nav items, labels
+  base: 14,   // Standard body
+  lg:   16,   // Sub-headings
+  xl:   20,   // Page titles
+  xxl:  28,   // KPI values, large numbers
+  hero: 36,   // Dashboard hero numbers
 } as const;
 
 export const fontWeight = {
@@ -93,48 +106,51 @@ export const fontWeight = {
   medium: 500,
   semi:   600,
   bold:   700,
+  black:  800,
 } as const;
 
 // ─── Spacing ─────────────────────────────────────────────────────────────────
 export const spacing = {
-  xs:  4,
-  sm:  8,
-  md:  12,
-  lg:  16,
-  xl:  20,
-  xxl: 24,
+  xs:   4,
+  sm:   8,
+  md:   12,
+  lg:   16,
+  xl:   20,
+  xxl:  24,
   xxxl: 32,
+  '4xl': 40,
 } as const;
 
 // ─── Border Radius ───────────────────────────────────────────────────────────
 export const radius = {
   sm:   6,
-  md:  10,
-  lg:  14,
-  xl:  18,
+  md:   10,
+  lg:   14,
+  xl:   18,
   full: 9999,
 } as const;
 
 // ─── Shadows ─────────────────────────────────────────────────────────────────
 export const shadow = {
-  sm:    '0 1px 3px rgba(0,0,0,.06)',
-  md:    '0 4px 12px rgba(0,0,0,.08)',
-  lg:    '0 8px 24px rgba(0,0,0,.12)',
-  focus: `0 0 0 3px rgba(124,92,252,.15)`,
+  sm:    '0 1px 2px rgba(0,0,0,.05)',
+  md:    '0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.05)',
+  lg:    '0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -4px rgba(0,0,0,.04)',
+  xl:    '0 20px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.04)',
+  focus: '0 0 0 3px rgba(37,99,235,.2)',
 } as const;
 
 // ─── Transitions ─────────────────────────────────────────────────────────────
 export const transition = {
   fast:   'all .1s ease',
-  normal: 'all .15s ease',
-  slow:   'all .25s ease',
+  normal: 'all .15s cubic-bezier(.4,0,.2,1)',
+  slow:   'all .25s cubic-bezier(.4,0,.2,1)',
 } as const;
 
 // ─── Breakpoints ─────────────────────────────────────────────────────────────
 export const breakpoint = {
-  phone:  480,
-  tablet: 768,
-  laptop: 1024,
+  phone:   480,
+  tablet:  768,
+  laptop:  1024,
   desktop: 1280,
 } as const;
 
@@ -149,14 +165,12 @@ export const zIndex = {
 
 // ─── Shorthand: commonly used inline style objects ───────────────────────────
 export const styles = {
-  // Card
   card: {
     background: colors.bg.card,
     borderRadius: radius.lg,
     border: `1px solid ${colors.border.default}`,
     boxShadow: shadow.sm,
   },
-  // Input field
   input: {
     width: '100%',
     padding: '10px 14px',
@@ -168,7 +182,6 @@ export const styles = {
     outline: 'none',
     transition: transition.fast,
   },
-  // Primary button
   btnPrimary: {
     padding: '10px 20px',
     borderRadius: radius.md,
@@ -180,7 +193,6 @@ export const styles = {
     cursor: 'pointer',
     transition: transition.fast,
   },
-  // Secondary/ghost button
   btnSecondary: {
     padding: '10px 20px',
     borderRadius: radius.md,
@@ -192,7 +204,6 @@ export const styles = {
     cursor: 'pointer',
     transition: transition.fast,
   },
-  // Danger button
   btnDanger: {
     padding: '10px 20px',
     borderRadius: radius.md,
@@ -204,7 +215,6 @@ export const styles = {
     cursor: 'pointer',
     transition: transition.fast,
   },
-  // Status badge
   badge: (status: 'success' | 'error' | 'warning' | 'info') => ({
     fontSize: fontSize.xs,
     fontWeight: fontWeight.semi,

@@ -89,7 +89,7 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
       <div style={{ background: '#fff', minHeight: '100vh' }}>
         {/* Toast */}
         {toast && (
-          <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#fff', color: '#1a1a2e', padding: '10px 24px', borderRadius: 10, fontSize: 13, zIndex: 9999, boxShadow: '0 4px 16px rgba(0,0,0,.1)', border: '1px solid rgba(0,0,0,.08)' }}>
+          <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#fff', color: '#1E293B', padding: '10px 24px', borderRadius: 10, fontSize: 13, zIndex: 9999, boxShadow: '0 4px 16px rgba(0,0,0,.1)', border: '1px solid rgba(0,0,0,.08)' }}>
             {toast}
           </div>
         )}
@@ -97,15 +97,15 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
         {/* Top bar */}
         <div style={{ background: '#fff', padding: '12px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(0,0,0,.06)', position: 'sticky', top: 0, zIndex: 50 }}>
           <Link href="/dashboard" style={{ color: '#6b7280', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>الفوترة والاشتراكات</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#1E293B' }}>الفوترة والاشتراكات</span>
         </div>
 
         {/* Stats banner */}
-        <div style={{ background: '#f8f7fc', borderBottom: '1px solid rgba(0,0,0,.06)', padding: '18px 32px' }}>
+        <div style={{ background: '#F1F5F9', borderBottom: '1px solid rgba(0,0,0,.06)', padding: '18px 32px' }}>
           <div style={{ display: 'flex', gap: 32, alignItems: 'center', maxWidth: 1400, margin: '0 auto', flexWrap: 'wrap' }}>
             <div>
               <p style={{ fontSize: 11, color: '#6b7280', margin: '0 0 4px', fontWeight: 500 }}>MRR المقدّر</p>
-              <p style={{ fontSize: 26, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>
+              <p style={{ fontSize: 26, fontWeight: 600, color: '#1E293B', margin: 0 }}>
                 {fmt(stats?.mrr || estimatedMrr)} <span style={{ fontSize: 13, color: '#6b7280' }}>ر.س</span>
               </p>
             </div>
@@ -114,7 +114,7 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
               { l: 'ARR',          v: `${fmt(stats?.arr || (stats?.mrr || estimatedMrr) * 12)} ر.س`, c: '#16a34a' },
               { l: 'فواتير معلقة', v: `${fmt(stats?.total_pending_sar || 0)} ر.س`,                  c: '#d97706' },
               { l: 'متأخرة',       v: `${overdueCount} فاتورة`,                                      c: '#dc2626' },
-              { l: 'في التجربة',   v: trialCount,                                                    c: '#1a1a2e' },
+              { l: 'في التجربة',   v: trialCount,                                                    c: '#1E293B' },
               { l: 'موقوفة',       v: suspendedCount,                                                c: '#dc2626' },
             ].map(k => (
               <div key={k.l} style={{ textAlign: 'center' }}>
@@ -128,7 +128,7 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
         {/* Body: sidebar + content */}
         <div style={{ display: 'flex', maxWidth: 1400, margin: '0 auto', padding: '0 16px', gap: 0 }}>
           {/* Sidebar nav */}
-          <nav style={{ width: 200, minWidth: 200, padding: '20px 0', borderLeft: '1px solid rgba(0,0,0,.06)', background: '#f8f7fc' }}>
+          <nav style={{ width: 200, minWidth: 200, padding: '20px 0', borderLeft: '1px solid rgba(0,0,0,.06)', background: '#F1F5F9' }}>
             {NAV_ITEMS.map(item => {
               const active = pathname === item.href || (item.href !== '/dashboard/billing' && pathname?.startsWith(item.href));
               return (
@@ -136,12 +136,12 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
                   style={{
                     display: 'flex', alignItems: 'center', gap: 8,
                     padding: '9px 16px', fontSize: 13, textDecoration: 'none',
-                    color: active ? '#7c5cfc' : '#6b7280',
+                    color: active ? '#2563EB' : '#6b7280',
                     background: active ? 'rgba(124,92,252,.08)' : 'transparent',
                     fontWeight: active ? 600 : 400,
                     borderRadius: '0 7px 7px 0',
                     marginBottom: 2,
-                    borderRight: active ? '2px solid #7c5cfc' : '2px solid transparent',
+                    borderRight: active ? '2px solid #2563EB' : '2px solid transparent',
                   }}>
                   <span>{item.label}</span>
                   {item.label === 'الفواتير' && overdueCount > 0 && (

@@ -62,7 +62,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
   };
 
   return (
-    <div style={{ padding: '16px 20px', background: '#f8f7fc', borderTop: '1px solid rgba(0,0,0,.06)' }}>
+    <div style={{ padding: '16px 20px', background: '#F1F5F9', borderTop: '1px solid rgba(0,0,0,.06)' }}>
       {/* Context from intake */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
         {lead.city && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#eff6ff', color: '#1d4070', fontWeight: 600 }}>📍 {lead.city}</span>}
@@ -75,7 +75,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
       <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 12 }}>
         {[
           { label: 'صفحات زارها', value: pageVisits.length, color: '#3b82f6' },
-          { label: 'سيناريوهات بدأها', value: scenarioStarts.length, color: '#7c5cfc' },
+          { label: 'سيناريوهات بدأها', value: scenarioStarts.length, color: '#2563EB' },
           { label: 'سيناريوهات أكملها', value: scenarioCompletes.length, color: '#10b981' },
           { label: 'لحظات إعجاب', value: spotlights.length, color: '#f59e0b' },
           { label: 'فتح صفحة الاشتراك', value: conversionOpens.length, color: '#dc2626' },
@@ -90,7 +90,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
       {/* Heatmap — top pages by dwell time */}
       {topPages.length > 0 && (
         <div style={{ marginBottom: 12 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e', marginBottom: 6 }}>خريطة الاهتمام (حسب وقت التصفح)</p>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#1E293B', marginBottom: 6 }}>خريطة الاهتمام (حسب وقت التصفح)</p>
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
             {topPages.map(([page, data]) => {
               const pct = Math.min(100, Math.round((data.totalDwell / Math.max(totalDwell, 1)) * 100));
@@ -99,7 +99,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
                 <div key={page} style={{
                   padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 600,
                   background: `rgba(124,92,252,${0.08 + intensity * 0.25})`,
-                  color: intensity > 0.5 ? '#7c5cfc' : '#6b7280',
+                  color: intensity > 0.5 ? '#2563EB' : '#6b7280',
                   border: `1px solid rgba(124,92,252,${intensity * 0.3})`,
                 }}>
                   {PAGE_AR[page] || page.split('/').pop()} · {Math.round(data.totalDwell / 1000)}ث
@@ -123,7 +123,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
         const level = score >= 60 ? { label: 'مرتفع', color: '#10b981', bg: '#ecfdf5' } : score >= 30 ? { label: 'متوسط', color: '#f59e0b', bg: '#fffbeb' } : { label: 'منخفض', color: '#6b7280', bg: '#f3f4f6' };
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: '#1a1a2e' }}>مستوى الاهتمام:</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: '#1E293B' }}>مستوى الاهتمام:</span>
             <div style={{ flex: 1, height: 6, background: 'rgba(0,0,0,.06)', borderRadius: 3, overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${score}%`, background: level.color, borderRadius: 3, transition: 'width .3s' }} />
             </div>
@@ -135,10 +135,10 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
       {/* Scenario funnel */}
       {scenarioStarts.length > 0 && (
         <div style={{ marginBottom: 12 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#1a1a2e', marginBottom: 6 }}>مسار السيناريوهات</p>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#1E293B', marginBottom: 6 }}>مسار السيناريوهات</p>
           <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
             <div style={{ flex: 1, textAlign: 'center', padding: '6px', borderRadius: 8, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.15)' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#7c5cfc' }}>{scenarioStarts.length}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#2563EB' }}>{scenarioStarts.length}</div>
               <div style={{ fontSize: 9, color: '#9ca3af' }}>بدأ</div>
             </div>
             <span style={{ color: '#d1d5db', fontSize: 14 }}>→</span>
@@ -158,7 +158,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
       {/* AI Agent summary */}
       {events.length > 0 && (
         <div style={{ padding: '10px 14px', borderRadius: 10, background: 'linear-gradient(135deg, rgba(124,92,252,0.05), rgba(37,99,235,0.05))', border: '1px solid rgba(124,92,252,0.15)' }}>
-          <p style={{ fontSize: 10, fontWeight: 700, color: '#7c5cfc', marginBottom: 4 }}>ملخص للوكيل الذكي</p>
+          <p style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', marginBottom: 4 }}>ملخص للوكيل الذكي</p>
           <p style={{ fontSize: 11, color: '#6b7280', lineHeight: 1.6, margin: 0 }}>
             الزائر من {lead.city || '—'} · {lead.property_count || '—'} عقار · {lead.unit_count || '—'} وحدة ·
             تحدياته: {(lead.pain_points || []).join('، ') || 'لم يحدد'} ·
@@ -259,13 +259,13 @@ export default function DemoLeadsPage() {
   const displayedItems = filter ? items.filter(r => r.status === filter) : items;
 
   return (
-    <div className="fade-in" style={{ color: '#1a1a2e', fontFamily: "'Tajawal', sans-serif" }}>
+    <div className="fade-in" style={{ color: '#1E293B', fontFamily: "'Tajawal', sans-serif" }}>
 
       <div style={{ maxWidth: 1300, margin: '0 auto', padding: '28px 24px' }}>
 
         {/* HEADER */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#1a1a2e', letterSpacing: '-0.02em' }}>قيادات الديمو المباشر</h1>
+          <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#1E293B', letterSpacing: '-0.02em' }}>قيادات الديمو المباشر</h1>
           <p style={{ color: '#9ca3af', fontSize: 13 }}>
             زوار استخدموا التجربة المجانية المباشرة — إجمالي {total} قيادة
           </p>
@@ -280,7 +280,7 @@ export default function DemoLeadsPage() {
         {/* STATS STRIP */}
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 24 }}>
           {[
-            { label: 'إجمالي',      value: total,                       color: '#1a1a2e' },
+            { label: 'إجمالي',      value: total,                       color: '#1E293B' },
             { label: 'جديد',        value: statusCounts.new || 0,       color: '#3b82f6' },
             { label: 'تم التواصل', value: statusCounts.contacted || 0,  color: '#f59e0b' },
             { label: 'تحوّل عميل', value: statusCounts.converted || 0,  color: '#10b981' },
@@ -303,9 +303,9 @@ export default function DemoLeadsPage() {
                 padding: '10px 18px', fontSize: 13, fontWeight: filter === tab.key ? 600 : 400,
                 cursor: 'pointer', fontFamily: 'inherit',
                 background: 'none',
-                color: filter === tab.key ? '#1a1a2e' : '#9ca3af',
+                color: filter === tab.key ? '#1E293B' : '#9ca3af',
                 border: 'none',
-                borderBottom: filter === tab.key ? '2px solid #7c5cfc' : '2px solid transparent',
+                borderBottom: filter === tab.key ? '2px solid #2563EB' : '2px solid transparent',
               }}>
               {tab.label} {tab.count > 0 && <span style={{ color: '#6b7280', marginRight: 4 }}>({tab.count})</span>}
             </button>
@@ -326,7 +326,7 @@ export default function DemoLeadsPage() {
         ) : (
           <div style={{ borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: '#f8f7fc', borderBottom: '1px solid rgba(0,0,0,.06)', padding: '10px 20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: '#F1F5F9', borderBottom: '1px solid rgba(0,0,0,.06)', padding: '10px 20px' }}>
               {['التاريخ', 'الزائر', 'الجوال', 'الشركة', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
                 <div key={h} style={{ fontSize: 11, fontWeight: 500, color: '#6b7280' }}>{h}</div>
               ))}
@@ -344,7 +344,7 @@ export default function DemoLeadsPage() {
                   style={{
                     display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px',
                     gap: 0, padding: '14px 20px', alignItems: 'center',
-                    background: isExpanded ? '#f8f7fc' : i % 2 === 0 ? '#fff' : '#fafafa',
+                    background: isExpanded ? '#F1F5F9' : i % 2 === 0 ? '#fff' : '#fafafa',
                     cursor: hasData ? 'pointer' : 'default',
                     transition: 'background 0.15s',
                   }}
@@ -355,8 +355,8 @@ export default function DemoLeadsPage() {
                   {/* Name */}
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 500, color: '#1a1a2e' }}>{item.name || '—'}</span>
-                      {hasData && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 6, background: isExpanded ? '#7c5cfc' : 'rgba(124,92,252,0.1)', color: isExpanded ? '#fff' : '#7c5cfc', fontWeight: 700 }}>📊</span>}
+                      <span style={{ fontSize: 13, fontWeight: 500, color: '#1E293B' }}>{item.name || '—'}</span>
+                      {hasData && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 6, background: isExpanded ? '#2563EB' : 'rgba(124,92,252,0.1)', color: isExpanded ? '#fff' : '#2563EB', fontWeight: 700 }}>📊</span>}
                     </div>
                     {item.demo_session_id && (
                       <div style={{ fontSize: 11, color: '#6b7280', fontFamily: 'Inter, monospace', marginTop: 2, fontWeight: 500 }}>
@@ -367,7 +367,7 @@ export default function DemoLeadsPage() {
 
                   {/* Phone */}
                   <div>
-                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: '#1a1a2e', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
+                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: '#1E293B', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
                       {item.phone}
                     </a>
                     <div style={{ marginTop: 4 }}>
@@ -395,7 +395,7 @@ export default function DemoLeadsPage() {
                         fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
                         background: 'transparent',
                         border: '1px solid rgba(0,0,0,.08)',
-                        color: item.notes ? '#1a1a2e' : '#6b7280',
+                        color: item.notes ? '#1E293B' : '#6b7280',
                         borderRadius: 10, padding: '4px 12px',
                       }}>
                       {item.notes ? 'عرض' : '+ ملاحظة'}
@@ -409,13 +409,13 @@ export default function DemoLeadsPage() {
                       disabled={updating === item.id}
                       onChange={e => changeStatus(item.id, e.target.value)}
                       style={{
-                        background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', color: '#1a1a2e',
+                        background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', color: '#1E293B',
                         borderRadius: 10, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
                         fontFamily: 'inherit', outline: 'none', flex: 1,
                         opacity: updating === item.id ? .5 : 1,
                       }}>
                       {ALL_STATUSES.map(s => (
-                        <option key={s} value={s} style={{ background: '#fff', color: '#1a1a2e' }}>{STATUS_CONFIG[s].label}</option>
+                        <option key={s} value={s} style={{ background: '#fff', color: '#1E293B' }}>{STATUS_CONFIG[s].label}</option>
                       ))}
                     </select>
                     {item.status !== 'converted' && (
@@ -429,7 +429,7 @@ export default function DemoLeadsPage() {
                         }}
                         style={{
                           fontSize: 12, padding: '7px 16px', borderRadius: 10,
-                          background: '#7c5cfc', border: 'none',
+                          background: '#2563EB', border: 'none',
                           color: '#fff', cursor: 'pointer', fontFamily: 'inherit',
                           whiteSpace: 'nowrap', fontWeight: 500,
                           boxShadow: '0 2px 8px rgba(124,92,252,.2)',
@@ -453,7 +453,7 @@ export default function DemoLeadsPage() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
           onClick={e => { if (e.target === e.currentTarget) setNotesModal(null); }}>
           <div style={{ background: '#fff', boxShadow: '0 20px 60px rgba(0,0,0,.12)', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#1a1a2e' }}>ملاحظات</h3>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#1E293B' }}>ملاحظات</h3>
             <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 20 }}>
               {notesModal.name || '—'} — {notesModal.phone}
             </p>
@@ -463,14 +463,14 @@ export default function DemoLeadsPage() {
               rows={5}
               placeholder="أضف ملاحظات حول هذا الزائر..."
               style={{
-                width: '100%', background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)',
-                borderRadius: 10, padding: '7px 12px', color: '#1a1a2e', fontSize: 13,
+                width: '100%', background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)',
+                borderRadius: 10, padding: '7px 12px', color: '#1E293B', fontSize: 13,
                 fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box',
               }}
             />
             <div style={{ display: 'flex', gap: 10, marginTop: 16, flexDirection: 'row' }}>
               <button onClick={saveNotes} disabled={savingNotes}
-                style={{ flex: 1, padding: '7px 16px', background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+                style={{ flex: 1, padding: '7px 16px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
                 {savingNotes ? 'جاري الحفظ...' : 'حفظ'}
               </button>
               <button onClick={() => setNotesModal(null)}

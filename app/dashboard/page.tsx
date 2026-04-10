@@ -34,7 +34,7 @@ function timeAgo(iso: string) {
 const EVENT_ICONS: Record<string, { icon: string; color: string }> = {
   payment_received:     { icon: '💰', color: '#16a34a' },
   payment_failed:       { icon: '❌', color: '#ef4444' },
-  company_created:      { icon: '🏢', color: '#7c5cfc' },
+  company_created:      { icon: '🏢', color: '#2563EB' },
   subscription_changed: { icon: '🔄', color: '#0ea5e9' },
   invoice_overdue:      { icon: '⏰', color: '#f97316' },
   trial_expiring:       { icon: '⚠️', color: '#f59e0b' },
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
-      <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #ede9fe', borderTopColor: '#7c5cfc', animation: 'spin .7s linear infinite' }} />
+      <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #DBEAFE', borderTopColor: '#2563EB', animation: 'spin .7s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
       <div className="fade-in" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', margin: 0 }}>لوحة التحكم</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 700, color: '#1E293B', margin: 0 }}>لوحة التحكم</h1>
             {isConnected && (
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10, color: '#16a34a', background: '#dcfce7', padding: '2px 8px', borderRadius: 10, fontWeight: 600 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16a34a', animation: 'pulse-dot 2s infinite' }} />
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
           </p>
         </div>
         <Link href="/dashboard/companies/new"
-          style={{ fontSize: 12, padding: '10px 22px', borderRadius: 10, background: '#7c5cfc', color: '#fff', textDecoration: 'none', fontWeight: 600, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+          style={{ fontSize: 12, padding: '10px 22px', borderRadius: 10, background: '#2563EB', color: '#fff', textDecoration: 'none', fontWeight: 600, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
           + إضافة شركة
         </Link>
       </div>
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
       {/* ── Revenue KPIs (6-col) ─────────────────────────────────── */}
       <div className="stagger-enter" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12, marginBottom: 24 }}>
         {[
-          { label: 'MRR', value: `${fmt(m.mrr || 0)}`, unit: 'ر.س', color: '#7c5cfc', sub: `ARR: ${fmt(m.arr || 0)}` },
+          { label: 'MRR', value: `${fmt(m.mrr || 0)}`, unit: 'ر.س', color: '#2563EB', sub: `ARR: ${fmt(m.arr || 0)}` },
           { label: 'ARPU', value: `${fmt(m.arpu || 0)}`, unit: 'ر.س', color: '#10b981', sub: `LTV: ${fmt(m.ltv || 0)}` },
           { label: 'الانسحاب', value: `${m.churn_rate || 0}%`, unit: '', color: (m.churn_rate||0) > 5 ? '#ef4444' : (m.churn_rate||0) > 3 ? '#f59e0b' : '#10b981', sub: `NRR: ${m.nrr || 100}%` },
           { label: 'عملاء يدفعون', value: `${m.total_paying || 0}`, unit: '', color: '#0ea5e9', sub: `من ${companies.length}` },
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
         ].map((k, i) => (
           <div key={k.label} className="card fade-in" style={{ padding: '18px 16px', animationDelay: `${i * 0.04}s`, borderRight: `3px solid ${k.color}` }}>
             <p style={{ fontSize: 10, color: '#9ca3af', margin: '0 0 8px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em' }}>{k.label}</p>
-            <p style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', margin: 0, lineHeight: 1 }}>
+            <p style={{ fontSize: 22, fontWeight: 700, color: '#1E293B', margin: 0, lineHeight: 1 }}>
               {k.value} <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 400 }}>{k.unit}</span>
             </p>
             {k.sub && <p style={{ fontSize: 10, color: '#9ca3af', margin: '6px 0 0' }}>{k.sub}</p>}
@@ -125,8 +125,8 @@ export default function AdminDashboard() {
       {/* ── Lifecycle Pipeline (horizontal bar) ──────────────────── */}
       <div className="card" style={{ padding: '18px 22px', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>دورة حياة الشركات</h2>
-          <Link href="/dashboard/companies" style={{ fontSize: 11, color: '#7c5cfc', textDecoration: 'none' }}>عرض الكل →</Link>
+          <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>دورة حياة الشركات</h2>
+          <Link href="/dashboard/companies" style={{ fontSize: 11, color: '#2563EB', textDecoration: 'none' }}>عرض الكل →</Link>
         </div>
         {/* Segmented bar */}
         <div style={{ display: 'flex', height: 32, borderRadius: 10, overflow: 'hidden', marginBottom: 12 }}>
@@ -156,7 +156,7 @@ export default function AdminDashboard() {
             <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ width: 8, height: 8, borderRadius: 2, background: l.color }} />
               <span style={{ fontSize: 11, color: '#6b7280' }}>{l.label}</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#1a1a2e' }}>{l.count}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#1E293B' }}>{l.count}</span>
             </div>
           ))}
         </div>
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
         {/* Real-time Activity Feed */}
         <div className="card" style={{ overflow: 'hidden' }}>
           <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(0,0,0,.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>النشاط المباشر</h2>
+            <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>النشاط المباشر</h2>
             <span style={{ fontSize: 10, color: isConnected ? '#16a34a' : '#9ca3af', fontWeight: 500 }}>
               {isConnected ? 'متصل' : 'غير متصل'}
             </span>
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
                   <div key={`${ev.at}-${i}`} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,.03)', animation: i === 0 ? 'fadeIn .4s ease' : undefined }}>
                     <span style={{ fontSize: 18, flexShrink: 0 }}>{cfg.icon}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#1E293B', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {ev.company || ev.name || ev.invoice || ev.type}
                       </p>
                       <p style={{ fontSize: 10, color: '#9ca3af', margin: '2px 0 0' }}>

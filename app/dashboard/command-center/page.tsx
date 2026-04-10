@@ -100,7 +100,7 @@ function Spark({ vals, color }: { vals:number[]; color:string }) {
 
 function AreaTimeline({ data, onSelect, selectedHour }: { data:TimeBucket[]; onSelect:(h:string|null)=>void; selectedHour:string|null }) {
   const W=900, H=80;
-  if (!data.length) return <div style={{ height:H,background:'#f8f7fc',borderRadius:8 }}/>;
+  if (!data.length) return <div style={{ height:H,background:'#F1F5F9',borderRadius:8 }}/>;
   const maxV = Math.max(...data.map(d=>d.critical+d.error+d.warning),1);
   const n = data.length;
   const makePts = (offset:(d:TimeBucket)=>number) => data.map((d,i) => `${8+(i/(n-1||1))*(W-16)},${H-((offset(d)/maxV)*(H-10))}`);
@@ -113,7 +113,7 @@ function AreaTimeline({ data, onSelect, selectedHour }: { data:TimeBucket[]; onS
       {data.map((d,i) => { const x=8+(i/(n-1||1))*(W-16); const isSel=selectedHour===d.hour; return (
         <g key={i} onClick={()=>onSelect(isSel?null:d.hour)} style={{ cursor:'pointer' }}>
           <rect x={x-((W-16)/(n-1||1))/2} y={0} width={(W-16)/(n-1||1)} height={H} fill={isSel?'rgba(124,92,252,.1)':'transparent'}/>
-          {i%4===0 && <text x={x} y={H+12} fontSize={8} fill={isSel?'#7c5cfc':'#9ca3af'} textAnchor="middle">{d.label}</text>}
+          {i%4===0 && <text x={x} y={H+12} fontSize={8} fill={isSel?'#2563EB':'#9ca3af'} textAnchor="middle">{d.label}</text>}
         </g>
       );})}
     </svg>
@@ -342,12 +342,12 @@ export default function CommandCenterPage() {
   const topIPs = Object.entries(ipMap).sort((a,b) => b[1]-a[1]).slice(0,8);
 
   // --- Light theme tokens ---
-  const C = { card:'#fff', border:'rgba(0,0,0,.08)', lightBorder:'rgba(0,0,0,.06)', text1:'#1a1a2e', text2:'#6b7280', muted:'#9ca3af', accent:'#7c5cfc', body:'#6b7280' };
+  const C = { card:'#fff', border:'rgba(0,0,0,.08)', lightBorder:'rgba(0,0,0,.06)', text1:'#1E293B', text2:'#6b7280', muted:'#9ca3af', accent:'#2563EB', body:'#6b7280' };
 
   // --- Loading ---
   if (loading) return (
     <div style={{ display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16,height:'100vh' }}>
-      <div style={{ width:40,height:40,border:'3px solid rgba(0,0,0,.08)',borderTopColor:'#7c5cfc',borderRadius:'50%',animation:'spin 1s linear infinite' }}/>
+      <div style={{ width:40,height:40,border:'3px solid rgba(0,0,0,.08)',borderTopColor:'#2563EB',borderRadius:'50%',animation:'spin 1s linear infinite' }}/>
       <p style={{ color:'#9ca3af',fontSize:13 }}>جاري تحميل مركز القيادة...</p>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes pulse-dot{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}`}</style>
     </div>
@@ -470,11 +470,11 @@ export default function CommandCenterPage() {
             {/* --- TAB: LOGS --- */}
             {tab === 'logs' && <>
               <div style={{ display:'flex',gap:8,marginBottom:12,flexWrap:'wrap',alignItems:'center' }}>
-                <select value={logLevel} onChange={e=>{setLogLevel(e.target.value);setLogPage(0)}} style={{ background:'#f8f7fc',border:`1px solid ${C.border}`,borderRadius:10,padding:'6px 10px',color:C.text1,fontSize:11 }}>
+                <select value={logLevel} onChange={e=>{setLogLevel(e.target.value);setLogPage(0)}} style={{ background:'#F1F5F9',border:`1px solid ${C.border}`,borderRadius:10,padding:'6px 10px',color:C.text1,fontSize:11 }}>
                   <option value="">كل المستويات</option>
                   {Object.keys(LVL).map(l => <option key={l} value={l}>{LVL[l].label}</option>)}
                 </select>
-                <select value={logStatus} onChange={e=>{setLogStatus(e.target.value);setLogPage(0)}} style={{ background:'#f8f7fc',border:`1px solid ${C.border}`,borderRadius:10,padding:'6px 10px',color:C.text1,fontSize:11 }}>
+                <select value={logStatus} onChange={e=>{setLogStatus(e.target.value);setLogPage(0)}} style={{ background:'#F1F5F9',border:`1px solid ${C.border}`,borderRadius:10,padding:'6px 10px',color:C.text1,fontSize:11 }}>
                   <option value="">كل الحالات</option>
                   <option value="open">مفتوح</option><option value="resolved">محلول</option><option value="ignored">متجاهل</option>
                 </select>
@@ -582,7 +582,7 @@ export default function CommandCenterPage() {
                     {s?((SEV_COLORS[s]||SEV_COLORS.info) && (s==='critical'?'حرج':s==='high'?'عالي':s==='medium'?'متوسط':'معلومة')):'الكل'}
                   </button>
                 ))}
-                <select value={evtHours} onChange={e=>{setEvtHours(e.target.value);setEvtPage(0);loadSecEvents()}} style={{ background:'#f8f7fc',border:`1px solid ${C.border}`,borderRadius:10,padding:'4px 8px',color:C.text1,fontSize:10 }}>
+                <select value={evtHours} onChange={e=>{setEvtHours(e.target.value);setEvtPage(0);loadSecEvents()}} style={{ background:'#F1F5F9',border:`1px solid ${C.border}`,borderRadius:10,padding:'4px 8px',color:C.text1,fontSize:10 }}>
                   <option value="6">6 ساعات</option><option value="24">24 ساعة</option><option value="72">3 أيام</option><option value="168">7 أيام</option>
                 </select>
               </div>
@@ -591,7 +591,7 @@ export default function CommandCenterPage() {
                 <div key={i} style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 0',borderBottom:`1px solid ${C.lightBorder}`,fontSize:11 }}>
                   <span style={{ fontSize:9,padding:'2px 6px',borderRadius:10,background:(SEV_COLORS[e.severity]||SEV_COLORS.info).bg,color:(SEV_COLORS[e.severity]||SEV_COLORS.info).c,fontWeight:600 }}>{e.severity}</span>
                   <span style={{ fontWeight:600,color:C.text1,minWidth:100 }}>{e.event_type}</span>
-                  {e.ip_address && <span style={{ fontSize:9,color:C.muted,fontFamily:'monospace',background:'#f8f7fc',padding:'1px 6px',borderRadius:4 }}>{e.ip_address}</span>}
+                  {e.ip_address && <span style={{ fontSize:9,color:C.muted,fontFamily:'monospace',background:'#F1F5F9',padding:'1px 6px',borderRadius:4 }}>{e.ip_address}</span>}
                   <span style={{ flex:1,color:C.text2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap' }}>{e.description||''}</span>
                   <span style={{ fontSize:9,color:C.muted }}>{new Date(e.created_at).toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})}</span>
                 </div>
@@ -718,17 +718,17 @@ export default function CommandCenterPage() {
           <div ref={agentScrollRef} style={{ flex:1,overflowY:'auto',padding:'10px 12px',display:'flex',flexDirection:'column',gap:8 }}>
             {agentMsgs.length === 0 && <p style={{ textAlign:'center',color:C.muted,fontSize:11,paddingTop:40 }}>اسأل وكيل IT أي سؤال</p>}
             {agentMsgs.map((m,i) => (
-              <div key={i} style={{ alignSelf:m.role==='user'?'flex-start':'flex-end',maxWidth:'90%',padding:'10px 14px',borderRadius:12,background:m.role==='user'?'#ede9fe':'#f8f7fc',border:`1px solid ${m.role==='user'?'rgba(124,92,252,.15)':'rgba(0,0,0,.06)'}`,fontSize:12,color:C.text1,lineHeight:1.7,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
+              <div key={i} style={{ alignSelf:m.role==='user'?'flex-start':'flex-end',maxWidth:'90%',padding:'10px 14px',borderRadius:12,background:m.role==='user'?'#DBEAFE':'#F1F5F9',border:`1px solid ${m.role==='user'?'rgba(124,92,252,.15)':'rgba(0,0,0,.06)'}`,fontSize:12,color:C.text1,lineHeight:1.7,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
                 {m.content}
               </div>
             ))}
-            {agentLoading && <div style={{ alignSelf:'flex-end',padding:'8px 12px',borderRadius:12,background:'#f8f7fc',border:`1px solid rgba(0,0,0,.06)` }}><span style={{ color:C.muted,fontSize:11 }}>...</span></div>}
+            {agentLoading && <div style={{ alignSelf:'flex-end',padding:'8px 12px',borderRadius:12,background:'#F1F5F9',border:`1px solid rgba(0,0,0,.06)` }}><span style={{ color:C.muted,fontSize:11 }}>...</span></div>}
           </div>
           {/* Input */}
           <div style={{ padding:'10px 12px',borderTop:`1px solid ${C.border}`,display:'flex',gap:6 }}>
             <input value={agentInput} onChange={e=>setAgentInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();agentSend();}}}
               placeholder="اسأل وكيل IT..." disabled={agentLoading}
-              style={{ flex:1,padding:'8px 10px',borderRadius:10,border:`1px solid ${C.border}`,background:'#f8f7fc',color:C.text1,fontSize:11,outline:'none' }} />
+              style={{ flex:1,padding:'8px 10px',borderRadius:10,border:`1px solid ${C.border}`,background:'#F1F5F9',color:C.text1,fontSize:11,outline:'none' }} />
             <button onClick={()=>agentSend()} disabled={agentLoading||!agentInput.trim()}
               style={{ padding:'8px 14px',borderRadius:10,border:'none',background:agentLoading||!agentInput.trim()?'#d1d5db':C.accent,color:'#fff',cursor:'pointer',fontSize:12,fontWeight:600 }}>↑</button>
           </div>
@@ -741,7 +741,7 @@ export default function CommandCenterPage() {
           <div style={{ background:'#fff',borderRadius:16,padding:24,width:380,border:'none',boxShadow:'0 20px 60px rgba(0,0,0,.12)' }} onClick={e=>e.stopPropagation()}>
             <p style={{ fontSize:13,fontWeight:600,color:C.text1,marginBottom:12 }}>حل المشكلة</p>
             <textarea value={resNote} onChange={e=>setResNote(e.target.value)} rows={3} placeholder="ملاحظة الحل (اختياري)..."
-              style={{ width:'100%',padding:'8px 10px',borderRadius:10,border:`1px solid rgba(0,0,0,.08)`,background:'#f8f7fc',color:C.text1,fontSize:12,resize:'vertical',boxSizing:'border-box' }} />
+              style={{ width:'100%',padding:'8px 10px',borderRadius:10,border:`1px solid rgba(0,0,0,.08)`,background:'#F1F5F9',color:C.text1,fontSize:12,resize:'vertical',boxSizing:'border-box' }} />
             <div style={{ display:'flex',gap:8,marginTop:12 }}>
               <button onClick={()=>setResModal(null)} style={{ flex:1,padding:'8px',borderRadius:10,border:`1px solid ${C.border}`,background:'transparent',color:C.text2,cursor:'pointer',fontSize:12 }}>إلغاء</button>
               <button onClick={handleResolve} style={{ flex:2,padding:'8px',borderRadius:10,border:'none',background:C.accent,color:'#fff',cursor:'pointer',fontSize:12,fontWeight:600 }}>تأكيد الحل</button>

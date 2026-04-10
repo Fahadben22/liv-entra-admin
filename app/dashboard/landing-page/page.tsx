@@ -24,21 +24,21 @@ interface LandingContent {
 }
 
 const S = {
-  page: { color: '#1a1a2e', fontFamily: 'system-ui, sans-serif' } as React.CSSProperties,
+  page: { color: '#1E293B', fontFamily: 'system-ui, sans-serif' } as React.CSSProperties,
   topbar: { borderBottom: '1px solid rgba(0,0,0,.08)', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' } as React.CSSProperties,
-  logo: { color: '#1a1a2e', fontWeight: 600, fontSize: 18, letterSpacing: '-0.02em' as const },
+  logo: { color: '#1E293B', fontWeight: 600, fontSize: 18, letterSpacing: '-0.02em' as const },
   body: { maxWidth: 960, margin: '0 auto', padding: '32px 16px' },
   card: { background: '#fff', border: 'none', borderRadius: 14, padding: 24, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,.06)' },
-  sectionTitle: { fontSize: 13, fontWeight: 600 as const, color: '#1a1a2e', letterSpacing: '-0.02em' as const, marginBottom: 16, marginTop: 0 },
+  sectionTitle: { fontSize: 13, fontWeight: 600 as const, color: '#1E293B', letterSpacing: '-0.02em' as const, marginBottom: 16, marginTop: 0 },
   label: { fontSize: 11, color: '#6b7280', fontWeight: 500 as const, marginBottom: 4, display: 'block' },
-  input: { width: '100%', background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '10px 12px', color: '#1a1a2e', fontSize: 13, outline: 'none', boxSizing: 'border-box' as const },
+  input: { width: '100%', background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '10px 12px', color: '#1E293B', fontSize: 13, outline: 'none', boxSizing: 'border-box' as const },
   row2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  saveBtn: { background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 32px', fontWeight: 600, cursor: 'pointer', fontSize: 13 },
+  saveBtn: { background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 32px', fontWeight: 600, cursor: 'pointer', fontSize: 13 },
   saveRow: { display: 'flex', alignItems: 'center', gap: 16, marginTop: 24 },
   badge: (ok: boolean) => ({ background: ok ? 'rgba(22,163,74,.1)' : 'rgba(220,38,38,.1)', color: ok ? '#16a34a' : '#dc2626', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, border: ok ? '1px solid rgba(22,163,74,.2)' : '1px solid rgba(220,38,38,.2)' }),
   addBtn: { background: 'transparent', color: '#6b7280', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
   removeBtn: { background: 'rgba(220,38,38,.08)', color: '#dc2626', border: '1px solid rgba(220,38,38,.2)', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', fontSize: 12 },
-  itemCard: { background: '#f8f7fc', border: '1px solid rgba(0,0,0,.06)', borderRadius: 8, padding: 16, marginBottom: 10 },
+  itemCard: { background: '#F1F5F9', border: '1px solid rgba(0,0,0,.06)', borderRadius: 8, padding: 16, marginBottom: 10 },
 };
 
 export default function LandingPageCMS() {
@@ -116,8 +116,8 @@ export default function LandingPageCMS() {
             <button key={t.key} onClick={() => setTab(t.key as any)} style={{
               padding: '12px 18px', border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: tab === t.key ? 600 : 400,
               background: 'transparent',
-              color: tab === t.key ? '#1a1a2e' : '#9ca3af',
-              borderBottom: tab === t.key ? '2px solid #7c5cfc' : '2px solid transparent',
+              color: tab === t.key ? '#1E293B' : '#9ca3af',
+              borderBottom: tab === t.key ? '2px solid #2563EB' : '2px solid transparent',
             }}>{t.label}</button>
           ))}
         </div>
@@ -270,7 +270,7 @@ export default function LandingPageCMS() {
               }>+ خطة جديدة</button>
             </div>
             {data.pricing_plans.map((p, i) => (
-              <div key={i} style={{ ...S.itemCard, borderColor: p.highlighted ? '#7c5cfc' : 'rgba(0,0,0,.06)' }}>
+              <div key={i} style={{ ...S.itemCard, borderColor: p.highlighted ? '#2563EB' : 'rgba(0,0,0,.06)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
                   <span style={{ color: '#6b7280', fontSize: 11, fontWeight: 500 }}>خطة #{i + 1} {p.highlighted ? 'مميزة' : ''}</span>
                   <div style={{ display: 'flex', gap: 8 }}>
@@ -339,7 +339,7 @@ export default function LandingPageCMS() {
                 <input style={{ ...S.input, direction: 'ltr' }} value={data.contact_email} onChange={e => set('contact_email', e.target.value)} />
               </div>
             </div>
-            <div style={{ background: '#f8f7fc', borderRadius: 8, padding: 16, border: '1px solid rgba(0,0,0,.06)' }}>
+            <div style={{ background: '#F1F5F9', borderRadius: 8, padding: 16, border: '1px solid rgba(0,0,0,.06)' }}>
               <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 8, fontWeight: 500 }}>معاينة زر واتساب:</div>
               <a
                 href={`https://wa.me/${data.contact_whatsapp}`}
@@ -364,7 +364,7 @@ export default function LandingPageCMS() {
             </span>
           )}
           <a href="https://www.liv-entra.com" target="_blank" rel="noreferrer"
-            style={{ fontSize: 13, color: '#7c5cfc', textDecoration: 'underline', marginRight: 'auto' }}>
+            style={{ fontSize: 13, color: '#2563EB', textDecoration: 'underline', marginRight: 'auto' }}>
             عرض الموقع
           </a>
         </div>

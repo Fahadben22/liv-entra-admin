@@ -25,19 +25,19 @@ function MarkPaidModal({ invoice, onClose, onDone }: { invoice: any; onClose: ()
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={onClose}>
       <div style={{ background: '#fff', borderRadius: 16, padding: '28px 32px', width: 380, boxShadow: '0 20px 60px rgba(0,0,0,.12)' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px', color: '#1a1a2e' }}>تسجيل دفع</h3>
+        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px', color: '#1E293B' }}>تسجيل دفع</h3>
         <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 20px' }}>{invoice.invoice_number} — {fmt(invoice.total_sar)} ر.س</p>
         <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>مرجع الدفع *</label>
         <input value={ref} onChange={e => setRef(e.target.value)} placeholder="رقم الحوالة / رقم المعاملة"
-          style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', marginBottom: 12, background: '#f8f7fc', color: '#1a1a2e' }} />
+          style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', marginBottom: 12, background: '#F1F5F9', color: '#1E293B' }} />
         <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>ملاحظات (اختياري)</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
-          style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', marginBottom: 16, resize: 'vertical', background: '#f8f7fc', color: '#1a1a2e' }} />
+          style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', marginBottom: 16, resize: 'vertical', background: '#F1F5F9', color: '#1E293B' }} />
         {err && <p style={{ fontSize: 12, color: '#dc2626', marginBottom: 12 }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
+          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#F1F5F9', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
           <button onClick={submit} disabled={loading}
-            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             {loading ? '...' : 'تأكيد الدفع'}
           </button>
         </div>
@@ -72,13 +72,13 @@ function CreateInvoiceModal({ companies, onClose, onDone }: { companies: any[]; 
     setLoading(false);
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', background: '#f8f7fc', color: '#1a1a2e' };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' };
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={onClose}>
       <div style={{ background: '#fff', borderRadius: 16, padding: '28px 32px', width: 420, boxShadow: '0 20px 60px rgba(0,0,0,.12)' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1a1a2e' }}>إنشاء فاتورة</h3>
+        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1E293B' }}>إنشاء فاتورة</h3>
         <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>الشركة *</label>
         <select value={form.company_id} onChange={e => set('company_id', e.target.value)}
           style={{ ...inputStyle, marginBottom: 12 }}>
@@ -115,17 +115,17 @@ function CreateInvoiceModal({ companies, onClose, onDone }: { companies: any[]; 
           </div>
         </div>
         {form.amount_sar && Number(form.amount_sar) > 0 && (
-          <div style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
+          <div style={{ background: '#F1F5F9', border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
               <span style={{ color: '#6b7280' }}>المجموع الفرعي</span>
-              <span style={{ fontWeight: 600, color: '#1a1a2e' }}>{Number(form.amount_sar).toLocaleString()} ر.س</span>
+              <span style={{ fontWeight: 600, color: '#1E293B' }}>{Number(form.amount_sar).toLocaleString()} ر.س</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
               <span style={{ color: '#6b7280' }}>ضريبة القيمة المضافة 15%</span>
-              <span style={{ fontWeight: 600, color: '#1a1a2e' }}>{(Number(form.amount_sar) * 0.15).toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
+              <span style={{ fontWeight: 600, color: '#1E293B' }}>{(Number(form.amount_sar) * 0.15).toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, borderTop: '1px solid rgba(0,0,0,.06)', paddingTop: 6 }}>
-              <span style={{ color: '#1a1a2e' }}>الإجمالي شامل الضريبة</span>
+              <span style={{ color: '#1E293B' }}>الإجمالي شامل الضريبة</span>
               <span style={{ color: '#16a34a' }}>{(Number(form.amount_sar) * 1.15).toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
             </div>
           </div>
@@ -135,9 +135,9 @@ function CreateInvoiceModal({ companies, onClose, onDone }: { companies: any[]; 
           style={{ ...inputStyle, marginBottom: 16, resize: 'vertical' }} />
         {err && <p style={{ fontSize: 12, color: '#dc2626', marginBottom: 12 }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
+          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#F1F5F9', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
           <button onClick={submit} disabled={loading}
-            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             {loading ? '...' : 'إنشاء الفاتورة'}
           </button>
         </div>
@@ -162,7 +162,7 @@ function CompanyDrawer({ companyId, onClose }: { companyId: string; onClose: () 
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.2)', zIndex: 200, display: 'flex', justifyContent: 'flex-end' }} onClick={onClose}>
       <div style={{ width: 480, background: '#fff', height: '100%', overflowY: 'auto', padding: '28px', borderLeft: '1px solid rgba(0,0,0,.08)', boxShadow: '-4px 0 20px rgba(0,0,0,.08)' }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>سجل الفوترة — {data?.company?.name || '...'}</h2>
+          <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>سجل الفوترة — {data?.company?.name || '...'}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#6b7280' }}>×</button>
         </div>
         {loading ? (
@@ -170,11 +170,11 @@ function CompanyDrawer({ companyId, onClose }: { companyId: string; onClose: () 
         ) : data ? (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
-              <div className="card" style={{ background: '#f8f7fc', borderRadius: 14, padding: '14px 16px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+              <div className="card" style={{ background: '#F1F5F9', borderRadius: 14, padding: '14px 16px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
                 <p style={{ fontSize: 18, fontWeight: 600, color: '#16a34a', margin: 0 }}>{fmt(data.total_paid || 0)}</p>
                 <p style={{ fontSize: 10, color: '#9ca3af', margin: '4px 0 0' }}>إجمالي المدفوع (ر.س)</p>
               </div>
-              <div className="card" style={{ background: '#f8f7fc', borderRadius: 14, padding: '14px 16px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+              <div className="card" style={{ background: '#F1F5F9', borderRadius: 14, padding: '14px 16px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
                 <p style={{ fontSize: 18, fontWeight: 600, color: '#c2410c', margin: 0 }}>{fmt(data.total_outstanding || 0)}</p>
                 <p style={{ fontSize: 10, color: '#9ca3af', margin: '4px 0 0' }}>مبالغ معلقة (ر.س)</p>
               </div>
@@ -185,7 +185,7 @@ function CompanyDrawer({ companyId, onClose }: { companyId: string; onClose: () 
               return (
                 <div key={inv.id} style={{ border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e' }}>{inv.invoice_number}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1E293B' }}>{inv.invoice_number}</span>
                     <span style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, color: sc.color, fontWeight: 500 }}>
                       <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block' }} />
                       {sc.label}
@@ -279,9 +279,9 @@ export default function InvoicesPage() {
       {drawerCompId && <CompanyDrawer companyId={drawerCompId} onClose={() => setDrawerCompId(null)} />}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>الفواتير</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1E293B' }}>الفواتير</h2>
         <button onClick={() => setShowCreate(true)}
-          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           + فاتورة جديدة
         </button>
       </div>
@@ -289,14 +289,14 @@ export default function InvoicesPage() {
       {/* Filters */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالشركة أو رقم الفاتورة..."
-          style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, minWidth: 220, background: '#f8f7fc', color: '#1a1a2e' }} />
+          style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, minWidth: 220, background: '#F1F5F9', color: '#1E293B' }} />
         <div style={{ display: 'flex', gap: 6 }}>
           {(['all', 'issued', 'overdue', 'paid', 'waived', 'void'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               style={{
                 padding: '6px 12px', borderRadius: 7,
                 border: '1px solid rgba(0,0,0,.08)',
-                background: statusFilter === s ? '#7c5cfc' : '#f8f7fc',
+                background: statusFilter === s ? '#2563EB' : '#F1F5F9',
                 color: statusFilter === s ? '#fff' : '#6b7280',
                 fontSize: 11, cursor: 'pointer', fontWeight: statusFilter === s ? 600 : 400,
               }}>
@@ -314,7 +314,7 @@ export default function InvoicesPage() {
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#f8f7fc' }}>
+              <tr style={{ background: '#F1F5F9' }}>
                 {['رقم الفاتورة', 'الشركة', 'المبلغ', 'الحالة', 'الاستحقاق', 'التذكير', 'إجراء'].map(h => (
                   <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#6b7280', borderBottom: '1px solid rgba(0,0,0,.06)', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
@@ -329,15 +329,15 @@ export default function InvoicesPage() {
                 return (
                   <tr key={inv.id} style={{ borderBottom: i < filteredInvoices.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
                     <td style={{ padding: '12px 18px' }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e', fontFamily: 'monospace' }}>{inv.invoice_number}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#1E293B', fontFamily: 'monospace' }}>{inv.invoice_number}</span>
                     </td>
                     <td style={{ padding: '12px 18px' }}>
                       <button onClick={() => setDrawerCompId(inv.company_id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'right' }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>{companyName}</p>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: 0 }}>{companyName}</p>
                       </button>
                     </td>
                     <td style={{ padding: '12px 18px' }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e', margin: 0 }}>{fmt(inv.total_sar)} ر.س</p>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: 0 }}>{fmt(inv.total_sar)} ر.س</p>
                       {Number(inv.vat_sar) > 0 && <p style={{ fontSize: 10, color: '#6b7280', margin: 0 }}>شامل {fmt(inv.vat_sar)} ض.ق.م</p>}
                     </td>
                     <td style={{ padding: '12px 18px' }}>

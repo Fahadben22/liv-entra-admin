@@ -1,33 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  /* ─── Light Analytics Theme ─── */
-  --bg-root: #f8f7fc;
+  /* ─── SaaS Blue Theme (Stripe/Linear inspired) ─── */
+  --bg-root: #F8FAFC;
   --bg-card: #ffffff;
-  --bg-sidebar: #f3f2f8;
-  --bg-input: #f8f7fc;
-  --bg-hover: #f3f2f8;
-  --bg-active: #ede9fe;
+  --bg-sidebar: #F1F5F9;
+  --bg-input: #F1F5F9;
+  --bg-hover: #F1F5F9;
+  --bg-active: #DBEAFE;
 
-  --border: rgba(0,0,0,.06);
-  --border-hover: rgba(0,0,0,.1);
-  --border-active: rgba(124,92,252,.3);
+  --border: #E2E8F0;
+  --border-hover: #CBD5E1;
+  --border-active: rgba(37,99,235,.3);
 
-  --text-primary: #1a1a2e;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
+  --text-primary: #1E293B;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
 
-  --accent: #7c5cfc;
-  --accent-light: #ede9fe;
-  --accent-hover: #6d4fed;
+  --accent: #2563EB;
+  --accent-light: #DBEAFE;
+  --accent-hover: #1D4ED8;
 
-  --success: #10b981;
-  --success-bg: #ecfdf5;
-  --success-border: #a7f3d0;
-  --warning: #f59e0b;
-  --warning-bg: #fffbeb;
-  --danger: #ef4444;
-  --danger-bg: #fef2f2;
+  --success: #16A34A;
+  --success-bg: #F0FDF4;
+  --success-border: #BBF7D0;
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+  --danger: #DC2626;
+  --danger-bg: #FEF2F2;
   --info: #3b82f6;
 
   --radius: 10px;

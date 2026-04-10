@@ -71,7 +71,7 @@ export default function QueuePage() {
       <div style={{ background: '#fff', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(0,0,0,.06)' }}>
         <Link href="/dashboard" style={{ color: '#6b7280', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>قائمة الإرسال</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1E293B' }}>قائمة الإرسال</div>
           <div style={{ fontSize: 11, color: '#9ca3af' }}>إشعارات واتساب — جميع الشركات</div>
         </div>
         <div style={{ marginRight: 'auto', display: 'flex', gap: 12 }}>
@@ -86,7 +86,7 @@ export default function QueuePage() {
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
           {[
             { label: 'أُرسل اليوم', value: stats.sentToday, color: '#16a34a' },
-            { label: 'نسبة التسليم', value: `${stats.deliveryRate}%`, color: '#1a1a2e' },
+            { label: 'نسبة التسليم', value: `${stats.deliveryRate}%`, color: '#1E293B' },
             { label: 'فشل', value: stats.failedToday, color: '#dc2626' },
             { label: 'معلق', value: stats.pending, color: '#d97706' },
           ].map(card => (
@@ -103,12 +103,12 @@ export default function QueuePage() {
           {(['', 'pending', 'sent', 'failed'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               style={{ padding: '4px 12px', borderRadius: 7, border: '1px solid rgba(0,0,0,.08)', fontSize: 12, cursor: 'pointer',
-                background: statusFilter === s ? '#7c5cfc' : '#f8f7fc',
+                background: statusFilter === s ? '#2563EB' : '#F1F5F9',
                 color: statusFilter === s ? '#fff' : '#6b7280' }}>
               {s === '' ? 'الكل' : STATUS_COLORS[s]?.label}
             </button>
           ))}
-          <button onClick={loadQueue} style={{ marginRight: 'auto', padding: '4px 14px', borderRadius: 7, border: '1px solid rgba(0,0,0,.08)', fontSize: 12, cursor: 'pointer', background: '#f8f7fc', color: '#6b7280' }}>
+          <button onClick={loadQueue} style={{ marginRight: 'auto', padding: '4px 14px', borderRadius: 7, border: '1px solid rgba(0,0,0,.08)', fontSize: 12, cursor: 'pointer', background: '#F1F5F9', color: '#6b7280' }}>
             تحديث
           </button>
         </div>
@@ -122,7 +122,7 @@ export default function QueuePage() {
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#f8f7fc', borderBottom: '1px solid rgba(0,0,0,.06)' }}>
+                <tr style={{ background: '#F1F5F9', borderBottom: '1px solid rgba(0,0,0,.06)' }}>
                   {['النوع', 'المستلم', 'القالب', 'موعد الإرسال', 'الحالة', 'المحاولات', 'الخطأ', ''].map(h => (
                     <th key={h} style={{ padding: '10px 14px', fontSize: 11, color: '#6b7280', fontWeight: 500, textAlign: 'right' }}>{h}</th>
                   ))}
@@ -133,10 +133,10 @@ export default function QueuePage() {
                   const sc = STATUS_COLORS[job.status] || STATUS_COLORS.pending;
                   return (
                     <tr key={job.id} style={{ borderBottom: '1px solid rgba(0,0,0,.04)', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
-                      <td style={{ padding: '10px 14px', fontSize: 12, color: '#1a1a2e' }}>
+                      <td style={{ padding: '10px 14px', fontSize: 12, color: '#1E293B' }}>
                         {job.notification_type.replace(/_/g, ' ')}
                       </td>
-                      <td style={{ padding: '10px 14px', fontSize: 12, fontFamily: 'monospace', color: '#1a1a2e' }}>{job.recipient_phone}</td>
+                      <td style={{ padding: '10px 14px', fontSize: 12, fontFamily: 'monospace', color: '#1E293B' }}>{job.recipient_phone}</td>
                       <td style={{ padding: '10px 14px', fontSize: 12, color: '#9ca3af' }}>{job.template_name || '—'}</td>
                       <td style={{ padding: '10px 14px', fontSize: 11, color: '#9ca3af' }}>
                         {new Date(job.scheduled_for).toLocaleString('ar-SA', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -154,7 +154,7 @@ export default function QueuePage() {
                       <td style={{ padding: '10px 14px' }}>
                         {job.status === 'failed' && (
                           <button onClick={() => retry(job.id)} disabled={retrying === job.id}
-                            style={{ background: '#f8f7fc', border: '1px solid rgba(0,0,0,.08)', color: '#d97706', fontSize: 11, padding: '3px 10px', borderRadius: 7, cursor: 'pointer' }}>
+                            style={{ background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', color: '#d97706', fontSize: 11, padding: '3px 10px', borderRadius: 7, cursor: 'pointer' }}>
                             {retrying === job.id ? '...' : 'إعادة'}
                           </button>
                         )}

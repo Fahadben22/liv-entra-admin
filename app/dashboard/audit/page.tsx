@@ -78,14 +78,14 @@ export default function AuditPage() {
   return (
     <div className="fade-in">
       {toast && (
-        <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#7c5cfc', color: '#fff', padding: '7px 20px', borderRadius: 7, fontSize: 12, zIndex: 9999, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+        <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#2563EB', color: '#fff', padding: '7px 20px', borderRadius: 7, fontSize: 12, zIndex: 9999, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
           {toast}
         </div>
       )}
 
       {/* Header */}
       <div style={{ borderBottom: '1px solid rgba(0,0,0,.06)', padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16 }}>
-        <span style={{ fontSize: 18, fontWeight: 600, color: '#1a1a2e', letterSpacing: '-0.02em' }}>التدقيق والأمان</span>
+        <span style={{ fontSize: 18, fontWeight: 600, color: '#1E293B', letterSpacing: '-0.02em' }}>التدقيق والأمان</span>
         {openCount > 0 && (
           <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ef4444', display: 'inline-block', boxShadow: '0 0 6px rgba(239,68,68,.4)' }} />
@@ -101,7 +101,7 @@ export default function AuditPage() {
           { k: 'audit',     l: `سجل التدقيق (${audit.length})` },
         ].map(t => (
           <button key={t.k} onClick={() => setTab(t.k as any)}
-            style={{ fontSize: 13, padding: '12px 18px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: tab === t.k ? 600 : 400, color: tab === t.k ? '#1a1a2e' : '#9ca3af', borderBottom: tab === t.k ? '2px solid #7c5cfc' : '2px solid transparent', transition: 'all .15s' }}>
+            style={{ fontSize: 13, padding: '12px 18px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: tab === t.k ? 600 : 400, color: tab === t.k ? '#1E293B' : '#9ca3af', borderBottom: tab === t.k ? '2px solid #2563EB' : '2px solid transparent', transition: 'all .15s' }}>
             {t.l}
           </button>
         ))}
@@ -112,7 +112,7 @@ export default function AuditPage() {
         <div style={{ display: 'flex', gap: 10, marginBottom: 20, alignItems: 'center' }}>
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder={tab === 'anomalies' ? 'بحث في التنبيهات...' : 'بحث في السجل...'}
-            style={{ padding: '7px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, outline: 'none', width: 280, background: '#f8f7fc', color: '#1a1a2e' }} />
+            style={{ padding: '7px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, outline: 'none', width: 280, background: '#F1F5F9', color: '#1E293B' }} />
 
           {tab === 'anomalies' && (
             <div style={{ display: 'flex', gap: 6 }}>
@@ -124,9 +124,9 @@ export default function AuditPage() {
               ].map(f => (
                 <button key={f.k} onClick={() => setSevFilter(f.k)}
                   style={{ fontSize: 12, padding: '7px 16px', borderRadius: 7, border: '1px solid', cursor: 'pointer', fontWeight: 500,
-                    background: sevFilter === f.k ? '#7c5cfc' : '#fff',
+                    background: sevFilter === f.k ? '#2563EB' : '#fff',
                     color:      sevFilter === f.k ? '#fff'    : '#9ca3af',
-                    borderColor: sevFilter === f.k ? '#7c5cfc' : 'rgba(0,0,0,.08)' }}>
+                    borderColor: sevFilter === f.k ? '#2563EB' : 'rgba(0,0,0,.08)' }}>
                   {f.l}
                 </button>
               ))}
@@ -158,7 +158,7 @@ export default function AuditPage() {
                               <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block', boxShadow: `0 0 6px ${sc.color}66` }} />
                               <span style={{ fontSize: 11, color: sc.color, fontWeight: 500 }}>{a.severity}</span>
                             </div>
-                            <h4 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>
+                            <h4 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>
                               {a.anomaly_type?.replace(/_/g, ' ')}
                             </h4>
                           </div>
@@ -181,7 +181,7 @@ export default function AuditPage() {
 
                         {a.company && (
                           <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 10px', fontWeight: 500 }}>
-                            الشركة: <Link href={`/dashboard/companies/${a.company_id}`} style={{ color: '#7c5cfc', fontWeight: 500 }}>{a.company.name}</Link>
+                            الشركة: <Link href={`/dashboard/companies/${a.company_id}`} style={{ color: '#2563EB', fontWeight: 500 }}>{a.company.name}</Link>
                           </p>
                         )}
 
@@ -192,7 +192,7 @@ export default function AuditPage() {
                               {isActing ? '...' : 'اعتراف'}
                             </button>
                             <button onClick={() => handleUpdateAnomaly(a.id, 'resolved')} disabled={isActing}
-                              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 10, background: '#7c5cfc', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+                              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 10, background: '#2563EB', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
                               حلّ
                             </button>
                             <button onClick={() => handleUpdateAnomaly(a.id, 'false_positive')} disabled={isActing}
@@ -212,13 +212,13 @@ export default function AuditPage() {
             {tab === 'audit' && (
               <>
                 <div style={{ borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-                  <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8f7fc' }}>
+                  <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F1F5F9' }}>
                     <span style={{ fontSize: 13, color: '#9ca3af' }}>{filteredAudit.length} حدث</span>
                     <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>صفحة {page+1} من {Math.max(1,totalPages)}</span>
                   </div>
                   <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
-                      <tr style={{ background: '#f8f7fc' }}>
+                      <tr style={{ background: '#F1F5F9' }}>
                         {['الإجراء', 'المشغّل', 'الدور', 'النوع', 'IP', 'التاريخ'].map(h => (
                           <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#6b7280', borderBottom: '1px solid rgba(0,0,0,.06)' }}>{h}</th>
                         ))}
@@ -228,11 +228,11 @@ export default function AuditPage() {
                       {paginated.map((a, i) => (
                         <tr key={a.id} style={{ borderBottom: '1px solid rgba(0,0,0,.04)', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
                           <td style={{ padding: '11px 18px' }}>
-                            <span style={{ fontSize: 13, fontWeight: 500, color: '#1a1a2e' }}>{a.action?.replace(/_/g,' ')}</span>
+                            <span style={{ fontSize: 13, fontWeight: 500, color: '#1E293B' }}>{a.action?.replace(/_/g,' ')}</span>
                           </td>
                           <td style={{ padding: '11px 18px', fontSize: 13, color: '#9ca3af' }}>{a.actor_email}</td>
                           <td style={{ padding: '11px 18px' }}>
-                            <span style={{ fontSize: 11, padding: '2px 7px', borderRadius: 7, background: '#f8f7fc', color: '#9ca3af', fontWeight: 500, border: '1px solid rgba(0,0,0,.08)' }}>
+                            <span style={{ fontSize: 11, padding: '2px 7px', borderRadius: 7, background: '#F1F5F9', color: '#9ca3af', fontWeight: 500, border: '1px solid rgba(0,0,0,.08)' }}>
                               {a.actor_role}
                             </span>
                           </td>
@@ -254,12 +254,12 @@ export default function AuditPage() {
                 {totalPages > 1 && (
                   <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20 }}>
                     <button onClick={() => setPage(p => Math.max(0, p-1))} disabled={page === 0}
-                      style={{ padding: '7px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', cursor: page > 0 ? 'pointer' : 'not-allowed', color: page > 0 ? '#1a1a2e' : '#6b7280', fontSize: 12, fontWeight: 500 }}>
+                      style={{ padding: '7px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', cursor: page > 0 ? 'pointer' : 'not-allowed', color: page > 0 ? '#1E293B' : '#6b7280', fontSize: 12, fontWeight: 500 }}>
                       السابق
                     </button>
                     <span style={{ padding: '7px 14px', fontSize: 13, color: '#9ca3af' }}>{page+1} / {totalPages}</span>
                     <button onClick={() => setPage(p => Math.min(totalPages-1, p+1))} disabled={page >= totalPages-1}
-                      style={{ padding: '7px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', cursor: page < totalPages-1 ? 'pointer' : 'not-allowed', color: page < totalPages-1 ? '#1a1a2e' : '#6b7280', fontSize: 12, fontWeight: 500 }}>
+                      style={{ padding: '7px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', cursor: page < totalPages-1 ? 'pointer' : 'not-allowed', color: page < totalPages-1 ? '#1E293B' : '#6b7280', fontSize: 12, fontWeight: 500 }}>
                       التالي
                     </button>
                   </div>

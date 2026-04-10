@@ -48,19 +48,19 @@ export default function BillingOverview() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#1a1a2e' }}>نظرة عامة</h2>
+      <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: '#1E293B' }}>نظرة عامة</h2>
 
       {/* ── KPI Row (4 cards with colored left border) ────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
         {[
-          { label: 'MRR', value: `${fmt(m.mrr || stats?.mrr || 0)} ر.س`, color: '#7c5cfc', sub: `ARR: ${fmt(m.arr || 0)}` },
+          { label: 'MRR', value: `${fmt(m.mrr || stats?.mrr || 0)} ر.س`, color: '#2563EB', sub: `ARR: ${fmt(m.arr || 0)}` },
           { label: 'إجمالي محصّل', value: `${fmt(m.collected_this_month || stats?.total_paid_sar || 0)} ر.س`, color: '#16a34a', sub: 'هذا الشهر' },
           { label: 'فواتير معلقة', value: `${fmt(stats?.total_pending_sar || 0)} ر.س`, color: '#c2410c', sub: `${safeInvoices.filter(i => ['draft','sent','issued'].includes(i.status)).length} فاتورة` },
-          { label: 'معدل الانسحاب', value: `${m.churn_rate || 0}%`, color: (m.churn_rate||0) > 5 ? '#dc2626' : '#1a1a2e', sub: `NRR: ${m.nrr || 100}%` },
+          { label: 'معدل الانسحاب', value: `${m.churn_rate || 0}%`, color: (m.churn_rate||0) > 5 ? '#dc2626' : '#1E293B', sub: `NRR: ${m.nrr || 100}%` },
         ].map(k => (
           <div key={k.label} className="card" style={{ padding: '18px 20px', borderRight: `3px solid ${k.color}` }}>
             <p style={{ fontSize: 10, color: '#9ca3af', margin: '0 0 8px', fontWeight: 600, letterSpacing: '.04em' }}>{k.label}</p>
-            <p style={{ fontSize: 22, fontWeight: 700, color: '#1a1a2e', margin: 0, lineHeight: 1 }}>{k.value}</p>
+            <p style={{ fontSize: 22, fontWeight: 700, color: '#1E293B', margin: 0, lineHeight: 1 }}>{k.value}</p>
             {k.sub && <p style={{ fontSize: 10, color: '#9ca3af', margin: '6px 0 0' }}>{k.sub}</p>}
           </div>
         ))}
@@ -69,7 +69,7 @@ export default function BillingOverview() {
       {/* ── Revenue Chart (full width) ───────────────────────────── */}
       <div className="card" style={{ padding: '22px 26px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h3 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1a1a2e' }}>الإيرادات (آخر 12 شهر)</h3>
+          <h3 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>الإيرادات (آخر 12 شهر)</h3>
           <div style={{ display: 'flex', gap: 14, fontSize: 11 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#6b7280' }}>
               <span style={{ width: 10, height: 10, borderRadius: 2, background: '#16a34a', display: 'inline-block' }} /> محصّل
@@ -100,7 +100,7 @@ export default function BillingOverview() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
         {/* Plan Distribution */}
         <div className="card" style={{ padding: '22px' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1a1a2e' }}>توزيع الخطط</h3>
+          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1E293B' }}>توزيع الخطط</h3>
           {['enterprise', 'professional', 'basic', 'trial'].map(plan => {
             const count = planDist[plan] || 0;
             const pct = Math.round((count / Math.max(safeCompanies.length, 1)) * 100);
@@ -109,7 +109,7 @@ export default function BillingOverview() {
               <div key={plan} style={{ marginBottom: 14 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
                   <span style={{ fontSize: 12, padding: '2px 8px', borderRadius: 7, background: pc.bg, color: pc.color, fontWeight: 600, border: `1px solid ${pc.border}` }}>{PLAN_AR[plan]}</span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e' }}>{count}</span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#1E293B' }}>{count}</span>
                 </div>
                 <div style={{ height: 6, borderRadius: 3, background: '#f0f0f0' }}>
                   <div style={{ height: '100%', width: `${pct}%`, background: pc.color, borderRadius: 3, opacity: 0.7, transition: 'width .5s' }} />
@@ -121,7 +121,7 @@ export default function BillingOverview() {
 
         {/* A/R Aging */}
         <div className="card" style={{ padding: '22px' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1a1a2e' }}>تقادم الذمم</h3>
+          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1E293B' }}>تقادم الذمم</h3>
           {(() => {
             const aging = m.aging || {};
             const buckets = [
@@ -150,7 +150,7 @@ export default function BillingOverview() {
                 })}
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px solid rgba(0,0,0,.06)', marginTop: 4 }}>
                   <span style={{ fontSize: 11, fontWeight: 600 }}>الإجمالي</span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1a1a2e' }}>{fmt(Math.round(total))} ر.س</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#1E293B' }}>{fmt(Math.round(total))} ر.س</span>
                 </div>
               </>
             );
@@ -159,7 +159,7 @@ export default function BillingOverview() {
 
         {/* SaaS Metrics */}
         <div className="card" style={{ padding: '22px' }}>
-          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1a1a2e' }}>مقاييس SaaS</h3>
+          <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1E293B' }}>مقاييس SaaS</h3>
           {[
             { label: 'ARPU', value: `${fmt(m.arpu || 0)} ر.س`, desc: 'متوسط الإيراد / عميل' },
             { label: 'LTV', value: `${fmt(m.ltv || 0)} ر.س`, desc: 'القيمة الدائمة' },
@@ -171,7 +171,7 @@ export default function BillingOverview() {
                 <p style={{ fontSize: 11, color: '#6b7280', margin: 0 }}>{item.label}</p>
                 <p style={{ fontSize: 9, color: '#9ca3af', margin: '2px 0 0' }}>{item.desc}</p>
               </div>
-              <p style={{ fontSize: 16, fontWeight: 700, color: '#1a1a2e', margin: 0 }}>{item.value}</p>
+              <p style={{ fontSize: 16, fontWeight: 700, color: '#1E293B', margin: 0 }}>{item.value}</p>
             </div>
           ))}
         </div>

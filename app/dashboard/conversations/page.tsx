@@ -105,9 +105,9 @@ export default function ConversationsPage() {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(0,0,0,.08)' }}>
-        <Link href="/dashboard" style={{ color: '#7c5cfc', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
+        <Link href="/dashboard" style={{ color: '#2563EB', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1a1a2e' }}>صندوق المحادثات</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: '#1E293B' }}>صندوق المحادثات</div>
           <div style={{ fontSize: 11, color: '#6b7280' }}>متعدد الشركات — واتساب</div>
         </div>
         <div style={{ marginRight: 'auto', display: 'flex', gap: 12, alignItems: 'center' }}>
@@ -121,13 +121,13 @@ export default function ConversationsPage() {
       <div style={{ borderBottom: '1px solid rgba(0,0,0,.08)', padding: '10px 24px', display: 'flex', gap: 12, alignItems: 'center' }}>
         <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>الشركة:</span>
         <select value={selectedCompany} onChange={e => setSelectedCompany(e.target.value)}
-          style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '5px 10px', fontSize: 13, background: '#f8f7fc', color: '#1a1a2e' }}>
+          style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '5px 10px', fontSize: 13, background: '#F1F5F9', color: '#1E293B' }}>
           {companies.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
         {(['all', 'open', 'handoff', 'idle'] as ConvStatus[]).map(s => (
           <button key={s} onClick={() => setStatusFilter(s)}
             style={{ padding: '4px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 12, cursor: 'pointer',
-              background: statusFilter === s ? '#7c5cfc' : 'transparent',
+              background: statusFilter === s ? '#2563EB' : 'transparent',
               color: statusFilter === s ? '#fff' : '#6b7280' }}>
             {s === 'all' ? 'الكل' : s === 'open' ? 'مفتوحة' : s === 'handoff' ? 'للموظف' : 'خاملة'}
           </button>
@@ -147,7 +147,7 @@ export default function ConversationsPage() {
               style={{ padding: '12px 16px', borderBottom: '1px solid rgba(0,0,0,.06)', cursor: 'pointer',
                 background: selectedConv?.id === conv.id ? '#f0edff' : 'transparent' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#1a1a2e' }}>{conv.phone}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#1E293B' }}>{conv.phone}</span>
                 {conv.unread_count > 0 && (
                   <span style={{ background: '#dc2626', color: '#fff', fontSize: 10, padding: '1px 6px', borderRadius: 10, fontWeight: 600 }}>
                     {conv.unread_count}
@@ -172,7 +172,7 @@ export default function ConversationsPage() {
             <>
               {/* Conv header */}
               <div style={{ borderBottom: '1px solid rgba(0,0,0,.08)', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ fontWeight: 600, fontSize: 13, color: '#1a1a2e' }}>{selectedConv.phone}</div>
+                <div style={{ fontWeight: 600, fontSize: 13, color: '#1E293B' }}>{selectedConv.phone}</div>
                 <div style={{ fontSize: 11, color: '#9ca3af' }}>
                   {selectedConv.current_flow || 'لا يوجد تدفق نشط'} · {selectedConv.handled_by === 'human' ? 'موظف' : 'بوت'}
                 </div>
@@ -187,8 +187,8 @@ export default function ConversationsPage() {
                   <div key={msg.id} style={{ display: 'flex', justifyContent: msg.direction === 'inbound' ? 'flex-end' : 'flex-start' }}>
                     <div style={{
                       maxWidth: '70%', padding: '8px 12px', borderRadius: 8,
-                      background: msg.direction === 'inbound' ? '#ede9fe' : '#7c5cfc',
-                      color: msg.direction === 'inbound' ? '#1a1a2e' : '#fff',
+                      background: msg.direction === 'inbound' ? '#DBEAFE' : '#2563EB',
+                      color: msg.direction === 'inbound' ? '#1E293B' : '#fff',
                       border: msg.direction === 'inbound' ? '1px solid rgba(124,92,252,.15)' : 'none',
                       fontSize: 13, lineHeight: 1.5,
                     }}>
@@ -210,10 +210,10 @@ export default function ConversationsPage() {
                   onChange={e => setInputText(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
                   placeholder="اكتب رسالة..."
-                  style={{ flex: 1, border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 12px', fontSize: 13, outline: 'none', background: '#f8f7fc', color: '#1a1a2e' }}
+                  style={{ flex: 1, border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 12px', fontSize: 13, outline: 'none', background: '#F1F5F9', color: '#1E293B' }}
                 />
                 <button onClick={handleSend} disabled={sending || !inputText.trim()}
-                  style={{ background: '#7c5cfc', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.7 : 1 }}>
+                  style={{ background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.7 : 1 }}>
                   {sending ? '...' : 'إرسال'}
                 </button>
               </div>
