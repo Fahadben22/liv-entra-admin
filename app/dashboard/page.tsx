@@ -48,6 +48,7 @@ export default function AdminDashboard() {
   const [stats,     setStats]     = useState<any>(null);
   const [companies, setCompanies] = useState<any[]>([]);
   const [anomalies, setAnomalies] = useState<any[]>([]);
+  const [metrics,   setMetrics]   = useState<any>(null);
   const [loading,   setLoading]   = useState(true);
 
   const load = useCallback(async () => {
@@ -56,10 +57,12 @@ export default function AdminDashboard() {
       adminApi.getStats(),                                           // always works
       adminApi.listCompanies(),                                      // always works
       adminApi.sa.listAnomalies({ status: 'open', limit: '8' }),    // needs migration, graceful
+      adminApi.sa.mrrStats(),                                            // billing metrics
     ]);
     if (results[0].status === 'fulfilled') setStats((results[0].value as any)?.data);
     if (results[1].status === 'fulfilled') setCompanies((results[1].value as any)?.data || []);
     if (results[2].status === 'fulfilled') setAnomalies((results[2].value as any)?.data || []);
+    if (results[3].status === 'fulfilled') setMetrics((results[3].value as any)?.data);
     setLoading(false);
   }, [router]);
 
@@ -138,6 +141,24 @@ export default function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      {/* Revenue KPIs */}
+      {metrics && (
+        <div className="grid-responsive stagger-enter" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 28 }}>
+          {[
+            { label: 'MRR', value: `${(metrics.mrr || 0).toLocaleString()} ر.س`, sub: `ARR: ${(metrics.arr || 0).toLocaleString()}`, color: '#7c5cfc' },
+            { label: 'ARPU', value: `${(metrics.arpu || 0).toLocaleString()} ر.س`, sub: `LTV: ${(metrics.ltv || 0).toLocaleString()}`, color: '#10b981' },
+            { label: 'معدل الانسحاب', value: `${metrics.churn_rate || 0}%`, sub: `NRR: ${metrics.nrr || 100}%`, color: (metrics.churn_rate || 0) > 5 ? '#ef4444' : (metrics.churn_rate || 0) > 3 ? '#f59e0b' : '#10b981' },
+            { label: 'محصّل هذا الشهر', value: `${(metrics.collected_this_month || 0).toLocaleString()} ر.س`, sub: `معرّض: ${(metrics.at_risk_revenue || 0).toLocaleString()}`, color: '#0ea5e9' },
+          ].map((k, i) => (
+            <div key={k.label} className="card card-lift fade-in" style={{ padding: '20px 22px', animationDelay: `${i * 0.06}s` }}>
+              <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 10px', fontWeight: 500 }}>{k.label}</p>
+              <p style={{ fontSize: 24, fontWeight: 700, color: k.color, margin: 0, letterSpacing: '-0.02em', lineHeight: 1 }}>{k.value}</p>
+              <p style={{ fontSize: 11, color: '#9ca3af', margin: '6px 0 0', fontWeight: 500 }}>{k.sub}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Lifecycle pipeline */}
       <div className="card card-lift" style={{ padding: '22px 26px', marginBottom: 28 }}>

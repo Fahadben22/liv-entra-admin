@@ -38,7 +38,7 @@ function buildRevenueChart(invoices: any[]) {
 }
 
 export default function BillingOverview() {
-  const { companies, stats, invoices, loading } = useBilling();
+  const { companies, stats, invoices, metrics, loading } = useBilling();
 
   if (loading) return <div style={{ textAlign: 'center', padding: '80px 0', color: '#6b7280' }}>جاري التحميل...</div>;
 
@@ -200,6 +200,68 @@ export default function BillingOverview() {
           )}
         </div>
       </div>
+
+      {/* Advanced Metrics — ARPU, LTV, Aging */}
+      {metrics && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+          {/* Key SaaS Metrics */}
+          <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '22px 26px' }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1a1a2e' }}>مؤشرات الأداء</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              {[
+                { label: 'ARPU', value: `${fmt(metrics.arpu || 0)} ر.س`, desc: 'متوسط الإيراد لكل عميل' },
+                { label: 'LTV', value: `${fmt(metrics.ltv || 0)} ر.س`, desc: 'القيمة الدائمة للعميل' },
+                { label: 'NRR', value: `${metrics.nrr || 100}%`, desc: 'صافي معدل الاحتفاظ بالإيرادات' },
+                { label: 'عملاء يدفعون', value: metrics.total_paying || 0, desc: `من أصل ${(metrics.active_count || 0) + (metrics.trial_count || 0)}` },
+              ].map(m => (
+                <div key={m.label} style={{ padding: '14px', background: '#fafafa', borderRadius: 10, border: '1px solid rgba(0,0,0,.04)' }}>
+                  <p style={{ fontSize: 10, color: '#6b7280', margin: '0 0 4px', fontWeight: 600 }}>{m.label}</p>
+                  <p style={{ fontSize: 20, fontWeight: 700, color: '#1a1a2e', margin: 0 }}>{m.value}</p>
+                  <p style={{ fontSize: 10, color: '#9ca3af', margin: '4px 0 0' }}>{m.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Accounts Receivable Aging */}
+          <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '22px 26px' }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1a1a2e' }}>تقادم الذمم المدينة</h3>
+            {(() => {
+              const aging = metrics.aging || {};
+              const buckets = [
+                { label: 'حالي (غير مستحق)', value: aging.current || 0, color: '#16a34a' },
+                { label: '1-30 يوم', value: aging.d30 || 0, color: '#f59e0b' },
+                { label: '31-60 يوم', value: aging.d60 || 0, color: '#f97316' },
+                { label: '61-90 يوم', value: aging.d90 || 0, color: '#ef4444' },
+                { label: '+90 يوم', value: aging.d90plus || 0, color: '#dc2626' },
+              ];
+              const total = buckets.reduce((s, b) => s + b.value, 0);
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {buckets.map(b => {
+                    const pct = total > 0 ? Math.round((b.value / total) * 100) : 0;
+                    return (
+                      <div key={b.label}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                          <span style={{ fontSize: 12, color: '#1a1a2e', fontWeight: 500 }}>{b.label}</span>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: b.color }}>{fmt(Math.round(b.value))} ر.س</span>
+                        </div>
+                        <div style={{ height: 6, borderRadius: 3, background: '#f0f0f0' }}>
+                          <div style={{ height: '100%', width: `${pct}%`, background: b.color, borderRadius: 3, transition: 'width .5s' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px solid rgba(0,0,0,.06)' }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1a1a2e' }}>الإجمالي</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#1a1a2e' }}>{fmt(Math.round(total))} ر.س</span>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -11,13 +11,14 @@ interface BillingCtx {
   stats: any;
   invoices: any[];
   gateways: any[];
+  metrics: any;
   loading: boolean;
   reload: () => Promise<void>;
   showToast: (m: string) => void;
 }
 
 const BillingContext = createContext<BillingCtx>({
-  companies: [], stats: null, invoices: [], gateways: [],
+  companies: [], stats: null, invoices: [], gateways: [], metrics: null,
   loading: true, reload: async () => {}, showToast: () => {},
 });
 
@@ -45,6 +46,7 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
   const [stats,     setStats]     = useState<any>(null);
   const [invoices,  setInvoices]  = useState<any[]>([]);
   const [gateways,  setGateways]  = useState<any[]>([]);
+  const [metrics,   setMetrics]   = useState<any>(null);
   const [loading,   setLoading]   = useState(true);
   const [toast,     setToast]     = useState('');
 
@@ -59,6 +61,7 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
       request<any>('GET', '/admin/billing/stats').catch(() => null),
       request<any>('GET', '/admin/billing/invoices?limit=200').catch(() => null),
       request<any>('GET', '/admin/billing/gateways').catch(() => null),
+      adminApi.sa.mrrStats().catch(() => null),
     ]);
     if (results[0].status === 'fulfilled') setCompanies(toArr((results[0].value as any)?.data));
     if (results[1].status === 'fulfilled' && results[1].value) setStats((results[1].value as any)?.data ?? null);
@@ -67,6 +70,7 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
       setInvoices(toArr(invData?.invoices ?? invData));
     }
     if (results[3].status === 'fulfilled') setGateways(toArr((results[3].value as any)?.data));
+    if (results[4].status === 'fulfilled' && results[4].value) setMetrics((results[4].value as any)?.data ?? null);
     setLoading(false);
   }, [router]);
 
@@ -81,7 +85,7 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
     .reduce((s, c) => s + (PLAN_PRICE[c.plan] || 0), 0);
 
   return (
-    <BillingContext.Provider value={{ companies, stats, invoices, gateways, loading, reload: load, showToast }}>
+    <BillingContext.Provider value={{ companies, stats, invoices, gateways, metrics, loading, reload: load, showToast }}>
       <div style={{ background: '#fff', minHeight: '100vh' }}>
         {/* Toast */}
         {toast && (
