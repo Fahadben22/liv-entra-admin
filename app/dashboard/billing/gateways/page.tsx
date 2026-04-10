@@ -96,7 +96,7 @@ function GatewayCard({ gateway, onSaved }: { gateway: any; onSaved: () => void }
               style={{ flex: 1, padding: '9px', borderRadius: 10, border: 'none', background: '#7c5cfc', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
               {saving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
             </button>
-            <button onClick={handleTest} disabled={testing || !active}
+            <button onClick={handleTest} disabled={testing}
               style={{ padding: '9px 16px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#f8f7fc', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>
               {testing ? '...' : 'اختبار'}
             </button>
