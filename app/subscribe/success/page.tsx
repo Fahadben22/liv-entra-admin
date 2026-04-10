@@ -11,7 +11,7 @@ export default function SubscribeSuccessWrapper() {
 
 function SubscribeSuccessPage() {
   const searchParams = useSearchParams();
-  const chargeId = searchParams?.get('charge_id') || searchParams?.get('tap_id') || '';
+  const chargeId = searchParams?.get('charge_id') || searchParams?.get('tap_id') || searchParams?.get('id') || '';
 
   const [status, setStatus]   = useState<'loading' | 'provisioned' | 'pending' | 'failed'>('loading');
   const [data, setData]       = useState<any>(null);

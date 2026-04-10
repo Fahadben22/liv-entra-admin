@@ -16,9 +16,10 @@ export default function SubscribePageWrapper() {
 
 function SubscribePage() {
   const searchParams = useSearchParams();
-  const planId = searchParams?.get('plan_id') || '';
-  const cycle  = searchParams?.get('cycle') || 'monthly';
-  const isTrial = searchParams?.get('trial') === '1';
+  const planId   = searchParams?.get('plan_id') || '';
+  const planName = searchParams?.get('plan') || '';
+  const cycle    = searchParams?.get('cycle') || 'monthly';
+  const isTrial  = searchParams?.get('trial') === '1';
 
   const [step, setStep] = useState(1);
   const [plan, setPlan]   = useState<Plan | null>(null);
@@ -43,17 +44,20 @@ function SubscribePage() {
     }
   };
 
-  // Fetch plan details
+  // Fetch plan details (match by ID or name)
   useEffect(() => {
-    if (!planId) return;
+    if (!planId && !planName) return;
     fetch(`${API}/public/plans`)
       .then(r => r.json())
       .then(r => {
-        const found = (r.data || []).find((p: Plan) => p.id === planId);
+        const plans = r.data || [];
+        const found = planId
+          ? plans.find((p: Plan) => p.id === planId)
+          : plans.find((p: Plan) => p.name?.toLowerCase() === planName.toLowerCase() || p.name_ar === planName);
         if (found) setPlan(found);
       })
       .catch(() => {});
-  }, [planId]);
+  }, [planId, planName]);
 
   const price = plan ? (cycle === 'yearly' ? plan.price_yearly : plan.price_monthly) : 0;
   const vatAmount = Math.round(price * 0.15 * 100) / 100;

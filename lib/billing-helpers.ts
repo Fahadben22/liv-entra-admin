@@ -52,5 +52,5 @@ export const DUNNING: Record<number, string> = {
 };
 
 export const GW_LABELS: Record<string, string> = {
-  stripe: 'Stripe', payfort: 'PayFort', telr: 'Telr', tap: 'Tap Payments',
+  stripe: 'Stripe', payfort: 'PayFort', telr: 'Telr', tap: 'Tap Payments', moyasar: 'Moyasar',
 };

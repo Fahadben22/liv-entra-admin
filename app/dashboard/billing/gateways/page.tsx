@@ -9,6 +9,7 @@ const CONFIG_FIELDS: Record<string, { label: string; key: string; placeholder: s
   payfort: [{ label: 'Merchant ID', key: 'merchant_id', placeholder: 'TESTMERCHANT' }, { label: 'Access Code', key: 'access_code', placeholder: '' }, { label: 'SHA Request Phrase', key: 'sha_request', placeholder: '' }],
   telr:    [{ label: 'Store ID', key: 'store_id', placeholder: '12345' }, { label: 'Auth Key', key: 'auth_key', placeholder: '' }],
   tap:     [{ label: 'Secret Key', key: 'secret_key', placeholder: 'sk_test_...' }, { label: 'Publishable Key', key: 'public_key', placeholder: 'pk_test_...' }, { label: 'Webhook Secret', key: 'webhook_secret', placeholder: '' }],
+  moyasar: [{ label: 'Secret Key', key: 'secret_key', placeholder: 'sk_test_...' }, { label: 'Publishable Key', key: 'public_key', placeholder: 'pk_test_...' }, { label: 'Webhook Secret', key: 'webhook_secret', placeholder: 'shared_secret' }],
 };
 
 function GatewayCard({ gateway, onSaved }: { gateway: any; onSaved: () => void }) {
@@ -113,20 +114,25 @@ export default function GatewaysPage() {
 
   const defaultGateways = [
     { provider: 'tap',     is_active: false, is_live: false, config: {} },
+    { provider: 'moyasar', is_active: false, is_live: false, config: {} },
     { provider: 'stripe',  is_active: false, is_live: false, config: {} },
     { provider: 'payfort', is_active: false, is_live: false, config: {} },
     { provider: 'telr',    is_active: false, is_live: false, config: {} },
   ];
 
-  const displayGateways = gateways.length > 0 ? gateways : defaultGateways;
+  // Merge: show all default gateways, but use API data if available
+  const displayGateways = defaultGateways.map(dg => {
+    const fromApi = gateways.find((g: any) => g.provider === dg.provider);
+    return fromApi || dg;
+  });
 
   return (
     <div>
       <h2 style={{ fontSize: 18, fontWeight: 600, margin: '0 0 16px', color: '#1a1a2e' }}>بوابات الدفع</h2>
 
       <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '14px 18px', fontSize: 12, color: '#6b7280', lineHeight: 1.6, marginBottom: 20 }}>
-        Tap Payments هي البوابة الرئيسية للسوق السعودي. أدخل مفاتيح API وفعّل البوابة لبدء استقبال المدفوعات.
-        <br />Webhook URL: <code style={{ fontSize: 11, background: '#f8f7fc', padding: '1px 5px', borderRadius: 4, border: '1px solid rgba(0,0,0,.06)', color: '#6b7280' }}>/api/v1/billing/webhook/tap</code>
+        فعّل بوابة دفع واحدة فقط في وقت واحد. أدخل مفاتيح API وفعّل البوابة لبدء استقبال المدفوعات.
+        <br />Webhook URL: <code style={{ fontSize: 11, background: '#f8f7fc', padding: '1px 5px', borderRadius: 4, border: '1px solid rgba(0,0,0,.06)', color: '#6b7280' }}>/api/v1/billing/webhook/{'{'}<span style={{ color: '#7c5cfc' }}>provider</span>{'}'}</code>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(380px,1fr))', gap: 16 }}>
