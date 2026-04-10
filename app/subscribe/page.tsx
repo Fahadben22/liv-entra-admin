@@ -75,7 +75,7 @@ function SubscribePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
-          plan_id: planId,
+          plan_id: plan?.id || planId,
           billing_cycle: cycle,
           coupon_code: couponCode || undefined,
         }),
