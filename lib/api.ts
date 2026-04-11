@@ -201,6 +201,11 @@ export const adminApi = {
     // Lead conversion
     convertLead: (id: string, data: { plan?: string; max_units?: number; max_staff?: number; send_welcome?: boolean }) =>
       request<any>('POST', `/superadmin/leads/${id}/convert`, data),
+
+    // Customer activity analytics
+    activityLive:     ()  => request<any>('GET', '/superadmin/activity/live'),
+    activityOverview: ()  => request<any>('GET', '/superadmin/activity/overview'),
+    companyHealth:    ()  => request<any>('GET', '/superadmin/companies/health'),
   },
 
   // ─── Security Center — platform-wide cross-company (admin only) ──────────────

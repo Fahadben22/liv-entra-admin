@@ -34,6 +34,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/companies',      label: 'الشركات',        section: 'main' },
   { href: '/dashboard/features',       label: 'الميزات',        section: 'main' },
   { href: '/dashboard/billing',        label: 'الفواتير',       section: 'main' },
+  { href: '/dashboard/activity',       label: 'نشاط العملاء',   section: 'ops' },
   { href: '/dashboard/command-center', label: 'مركز القيادة',   section: 'ops' },
   { href: '/dashboard/agents',         label: 'الوكلاء',        section: 'ops' },
   { href: '/dashboard/leads',          label: 'طلبات العرض',    section: 'growth' },

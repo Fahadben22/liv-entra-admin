@@ -39,7 +39,7 @@ export function useEvents(maxEvents = 30) {
     const eventTypes = [
       'connected', 'payment_received', 'payment_failed',
       'company_created', 'subscription_changed',
-      'invoice_overdue', 'trial_expiring', 'plan_changed',
+      'invoice_overdue', 'trial_expiring', 'plan_changed', 'client_activity',
     ];
 
     eventTypes.forEach(type => {
