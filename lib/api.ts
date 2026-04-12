@@ -206,6 +206,31 @@ export const adminApi = {
     activityLive:     ()  => request<any>('GET', '/superadmin/activity/live'),
     activityOverview: ()  => request<any>('GET', '/superadmin/activity/overview'),
     companyHealth:    ()  => request<any>('GET', '/superadmin/companies/health'),
+
+    // ─── Real Estate Intelligence Platform ──────────────────────────────────────
+    intel: {
+      overview:       ()  => request<any>('GET', '/superadmin/intelligence/overview'),
+      financial:      (params?: Record<string, string>) => {
+        const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+        return request<any>('GET', `/superadmin/intelligence/financial${qs}`);
+      },
+      companyFinancial: (id: string, months = 6) =>
+        request<any>('GET', `/superadmin/intelligence/financial/${id}?months=${months}`),
+      benchmarks:     ()  => request<any>('GET', '/superadmin/intelligence/benchmarks'),
+      compliance:     ()  => request<any>('GET', '/superadmin/intelligence/compliance'),
+      audit:          (params?: Record<string, string>) => {
+        const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+        return request<any>('GET', `/superadmin/intelligence/audit${qs}`);
+      },
+      risk:           (params?: Record<string, string>) => {
+        const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+        return request<any>('GET', `/superadmin/intelligence/risk${qs}`);
+      },
+      performance:    ()  => request<any>('GET', '/superadmin/intelligence/performance'),
+      vacancy:        ()  => request<any>('GET', '/superadmin/intelligence/vacancy'),
+      alerts:         ()  => request<any>('GET', '/superadmin/intelligence/alerts'),
+      dataQuality:    ()  => request<any>('GET', '/superadmin/intelligence/data-quality'),
+    },
   },
 
   // ─── Security Center — platform-wide cross-company (admin only) ──────────────
