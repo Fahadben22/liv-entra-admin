@@ -142,10 +142,7 @@ export default function FeaturesPage() {
     try {
       await adminApi.sa.setFlag(companyId, featureKey, newVal, rollout_pct, notes);
       showToast(`${featureKey} ${newVal ? 'مُفعَّل' : 'مُعطَّل'}`);
-      // Sync server state in background (no await — UI already updated)
-      if (selectedCompany === companyId) loadCompanyFlags(companyId).catch(() => {});
-      if (selectedFeature === featureKey) loadFeatureCompanies(featureKey).catch(() => {});
-      if (view === 'matrix') loadMatrix().catch(() => {});
+      // Update stats in background — do NOT reload flags (would overwrite optimistic state)
       adminApi.sa.featureStats().then(r => {
         if (r) { setStats((r as any)?.data?.stats || {}); setRecentChanges((r as any)?.data?.recent || []); }
       }).catch(() => {});
