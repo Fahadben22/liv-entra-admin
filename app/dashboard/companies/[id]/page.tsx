@@ -225,14 +225,18 @@ export default function CompanyDetailPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               <Section title="معلومات الشركة">
-                <Row label="الاسم"        value={company.name} />
-                <Row label="المعرّف"      value={<span style={{ direction: 'ltr' }}>{company.slug}</span>} />
-                <Row label="البريد"       value={company.email} />
-                <Row label="الهاتف"       value={company.phone} />
-                <Row label="الدولة"       value={company.country || 'SA'} />
-                <Row label="تاريخ التسجيل" value={new Date(company.created_at).toLocaleDateString('ar-SA')} />
-                <Row label="سبب الإيقاف" value={company.suspended_reason} />
-                <Row label="ملاحظات"      value={company.notes} />
+                <Row label="الاسم"           value={company.name} />
+                {company.name_ar && company.name_ar !== company.name && (
+                  <Row label="الاسم بالعربية" value={company.name_ar} />
+                )}
+                <Row label="المعرّف"         value={<span style={{ direction: 'ltr' }}>{company.slug}</span>} />
+                <Row label="البريد"          value={company.contact_email || company.email} />
+                <Row label="الهاتف"          value={company.contact_phone || company.phone} />
+                <Row label="المدينة"         value={company.city} />
+                <Row label="السجل التجاري"   value={company.cr_number} />
+                <Row label="تاريخ التسجيل"   value={new Date(company.created_at).toLocaleDateString('ar-SA')} />
+                {company.suspended_reason && <Row label="سبب الإيقاف" value={company.suspended_reason} />}
+                {company.notes && <Row label="ملاحظات" value={company.notes} />}
               </Section>
 
               <Section title="الحدود والصلاحيات">
