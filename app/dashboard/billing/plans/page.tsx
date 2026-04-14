@@ -12,7 +12,7 @@ const TIER_COLORS: Record<string, { bg: string; border: string; color: string }>
   enterprise:   { bg: '#F1F5F9', border: 'rgba(0,0,0,.08)', color: '#7c3aed' },
 };
 
-const EMPTY_PLAN = { name: '', name_ar: '', price_monthly: 0, price_yearly: 0, max_users: 5, max_properties: 5, max_units: 50, max_contracts: 100, features: [], is_active: true, sort_order: 0 };
+const EMPTY_PLAN = { name: '', name_ar: '', price_monthly: 0, price_yearly: 0, max_users: 5, max_properties: 5, max_units: 50, max_contracts: 100, max_leads: 200, max_ai_queries: 0, max_inspections: 50, features: [], is_active: true, sort_order: 0 };
 
 export default function PlansPage() {
   const [plans, setPlans] = useState<any[]>([]);
@@ -50,6 +50,9 @@ export default function PlansPage() {
       max_properties: plan.max_properties || 5,
       max_units: plan.max_units || 50,
       max_contracts: plan.max_contracts || 100,
+      max_leads: plan.max_leads ?? 200,
+      max_ai_queries: plan.max_ai_queries ?? 0,
+      max_inspections: plan.max_inspections ?? 50,
       features: plan.features || [],
       is_active: plan.is_active !== false,
       sort_order: plan.sort_order || 0,
@@ -123,6 +126,7 @@ export default function PlansPage() {
               <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 12 }}>
                 <div>الوحدات: {plan.max_units || '∞'} · العقارات: {plan.max_properties || '∞'}</div>
                 <div>الموظفين: {plan.max_users || '∞'} · العقود: {plan.max_contracts || '∞'}</div>
+                <div>العملاء: {plan.max_leads ?? '∞'} · AI/شهر: {plan.max_ai_queries ?? '∞'}</div>
               </div>
 
               <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 8, fontWeight: 500 }}>الميزات ({(plan.features || []).length}):</div>
@@ -172,31 +176,64 @@ export default function PlansPage() {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10, marginBottom: 14 }}>
-              {[
-                { key: 'max_units', label: 'الوحدات' },
-                { key: 'max_properties', label: 'العقارات' },
-                { key: 'max_users', label: 'الموظفين' },
-                { key: 'max_contracts', label: 'العقود' },
-              ].map(f => (
-                <div key={f.key}>
-                  <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>{f.label}</label>
-                  <input type="number" value={form[f.key]} onChange={e => setForm((p: any) => ({ ...p, [f.key]: Number(e.target.value) }))}
-                    style={{ width: '100%', padding: '6px 8px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, background: '#F1F5F9', color: '#1E293B' }} />
-                </div>
-              ))}
+            {/* Resource Limits Grid */}
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#1E293B', display: 'block', marginBottom: 8 }}>حدود الموارد</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
+                {[
+                  { key: 'max_units', label: 'الوحدات' },
+                  { key: 'max_properties', label: 'العقارات' },
+                  { key: 'max_users', label: 'الموظفين' },
+                  { key: 'max_contracts', label: 'العقود' },
+                ].map(f => (
+                  <div key={f.key}>
+                    <label style={{ fontSize: 10, color: '#6b7280', display: 'block', marginBottom: 3, fontWeight: 500 }}>{f.label}</label>
+                    <input type="number" value={form[f.key]} onChange={e => setForm((p: any) => ({ ...p, [f.key]: Number(e.target.value) }))}
+                      style={{ width: '100%', padding: '6px 8px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, background: '#F1F5F9', color: '#1E293B' }} />
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                {[
+                  { key: 'max_leads', label: 'العملاء المحتملون' },
+                  { key: 'max_ai_queries', label: 'استعلامات AI/شهر' },
+                  { key: 'max_inspections', label: 'المعاينات' },
+                ].map(f => (
+                  <div key={f.key}>
+                    <label style={{ fontSize: 10, color: '#6b7280', display: 'block', marginBottom: 3, fontWeight: 500 }}>{f.label}</label>
+                    <input type="number" value={form[f.key] ?? 0} onChange={e => setForm((p: any) => ({ ...p, [f.key]: Number(e.target.value) }))}
+                      style={{ width: '100%', padding: '6px 8px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, background: '#F1F5F9', color: '#1E293B' }} />
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', display: 'block', marginBottom: 8 }}>الميزات المضمنة</label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-                {allFeatureKeys.map(key => (
-                  <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 8px', borderRadius: 7, background: form.features.includes(key) ? 'rgba(124,92,252,.08)' : '#fafafa', border: `1px solid ${form.features.includes(key) ? '#2563EB' : 'rgba(0,0,0,.06)'}`, cursor: 'pointer', fontSize: 11 }}>
-                    <input type="checkbox" checked={form.features.includes(key)} onChange={() => toggleFeature(key)} />
-                    <span style={{ color: '#1E293B' }}>{registry[key]?.name_ar || key}</span>
-                  </label>
-                ))}
-              </div>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', display: 'block', marginBottom: 8 }}>الميزات المضمنة ({form.features.length} من {allFeatureKeys.length})</label>
+              {/* Group features by category */}
+              {(['core','portals','ai','integrations','enterprise'] as const).map(cat => {
+                const catKeys = allFeatureKeys.filter(k => (registry[k]?.category || 'core') === cat);
+                if (catKeys.length === 0) return null;
+                const CAT_AR: Record<string, string> = { core:'أساسية', portals:'البوابات', ai:'AI والتحليل', integrations:'التكاملات', enterprise:'المؤسسية' };
+                return (
+                  <div key={cat} style={{ marginBottom: 10 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', letterSpacing: '.04em', marginBottom: 5, textTransform: 'uppercase' }}>{CAT_AR[cat]}</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
+                      {catKeys.map(key => (
+                        <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', borderRadius: 7, background: form.features.includes(key) ? 'rgba(37,99,235,.06)' : '#fafafa', border: `1px solid ${form.features.includes(key) ? '#2563EB' : 'rgba(0,0,0,.06)'}`, cursor: 'pointer', fontSize: 11 }}>
+                          <input type="checkbox" checked={form.features.includes(key)} onChange={() => toggleFeature(key)} />
+                          <span style={{ color: '#1E293B', flex: 1 }}>{registry[key]?.name_ar || key}</span>
+                          {registry[key]?.tier_min && (
+                            <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 5, background: '#f1f5f9', color: '#94a3b8', whiteSpace: 'nowrap' }}>
+                              {registry[key].tier_min}
+                            </span>
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
