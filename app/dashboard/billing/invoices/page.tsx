@@ -374,15 +374,33 @@ export default function InvoicesPage() {
                             </button>
                           </>
                         )}
-                        <a href={`${BASE}/admin/billing/invoices/${inv.id}/pdf`} target="_blank" rel="noopener"
-                          style={{ ...ghostBtn, color: '#6b7280', textDecoration: 'none', display: 'inline-block' }}>
+                        <button style={{ ...ghostBtn, color: '#6b7280', cursor: 'pointer' }}
+                          onClick={async () => {
+                            try {
+                              const token = localStorage.getItem('admin_token');
+                              const res = await fetch(`${BASE}/admin/billing/invoices/${inv.id}/pdf`, { headers: { Authorization: `Bearer ${token}` } });
+                              if (!res.ok) throw new Error();
+                              const blob = await res.blob();
+                              const u = URL.createObjectURL(blob);
+                              const a = document.createElement('a'); a.href = u; a.download = `invoice-${inv.invoice_number || inv.id}.pdf`; a.click(); URL.revokeObjectURL(u);
+                            } catch { alert('فشل تحميل الفاتورة'); }
+                          }}>
                           PDF
-                        </a>
+                        </button>
                         {inv.status === 'paid' && (
-                          <a href={`${BASE}/admin/billing/invoices/${inv.id}/receipt`} target="_blank" rel="noopener"
-                            style={{ ...ghostBtn, color: '#16a34a', textDecoration: 'none', display: 'inline-block' }}>
+                          <button style={{ ...ghostBtn, color: '#16a34a', cursor: 'pointer' }}
+                            onClick={async () => {
+                              try {
+                                const token = localStorage.getItem('admin_token');
+                                const res = await fetch(`${BASE}/admin/billing/invoices/${inv.id}/receipt`, { headers: { Authorization: `Bearer ${token}` } });
+                                if (!res.ok) throw new Error();
+                                const blob = await res.blob();
+                                const u = URL.createObjectURL(blob);
+                                const a = document.createElement('a'); a.href = u; a.download = `receipt-${inv.invoice_number || inv.id}.pdf`; a.click(); URL.revokeObjectURL(u);
+                              } catch { alert('فشل تحميل الإيصال'); }
+                            }}>
                             إيصال
-                          </a>
+                          </button>
                         )}
                       </div>
                     </td>
