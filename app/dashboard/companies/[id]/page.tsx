@@ -284,6 +284,18 @@ export default function CompanyDetailPage() {
                 ))}
               </div>
             </div>
+
+            {/* ── Hatif.io Integration Config ── */}
+            <div style={{ marginTop: 20, borderTop: '1px solid rgba(0,0,0,.04)', paddingTop: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                <span style={{ fontSize: 18 }}>📞</span>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>تكامل هاتف — رعاية العملاء</p>
+                  <p style={{ fontSize: 11, color: '#9ca3af', margin: '2px 0 0', fontWeight: 500 }}>Hatif.io Customer Care Integration</p>
+                </div>
+              </div>
+              <HatifConfigForm companyId={id} current={company} onSave={load} showToast={showToast} />
+            </div>
           </Section>
         )}
 
@@ -495,6 +507,67 @@ function LimitsForm({ companyId, current, onSave, showToast }: { companyId: stri
       <button onClick={save} disabled={saving}
         style={{ padding: '7px 16px', borderRadius: 10, background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
         {saving ? '...' : 'حفظ'}
+      </button>
+    </div>
+  );
+}
+
+// ── Hatif.io integration config form ────────────────────────────────────────
+function HatifConfigForm({ companyId, current, onSave, showToast }: { companyId: string; current: any; onSave: () => void; showToast: (m: string) => void }) {
+  const [enabled,   setEnabled]   = useState<boolean>(current.hatif_enabled ?? false);
+  const [portalUrl, setPortalUrl] = useState<string>(current.hatif_portal_url ?? '');
+  const [saving,    setSaving]    = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await adminApi.updateCompany(companyId, { hatif_enabled: enabled, hatif_portal_url: portalUrl || null });
+      showToast('تم حفظ إعدادات هاتف');
+      onSave();
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+    setSaving(false);
+  };
+
+  const inp = { padding: '7px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 12, width: '100%', background: '#F1F5F9', color: '#1E293B', boxSizing: 'border-box' as const };
+
+  return (
+    <div style={{ background: 'rgba(5,150,105,.04)', border: '1px solid rgba(5,150,105,.15)', borderRadius: 12, padding: '16px 18px' }}>
+      {/* Enable toggle */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <div>
+          <p style={{ fontSize: 12, fontWeight: 600, margin: 0, color: '#1E293B' }}>تفعيل تكامل هاتف لهذه الشركة</p>
+          <p style={{ fontSize: 11, color: '#6b7280', margin: '2px 0 0', fontWeight: 400 }}>يُظهر صفحة رعاية العملاء في لوحة تحكم الموظفين</p>
+        </div>
+        <button onClick={() => setEnabled(v => !v)}
+          style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: enabled ? '#22c55e' : '#d1d5db', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
+          <span style={{ position: 'absolute', top: 3, left: enabled ? 22 : 3, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'left .2s', boxShadow: '0 1px 2px rgba(0,0,0,.2)' }} />
+        </button>
+      </div>
+
+      {/* Portal URL */}
+      <div style={{ marginBottom: 12 }}>
+        <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 5px', fontWeight: 500 }}>رابط بوابة هاتف (اختياري)</p>
+        <input
+          value={portalUrl}
+          onChange={e => setPortalUrl(e.target.value)}
+          dir="ltr"
+          placeholder="https://app.hatif.io/org/XXXXX"
+          style={inp}
+        />
+        <p style={{ fontSize: 10, color: '#9ca3af', margin: '3px 0 0' }}>إذا تُرك فارغاً تظهر صفحة التعريف بهاتف مع زر الانتقال لموقعهم</p>
+      </div>
+
+      {/* Hatif info pill */}
+      <div style={{ background: 'rgba(0,0,0,.04)', borderRadius: 8, padding: '8px 12px', marginBottom: 14, display: 'flex', gap: 16, fontSize: 11, color: '#6b7280', flexWrap: 'wrap' }}>
+        <span>📞 299 ر.س/شهر (3 مستخدمين)</span>
+        <span>💬 واتساب مشترك للفريق</span>
+        <span>🤖 تلخيص المكالمات بالذكاء الاصطناعي</span>
+        <a href="https://www.hatif.io" target="_blank" rel="noopener noreferrer" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 500 }}>موقع هاتف ←</a>
+      </div>
+
+      <button onClick={save} disabled={saving}
+        style={{ padding: '8px 20px', borderRadius: 10, background: '#059669', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(5,150,105,.3)' }}>
+        {saving ? '...' : 'حفظ إعدادات هاتف'}
       </button>
     </div>
   );
