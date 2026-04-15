@@ -209,6 +209,7 @@ export default function OnboardingCommandCenter() {
           {selected && detailData && (
             <DetailPanel company={detailData.company || selected} usage={detailData.usage} flags={detailData.flags} audit={detailData.audit}
               plans={plans} registry={registry} onAction={handleAction} onToggleFlag={handleToggleFlag}
+              onReload={() => loadDetail(selected!.id)}
               onClose={() => { setSelected(null); setDetailData(null); }} />
           )}
         </div>
@@ -285,7 +286,7 @@ function MiniBtn({ label, variant, onClick }: { label: string; variant: 'default
 }
 
 // ─── Detail Panel ────────────────────────────────────────────────────────────
-function DetailPanel({ company: c, usage, flags, audit, plans, registry, onAction, onToggleFlag, onClose }: any) {
+function DetailPanel({ company: c, usage, flags, audit, plans, registry, onAction, onToggleFlag, onReload, onClose }: any) {
   const [dtab, setDtab] = useState('overview');
   const pc = PLAN_C[c?.plan] || PLAN_C.basic;
   if (!c) return null;
@@ -354,7 +355,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
           </div>
 
           {/* ── Hatif.io Integration ── */}
-          <HatifInlineForm companyId={c.id} hatifEnabled={c.hatif_enabled} hatifPortalUrl={c.hatif_portal_url} onSaved={onAction} />
+          <HatifInlineForm companyId={c.id} hatifEnabled={c.hatif_enabled} hatifPortalUrl={c.hatif_portal_url} onSaved={onReload} />
         </div>
       )}
 
@@ -500,7 +501,7 @@ function HatifInlineForm({ companyId, hatifEnabled, hatifPortalUrl, onSaved }: {
   companyId: string;
   hatifEnabled?: boolean;
   hatifPortalUrl?: string;
-  onSaved: (id: string, action: string, data?: any) => void;
+  onSaved: () => void;
 }) {
   const [enabled,   setEnabled]   = useState<boolean>(hatifEnabled ?? false);
   const [portalUrl, setPortalUrl] = useState<string>(hatifPortalUrl ?? '');
@@ -513,6 +514,7 @@ function HatifInlineForm({ companyId, hatifEnabled, hatifPortalUrl, onSaved }: {
       await adminApi.updateCompany(companyId, { hatif_enabled: enabled, hatif_portal_url: portalUrl || null });
       setMsg('تم الحفظ ✓');
       setTimeout(() => setMsg(''), 2500);
+      onSaved();
     } catch (e: any) { setMsg(`خطأ: ${e.message}`); }
     setSaving(false);
   };
