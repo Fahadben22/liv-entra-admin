@@ -2,6 +2,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { adminApi } from '@/lib/api';
 import { colors, fontSize, fontWeight, radius, shadow, spacing, styles, transition } from '@/lib/design-tokens';
+import {
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip,
+  CartesianGrid, ResponsiveContainer, Legend, Cell,
+} from 'recharts';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -163,9 +167,11 @@ function DataTable({ columns, rows }: { columns: { key: string; label: string; r
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} style={{ borderBottom: `1px solid ${colors.border.subtle}`, transition: transition.fast }}
-                onMouseEnter={e => (e.currentTarget.style.background = colors.bg.hover)}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+            <tr key={i}
+                style={{ borderBottom: `1px solid ${colors.border.subtle}`, transition: transition.fast, ...(row._rowStyle || {}) }}
+                onClick={row._onClick}
+                onMouseEnter={e => { if (!row._rowStyle?.background) e.currentTarget.style.background = colors.bg.hover; }}
+                onMouseLeave={e => { if (!row._rowStyle?.background) e.currentTarget.style.background = 'transparent'; }}>
               {columns.map(c => (
                 <td key={c.key} style={{ padding: '10px 12px', color: colors.text.primary }}>
                   {c.render ? c.render(row[c.key], row) : row[c.key]}
@@ -254,13 +260,205 @@ function RiskPill({ label, count, color, bg }: { label: string; count: number; c
 
 // ─── Tab 2: Financial ───────────────────────────────────────────────────────
 
+const MONTHS_AR_SHORT = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+function monthLabel(ym: string) {
+  const [, m] = (ym || '').split('-');
+  return MONTHS_AR_SHORT[parseInt(m, 10) - 1]?.slice(0, 3) || ym;
+}
+
+function computeHealthScore(row: any): number {
+  const occupied = Number(row.total_units || 0) - Number(row.vacant_units || 0);
+  const occScore = row.total_units > 0 ? (occupied / row.total_units) * 100 : 0;
+  const base = Number(row.revenue_this_month || 0) + Number(row.overdue_amount || 0);
+  const collScore = base > 0 ? (Number(row.revenue_this_month || 0) / base) * 100 : 100;
+  const ovdScore = Number(row.overdue_amount) > 0
+    ? Math.max(0, 100 - (Number(row.overdue_amount) / Math.max(Number(row.revenue_this_month), 1)) * 100)
+    : 100;
+  return Math.round(occScore * 0.35 + collScore * 0.40 + ovdScore * 0.25);
+}
+
+function HealthBar({ score }: { score: number }) {
+  const color = score >= 75 ? '#16A34A' : score >= 50 ? '#D97706' : '#DC2626';
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      <div style={{ width: 60, height: 6, borderRadius: 3, background: '#E2E8F0', overflow: 'hidden', flexShrink: 0 }}>
+        <div style={{ width: `${score}%`, height: '100%', background: color, borderRadius: 3 }} />
+      </div>
+      <span style={{ fontSize: 11, color, fontWeight: 600 }}>{score}%</span>
+    </div>
+  );
+}
+
+function CompanyRevenueChart({ companies, selectedId, onSelect }: { companies: any[]; selectedId: string | null; onSelect: (id: string) => void }) {
+  const sorted = [...(companies || [])].sort((a, b) => Number(b.revenue_this_month) - Number(a.revenue_this_month)).slice(0, 12);
+  const chartData = sorted.map(c => ({
+    name: c.name?.length > 12 ? c.name.slice(0, 12) + '…' : c.name,
+    fullName: c.name,
+    id: c.company_id || c.id,
+    إيرادات: Math.round(Number(c.revenue_this_month || 0)),
+    مصاريف: Math.round(Number(c.expenses_this_month || 0)),
+  }));
+  const chartHeight = Math.max(200, chartData.length * 48);
+
+  return (
+    <div style={{ ...styles.card, padding: '20px 24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h3 style={{ fontSize: fontSize.lg, fontWeight: fontWeight.semi, color: colors.text.primary, margin: 0 }}>
+          مقارنة الإيرادات والمصاريف — هذا الشهر
+        </h3>
+        <span style={{ fontSize: fontSize.xs, color: colors.text.muted }}>اضغط على شركة لعرض التفاصيل</span>
+      </div>
+      <ResponsiveContainer width="100%" height={chartHeight}>
+        <BarChart layout="vertical" data={chartData} margin={{ top: 0, right: 20, bottom: 0, left: 10 }}
+          onClick={(e: any) => { if (e?.activePayload?.[0]) onSelect(e.activePayload[0].payload.id); }}>
+          <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#F1F5F9" />
+          <XAxis type="number" tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={v => v >= 1000 ? `${Math.round(v/1000)}k` : String(v)} />
+          <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#1E293B' }} width={90} />
+          <Tooltip
+            formatter={(v: any, name: string) => [`${Number(v).toLocaleString('en-US')} ر.س`, name]}
+            contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E2E8F0' }}
+          />
+          <Legend wrapperStyle={{ fontSize: 12 }} />
+          <Bar dataKey="إيرادات" fill="#2563EB" radius={[0, 4, 4, 0]} maxBarSize={20}
+            style={{ cursor: 'pointer' }}>
+            {chartData.map((entry) => (
+              <Cell key={entry.id} fill={entry.id === selectedId ? '#1d4ed8' : '#2563EB'} />
+            ))}
+          </Bar>
+          <Bar dataKey="مصاريف" fill="#DC2626" radius={[0, 4, 4, 0]} maxBarSize={20} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function CompanyDrillDown({ companyName, drillData, onClose }: { companyName: string; drillData: any; onClose: () => void }) {
+  if (!drillData) return (
+    <div style={{ ...styles.card, padding: 24, textAlign: 'center' }}>
+      <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid #DBEAFE', borderTopColor: '#2563EB', animation: 'spin .7s linear infinite', margin: '0 auto' }} />
+    </div>
+  );
+
+  const monthly = (drillData.monthly_revenue || []).map((m: any) => ({
+    month: monthLabel(m.month),
+    إيرادات: Math.round(Number(m.revenue || 0)),
+    مصاريف: Math.round(Number(m.expenses || 0)),
+    صافي: Math.round(Number(m.revenue || 0) - Number(m.expenses || 0)),
+  }));
+
+  const totalRev = (drillData.monthly_revenue || []).reduce((s: number, m: any) => s + Number(m.revenue || 0), 0);
+  const totalExp = (drillData.monthly_revenue || []).reduce((s: number, m: any) => s + Number(m.expenses || 0), 0);
+  const noi = totalRev - totalExp;
+
+  return (
+    <div style={{ ...styles.card, padding: '20px 24px', borderRight: `4px solid ${colors.accent.primary}` }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h3 style={{ fontSize: fontSize.lg, fontWeight: fontWeight.semi, color: colors.text.primary, margin: 0 }}>
+          {companyName} — الاتجاه المالي (6 أشهر)
+        </h3>
+        <button onClick={onClose} style={{ background: '#F1F5F9', border: 'none', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', fontSize: 14, color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+      </div>
+
+      {/* 6-month line chart */}
+      {monthly.length > 0 ? (
+        <ResponsiveContainer width="100%" height={200}>
+          <LineChart data={monthly} margin={{ top: 4, right: 20, bottom: 0, left: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+            <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94A3B8' }} />
+            <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={v => v >= 1000 ? `${Math.round(v/1000)}k` : String(v)} />
+            <Tooltip formatter={(v: any, name: string) => [`${Number(v).toLocaleString('en-US')} ر.س`, name]} contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Line type="monotone" dataKey="إيرادات" stroke="#2563EB" strokeWidth={2} dot={{ r: 3 }} />
+            <Line type="monotone" dataKey="مصاريف" stroke="#DC2626" strokeWidth={2} dot={{ r: 3 }} />
+            <Line type="monotone" dataKey="صافي" stroke="#16A34A" strokeWidth={2} strokeDasharray="5 3" dot={{ r: 3 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <p style={{ color: colors.text.muted, fontSize: fontSize.sm, textAlign: 'center', padding: '20px 0' }}>لا توجد بيانات شهرية</p>
+      )}
+
+      {/* Activity grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 20 }}>
+        {/* Recent payments */}
+        <div>
+          <p style={{ fontSize: fontSize.sm, fontWeight: fontWeight.semi, color: colors.text.secondary, margin: '0 0 10px' }}>آخر المدفوعات</p>
+          {(drillData.recent_payments || []).slice(0, 5).length === 0
+            ? <p style={{ fontSize: fontSize.xs, color: colors.text.muted }}>لا توجد مدفوعات</p>
+            : (drillData.recent_payments || []).slice(0, 5).map((p: any, i: number) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `1px solid ${colors.border.subtle}` }}>
+                <span style={{ fontSize: fontSize.xs, color: colors.text.primary }}>{Number(p.amount_paid || 0).toLocaleString('en-US')} ر.س</span>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: p.status === 'paid' ? '#F0FDF4' : '#FEF2F2', color: p.status === 'paid' ? '#16A34A' : '#DC2626', fontWeight: 600 }}>
+                    {p.status === 'paid' ? 'مدفوع' : 'متأخر'}
+                  </span>
+                  <span style={{ fontSize: 10, color: colors.text.muted }}>{p.paid_at ? new Date(p.paid_at).toLocaleDateString('ar-SA') : '—'}</span>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+        {/* Recent expenses */}
+        <div>
+          <p style={{ fontSize: fontSize.sm, fontWeight: fontWeight.semi, color: colors.text.secondary, margin: '0 0 10px' }}>آخر المصاريف</p>
+          {(drillData.recent_expenses || []).slice(0, 5).length === 0
+            ? <p style={{ fontSize: fontSize.xs, color: colors.text.muted }}>لا توجد مصاريف</p>
+            : (drillData.recent_expenses || []).slice(0, 5).map((e: any, i: number) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: `1px solid ${colors.border.subtle}` }}>
+                <span style={{ fontSize: fontSize.xs, color: colors.text.primary, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.description || e.category || '—'}</span>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <span style={{ fontSize: fontSize.xs, color: colors.status.error, fontWeight: 600 }}>{Number(e.amount || 0).toLocaleString('en-US')} ر.س</span>
+                  <span style={{ fontSize: 10, color: colors.text.muted }}>{e.expense_date ? new Date(e.expense_date).toLocaleDateString('ar-SA') : '—'}</span>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      {/* NOI footer */}
+      <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${colors.border.default}`, display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: 10, color: colors.text.muted, margin: '0 0 2px' }}>الإيرادات (6 أشهر)</p>
+          <p style={{ fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.status.success, margin: 0 }}>{fmtSAR(totalRev)}</p>
+        </div>
+        <span style={{ fontSize: 20, color: colors.text.muted }}>−</span>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: 10, color: colors.text.muted, margin: '0 0 2px' }}>المصاريف (6 أشهر)</p>
+          <p style={{ fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.status.error, margin: 0 }}>{fmtSAR(totalExp)}</p>
+        </div>
+        <span style={{ fontSize: 20, color: colors.text.muted }}>=</span>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: 10, color: colors.text.muted, margin: '0 0 2px' }}>صافي الدخل</p>
+          <p style={{ fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: noi >= 0 ? colors.status.success : colors.status.error, margin: 0 }}>{fmtSAR(noi)}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function FinancialTab({ data }: { data: any }) {
   if (!data) return <EmptyMsg />;
   const { companies, totals } = data;
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [drillData, setDrillData] = useState<any>(null);
+  const [drillLoading, setDrillLoading] = useState(false);
+
+  const selectedCompany = (companies || []).find((c: any) => (c.company_id || c.id) === selectedId);
+
+  useEffect(() => {
+    if (!selectedId) { setDrillData(null); return; }
+    setDrillLoading(true);
+    setDrillData(null);
+    adminApi.sa.intel.companyFinancial(selectedId, 6)
+      .then((res: any) => setDrillData(res?.data))
+      .catch(() => setDrillData({}))
+      .finally(() => setDrillLoading(false));
+  }, [selectedId]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Totals */}
+      {/* KPI Totals */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
         <KPICard label="إجمالي الإيرادات" value={fmtSAR(totals?.total_revenue)} color={colors.status.success} />
         <KPICard label="إجمالي المصاريف" value={fmtSAR(totals?.total_expenses)} />
@@ -269,22 +467,41 @@ function FinancialTab({ data }: { data: any }) {
         <KPICard label="نسبة الإشغال" value={pct(totals?.occupancy_rate)} />
       </div>
 
-      {/* Company breakdown */}
+      {/* A1: Company Revenue Bar Chart */}
+      {(companies || []).length > 0 && (
+        <CompanyRevenueChart companies={companies} selectedId={selectedId} onSelect={id => setSelectedId(prev => prev === id ? null : id)} />
+      )}
+
+      {/* Company breakdown table with A3 health score */}
       <Section title="تفاصيل الشركات">
         <DataTable
           columns={[
             { key: 'name', label: 'الشركة' },
-            { key: 'plan', label: 'الخطة', render: v => <PlanBadge plan={v} /> },
-            { key: 'revenue_this_month', label: 'الإيرادات', render: v => fmtSAR(v) },
-            { key: 'expenses_this_month', label: 'المصاريف', render: v => fmtSAR(v) },
-            { key: 'overdue_amount', label: 'المتأخرات', render: v => Number(v) > 0 ? <span style={{ color: colors.status.error }}>{fmtSAR(v)}</span> : '-' },
-            { key: 'total_units', label: 'الوحدات', render: (v, r) => `${Number(v) - Number(r.vacant_units)}/${v}` },
+            { key: 'plan', label: 'الخطة', render: (v: any) => <PlanBadge plan={v} /> },
+            { key: 'revenue_this_month', label: 'الإيرادات', render: (v: any) => fmtSAR(v) },
+            { key: 'expenses_this_month', label: 'المصاريف', render: (v: any) => fmtSAR(v) },
+            { key: 'overdue_amount', label: 'المتأخرات', render: (v: any) => Number(v) > 0 ? <span style={{ color: colors.status.error }}>{fmtSAR(v)}</span> : '-' },
+            { key: 'total_units', label: 'الوحدات', render: (v: any, r: any) => `${Number(v) - Number(r.vacant_units)}/${v}` },
             { key: 'active_contracts', label: 'العقود' },
             { key: 'open_tickets', label: 'الصيانة' },
+            { key: '_health', label: 'الصحة المالية', render: (_: any, r: any) => <HealthBar score={computeHealthScore(r)} /> },
           ]}
-          rows={companies || []}
+          rows={(companies || []).map((c: any) => ({
+            ...c,
+            _rowStyle: (c.company_id || c.id) === selectedId ? { background: '#DBEAFE', cursor: 'pointer' } : { cursor: 'pointer' },
+            _onClick: () => setSelectedId(prev => prev === (c.company_id || c.id) ? null : (c.company_id || c.id)),
+          }))}
         />
       </Section>
+
+      {/* A2: Company Drill-Down */}
+      {selectedId && (
+        <CompanyDrillDown
+          companyName={selectedCompany?.name || selectedId}
+          drillData={drillLoading ? null : drillData}
+          onClose={() => { setSelectedId(null); setDrillData(null); }}
+        />
+      )}
     </div>
   );
 }
