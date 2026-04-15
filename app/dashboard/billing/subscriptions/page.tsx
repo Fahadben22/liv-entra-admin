@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { request } from '@/lib/api';
 import { useBilling } from '../layout';
 import { fmt, fmtDate, PLAN_AR, PLAN_C, PLAN_PRICE, lcOf, daysUntil } from '@/lib/billing-helpers';
@@ -22,12 +22,12 @@ function ChangePlanModal({ company, onClose, onDone }: { company: any; onClose: 
   const [fetching, setFetching] = useState(true);
 
   // Fetch plans on mount
-  useState(() => {
+  useEffect(() => {
     request<any>('GET', '/superadmin/plans')
       .then(r => setPlans((r as any)?.data || []))
       .catch(() => {})
       .finally(() => setFetching(false));
-  });
+  }, []);
 
   const submit = async () => {
     if (!planId) { showToast('اختر خطة'); return; }

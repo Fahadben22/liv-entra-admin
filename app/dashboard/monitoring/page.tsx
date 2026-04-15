@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { adminApi } from '@/lib/api';
+import { adminApi, BASE } from '@/lib/api';
 
 export default function MonitoringPage() {
   const router = useRouter();
@@ -14,9 +14,9 @@ export default function MonitoringPage() {
     if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
     Promise.all([
       adminApi.getStats(),
-      fetch('https://liv-entra-api-production.up.railway.app/api/v1/health').then(r=>r.json()),
+      fetch(`${BASE}/health`).then(r=>r.json()),
     ]).then(([s, h]) => { setStats((s as any)?.data); setHealth(h); })
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 

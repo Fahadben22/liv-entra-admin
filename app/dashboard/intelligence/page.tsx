@@ -55,8 +55,8 @@ export default function IntelligencePage() {
         case 'quality':     result = await api.dataQuality(); break;
       }
       setData(prev => ({ ...prev, [t]: result?.data }));
-    } catch (err) {
-      console.error(`[Intel] Failed to load ${t}`, err);
+    } catch {
+      // silent fail — tab shows empty state
     }
     setLoading(false);
   }, []);

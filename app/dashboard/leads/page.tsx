@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { adminApi } from '../../../lib/api';
 
@@ -27,6 +28,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
 const ALL_STATUSES = ['new', 'contacted', 'demo_done', 'converted', 'lost'];
 
 export default function LeadsPage() {
+  const router = useRouter();
   const [items, setItems]           = useState<DemoRequest[]>([]);
   const [total, setTotal]           = useState(0);
   const [loading, setLoading]       = useState(true);
@@ -37,6 +39,10 @@ export default function LeadsPage() {
   const [savingNotes, setSavingNotes] = useState(false);
   const [error, setError]           = useState('');
   const [stats, setStats]           = useState<any>(null);
+
+  useEffect(() => {
+    if (!localStorage.getItem('admin_token')) { router.push('/login'); }
+  }, [router]);
 
   const load = useCallback(async () => {
     try {
@@ -91,12 +97,6 @@ export default function LeadsPage() {
 
   function fmt(iso: string) {
     return new Date(iso).toLocaleDateString('ar-SA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  }
-
-  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
-  if (!token) {
-    if (typeof window !== 'undefined') window.location.href = '/login';
-    return null;
   }
 
   const filteredCount: Record<string, number> = {};

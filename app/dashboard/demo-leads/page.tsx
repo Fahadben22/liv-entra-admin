@@ -250,12 +250,6 @@ export default function DemoLeadsPage() {
     return new Date(iso).toLocaleDateString('ar-SA', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
-  if (!token) {
-    if (typeof window !== 'undefined') window.location.href = '/login';
-    return null;
-  }
-
   const displayedItems = filter ? items.filter(r => r.status === filter) : items;
 
   return (

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { request, BASE } from '@/lib/api';
 import { useBilling } from '../layout';
 import { fmt, fmtDate, PLAN_AR, INV_STATUS, DUNNING } from '@/lib/billing-helpers';
@@ -151,12 +151,12 @@ function CompanyDrawer({ companyId, onClose }: { companyId: string; onClose: () 
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useState(() => {
+  useEffect(() => {
     request<any>('GET', `/admin/billing/company/${companyId}`)
       .then(r => setData(r?.data))
       .catch(() => {})
       .finally(() => setLoading(false));
-  });
+  }, [companyId]);
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.2)', zIndex: 200, display: 'flex', justifyContent: 'flex-end' }} onClick={onClose}>
@@ -377,7 +377,7 @@ export default function InvoicesPage() {
                         <button style={{ ...ghostBtn, color: '#6b7280', cursor: 'pointer' }}
                           onClick={async () => {
                             try {
-                              const token = localStorage.getItem('admin_token');
+                              const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
                               const res = await fetch(`${BASE}/admin/billing/invoices/${inv.id}/pdf`, { headers: { Authorization: `Bearer ${token}` } });
                               if (!res.ok) throw new Error();
                               const blob = await res.blob();
@@ -391,7 +391,7 @@ export default function InvoicesPage() {
                           <button style={{ ...ghostBtn, color: '#16a34a', cursor: 'pointer' }}
                             onClick={async () => {
                               try {
-                                const token = localStorage.getItem('admin_token');
+                                const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
                                 const res = await fetch(`${BASE}/admin/billing/invoices/${inv.id}/receipt`, { headers: { Authorization: `Bearer ${token}` } });
                                 if (!res.ok) throw new Error();
                                 const blob = await res.blob();
