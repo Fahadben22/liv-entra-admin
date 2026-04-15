@@ -261,4 +261,11 @@ export const adminApi = {
     templates:     () =>
       request<any>('GET', '/whatsapp/templates'),
   },
+
+  // ─── Maintenance Flows ───────────────────────────────────────────────────────
+  maintenanceFlows: {
+    list:   ()                          => request<any>('GET',   '/maintenance/flows'),
+    get:    (id: string)                => request<any>('GET',   `/maintenance/flows/${id}`),
+    update: (id: string, data: any)     => request<any>('PATCH', `/maintenance/flows/${id}`, data),
+  },
 };

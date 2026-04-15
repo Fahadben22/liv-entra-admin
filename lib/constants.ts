@@ -44,6 +44,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/template-center',label: 'القوالب',        section: 'settings' },
   { href: '/dashboard/landing-page',   label: 'الموقع',         section: 'settings' },
   { href: '/dashboard/audit',          label: 'التدقيق',        section: 'settings' },
+  { href: '/dashboard/maintenance-flows', label: 'مسارات الصيانة',  section: 'settings' },
 ];
 
 export const NAV_SECTIONS: Record<string, string> = {
