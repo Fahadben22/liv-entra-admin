@@ -225,18 +225,13 @@ export default function CompanyDetailPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
               <Section title="معلومات الشركة">
-                <Row label="الاسم"           value={company.name} />
-                {company.name_ar && company.name_ar !== company.name && (
-                  <Row label="الاسم بالعربية" value={company.name_ar} />
-                )}
                 <Row label="المعرّف"         value={<span style={{ direction: 'ltr' }}>{company.slug}</span>} />
-                <Row label="البريد"          value={company.contact_email || company.email} />
-                <Row label="الهاتف"          value={company.contact_phone || company.phone} />
-                <Row label="المدينة"         value={company.city} />
-                <Row label="السجل التجاري"   value={company.cr_number} />
                 <Row label="تاريخ التسجيل"   value={new Date(company.created_at).toLocaleDateString('ar-SA')} />
                 {company.suspended_reason && <Row label="سبب الإيقاف" value={company.suspended_reason} />}
-                {company.notes && <Row label="ملاحظات" value={company.notes} />}
+                <div style={{ marginTop: 16 }}>
+                  <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8, fontWeight: 500 }}>تعديل البيانات الأساسية</p>
+                  <CompanyInfoForm companyId={id} current={company} onSave={load} showToast={showToast} />
+                </div>
               </Section>
 
               <Section title="الحدود والصلاحيات">
@@ -386,6 +381,75 @@ export default function CompanyDetailPage() {
           </Section>
         )}
       </div>
+    </div>
+  );
+}
+
+// ── Company info edit form ──────────────────────────────────────────────────
+function CompanyInfoForm({ companyId, current, onSave, showToast }: { companyId: string; current: any; onSave: () => void; showToast: (m: string) => void }) {
+  const [form, setForm] = useState({
+    name:          current.name          || '',
+    name_ar:       current.name_ar       || '',
+    contact_email: current.contact_email || current.email || '',
+    contact_phone: current.contact_phone || current.phone || '',
+    city:          current.city          || '',
+    cr_number:     current.cr_number     || '',
+    notes:         current.notes         || '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  const f = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm(p => ({ ...p, [k]: e.target.value }));
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await adminApi.updateCompany(companyId, form);
+      showToast('تم تحديث بيانات الشركة');
+      onSave();
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+    setSaving(false);
+  };
+
+  const inp = { padding: '7px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 12, width: '100%', background: '#F1F5F9', color: '#1E293B', boxSizing: 'border-box' as const };
+
+  return (
+    <div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+        <div>
+          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>الاسم</p>
+          <input value={form.name} onChange={f('name')} style={inp} placeholder="اسم الشركة" />
+        </div>
+        <div>
+          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>الاسم بالعربي</p>
+          <input value={form.name_ar} onChange={f('name_ar')} style={inp} placeholder="الاسم بالعربية" />
+        </div>
+        <div>
+          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>البريد</p>
+          <input value={form.contact_email} onChange={f('contact_email')} type="email" dir="ltr" style={inp} placeholder="email@company.com" />
+        </div>
+        <div>
+          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>الهاتف</p>
+          <input value={form.contact_phone} onChange={f('contact_phone')} type="tel" dir="ltr" style={inp} placeholder="+966XXXXXXXXX" />
+        </div>
+        <div>
+          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>المدينة</p>
+          <input value={form.city} onChange={f('city')} style={inp} placeholder="الرياض" />
+        </div>
+        <div>
+          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>السجل التجاري</p>
+          <input value={form.cr_number} onChange={f('cr_number')} dir="ltr" style={inp} placeholder="10XXXXXXXXX" />
+        </div>
+      </div>
+      <div style={{ marginBottom: 10 }}>
+        <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>ملاحظات</p>
+        <textarea value={form.notes} onChange={f('notes')} rows={2}
+          style={{ ...inp, resize: 'vertical' as const, fontFamily: 'inherit' }} placeholder="ملاحظات اختيارية" />
+      </div>
+      <button onClick={save} disabled={saving}
+        style={{ padding: '8px 20px', borderRadius: 10, background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+        {saving ? '...' : 'حفظ البيانات'}
+      </button>
     </div>
   );
 }
