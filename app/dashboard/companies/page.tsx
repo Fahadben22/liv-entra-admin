@@ -352,6 +352,9 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
             {lcOf(c) === 'trial' && <MiniBtn label="تمديد 7 أيام" variant="default" onClick={() => onAction(c.id, 'extend', 7)} />}
             {lcOf(c) === 'trial' && <MiniBtn label="تمديد 30 يوم" variant="default" onClick={() => onAction(c.id, 'extend', 30)} />}
           </div>
+
+          {/* ── Hatif.io Integration ── */}
+          <HatifInlineForm companyId={c.id} hatifEnabled={c.hatif_enabled} hatifPortalUrl={c.hatif_portal_url} onSaved={onAction} />
         </div>
       )}
 
@@ -487,6 +490,62 @@ function MatrixTab({ companies, matrix, registry, onToggle, reload }: any) {
             })}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+// ─── Hatif Inline Form (used inside DetailPanel subscription tab) ─────────────
+function HatifInlineForm({ companyId, hatifEnabled, hatifPortalUrl, onSaved }: {
+  companyId: string;
+  hatifEnabled?: boolean;
+  hatifPortalUrl?: string;
+  onSaved: (id: string, action: string, data?: any) => void;
+}) {
+  const [enabled,   setEnabled]   = useState<boolean>(hatifEnabled ?? false);
+  const [portalUrl, setPortalUrl] = useState<string>(hatifPortalUrl ?? '');
+  const [saving,    setSaving]    = useState(false);
+  const [msg,       setMsg]       = useState('');
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await adminApi.updateCompany(companyId, { hatif_enabled: enabled, hatif_portal_url: portalUrl || null });
+      setMsg('تم الحفظ ✓');
+      setTimeout(() => setMsg(''), 2500);
+    } catch (e: any) { setMsg(`خطأ: ${e.message}`); }
+    setSaving(false);
+  };
+
+  return (
+    <div style={{ marginTop: 16, borderTop: '1px solid #f0f0f0', paddingTop: 14 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        <span style={{ fontSize: 15 }}>📞</span>
+        <p style={{ fontSize: 12, fontWeight: 700, margin: 0, color: '#18181b' }}>تكامل هاتف</p>
+        {msg && <span style={{ fontSize: 11, color: msg.startsWith('خطأ') ? '#ef4444' : '#22c55e', marginRight: 'auto' }}>{msg}</span>}
+      </div>
+      <div style={{ background: 'rgba(5,150,105,.04)', border: '1px solid rgba(5,150,105,.15)', borderRadius: 10, padding: '12px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <p style={{ fontSize: 11, color: '#374151', margin: 0 }}>تفعيل هاتف لهذه الشركة</p>
+          <button onClick={() => setEnabled(v => !v)}
+            style={{ width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer', background: enabled ? '#22c55e' : '#d1d5db', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
+            <span style={{ position: 'absolute', top: 2, left: enabled ? 20 : 2, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'left .2s', boxShadow: '0 1px 2px rgba(0,0,0,.2)' }} />
+          </button>
+        </div>
+        <div style={{ marginBottom: 10 }}>
+          <p style={{ fontSize: 10, color: '#9ca3af', margin: '0 0 4px' }}>رابط بوابة هاتف (اختياري)</p>
+          <input
+            value={portalUrl}
+            onChange={e => setPortalUrl(e.target.value)}
+            dir="ltr"
+            placeholder="https://app.hatif.io/org/XXXXX"
+            style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', fontSize: 11, width: '100%', background: '#fff', color: '#18181b', boxSizing: 'border-box' }}
+          />
+        </div>
+        <button onClick={save} disabled={saving}
+          style={{ padding: '6px 16px', borderRadius: 8, background: '#059669', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
+          {saving ? '...' : 'حفظ'}
+        </button>
       </div>
     </div>
   );
