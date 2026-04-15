@@ -648,7 +648,7 @@ export default function CommandCenterPage() {
                     <div style={{ display:'flex',alignItems:'center',gap:8,marginBottom:4 }}>
                       <span style={{ fontSize:11,color:C.text1 }}>{a.recipient_phone||a.to}</span>
                       <span style={{ fontSize:9,padding:'1px 6px',borderRadius:10,background:a.status==='sent'?'rgba(22,163,74,.08)':'rgba(239,68,68,.08)',color:a.status==='sent'?'#16a34a':'#ef4444' }}>{a.status}</span>
-                      <span style={{ fontSize:9,color:C.muted,marginRight:'auto' }}>{new Date(a.sent_at||a.created_at).toLocaleString('ar-SA')}</span>
+                      <span style={{ fontSize:9,color:C.muted,marginRight:'auto' }}>{new Date(a.sent_at||a.created_at).toLocaleString('en-US')}</span>
                     </div>
                     {a.message_body && <p style={{ fontSize:10,color:C.text2,whiteSpace:'pre-wrap' }}>{(a.message_body||a.body||'').slice(0,200)}</p>}
                   </div>

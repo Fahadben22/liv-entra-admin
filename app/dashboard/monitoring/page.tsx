@@ -61,7 +61,7 @@ export default function MonitoringPage() {
         </div>
         {/* Last check */}
         <p style={{fontSize:11,color:'#9ca3af',marginTop:16,direction:'ltr'}}>
-          Last checked: {health?.ts ? new Date(health.ts).toLocaleString('ar-SA') : 'N/A'}
+          Last checked: {health?.ts ? new Date(health.ts).toLocaleString('en-US') : 'N/A'}
         </p>
       </div>
     </div>

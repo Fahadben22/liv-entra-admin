@@ -167,7 +167,7 @@ export default function AuditPage() {
                               <span style={{ width: 6, height: 6, borderRadius: '50%', background: st.color, display: 'inline-block', boxShadow: `0 0 6px ${st.color}66` }} />
                               <span style={{ fontSize: 11, color: st.color, fontWeight: 500 }}>{st.label}</span>
                             </div>
-                            <span style={{ fontSize: 11, color: '#9ca3af', direction: 'ltr', fontWeight: 500 }}>{new Date(a.created_at).toLocaleString('ar-SA')}</span>
+                            <span style={{ fontSize: 11, color: '#9ca3af', direction: 'ltr', fontWeight: 500 }}>{new Date(a.created_at).toLocaleString('en-US')}</span>
                           </div>
                         </div>
 
@@ -239,7 +239,7 @@ export default function AuditPage() {
                           <td style={{ padding: '11px 18px', fontSize: 11, color: '#6b7280', fontWeight: 500 }}>{a.target_type}</td>
                           <td style={{ padding: '11px 18px', fontSize: 11, color: '#6b7280', direction: 'ltr', fontWeight: 500 }}>{a.ip_address}</td>
                           <td style={{ padding: '11px 18px', fontSize: 11, color: '#6b7280', direction: 'ltr', whiteSpace: 'nowrap', fontWeight: 500 }}>
-                            {new Date(a.created_at).toLocaleString('ar-SA')}
+                            {new Date(a.created_at).toLocaleString('en-US')}
                           </td>
                         </tr>
                       ))}

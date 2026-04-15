@@ -139,7 +139,7 @@ export default function QueuePage() {
                       <td style={{ padding: '10px 14px', fontSize: 12, fontFamily: 'monospace', color: '#1E293B' }}>{job.recipient_phone}</td>
                       <td style={{ padding: '10px 14px', fontSize: 12, color: '#9ca3af' }}>{job.template_name || '—'}</td>
                       <td style={{ padding: '10px 14px', fontSize: 11, color: '#9ca3af' }}>
-                        {new Date(job.scheduled_for).toLocaleString('ar-SA', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        {new Date(job.scheduled_for).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </td>
                       <td style={{ padding: '10px 14px' }}>
                         <span style={{ fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 4, color: sc.color, fontWeight: 500 }}>

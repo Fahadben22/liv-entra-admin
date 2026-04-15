@@ -153,7 +153,7 @@ export default function LandingPageCMS() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={S.badge(data.is_published)}>{data.is_published ? 'منشور' : 'مسودة'}</span>
           <span style={{ fontSize: 11, color: '#9ca3af' }}>
-            آخر تحديث: {data.updated_at ? new Date(data.updated_at).toLocaleString('ar-SA') : '—'} بواسطة: {data.updated_by || '—'}
+            آخر تحديث: {data.updated_at ? new Date(data.updated_at).toLocaleString('en-US') : '—'} بواسطة: {data.updated_by || '—'}
           </span>
         </div>
       </div>

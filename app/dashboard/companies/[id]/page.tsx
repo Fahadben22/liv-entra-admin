@@ -379,7 +379,7 @@ export default function CompanyDetailPage() {
                           <span style={{ fontSize: 11, color: '#6b7280', marginRight: 8, fontWeight: 500 }}>بواسطة {a.actor_email}</span>
                         </div>
                         <span style={{ fontSize: 11, color: '#6b7280', direction: 'ltr', fontWeight: 500 }}>
-                          {new Date(a.created_at).toLocaleString('ar-SA')}
+                          {new Date(a.created_at).toLocaleString('en-US')}
                         </span>
                       </div>
                       <p style={{ fontSize: 11, color: '#9ca3af', margin: '4px 0 0', fontWeight: 500 }}>

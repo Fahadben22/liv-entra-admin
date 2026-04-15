@@ -22,7 +22,7 @@ const LC: Record<string, { bg: string; color: string; dot: string; label: string
 const PLAN_AR: Record<string, string> = { trial: 'تجريبي', basic: 'أساسي', professional: 'احترافي', enterprise: 'مؤسسي' };
 
 function daysUntil(d: string) { return Math.ceil((new Date(d).getTime() - Date.now()) / 86400000); }
-function fmt(n: number) { return n.toLocaleString('ar-SA'); }
+function fmt(n: number) { return n.toLocaleString('en-US'); }
 function timeAgo(iso: string) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 60) return 'الآن';
