@@ -315,7 +315,7 @@ function CompanyRevenueChart({ companies, selectedId, onSelect }: { companies: a
           <XAxis type="number" tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={v => v >= 1000 ? `${Math.round(v/1000)}k` : String(v)} />
           <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#1E293B' }} width={90} />
           <Tooltip
-            formatter={(v: any, name: string | undefined) => [`${Number(v).toLocaleString('en-US')} ر.س`, name ?? '']}
+            formatter={((v: any) => [`${Number(v).toLocaleString('en-US')} ر.س`]) as any}
             contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E2E8F0' }}
           />
           <Legend wrapperStyle={{ fontSize: 12 }} />
@@ -367,7 +367,7 @@ function CompanyDrillDown({ companyName, drillData, onClose }: { companyName: st
             <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
             <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94A3B8' }} />
             <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={v => v >= 1000 ? `${Math.round(v/1000)}k` : String(v)} />
-            <Tooltip formatter={(v: any, name: string | undefined) => [`${Number(v).toLocaleString('en-US')} ر.س`, name ?? '']} contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+            <Tooltip formatter={((v: any) => [`${Number(v).toLocaleString('en-US')} ر.س`]) as any} contentStyle={{ fontSize: 12, borderRadius: 8 }} />
             <Legend wrapperStyle={{ fontSize: 12 }} />
             <Line type="monotone" dataKey="إيرادات" stroke="#2563EB" strokeWidth={2} dot={{ r: 3 }} />
             <Line type="monotone" dataKey="مصاريف" stroke="#DC2626" strokeWidth={2} dot={{ r: 3 }} />
