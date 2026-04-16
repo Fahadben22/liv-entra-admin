@@ -17,6 +17,7 @@ interface AgentChatProps {
   messages?: Message[];
   onMessagesChange?: (msgs: Message[]) => void;
   compact?: boolean; // hide header when parent provides its own
+  pendingMessage?: string; // auto-sent once when non-empty (used by briefing card)
 }
 
 interface DraftEmail {
@@ -27,7 +28,7 @@ interface DraftEmail {
   body: string;
 }
 
-export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions, messages: externalMessages, onMessagesChange, compact }: AgentChatProps) {
+export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions, messages: externalMessages, onMessagesChange, compact, pendingMessage }: AgentChatProps) {
   // Use external state if provided, otherwise internal
   const [internalMessages, setInternalMessages] = useState<Message[]>([]);
   const messages = externalMessages ?? internalMessages;
@@ -45,6 +46,15 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages]);
+
+  // Auto-send pendingMessage once when it becomes non-empty
+  const pendingSentRef = useRef<string>('');
+  useEffect(() => {
+    if (pendingMessage && pendingMessage !== pendingSentRef.current && !loading) {
+      pendingSentRef.current = pendingMessage;
+      send(pendingMessage);
+    }
+  }, [pendingMessage]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function send(text?: string) {
     const msg = (text || input).trim();

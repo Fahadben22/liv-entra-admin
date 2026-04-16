@@ -3,14 +3,105 @@ import { useState, useEffect, useCallback } from 'react';
 import AgentChat, { Message } from './AgentChat';
 import { adminApi } from '@/lib/api';
 
+// ─── Morning Briefing Card ────────────────────────────────────────────────────
+function MorningBriefingCard({ onAskAgent }: { onAskAgent: (agentType: string, msg: string) => void }) {
+  const [briefing, setBriefing] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState(false);
+  const [triggering, setTriggering] = useState(false);
+
+  useEffect(() => {
+    adminApi.sa.getTodayBriefing?.().then((r: any) => {
+      const b = r?.data;
+      setBriefing(b || null);
+      if (b?.actions_taken?.length > 0) setExpanded(true);
+    }).catch(() => {}).finally(() => setLoading(false));
+  }, []);
+
+  async function handleTrigger() {
+    setTriggering(true);
+    try {
+      await adminApi.sa.triggerBriefing?.();
+      setTimeout(() => {
+        adminApi.sa.getTodayBriefing?.().then((r: any) => setBriefing(r?.data || null)).catch(() => {});
+        setTriggering(false);
+      }, 5000);
+    } catch { setTriggering(false); }
+  }
+
+  const today = new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const actionsCount = briefing?.actions_taken?.length || 0;
+
+  if (loading) return null;
+
+  return (
+    <div style={{ margin: '10px 10px 0', background: '#fff', border: '1px solid rgba(37,99,235,.15)', borderRadius: 10, overflow: 'hidden' }}>
+      <button onClick={() => setExpanded(!expanded)}
+        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: 'none', background: expanded ? 'rgba(37,99,235,.04)' : 'transparent', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <span style={{ fontSize: 16 }}>☀️</span>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#1E293B', margin: 0 }}>ملخص اليوم</p>
+            <p style={{ fontSize: 9, color: '#9ca3af', margin: 0 }}>{today}</p>
+          </div>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          {actionsCount > 0 && (
+            <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 10, background: '#dcfce7', color: '#166534', fontWeight: 700 }}>
+              {actionsCount} إجراء تلقائي
+            </span>
+          )}
+          {!briefing && (
+            <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 10, background: '#fef3c7', color: '#92400e', fontWeight: 700 }}>
+              لا يوجد
+            </span>
+          )}
+          <span style={{ fontSize: 10, color: '#9ca3af' }}>{expanded ? '▲' : '▼'}</span>
+        </div>
+      </button>
+
+      {expanded && (
+        <div style={{ padding: '0 14px 12px', borderTop: '1px solid rgba(0,0,0,.04)' }}>
+          {briefing ? (
+            <>
+              <p style={{ fontSize: 11, color: '#374151', lineHeight: 1.6, margin: '10px 0 8px', whiteSpace: 'pre-wrap' }}>{briefing.content}</p>
+              {actionsCount > 0 && (
+                <div style={{ background: '#f0fdf4', borderRadius: 6, padding: '6px 10px', marginBottom: 8 }}>
+                  <p style={{ fontSize: 10, fontWeight: 600, color: '#166534', margin: '0 0 4px' }}>الإجراءات التلقائية:</p>
+                  {briefing.actions_taken.map((a: any, i: number) => (
+                    <p key={i} style={{ fontSize: 9, color: '#374151', margin: '2px 0' }}>• {a.company_name}: {a.result?.slice(0, 60)}</p>
+                  ))}
+                </div>
+              )}
+              <button
+                onClick={() => onAskAgent('product', 'اشرح لي ملخص اليوم بالتفصيل وما الإجراءات التي تقترحها؟')}
+                style={{ width: '100%', padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: 600, border: 'none', background: 'rgba(37,99,235,.08)', color: '#2563EB', cursor: 'pointer' }}>
+                اسأل يوسف عن هذا
+              </button>
+            </>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '10px 0' }}>
+              <p style={{ fontSize: 10, color: '#9ca3af', margin: '0 0 8px' }}>لا يوجد ملخص لليوم — يُنشأ تلقائياً في 7:15 صباحاً</p>
+              <button onClick={handleTrigger} disabled={triggering}
+                style={{ padding: '5px 16px', borderRadius: 6, fontSize: 10, fontWeight: 600, border: '1px solid #2563EB', background: '#fff', color: '#2563EB', cursor: 'pointer' }}>
+                {triggering ? 'جارٍ الإنشاء...' : 'أنشئ الآن'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Agent Registry (fixed order = spatial memory) ───────────────────────────
 const AGENTS = [
   { type: 'meeting_room', name: 'الاجتماعات', icon: '🏛️', color: '#2563EB', role: 'غرفة الاجتماعات', quickActions: ['نظرة شاملة على كل الأقسام', 'KPIs اليوم', 'أنشئ تقرير تنفيذي', 'الخطط النشطة', 'مشاكل تحتاج انتباهي'] },
   { type: 'it', name: 'سالم', icon: '🛡️', color: '#3b82f6', role: 'IT', spec: 'it_specialist', specName: 'طارق', specIcon: '🔧', quickActions: ['حالة النظام', 'Cloudflare', 'أنماط الأخطاء', 'أحداث أمنية', 'SSL'] },
-  { type: 'sales', name: 'خالد', icon: '💼', color: '#22c55e', role: 'مبيعات', spec: 'sales_specialist', specName: 'عمر', specIcon: '📞', quickActions: ['أفضل عميل', 'MRR', 'التجارب المنتهية', 'ملخص الأسبوع', 'خط الأنابيب'] },
+  { type: 'sales', name: 'خالد', icon: '💼', color: '#22c55e', role: 'مبيعات', spec: 'sales_specialist', specName: 'عمر', specIcon: '📞', quickActions: ['تجارب قريبة الانتهاء — من منهم يستحق تمديداً؟', 'عملاء خاملون — من نحتاج نبعث لهم إيميل تفعيل؟', 'خط أنابيب المبيعات', 'MRR والاشتراكات', 'ملخص الأسبوع'] },
   { type: 'marketing', name: 'نورة', icon: '📊', color: '#8b5cf6', role: 'تسويق', spec: 'marketing_specialist', specName: 'سارة', specIcon: '📱', quickActions: ['KPIs الأسبوع', 'الحملات', 'الزوار', 'التحويل', 'المصادر'] },
-  { type: 'finance', name: 'ريم', icon: '💰', color: '#f59e0b', role: 'مالية', spec: 'finance_specialist', specName: 'ماجد', specIcon: '📋', quickActions: ['MRR', 'الفواتير', 'المتأخرات', 'المصروفات', 'التوقعات'] },
-  { type: 'product', name: 'يوسف', icon: '🚀', color: '#06b6d4', role: 'منتج', spec: 'product_specialist', specName: 'لينا', specIcon: '🔍', quickActions: ['تبني الميزات', 'تذاكر مفتوحة', 'المغادرة', 'NPS', 'خريطة الطريق'] },
+  { type: 'finance', name: 'ريم', icon: '💰', color: '#f59e0b', role: 'مالية', spec: 'finance_specialist', specName: 'ماجد', specIcon: '📋', quickActions: ['معدل التحصيل هذا الشهر لكل شركة', 'المتأخرات', 'MRR', 'المصروفات', 'التوقعات'] },
+  { type: 'product', name: 'يوسف', icon: '🚀', color: '#06b6d4', role: 'منتج', spec: 'product_specialist', specName: 'لينا', specIcon: '🔍', quickActions: ['عملاء خاملون — قائمة مع توصية لكل منهم', 'شركات تواجه مشاكل تشغيلية أو مالية', 'تبني الميزات — أيها مُستخدم وأيها مهجور', 'الشركات الجديدة خلال آخر 14 يوم وحال انطلاقها', 'NPS والمغادرة'] },
 ];
 
 // Specialist quick actions
@@ -67,11 +158,19 @@ export default function AgentsWorkspace() {
     setConversations(prev => ({ ...prev, [activeAgent]: msgs }));
   }
 
+  // Switch to agent and auto-send a message (used by briefing card)
+  const [pendingMessage, setPendingMessage] = useState<string>('');
+  function askAgent(agentType: string, msg: string) {
+    setActiveAgent(agentType);
+    setPendingMessage(msg);
+  }
+
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
 
       {/* LEFT: Agent list panel */}
-      <div style={{ width: 220, borderLeft: '1px solid rgba(0,0,0,.06)', background: '#fff', overflowY: 'auto', flexShrink: 0 }}>
+      <div style={{ width: 240, borderLeft: '1px solid rgba(0,0,0,.06)', background: '#fff', overflowY: 'auto', flexShrink: 0 }}>
+        <MorningBriefingCard onAskAgent={askAgent} />
         <div style={{ padding: '14px 12px 8px', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
           <h2 style={{ fontSize: 12, fontWeight: 700, color: '#1E293B', margin: 0 }}>الفريق</h2>
         </div>
@@ -120,6 +219,7 @@ export default function AgentsWorkspace() {
           messages={conversations[activeAgent] || []}
           onMessagesChange={updateMessages}
           compact={false}
+          pendingMessage={pendingMessage}
         />
       </div>
 

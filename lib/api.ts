@@ -118,6 +118,10 @@ export const adminApi = {
     rejectAction:         (id: string, reason?: string) => request<any>('POST', `/admin/agents/meeting-room/reject-action/${id}`, { reason }),
     approveReport:        (id: string)    => request<any>('POST', `/admin/agents/meeting-room/approve-report/${id}`),
 
+    // Daily briefing
+    getTodayBriefing:     ()             => request<any>('GET', '/admin/agents/briefing/today'),
+    triggerBriefing:      ()             => request<any>('POST', '/admin/agents/briefing/trigger'),
+
     // Tenant / Company control
     checkSlug:       (slug: string)  => request<any>('GET', `/superadmin/companies/check-slug?slug=${encodeURIComponent(slug)}`),
     listCompanies:   (params?: Record<string, string>) => {
