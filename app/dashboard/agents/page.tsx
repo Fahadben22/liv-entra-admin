@@ -99,7 +99,7 @@ const AGENTS = [
   { type: 'meeting_room', name: 'الاجتماعات', icon: '🏛️', color: '#2563EB', role: 'غرفة الاجتماعات', quickActions: ['نظرة شاملة على كل الأقسام', 'KPIs اليوم', 'أنشئ تقرير تنفيذي', 'الخطط النشطة', 'مشاكل تحتاج انتباهي'] },
   { type: 'it', name: 'سالم', icon: '🛡️', color: '#3b82f6', role: 'IT', spec: 'it_specialist', specName: 'طارق', specIcon: '🔧', quickActions: ['حالة النظام', 'Cloudflare', 'أنماط الأخطاء', 'أحداث أمنية', 'SSL'] },
   { type: 'sales', name: 'خالد', icon: '💼', color: '#22c55e', role: 'مبيعات', spec: 'sales_specialist', specName: 'عمر', specIcon: '📞', quickActions: ['تجارب قريبة الانتهاء — من منهم يستحق تمديداً؟', 'عملاء خاملون — من نحتاج نبعث لهم إيميل تفعيل؟', 'خط أنابيب المبيعات', 'MRR والاشتراكات', 'ملخص الأسبوع'] },
-  { type: 'marketing', name: 'نورة', icon: '📊', color: '#8b5cf6', role: 'تسويق', spec: 'marketing_specialist', specName: 'سارة', specIcon: '📱', quickActions: ['KPIs الأسبوع', 'الحملات', 'الزوار', 'التحويل', 'المصادر'] },
+  { type: 'marketing', name: 'نورة', icon: '📊', color: '#8b5cf6', role: 'تسويق', spec: 'marketing_specialist', specName: 'سارة', specIcon: '📱', spec2: 'design_specialist', specName2: 'ليلى', specIcon2: '🎨', quickActions: ['KPIs الأسبوع', 'الحملات', 'الزوار', 'التحويل', 'المصادر'] },
   { type: 'finance', name: 'ريم', icon: '💰', color: '#f59e0b', role: 'مالية', spec: 'finance_specialist', specName: 'ماجد', specIcon: '📋', quickActions: ['معدل التحصيل هذا الشهر لكل شركة', 'المتأخرات', 'MRR', 'المصروفات', 'التوقعات'] },
   { type: 'product', name: 'يوسف', icon: '🚀', color: '#06b6d4', role: 'منتج', spec: 'product_specialist', specName: 'لينا', specIcon: '🔍', quickActions: ['عملاء خاملون — قائمة مع توصية لكل منهم', 'شركات تواجه مشاكل تشغيلية أو مالية', 'تبني الميزات — أيها مُستخدم وأيها مهجور', 'الشركات الجديدة خلال آخر 14 يوم وحال انطلاقها', 'NPS والمغادرة'] },
 ];
@@ -111,6 +111,7 @@ const SPEC_ACTIONS: Record<string, string[]> = {
   marketing_specialist: ['مهامي', 'التحويل', 'المصادر'],
   finance_specialist: ['مهامي', 'الفواتير', 'المتأخرات'],
   product_specialist: ['مهامي', 'التذاكر', 'الميزات'],
+  design_specialist: ['مهامي', 'صمم بوست إنستجرام', 'اقترح هوية بصرية', 'كتابة نص إعلاني'],
 };
 
 function getAgentInfo(type: string) {
@@ -118,6 +119,8 @@ function getAgentInfo(type: string) {
   if (mgr) return mgr;
   const parent = AGENTS.find(a => a.spec === type);
   if (parent) return { type, name: parent.specName!, icon: parent.specIcon!, color: parent.color, role: `متخصص ${parent.role}`, quickActions: SPEC_ACTIONS[type] || ['مهامي'] };
+  const parent2 = AGENTS.find(a => (a as any).spec2 === type);
+  if (parent2) return { type, name: (parent2 as any).specName2!, icon: (parent2 as any).specIcon2!, color: parent2.color, role: `متخصص ${parent2.role}`, quickActions: SPEC_ACTIONS[type] || ['مهامي'] };
   return AGENTS[0];
 }
 
@@ -203,6 +206,17 @@ export default function AgentsWorkspace() {
                   <span style={{ fontSize: 10, color: specActive ? a.color : '#9ca3af', fontWeight: specActive ? 600 : 400 }}>{a.specName}</span>
                 </button>
               )}
+              {/* Second specialist (e.g. design_specialist under marketing) */}
+              {(a as any).spec2 && (() => {
+                const spec2Active = activeAgent === (a as any).spec2;
+                return (
+                  <button onClick={() => setActiveAgent((a as any).spec2)}
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px 6px 28px', border: 'none', background: spec2Active ? `${a.color}08` : 'transparent', cursor: 'pointer', borderRight: spec2Active ? `3px solid ${a.color}` : '3px solid transparent', transition: 'all .1s' }}>
+                    <span style={{ fontSize: 13 }}>{(a as any).specIcon2}</span>
+                    <span style={{ fontSize: 10, color: spec2Active ? a.color : '#9ca3af', fontWeight: spec2Active ? 600 : 400 }}>{(a as any).specName2}</span>
+                  </button>
+                );
+              })()}
             </div>
           );
         })}
