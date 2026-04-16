@@ -5,6 +5,7 @@ import { request } from '@/lib/api';
 export interface Message {
   role: 'user' | 'assistant';
   content: string;
+  tools_used?: string[]; // tools that ran to produce this message
 }
 
 interface AgentChatProps {
@@ -67,8 +68,9 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
     try {
       const res = await request<any>('POST', `/admin/agents/${agentType}/chat`, { message: msg });
       const reply = res?.data?.reply || 'لم أتمكن من الرد.';
+      const toolsUsed: string[] = res?.data?.tools_used || [];
       setTokens(prev => prev + (res?.data?.tokens_used || 0));
-      setMessages([...updated, { role: 'assistant', content: reply }]);
+      setMessages([...updated, { role: 'assistant', content: reply, tools_used: toolsUsed }]);
 
       // Check if agent drafted an email outreach
       const draftAction = (res?.data?.actions || []).find((a: any) => {
@@ -141,10 +143,22 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
           </div>
         )}
         {messages.map((msg, i) => (
-          <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-start' : 'flex-end', gap: 6 }}>
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-start' : 'flex-end', gap: 4 }}>
             <div style={{ maxWidth: '85%', padding: '10px 14px', borderRadius: 14, background: msg.role === 'user' ? '#DBEAFE' : '#F1F5F9', border: msg.role === 'user' ? '1px solid rgba(124,92,252,.12)' : '1px solid rgba(0,0,0,.04)', color: '#1E293B', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
               {msg.content}
             </div>
+            {msg.role === 'assistant' && msg.tools_used && msg.tools_used.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxWidth: '85%', justifyContent: 'flex-end' }}>
+                {msg.tools_used.map((tool, ti) => (
+                  <span key={ti} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.2)', color: '#7c5cfc', fontFamily: 'monospace' }}>
+                    ✓ {tool}
+                  </span>
+                ))}
+              </div>
+            )}
+            {msg.role === 'assistant' && msg.tools_used && msg.tools_used.length === 0 && msg.content.includes('⚠️') && (
+              <div style={{ fontSize: 10, color: '#f59e0b', maxWidth: '85%', textAlign: 'right' }}>بدون أدوات</div>
+            )}
           </div>
         ))}
         {loading && (
