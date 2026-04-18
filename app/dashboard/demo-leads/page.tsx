@@ -320,8 +320,8 @@ export default function DemoLeadsPage() {
         ) : (
           <div style={{ borderRadius: 14, overflow: 'hidden', background: 'var(--lv-panel)', boxShadow: 'var(--lv-shadow-sm)' }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: 'var(--lv-bg)', borderBottom: '1px solid var(--lv-line)', padding: '10px 20px' }}>
-              {['التاريخ', 'الزائر', 'الجوال', 'الشركة', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 130px 150px 100px 220px', gap: 0, background: 'var(--lv-bg)', borderBottom: '1px solid var(--lv-line)', padding: '10px 20px' }}>
+              {['التاريخ', 'الزائر', 'الجوال', 'الشركة', 'الحالة', 'الإجراءات'].map(h => (
                 <div key={h} style={{ fontSize: 11, fontWeight: 500, color: 'var(--lv-muted)' }}>{h}</div>
               ))}
             </div>
@@ -334,23 +334,21 @@ export default function DemoLeadsPage() {
               return (
                 <div key={item.id} style={{ borderBottom: i < displayedItems.length - 1 ? '1px solid var(--lv-line)' : 'none' }}>
                 <div
-                  onClick={() => hasData && setExpandedLead(isExpanded ? null : item.id)}
                   style={{
-                    display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px',
+                    display: 'grid', gridTemplateColumns: '120px 1fr 130px 150px 100px 220px',
                     gap: 0, padding: '14px 20px', alignItems: 'center',
                     background: isExpanded ? 'var(--lv-bg)' : i % 2 === 0 ? 'var(--lv-panel)' : 'var(--lv-bg)',
-                    cursor: hasData ? 'pointer' : 'default',
                     transition: 'background 0.15s',
                   }}
                 >
                   {/* Date */}
                   <div style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>{fmt(item.created_at)}</div>
 
-                  {/* Name */}
-                  <div>
+                  {/* Name — click to expand */}
+                  <div onClick={() => hasData && setExpandedLead(isExpanded ? null : item.id)} style={{ cursor: hasData ? 'pointer' : 'default' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--lv-fg)' }}>{item.name || '—'}</span>
-                      {hasData && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 6, background: isExpanded ? 'var(--lv-accent)' : 'rgba(124,92,252,0.1)', color: isExpanded ? '#fff' : 'var(--lv-accent)', fontWeight: 700 }}>بيانات</span>}
+                      {hasData && <span style={{ fontSize: 9, padding: '1px 6px', borderRadius: 6, background: isExpanded ? 'var(--lv-accent)' : 'rgba(124,92,252,0.1)', color: isExpanded ? '#fff' : 'var(--lv-accent)', fontWeight: 700 }}>{isExpanded ? '▲' : '▼ بيانات'}</span>}
                     </div>
                     {item.demo_session_id && (
                       <div style={{ fontSize: 11, color: 'var(--lv-muted)', fontFamily: 'Inter, monospace', marginTop: 2, fontWeight: 500 }}>
@@ -361,7 +359,7 @@ export default function DemoLeadsPage() {
 
                   {/* Phone */}
                   <div>
-                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: 'var(--lv-fg)', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
+                    <a href={`tel:${item.phone}`} style={{ fontSize: 12, color: 'var(--lv-fg)', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
                       {item.phone}
                     </a>
                     <div style={{ marginTop: 4 }}>
@@ -373,7 +371,7 @@ export default function DemoLeadsPage() {
                   </div>
 
                   {/* Company */}
-                  <div style={{ fontSize: 13, color: 'var(--lv-muted)' }}>{item.company_name || '—'}</div>
+                  <div style={{ fontSize: 12, color: 'var(--lv-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.company_name || '—'}</div>
 
                   {/* Status pill */}
                   <div>
@@ -382,39 +380,36 @@ export default function DemoLeadsPage() {
                     </span>
                   </div>
 
-                  {/* Notes */}
-                  <div>
-                    <button onClick={() => openNotes(item)}
-                      style={{
-                        fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
-                        background: 'transparent',
-                        border: '1px solid var(--lv-line)',
-                        color: item.notes ? 'var(--lv-fg)' : 'var(--lv-muted)',
-                        borderRadius: 10, padding: '4px 12px',
-                      }}>
-                      {item.notes ? 'عرض' : '+ ملاحظة'}
-                    </button>
-                  </div>
-
-                  {/* Status dropdown + Convert */}
-                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                  {/* Actions: status select + notes + convert — all in one row */}
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                     <select
                       value={item.status}
                       disabled={updating === item.id}
-                      onChange={e => changeStatus(item.id, e.target.value)}
+                      onChange={e => { e.stopPropagation(); changeStatus(item.id, e.target.value); }}
                       style={{
                         background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', color: 'var(--lv-fg)',
-                        borderRadius: 10, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
-                        fontFamily: 'inherit', outline: 'none', flex: 1,
+                        borderRadius: 8, padding: '5px 6px', fontSize: 11, cursor: 'pointer',
+                        fontFamily: 'inherit', outline: 'none', flex: '0 0 90px',
                         opacity: updating === item.id ? .5 : 1,
                       }}>
                       {ALL_STATUSES.map(s => (
                         <option key={s} value={s} style={{ background: 'var(--lv-panel)', color: 'var(--lv-fg)' }}>{STATUS_CONFIG[s].label}</option>
                       ))}
                     </select>
+                    <button onClick={e => { e.stopPropagation(); openNotes(item); }}
+                      style={{
+                        fontSize: 11, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
+                        background: item.notes ? 'var(--lv-bg)' : 'transparent',
+                        border: '1px solid var(--lv-line)',
+                        color: item.notes ? 'var(--lv-fg)' : 'var(--lv-muted)',
+                        borderRadius: 8, padding: '5px 8px', whiteSpace: 'nowrap', flexShrink: 0,
+                      }}>
+                      {item.notes ? '📋' : '+ ملاحظة'}
+                    </button>
                     {item.status !== 'converted' && (
                       <button
-                        onClick={async () => {
+                        onClick={async e => {
+                          e.stopPropagation();
                           if (!confirm(`تحويل "${item.name || item.phone}" إلى عميل؟`)) return;
                           try {
                             await adminApi.sa.convertLead(item.id, { plan: 'trial', send_welcome: true });
@@ -422,14 +417,13 @@ export default function DemoLeadsPage() {
                           } catch (e: any) { alert(e.message || 'فشل التحويل'); }
                         }}
                         style={{
-                          fontSize: 12, padding: '7px 16px', borderRadius: 10,
+                          fontSize: 11, padding: '5px 10px', borderRadius: 8,
                           background: 'var(--lv-accent)', border: 'none',
                           color: '#fff', cursor: 'pointer', fontFamily: 'inherit',
-                          whiteSpace: 'nowrap', fontWeight: 500,
-                          boxShadow: '0 2px 8px rgba(124,92,252,.2)',
+                          whiteSpace: 'nowrap', fontWeight: 600, flexShrink: 0,
                         }}
                       >
-                        تحويل
+                        تحويل ✓
                       </button>
                     )}
                   </div>

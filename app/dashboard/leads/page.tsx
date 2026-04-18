@@ -166,8 +166,8 @@ export default function LeadsPage() {
         ) : (
           <div style={{ borderRadius: 14, overflow: 'hidden', background: 'var(--lv-panel)', boxShadow: 'var(--lv-shadow-sm)' }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr 180px 130px 80px 110px 140px 80px', gap: 0, background: 'var(--lv-bg)', borderBottom: '1px solid var(--lv-line)', padding: '10px 20px' }}>
-              {['التاريخ', 'العميل', 'البريد', 'الجوال', 'الوحدات', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
+            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 160px 130px 70px 100px 220px', gap: 0, background: 'var(--lv-bg)', borderBottom: '1px solid var(--lv-line)', padding: '10px 20px' }}>
+              {['التاريخ', 'العميل', 'البريد', 'الجوال', 'الوحدات', 'الحالة', 'الإجراءات'].map(h => (
                 <div key={h} style={{ fontSize: 11, fontWeight: 500, color: 'var(--lv-muted)' }}>{h}</div>
               ))}
             </div>
@@ -178,7 +178,7 @@ export default function LeadsPage() {
               return (
                 <div key={item.id}
                   style={{
-                    display: 'grid', gridTemplateColumns: '130px 1fr 180px 130px 80px 110px 140px 80px',
+                    display: 'grid', gridTemplateColumns: '120px 1fr 160px 130px 70px 100px 220px',
                     gap: 0, padding: '14px 20px', alignItems: 'center',
                     borderBottom: i < items.length - 1 ? '1px solid var(--lv-line)' : 'none',
                     background: i % 2 === 0 ? 'var(--lv-panel)' : 'var(--lv-bg)',
@@ -196,7 +196,7 @@ export default function LeadsPage() {
                   {/* Email */}
                   <div>
                     {item.email ? (
-                      <a href={`mailto:${item.email}`} style={{ fontSize: 13, color: 'var(--lv-accent)', textDecoration: 'none', direction: 'ltr', display: 'block' }}>{item.email}</a>
+                      <a href={`mailto:${item.email}`} style={{ fontSize: 12, color: 'var(--lv-accent)', textDecoration: 'none', direction: 'ltr', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.email}</a>
                     ) : (
                       <span style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>—</span>
                     )}
@@ -204,7 +204,7 @@ export default function LeadsPage() {
 
                   {/* Phone */}
                   <div>
-                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: 'var(--lv-fg)', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>{item.phone}</a>
+                    <a href={`tel:${item.phone}`} style={{ fontSize: 12, color: 'var(--lv-fg)', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>{item.phone}</a>
                     <div style={{ marginTop: 4 }}>
                       <a href={`https://wa.me/${item.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener"
                         style={{ fontSize: 11, color: '#22c55e', textDecoration: 'none', background: 'rgba(34,197,94,.1)', border: '1px solid rgba(34,197,94,.2)', borderRadius: 7, padding: '2px 8px', fontWeight: 500 }}>
@@ -223,30 +223,16 @@ export default function LeadsPage() {
                     </span>
                   </div>
 
-                  {/* Notes */}
-                  <div>
-                    <button onClick={() => openNotes(item)}
-                      style={{
-                        fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
-                        background: 'transparent',
-                        border: '1px solid var(--lv-line)',
-                        color: item.notes ? 'var(--lv-fg)' : 'var(--lv-muted)',
-                        borderRadius: 10, padding: '4px 12px',
-                      }}>
-                      {item.notes ? 'عرض الملاحظات' : '+ ملاحظة'}
-                    </button>
-                  </div>
-
-                  {/* Status update dropdown */}
-                  <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                  {/* Actions: status select + notes + convert */}
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                     <select
                       value={item.status}
                       disabled={updating === item.id}
                       onChange={e => changeStatus(item.id, e.target.value)}
                       style={{
                         background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', color: 'var(--lv-fg)',
-                        borderRadius: 10, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
-                        fontFamily: 'inherit', outline: 'none', flex: 1,
+                        borderRadius: 8, padding: '5px 6px', fontSize: 11, cursor: 'pointer',
+                        fontFamily: 'inherit', outline: 'none', flex: '0 0 90px',
                         opacity: updating === item.id ? .5 : 1,
                       }}
                     >
@@ -254,6 +240,16 @@ export default function LeadsPage() {
                         <option key={s} value={s} style={{ background: 'var(--lv-panel)', color: 'var(--lv-fg)' }}>{STATUS_CONFIG[s].label}</option>
                       ))}
                     </select>
+                    <button onClick={() => openNotes(item)}
+                      style={{
+                        fontSize: 11, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
+                        background: item.notes ? 'var(--lv-bg)' : 'transparent',
+                        border: '1px solid var(--lv-line)',
+                        color: item.notes ? 'var(--lv-fg)' : 'var(--lv-muted)',
+                        borderRadius: 8, padding: '5px 8px', whiteSpace: 'nowrap', flexShrink: 0,
+                      }}>
+                      {item.notes ? '📋' : '+ ملاحظة'}
+                    </button>
                     {item.status !== 'converted' && (
                       <button
                         onClick={async () => {
@@ -264,14 +260,13 @@ export default function LeadsPage() {
                           } catch (e: any) { alert(e.message || 'فشل التحويل'); }
                         }}
                         style={{
-                          fontSize: 12, padding: '7px 16px', borderRadius: 10,
+                          fontSize: 11, padding: '5px 10px', borderRadius: 8,
                           background: 'var(--lv-accent)', border: 'none',
                           color: '#fff', cursor: 'pointer', fontFamily: 'inherit',
-                          whiteSpace: 'nowrap', fontWeight: 500,
-                          boxShadow: '0 2px 8px rgba(124,92,252,.2)',
+                          whiteSpace: 'nowrap', fontWeight: 600, flexShrink: 0,
                         }}
                       >
-                        تحويل
+                        تحويل ✓
                       </button>
                     )}
                   </div>
