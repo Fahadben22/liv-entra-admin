@@ -1,7 +1,256 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import AgentChat, { Message } from './AgentChat';
-import { adminApi } from '@/lib/api';
+import { adminApi, BASE } from '@/lib/api';
+
+// ─── Marketing Workshop ───────────────────────────────────────────────────────
+interface WorkshopStep {
+  step: number;
+  title: string;
+  status: 'waiting' | 'running' | 'done' | 'error';
+  content?: string;
+}
+interface WorkshopResult {
+  brief: string;
+  strategic_brief: string;
+  copy_content: string;
+  design_reply: string;
+  noura_approval: string;
+  post_url: string | null;
+  canva_edit_url: string | null;
+  post_id: string | null;
+}
+
+function MarketingWorkshop({ onClose }: { onClose: () => void }) {
+  const [brief, setBrief] = useState('');
+  const [running, setRunning] = useState(false);
+  const [steps, setSteps] = useState<WorkshopStep[]>([
+    { step: 1, title: 'نورة تحلل وتضع الاستراتيجية', status: 'waiting' },
+    { step: 2, title: 'سارة تكتب النصوص والـ Hook', status: 'waiting' },
+    { step: 3, title: 'ليلى تصمم البوست', status: 'waiting' },
+    { step: 4, title: 'نورة تراجع وتوافق', status: 'waiting' },
+  ]);
+  const [result, setResult] = useState<WorkshopResult | null>(null);
+  const [error, setError] = useState('');
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  const updateStep = (step: number, patch: Partial<WorkshopStep>) => {
+    setSteps(prev => prev.map(s => s.step === step ? { ...s, ...patch } : s));
+  };
+
+  async function runWorkshop() {
+    if (!brief.trim()) return;
+    setRunning(true);
+    setError('');
+    setResult(null);
+    setSteps(prev => prev.map(s => ({ ...s, status: 'waiting', content: undefined })));
+
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
+    const abort = new AbortController();
+    abortRef.current = abort;
+
+    try {
+      const res = await fetch(`${BASE}/admin/agents/marketing/workshop`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ brief }),
+        signal: abort.signal,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `HTTP ${res.status}`);
+      }
+
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split('\n\n');
+        buffer = parts.pop() || '';
+        for (const part of parts) {
+          const lines = part.split('\n');
+          let eventType = '';
+          let dataStr = '';
+          for (const line of lines) {
+            if (line.startsWith('event: ')) eventType = line.slice(7).trim();
+            if (line.startsWith('data: ')) dataStr = line.slice(6).trim();
+          }
+          if (!dataStr) continue;
+          try {
+            const payload = JSON.parse(dataStr);
+            if (eventType === 'step') {
+              updateStep(payload.step, { title: payload.title, status: payload.status, content: payload.content });
+              if (payload.status === 'running') setExpandedStep(payload.step);
+              if (payload.status === 'done') setExpandedStep(null);
+            } else if (eventType === 'complete') {
+              setResult(payload);
+            } else if (eventType === 'error') {
+              setError(payload.message || 'حدث خطأ');
+            }
+          } catch { /* ignore parse errors */ }
+        }
+      }
+    } catch (e: any) {
+      if (e.name !== 'AbortError') setError(e.message || 'فشل الاتصال');
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  function handleStop() {
+    abortRef.current?.abort();
+    setRunning(false);
+    setError('تم إيقاف الورشة');
+  }
+
+  const STEP_ICONS = ['🎯', '✍️', '🎨', '✅'];
+  const STEP_COLORS = ['#8b5cf6', '#3b82f6', '#ec4899', '#10b981'];
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 640, maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+
+        {/* Header */}
+        <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>🏭 ورشة التسويق</h2>
+            <p style={{ margin: '2px 0 0', fontSize: 10, color: '#9ca3af' }}>نورة ← سارة ← ليلى — من الفكرة إلى التصميم</p>
+          </div>
+          <button onClick={onClose} style={{ border: 'none', background: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af', padding: 4 }}>✕</button>
+        </div>
+
+        {/* Brief input */}
+        {!running && !result && (
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(0,0,0,.06)', flexShrink: 0 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 6 }}>ما الهدف التسويقي؟</label>
+            <textarea
+              value={brief}
+              onChange={e => setBrief(e.target.value)}
+              placeholder="مثال: بوست سناب ستوري لخصم 20% على باقة Liventra الاحترافية للمشتركين الجدد هذا الأسبوع فقط"
+              rows={3}
+              style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 12, resize: 'none', outline: 'none', fontFamily: 'inherit', direction: 'rtl' }}
+              onFocus={e => e.target.style.borderColor = '#8b5cf6'}
+              onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+            />
+            <button
+              onClick={runWorkshop}
+              disabled={!brief.trim()}
+              style={{ marginTop: 8, width: '100%', padding: '11px', borderRadius: 8, background: brief.trim() ? 'linear-gradient(135deg,#8b5cf6,#7c3aed)' : '#e2e8f0', color: brief.trim() ? '#fff' : '#9ca3af', border: 'none', fontSize: 13, fontWeight: 700, cursor: brief.trim() ? 'pointer' : 'not-allowed', transition: 'all .15s' }}>
+              🚀 ابدأ الورشة
+            </button>
+          </div>
+        )}
+
+        {/* Running brief display */}
+        {(running || result) && (
+          <div style={{ padding: '10px 20px', background: '#f8fafc', borderBottom: '1px solid rgba(0,0,0,.06)', flexShrink: 0 }}>
+            <p style={{ margin: 0, fontSize: 10, color: '#64748b' }}>📋 {brief}</p>
+          </div>
+        )}
+
+        {/* Steps */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
+          {steps.map((s, i) => {
+            const isExpanded = expandedStep === s.step || (result && s.content);
+            return (
+              <div key={s.step} style={{ marginBottom: 8 }}>
+                <button
+                  onClick={() => setExpandedStep(isExpanded ? null : s.step)}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: `1px solid ${s.status === 'done' ? STEP_COLORS[i] + '30' : s.status === 'running' ? STEP_COLORS[i] + '40' : 'rgba(0,0,0,.05)'}`, background: s.status === 'running' ? STEP_COLORS[i] + '08' : s.status === 'done' ? STEP_COLORS[i] + '05' : '#fafafa', cursor: s.content ? 'pointer' : 'default', transition: 'all .15s' }}>
+                  {/* Icon */}
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.status === 'waiting' ? '#f1f5f9' : s.status === 'running' ? STEP_COLORS[i] + '20' : STEP_COLORS[i] + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14, transition: 'all .2s' }}>
+                    {s.status === 'running' ? (
+                      <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', fontSize: 14 }}>⟳</span>
+                    ) : s.status === 'done' ? (
+                      <span style={{ color: STEP_COLORS[i], fontSize: 14 }}>✓</span>
+                    ) : (
+                      STEP_ICONS[i]
+                    )}
+                  </div>
+                  {/* Title */}
+                  <div style={{ flex: 1, textAlign: 'right' }}>
+                    <p style={{ margin: 0, fontSize: 12, fontWeight: s.status !== 'waiting' ? 600 : 400, color: s.status === 'waiting' ? '#94a3b8' : s.status === 'running' ? STEP_COLORS[i] : '#1e293b' }}>{s.title}</p>
+                    {s.status === 'running' && <p style={{ margin: '2px 0 0', fontSize: 9, color: STEP_COLORS[i] }}>جارٍ العمل...</p>}
+                    {s.status === 'done' && s.content && <p style={{ margin: '2px 0 0', fontSize: 9, color: '#94a3b8' }}>اضغط لرؤية التفاصيل ▾</p>}
+                  </div>
+                  {/* Status badge */}
+                  {s.status === 'done' && (
+                    <span style={{ fontSize: 9, padding: '2px 8px', borderRadius: 10, background: STEP_COLORS[i] + '15', color: STEP_COLORS[i], fontWeight: 600, flexShrink: 0 }}>مكتمل</span>
+                  )}
+                </button>
+                {/* Expanded content */}
+                {isExpanded && s.content && (
+                  <div style={{ margin: '4px 0 0', padding: '12px 14px', background: '#f8fafc', borderRadius: '0 0 10px 10px', border: `1px solid ${STEP_COLORS[i]}20`, borderTop: 'none' }}>
+                    <p style={{ margin: 0, fontSize: 11, color: '#475569', lineHeight: 1.7, whiteSpace: 'pre-wrap', direction: 'rtl' }}>{s.content}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          {/* Error */}
+          {error && (
+            <div style={{ padding: '10px 14px', borderRadius: 8, background: '#fef2f2', border: '1px solid #fecaca', marginTop: 4 }}>
+              <p style={{ margin: 0, fontSize: 11, color: '#ef4444' }}>⚠️ {error}</p>
+            </div>
+          )}
+
+          {/* Final result card */}
+          {result?.post_url && (
+            <div style={{ marginTop: 12, borderRadius: 12, overflow: 'hidden', border: '2px solid #8b5cf640', background: 'linear-gradient(135deg,#fdf4ff,#f0f9ff)' }}>
+              <div style={{ padding: '12px 14px', background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)', color: '#fff' }}>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 700 }}>🎉 التصميم جاهز!</p>
+                <p style={{ margin: '2px 0 0', fontSize: 9, opacity: 0.85 }}>اكتملت الورشة — من الفكرة إلى التصميم النهائي</p>
+              </div>
+              <div style={{ padding: '12px 14px' }}>
+                <img src={result.post_url} alt="التصميم النهائي" style={{ width: '100%', borderRadius: 8, display: 'block', marginBottom: 10, border: '1px solid rgba(0,0,0,.08)' }} />
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {result.canva_edit_url && (
+                    <a href={result.canva_edit_url} target="_blank" rel="noopener noreferrer"
+                      style={{ flex: 1, padding: '9px', borderRadius: 8, background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)', color: '#fff', textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center', display: 'block' }}>
+                      ✏️ فتح في Canva
+                    </a>
+                  )}
+                  <a href={result.post_url} download target="_blank" rel="noopener noreferrer"
+                    style={{ flex: 1, padding: '9px', borderRadius: 8, background: '#1e293b', color: '#fff', textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center', display: 'block' }}>
+                    ⬇️ تحميل PNG
+                  </a>
+                </div>
+                {result.noura_approval && (
+                  <div style={{ marginTop: 8, padding: '8px 10px', background: '#f0fdf4', borderRadius: 6, border: '1px solid #bbf7d0' }}>
+                    <p style={{ margin: 0, fontSize: 10, color: '#166534', lineHeight: 1.6 }}>📊 {result.noura_approval}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: '10px 16px', borderTop: '1px solid rgba(0,0,0,.06)', display: 'flex', gap: 8, flexShrink: 0 }}>
+          {running ? (
+            <button onClick={handleStop} style={{ flex: 1, padding: '9px', borderRadius: 8, background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+              ⬛ إيقاف الورشة
+            </button>
+          ) : result ? (
+            <button onClick={() => { setResult(null); setBrief(''); setSteps(prev => prev.map(s => ({ ...s, status: 'waiting', content: undefined }))); setExpandedStep(null); }}
+              style={{ flex: 1, padding: '9px', borderRadius: 8, background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)', color: '#fff', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
+              ➕ ورشة جديدة
+            </button>
+          ) : null}
+          {!running && <button onClick={onClose} style={{ padding: '9px 16px', borderRadius: 8, background: '#f1f5f9', color: '#475569', border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>إغلاق</button>}
+        </div>
+      </div>
+      <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
+    </div>
+  );
+}
 
 // ─── Morning Briefing Card ────────────────────────────────────────────────────
 function MorningBriefingCard({ onAskAgent }: { onAskAgent: (agentType: string, msg: string) => void }) {
@@ -141,6 +390,7 @@ export default function AgentsWorkspace() {
   const [actions, setActions] = useState<any[]>([]);
   const [sidebarTab, setSidebarTab] = useState<'actions' | 'reports'>('actions');
   const [acting, setActing] = useState<string | null>(null);
+  const [workshopOpen, setWorkshopOpen] = useState(false);
 
   const loadSidebar = useCallback(async () => {
     const [r, a] = await Promise.allSettled([adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.()]);
@@ -217,6 +467,16 @@ export default function AgentsWorkspace() {
                   </button>
                 );
               })()}
+              {/* Workshop button — only for marketing team */}
+              {a.type === 'marketing' && (
+                <button onClick={() => setWorkshopOpen(true)}
+                  style={{ width: 'calc(100% - 24px)', margin: '4px 12px 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, padding: '7px 10px', border: 'none', borderRadius: 8, background: 'linear-gradient(135deg,#8b5cf620,#7c3aed15)', cursor: 'pointer', transition: 'all .15s' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'linear-gradient(135deg,#8b5cf630,#7c3aed25)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'linear-gradient(135deg,#8b5cf620,#7c3aed15)')}>
+                  <span style={{ fontSize: 11 }}>🏭</span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed' }}>ورشة تسويق</span>
+                </button>
+              )}
             </div>
           );
         })}
@@ -295,6 +555,9 @@ export default function AgentsWorkspace() {
         style={{ position: 'fixed', bottom: 16, left: 16, width: 32, height: 32, borderRadius: '50%', background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(124,92,252,.3)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         {sidebarOpen ? '→' : '←'}
       </button>
+
+      {/* Marketing Workshop Modal */}
+      {workshopOpen && <MarketingWorkshop onClose={() => setWorkshopOpen(false)} />}
     </div>
   );
 }
