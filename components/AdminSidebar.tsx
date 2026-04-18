@@ -24,11 +24,6 @@ const SECTION_ICONS: Record<string, IconName> = {
   '/dashboard/maintenance-flows': 'wrench',
 };
 
-const PINNED_ACCOUNTS = [
-  { name: 'شركة الأفق العقاري', id: 'afc-001' },
-  { name: 'مجموعة النخبة', id: 'nkb-042' },
-  { name: 'الإمارات للسكن', id: 'emr-017' },
-];
 
 export interface AdminSidebarProps {
   lang?: 'ar' | 'en';
@@ -49,7 +44,6 @@ export default function AdminSidebar({
   const brandName = isAr ? 'ليفنترا' : 'Liventra';
   const adminBadge = isAr ? 'إدارة' : 'ADMIN';
   const searchPlaceholder = isAr ? 'ابحث عن أي شيء…' : 'Search anything…';
-  const pinnedLabel = isAr ? 'مثبّتة' : 'Pinned';
   const roleLabel = isAr ? 'مدير النظام' : 'System Admin';
   const logoChar = isAr ? 'ل' : 'L';
 
@@ -262,60 +256,6 @@ export default function AdminSidebar({
           );
         })}
 
-        {/* ── Pinned accounts ── */}
-        <div style={{ marginBottom: 20 }}>
-          <div
-            style={{
-              fontSize: 10.5,
-              fontWeight: 600,
-              color: 'rgba(255,255,255,0.28)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.12em',
-              padding: '0 10px 6px',
-              fontFamily: 'var(--lv-font-ui)',
-            }}
-          >
-            {pinnedLabel}
-          </div>
-          {PINNED_ACCOUNTS.map((acc) => (
-            <div
-              key={acc.id}
-              className="lv-nav-item"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 9,
-                padding: '6px 10px',
-                borderRadius: 8,
-                marginBottom: 1,
-                cursor: 'pointer',
-                color: 'rgba(255,255,255,0.48)',
-                fontSize: 12.5,
-                fontFamily: isAr ? 'var(--lv-font-ar)' : 'var(--lv-font-ui)',
-              }}
-            >
-              <span
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: '50%',
-                  background: accent,
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  flex: 1,
-                }}
-              >
-                {acc.name}
-              </span>
-            </div>
-          ))}
-        </div>
       </nav>
 
       {/* ── User footer ── */}
