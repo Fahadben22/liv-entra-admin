@@ -25,8 +25,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 const fraunces = Fraunces({
   subsets: ['latin'],
-  axes: ['opsz'],
-  weight: ['400', '600', '800'],
+  weight: 'variable',
   variable: '--font-fraunces',
   display: 'swap',
 });
