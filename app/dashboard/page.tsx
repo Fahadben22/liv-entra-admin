@@ -3,7 +3,6 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { adminApi } from '@/lib/api';
 import { useEvents, DashboardEvent } from '@/lib/useEvents';
-import PageShell from '@/components/PageShell';
 import Icon from '@/components/Icon';
 
 function lcOf(c: any): string {
@@ -92,26 +91,31 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <PageShell
-      eyebrow="لوحة التحكم"
-      title="نظرة عامة"
-      subtitle={new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-      actions={
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ direction: 'rtl', display: 'flex', flexDirection: 'column', gap: 'var(--lv-section-gap)', fontFamily: 'var(--lv-font-ar)', color: 'var(--lv-fg)' }}>
+
+      {/* Header — matches companies page style */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 }}>
+        <div>
+          <h1 style={{ fontSize: 18, fontWeight: 600, color: 'var(--lv-fg)', margin: 0, letterSpacing: '-0.02em' }}>لوحة التحكم</h1>
+          <p style={{ fontSize: 12, color: 'var(--lv-muted)', marginTop: 3 }}>
+            {new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {isConnected && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#0a8f5f', background: 'rgba(10,143,95,0.1)', padding: '3px 10px', borderRadius: 99, fontWeight: 600 }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#0a8f5f', animation: 'pulse-dot 2s infinite' }} />
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11, color: '#0a8f5f', background: 'rgba(10,143,95,0.1)', padding: '3px 10px', borderRadius: 7, fontWeight: 600 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#0a8f5f' }} />
               مباشر
             </span>
           )}
           <Link href="/dashboard/companies/new"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, padding: '7px 16px', borderRadius: 8, background: 'var(--lv-fg)', color: 'var(--lv-bg)', textDecoration: 'none', fontWeight: 600 }}>
-            <Icon name="plus" size={14} color="var(--lv-bg)" />
-            إضافة شركة
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, padding: '6px 16px', borderRadius: 7, background: 'var(--lv-fg)', color: 'var(--lv-bg)', textDecoration: 'none', fontWeight: 500 }}>
+            <Icon name="plus" size={13} color="var(--lv-bg)" />
+            + إضافة شركة
           </Link>
         </div>
-      }
-    >
+      </div>
+
       {/* KPI strip */}
       <div className="stagger-enter" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12 }}>
         {kpis.map((k, i) => (
@@ -268,6 +272,8 @@ export default function AdminDashboard() {
       </div>
 
       <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
         @media (max-width: 1100px) {
           .kpi-row { grid-template-columns: repeat(3, 1fr) !important; }
         }
@@ -275,6 +281,6 @@ export default function AdminDashboard() {
           .two-col { grid-template-columns: 1fr !important; }
         }
       `}</style>
-    </PageShell>
+    </div>
   );
 }
