@@ -8,6 +8,8 @@ import { useDebounce } from '@/lib/hooks';
 import { useToast } from '@/components/Toast';
 import { KanbanSkeleton } from '@/components/LoadingSkeleton';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import AccountsTable from '@/components/AccountsTable';
+import KpiStrip from '@/components/KpiStrip';
 import type { Company } from '@/lib/types';
 
 function daysSince(d: string) { return Math.floor((Date.now() - new Date(d).getTime()) / 86400000); }
@@ -15,6 +17,7 @@ function daysSince(d: string) { return Math.floor((Date.now() - new Date(d).getT
 const TABS = [
   { key: 'pipeline', label: 'خط الأنابيب' },
   { key: 'matrix',   label: 'مصفوفة الميزات' },
+  { key: 'accounts', label: 'جدول الحسابات' },
 ];
 
 export default function OnboardingCommandCenter() {
@@ -218,6 +221,15 @@ export default function OnboardingCommandCenter() {
       {tab === 'matrix' && (
         <MatrixTab companies={companies} matrix={matrix} registry={registry} onToggle={handleToggleFlag}
           reload={() => { adminApi.sa.featureMatrix().then(r => setMatrix(r?.data || [])).catch(() => {}); }} />
+      )}
+
+      {tab === 'accounts' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          {/* KPI strip */}
+          <KpiStrip />
+          {/* Accounts table with real company data */}
+          <AccountsTable companies={companies} lang="ar" />
+        </div>
       )}
 
       {/* Suspend Confirm Dialog */}

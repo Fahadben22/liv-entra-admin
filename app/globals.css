@@ -310,3 +310,84 @@ button:active:not(:disabled) {
 .status-error::before { content: '✗'; color: var(--danger); }
 .status-warning::before { content: '⚠'; color: var(--warning); }
 .status-info::before { content: 'ℹ'; color: var(--info); }
+
+/* ═══════════════════════════════════════════
+   LIVENTRA ADMIN REDESIGN — Design Tokens
+   design_handoff_liventra_admin/README.md
+   ═══════════════════════════════════════════ */
+
+:root {
+  /* Light mode */
+  --lv-bg:          #fafaf9;
+  --lv-panel:       #ffffff;
+  --lv-fg:          #0a0a0a;
+  --lv-muted:       #6b6b6b;
+  --lv-line:        rgba(0,0,0,0.08);
+  --lv-line-strong: rgba(0,0,0,0.14);
+  --lv-chip:        rgba(0,0,0,0.045);
+  --lv-success:     #0a8f5f;
+  --lv-warn:        #b4630a;
+  --lv-danger:      #b8321f;
+
+  /* Sidebar — always dark regardless of theme */
+  --lv-sidebar-bg:     #141210;
+  --lv-sidebar-border: rgba(255,255,255,0.07);
+
+  /* Accent — default indigo (can be overridden inline) */
+  --lv-accent:      #4f46e5;
+
+  /* Font families */
+  --lv-font-ui:     var(--font-inter-tight, 'Inter Tight', system-ui, sans-serif);
+  --lv-font-ar:     var(--font-cairo, 'Cairo', var(--font-noto), system-ui, sans-serif);
+  --lv-font-num:    var(--font-fraunces, 'Fraunces', Georgia, serif);
+  --lv-font-mono:   var(--font-jetbrains-mono, 'JetBrains Mono', 'Courier New', monospace);
+
+  /* Spacing */
+  --lv-page-pad:    36px 32px;
+  --lv-section-gap: 28px;
+
+  /* Radius */
+  --lv-r-card:   16px;
+  --lv-r-chip:   8px;
+  --lv-r-pill:   99px;
+  --lv-r-nav:    8px;
+  --lv-r-badge:  5px;
+
+  /* Shadows */
+  --lv-shadow-card:  0 1px 4px rgba(0,0,0,0.06);
+  --lv-shadow-panel: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+/* Dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --lv-bg:          #0b0b0c;
+    --lv-panel:       #131315;
+    --lv-fg:          #eeeeec;
+    --lv-muted:       #8a8a8a;
+    --lv-line:        rgba(255,255,255,0.07);
+    --lv-line-strong: rgba(255,255,255,0.14);
+    --lv-chip:        rgba(255,255,255,0.05);
+  }
+}
+
+/* ─── Liventra table row hover ─── */
+.lv-table-row {
+  transition: background 80ms ease;
+}
+.lv-table-row:hover {
+  background: var(--lv-chip) !important;
+}
+
+/* ─── Liventra sidebar nav hover ─── */
+.lv-nav-item {
+  transition: background 100ms ease, color 100ms ease;
+}
+.lv-nav-item:hover {
+  background: rgba(255,255,255,0.06) !important;
+}
+
+/* ─── Liventra quick action hover ─── */
+.lv-quick-action:hover {
+  background: var(--lv-chip) !important;
+}
