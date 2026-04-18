@@ -20,7 +20,11 @@ export async function request<T>(method: string, path: string, body?: unknown): 
   // Skip auto-redirect for /superadmin/* paths: those return 401 when the
   // migration tables don't exist yet or the old token lacks adminUser claim.
   // Those failures are handled gracefully via Promise.allSettled in each page.
-  if (res.status === 401 && typeof window !== 'undefined' && !path.startsWith('/superadmin/') && !path.includes('/auth/refresh')) {
+  // Paths that should NOT auto-redirect on 401 — they are tenant-context or
+  // optional endpoints; pages handle failures via Promise.allSettled / catch.
+  const skipRedirectPaths = ['/superadmin/', '/auth/refresh', '/maintenance/', '/security/', '/whatsapp/'];
+  const skipRedirect = skipRedirectPaths.some(p => path.startsWith(p) || path.includes(p));
+  if (res.status === 401 && typeof window !== 'undefined' && !skipRedirect) {
     // Try silent refresh before redirecting to login
     const rt = localStorage.getItem('admin_refresh_token');
     if (rt) {
