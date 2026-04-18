@@ -182,17 +182,17 @@ export default function BillingOverview() {
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           {trialsExpiringSoon.length > 0 && (
             <Link href="/dashboard/billing/subscriptions?status=trial" className="card" style={{ flex: 1, minWidth: 200, padding: '14px 18px', textDecoration: 'none', borderRight: '3px solid #f59e0b' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#854d0e', margin: 0 }}>⚠️ {trialsExpiringSoon.length} تجربة تنتهي قريباً</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#854d0e', margin: 0 }}>{trialsExpiringSoon.length} تجربة تنتهي قريباً</p>
             </Link>
           )}
           {overdueInvoices.length > 0 && (
             <Link href="/dashboard/billing/invoices?status=overdue" className="card" style={{ flex: 1, minWidth: 200, padding: '14px 18px', textDecoration: 'none', borderRight: '3px solid #f97316' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#c2410c', margin: 0 }}>🔴 {overdueInvoices.length} فاتورة متأخرة</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#c2410c', margin: 0 }}>{overdueInvoices.length} فاتورة متأخرة</p>
             </Link>
           )}
           {suspendedCompanies.length > 0 && (
             <Link href="/dashboard/companies?status=suspended" className="card" style={{ flex: 1, minWidth: 200, padding: '14px 18px', textDecoration: 'none', borderRight: '3px solid #ef4444' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#dc2626', margin: 0 }}>⛔ {suspendedCompanies.length} موقوفة</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#dc2626', margin: 0 }}>{suspendedCompanies.length} موقوفة</p>
             </Link>
           )}
         </div>

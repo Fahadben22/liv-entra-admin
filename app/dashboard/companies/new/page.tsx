@@ -252,7 +252,7 @@ export default function NewCompanyPage() {
         <Header />
         <div style={{ padding: 32, maxWidth: 560, margin: '0 auto' }}>
           <div className="card" style={{ background: '#fff', borderRadius: 14, padding: 36, boxShadow: '0 1px 3px rgba(0,0,0,.06)', textAlign: 'center' }}>
-            <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(124,92,252,.1)', border: '1px solid rgba(124,92,252,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 20, color: '#2563EB' }}>✓</div>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(124,92,252,.1)', border: '1px solid rgba(124,92,252,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 14, fontWeight: 700, color: '#2563EB' }}>تم</div>
             <h2 style={{ fontSize: 18, fontWeight: 600, color: '#1E293B', margin: '0 0 6px' }}>تم إنشاء الشركة بنجاح</h2>
             <p style={{ fontSize: 13, color: '#9ca3af', margin: '0 0 28px' }}>
               {form.admin_email
@@ -326,7 +326,7 @@ export default function NewCompanyPage() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   zIndex: 1, position: 'relative', transition: 'all 0.2s',
                 }}>
-                  {done ? '✓' : s.num}
+                  {done ? 'تم' : s.num}
                 </div>
                 <span style={{ fontSize: 10, color: active ? '#1E293B' : done ? '#1E293B' : '#9ca3af', marginTop: 4, fontWeight: active ? 600 : 400, whiteSpace: 'nowrap' }}>{s.label}</span>
               </div>
@@ -357,7 +357,7 @@ export default function NewCompanyPage() {
                       return (
                         <div key={c.country_code} onClick={() => handleCountryChange(c.country_code)}
                           style={{ border: `1.5px solid ${active ? '#2563EB' : 'rgba(0,0,0,.08)'}`, borderRadius: 10, padding: '10px 14px', cursor: 'pointer', background: active ? 'rgba(124,92,252,.05)' : '#fff', transition: 'all 0.15s', display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: 18 }}>{FLAGS[c.country_code] || '🏳️'}</span>
+                          <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'var(--lv-chip)', color: 'var(--lv-muted)', fontFamily: 'var(--lv-font-mono)', fontWeight: 600 }}>{c.country_code}</span>
                           <span style={{ fontSize: 12, fontWeight: active ? 600 : 400, color: active ? '#1E293B' : '#6b7280' }}>{c.country_name_ar}</span>
                         </div>
                       );
@@ -452,7 +452,7 @@ export default function NewCompanyPage() {
                         </li>
                       ))}
                     </ul>
-                    {active && <div style={{ marginTop: 10, fontSize: 11, fontWeight: 600, color: '#2563EB' }}>✓ محدد</div>}
+                    {active && <div style={{ marginTop: 10, fontSize: 11, fontWeight: 600, color: '#2563EB' }}>محدد</div>}
                   </div>
                 );
               })}

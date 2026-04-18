@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { request } from '@/lib/api';
+import Icon, { IconName } from '@/components/Icon';
 
 export interface Message {
   role: 'user' | 'assistant';
@@ -11,7 +12,7 @@ export interface Message {
 interface AgentChatProps {
   agentType: string;
   agentName: string;
-  agentIcon: string;
+  agentIcon: IconName;
   accentColor: string;
   quickActions: string[];
   // Lifted state mode — parent controls messages
@@ -121,7 +122,9 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       {/* Header — hidden in compact mode */}
       {!compact && (
         <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          <span style={{ fontSize: 20 }}>{agentIcon}</span>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Icon name={agentIcon} size={16} color="var(--lv-accent)" />
+          </div>
           <div style={{ flex: 1 }}>
             <h2 style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: 0 }}>{agentName}</h2>
             <p style={{ fontSize: 10, color: '#9ca3af', margin: 0 }}>{tokens > 0 ? `${tokens.toLocaleString()} رمز` : 'جاهز'}</p>
@@ -134,7 +137,9 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.length === 0 && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-            <div style={{ fontSize: 40 }}>{agentIcon}</div>
+            <div style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Icon name={agentIcon} size={28} color="var(--lv-accent)" />
+          </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center', maxWidth: 480 }}>
               {quickActions.map((q, i) => (
                 <button key={i} onClick={() => send(q)} style={{ fontSize: 11, padding: '7px 14px', borderRadius: 18, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', color: '#6b7280', cursor: 'pointer' }}>{q}</button>
@@ -151,12 +156,12 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxWidth: '85%', justifyContent: 'flex-end' }}>
                 {msg.tools_used.map((tool, ti) => (
                   <span key={ti} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.2)', color: '#7c5cfc', fontFamily: 'monospace' }}>
-                    ✓ {tool}
+                    {tool}
                   </span>
                 ))}
               </div>
             )}
-            {msg.role === 'assistant' && msg.tools_used && msg.tools_used.length === 0 && msg.content.includes('⚠️') && (
+            {msg.role === 'assistant' && msg.tools_used && msg.tools_used.length === 0 && msg.content.includes('[تحذير]') && (
               <div style={{ fontSize: 10, color: '#f59e0b', maxWidth: '85%', textAlign: 'right' }}>بدون أدوات</div>
             )}
           </div>

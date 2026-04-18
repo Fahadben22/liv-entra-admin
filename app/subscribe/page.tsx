@@ -131,7 +131,7 @@ function SubscribePage() {
                 background: step > i + 1 ? '#15803d' : step === i + 1 ? '#3b82f6' : '#1e293b',
                 color: '#fff',
               }}>
-                {step > i + 1 ? '✓' : i + 1}
+                {step > i + 1 ? 'ok' : i + 1}
               </div>
               <span style={{ fontSize: 12, color: step === i + 1 ? '#e2e8f0' : '#64748b' }}>{s}</span>
               {i < 2 && <div style={{ width: 30, height: 1, background: 'rgba(255,255,255,.1)' }} />}

@@ -1,42 +1,42 @@
 @import "tailwindcss";
 
 :root {
-  /* ─── SaaS Blue Theme (Stripe/Linear inspired) ─── */
-  --bg-root: #F8FAFC;
-  --bg-card: #ffffff;
-  --bg-sidebar: #F1F5F9;
-  --bg-input: #F1F5F9;
-  --bg-hover: #F1F5F9;
-  --bg-active: #DBEAFE;
+  /* ─── Liventra Admin Theme (maps old vars → new lv-* tokens) ─── */
+  --bg-root:    #fafaf9;
+  --bg-card:    #ffffff;
+  --bg-sidebar: #141210;
+  --bg-input:   #f4f4f2;
+  --bg-hover:   rgba(0,0,0,0.045);
+  --bg-active:  rgba(0,0,0,0.07);
 
-  --border: #E2E8F0;
-  --border-hover: #CBD5E1;
-  --border-active: rgba(37,99,235,.3);
+  --border:        rgba(0,0,0,0.10);
+  --border-hover:  rgba(0,0,0,0.18);
+  --border-active: rgba(0,0,0,0.22);
 
-  --text-primary: #1E293B;
-  --text-secondary: #64748B;
-  --text-muted: #94A3B8;
+  --text-primary:   #0a0a0a;
+  --text-secondary: #4b4b4b;
+  --text-muted:     #6b6b6b;
 
-  --accent: #2563EB;
-  --accent-light: #DBEAFE;
-  --accent-hover: #1D4ED8;
+  --accent:       var(--lv-accent, #4f46e5);
+  --accent-light: color-mix(in srgb, var(--lv-accent, #4f46e5) 12%, transparent);
+  --accent-hover: var(--lv-accent, #4f46e5);
 
-  --success: #16A34A;
-  --success-bg: #F0FDF4;
-  --success-border: #BBF7D0;
-  --warning: #D97706;
-  --warning-bg: #FFFBEB;
-  --danger: #DC2626;
-  --danger-bg: #FEF2F2;
-  --info: #3b82f6;
+  --success:        #0a8f5f;
+  --success-bg:     rgba(10,143,95,0.08);
+  --success-border: rgba(10,143,95,0.2);
+  --warning:        #b4630a;
+  --warning-bg:     rgba(180,99,10,0.08);
+  --danger:         #b8321f;
+  --danger-bg:      rgba(184,50,31,0.08);
+  --info:           var(--lv-accent, #4f46e5);
 
-  --radius: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-  --shadow-card: 0 1px 3px rgba(0,0,0,.06);
-  --shadow-card-hover: 0 4px 12px rgba(0,0,0,.08);
+  --radius:    8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-card:       0 1px 4px rgba(0,0,0,0.06);
+  --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.09);
 
-  --font-sans: var(--font-noto, 'Noto Sans Arabic'), system-ui, -apple-system, sans-serif;
+  --font-sans: var(--font-cairo, var(--font-noto, 'Noto Sans Arabic')), system-ui, sans-serif;
 }
 
 @theme inline {
@@ -49,9 +49,9 @@
 * { box-sizing: border-box; }
 
 body {
-  background: var(--bg-root);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
+  background: var(--lv-bg, var(--bg-root));
+  color: var(--lv-fg, var(--text-primary));
+  font-family: var(--lv-font-ar, var(--font-sans));
   font-size: 14px;
   direction: rtl;
   -webkit-font-smoothing: antialiased;
@@ -95,10 +95,11 @@ body {
 
 /* ─── Card base ─── */
 .card {
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow .2s ease, transform .2s ease;
+  background: var(--lv-panel, var(--bg-card));
+  border: 1px solid var(--lv-line-strong, var(--border));
+  border-radius: var(--lv-r-card, var(--radius-lg));
+  box-shadow: var(--lv-shadow-card, var(--shadow-card));
+  transition: box-shadow .15s ease, transform .15s ease;
 }
 .card:hover {
   box-shadow: var(--shadow-card-hover);

@@ -357,7 +357,7 @@ function CompanyDrillDown({ companyName, drillData, onClose }: { companyName: st
         <h3 style={{ fontSize: fontSize.lg, fontWeight: fontWeight.semi, color: colors.text.primary, margin: 0 }}>
           {companyName} — الاتجاه المالي (6 أشهر)
         </h3>
-        <button onClick={onClose} style={{ background: '#F1F5F9', border: 'none', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', fontSize: 14, color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+        <button onClick={onClose} style={{ background: '#F1F5F9', border: 'none', borderRadius: 6, width: 28, height: 28, cursor: 'pointer', fontSize: 14, color: '#64748B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
       </div>
 
       {/* 6-month line chart */}

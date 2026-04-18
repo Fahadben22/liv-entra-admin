@@ -4,10 +4,13 @@ import Link from 'next/link';
 import { adminApi } from '@/lib/api';
 import { useEvents, DashboardEvent } from '@/lib/useEvents';
 
-const MODULE_ICONS: Record<string, string> = {
-  properties: '🏢', units: '🏠', tenants: '👤', contracts: '📋', payments: '💰',
-  maintenance: '🔧', reports: '📊', dashboard: '📈', whatsapp: '💬', settings: '⚙️',
-  expenses: '💸', documents: '📄', leads: '🎯', vendors: '🏪', auth: '🔐', other: '📋',
+import Icon, { IconName } from '@/components/Icon';
+
+const MODULE_ICONS: Record<string, IconName> = {
+  properties: 'building', units: 'home', tenants: 'user', contracts: 'clipboard',
+  payments: 'dollar', maintenance: 'wrench', reports: 'bar-chart', dashboard: 'grid',
+  whatsapp: 'whatsapp', settings: 'settings', expenses: 'coins', documents: 'file-text',
+  leads: 'target', vendors: 'store', auth: 'lock', other: 'list',
 };
 
 const MODULE_AR: Record<string, string> = {
@@ -117,7 +120,7 @@ export default function ActivityPage() {
         {/* Live Activity Feed */}
         <div className="card" style={{ overflow: 'hidden' }}>
           <div style={{ padding: '14px 20px', borderBottom: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>🟢 النشاط المباشر</h2>
+            <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>النشاط المباشر</h2>
             <span style={{ fontSize: 10, color: '#94A3B8' }}>{clientEvents.length} حدث</span>
           </div>
           <div style={{ maxHeight: 400, overflowY: 'auto' }}>
@@ -133,7 +136,9 @@ export default function ActivityPage() {
                   borderBottom: '1px solid #F1F5F9',
                   animation: i === 0 ? 'fadeIn .4s ease' : undefined,
                 }}>
-                  <span style={{ fontSize: 18, flexShrink: 0 }}>{MODULE_ICONS[ev.module] || '📋'}</span>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Icon name={MODULE_ICONS[ev.module] || 'list'} size={15} color="var(--lv-muted)" />
+                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {ev.company || 'شركة'}
@@ -195,8 +200,9 @@ export default function ActivityPage() {
               return (
                 <div key={m.module}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                    <span style={{ fontSize: 12, color: '#1E293B', fontWeight: 500 }}>
-                      {MODULE_ICONS[m.module] || '📋'} {MODULE_AR[m.module] || m.module}
+                    <span style={{ fontSize: 12, color: 'var(--lv-fg)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Icon name={MODULE_ICONS[m.module] || 'list'} size={13} color="var(--lv-muted)" />
+                      {MODULE_AR[m.module] || m.module}
                     </span>
                     <span style={{ fontSize: 12, fontWeight: 600, color: '#2563EB' }}>{m.count.toLocaleString()}</span>
                   </div>
@@ -213,9 +219,9 @@ export default function ActivityPage() {
       {/* ── Section E: Engagement Tiers ────────────────────── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
         {[
-          { label: '🟢 نشط جداً', count: o.engagement?.high || 0, desc: '>10 عملية/يوم', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0', companies: o.engagement?.high_companies || [] },
-          { label: '🟡 نشط معتدل', count: o.engagement?.medium || 0, desc: '3-10 عملية/يوم', color: '#D97706', bg: '#FFFBEB', border: '#FDE68A', companies: [] },
-          { label: '🔴 خامل', count: o.engagement?.low || 0, desc: '<3 عملية/يوم', color: '#DC2626', bg: '#FEF2F2', border: '#FECACA', companies: o.engagement?.low_companies || [] },
+          { label: 'نشط جداً', count: o.engagement?.high || 0, desc: '>10 عملية/يوم', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0', companies: o.engagement?.high_companies || [] },
+          { label: 'نشط معتدل', count: o.engagement?.medium || 0, desc: '3-10 عملية/يوم', color: '#D97706', bg: '#FFFBEB', border: '#FDE68A', companies: [] },
+          { label: 'خامل', count: o.engagement?.low || 0, desc: '<3 عملية/يوم', color: '#DC2626', bg: '#FEF2F2', border: '#FECACA', companies: o.engagement?.low_companies || [] },
         ].map(tier => (
           <div key={tier.label} className="card" style={{ padding: '20px', borderTop: `3px solid ${tier.color}` }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: '#1E293B', margin: '0 0 4px' }}>{tier.label}</p>
@@ -257,7 +263,7 @@ export default function ActivityPage() {
           {/* At-risk companies (D/F) */}
           {(h.companies || []).filter((c: any) => c.grade === 'D' || c.grade === 'F').length > 0 && (
             <div style={{ background: '#FEF2F2', borderRadius: 10, padding: '14px 16px', border: '1px solid #FECACA' }}>
-              <p style={{ fontSize: 12, fontWeight: 600, color: '#DC2626', margin: '0 0 8px' }}>⚠️ شركات معرّضة للخطر</p>
+              <p style={{ fontSize: 12, fontWeight: 600, color: '#DC2626', margin: '0 0 8px' }}>شركات معرّضة للخطر</p>
               {(h.companies || []).filter((c: any) => c.grade === 'D' || c.grade === 'F').slice(0, 5).map((c: any) => (
                 <Link key={c.company_id} href={`/dashboard/companies/${c.company_id}`}
                   style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(220,38,38,.1)', fontSize: 12, textDecoration: 'none', color: '#1E293B' }}>

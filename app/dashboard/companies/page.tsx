@@ -313,7 +313,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
 
   return (
     <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, padding: 20, marginTop: 10, position: 'relative' }}>
-      <button onClick={onClose} style={{ position: 'absolute', top: 14, left: 14, background: '#f4f4f5', border: 'none', borderRadius: 6, width: 26, height: 26, cursor: 'pointer', fontSize: 12, color: '#71717a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+      <button onClick={onClose} style={{ position: 'absolute', top: 14, left: 14, background: '#f4f4f5', border: 'none', borderRadius: 6, width: 26, height: 26, cursor: 'pointer', fontSize: 12, color: '#71717a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
         <div style={{ width: 36, height: 36, borderRadius: 8, background: '#18181b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 600 }}>{(c.name_ar || c.name || '?').charAt(0)}</div>
@@ -493,7 +493,7 @@ function MatrixTab({ companies, matrix, registry, onToggle, reload }: any) {
                         <button onClick={() => { onToggle(c.id, key, !enabled); setTimeout(reload, 500); }}
                           style={{ width: 22, height: 22, borderRadius: 5, border: '1px solid ' + (enabled ? '#d1fae5' : '#f0f0f0'), cursor: 'pointer', fontSize: 11,
                             background: enabled ? '#ecfdf5' : '#fff', color: enabled ? '#059669' : '#d4d4d8', fontWeight: 500, transition: 'all .1s' }}>
-                          {enabled ? '✓' : '—'}
+                          {enabled ? 'نعم' : '—'}
                         </button>
                       </td>
                     );
@@ -524,7 +524,7 @@ function HatifInlineForm({ companyId, hatifEnabled, hatifPortalUrl, onSaved }: {
     setSaving(true);
     try {
       await adminApi.updateCompany(companyId, { hatif_enabled: enabled, hatif_portal_url: portalUrl || null });
-      setMsg('تم الحفظ ✓');
+      setMsg('تم الحفظ');
       setTimeout(() => setMsg(''), 2500);
       onSaved();
     } catch (e: any) { setMsg(`خطأ: ${e.message}`); }
@@ -534,7 +534,7 @@ function HatifInlineForm({ companyId, hatifEnabled, hatifPortalUrl, onSaved }: {
   return (
     <div style={{ marginTop: 16, borderTop: '1px solid #f0f0f0', paddingTop: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-        <span style={{ fontSize: 15 }}>📞</span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--lv-accent)' }}>هاتف</span>
         <p style={{ fontSize: 12, fontWeight: 700, margin: 0, color: '#18181b' }}>تكامل هاتف</p>
         {msg && <span style={{ fontSize: 11, color: msg.startsWith('خطأ') ? '#ef4444' : '#22c55e', marginRight: 'auto' }}>{msg}</span>}
       </div>

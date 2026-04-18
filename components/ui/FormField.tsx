@@ -89,7 +89,7 @@ export function FormField({
       {/* Helper or Error text */}
       {showError && (
         <p id={`${id}-error`} role="alert" style={{ fontSize: fontSize.xs, color: colors.status.error, margin: `${spacing.xs}px 0 0`, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span>✗</span> {error}
+          {error}
         </p>
       )}
       {!showError && helperText && (
@@ -131,7 +131,7 @@ export function FormSelect({ label, value, onChange, options, required, disabled
         style={{ width: '100%', padding: '10px 14px', borderRadius: radius.md, border: `1.5px solid ${error ? colors.border.error : colors.border.default}`, background: colors.bg.input, color: colors.text.primary, fontSize: fontSize.md, fontFamily: 'inherit', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
-      {error && <p role="alert" style={{ fontSize: fontSize.xs, color: colors.status.error, margin: `${spacing.xs}px 0 0` }}>✗ {error}</p>}
+      {error && <p role="alert" style={{ fontSize: fontSize.xs, color: colors.status.error, margin: `${spacing.xs}px 0 0` }}>{error}</p>}
       {!error && helperText && <p style={{ fontSize: fontSize.xs, color: colors.text.muted, margin: `${spacing.xs}px 0 0` }}>{helperText}</p>}
     </div>
   );

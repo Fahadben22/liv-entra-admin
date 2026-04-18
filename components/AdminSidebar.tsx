@@ -2,24 +2,26 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { NAV_ITEMS, NAV_SECTIONS } from '@/lib/constants';
+import Icon from '@/components/Icon';
+import type { IconName } from '@/components/Icon';
 
-// Nav icon map — simple SVG icons per section key
-const SECTION_ICONS: Record<string, string> = {
-  '/dashboard': '⊞',
-  '/dashboard/companies': '🏢',
-  '/dashboard/features': '⚡',
-  '/dashboard/billing': '💳',
-  '/dashboard/intelligence': '🧠',
-  '/dashboard/activity': '📊',
-  '/dashboard/command-center': '🎛️',
-  '/dashboard/agents': '🤖',
-  '/dashboard/leads': '📋',
-  '/dashboard/demo-leads': '🎯',
-  '/dashboard/landing-page/analytics': '📈',
-  '/dashboard/template-center': '🗂️',
-  '/dashboard/landing-page': '🌐',
-  '/dashboard/audit': '🔍',
-  '/dashboard/maintenance-flows': '🔧',
+// Nav icon map — flat SVG icons per route
+const SECTION_ICONS: Record<string, IconName> = {
+  '/dashboard': 'home',
+  '/dashboard/companies': 'building',
+  '/dashboard/features': 'zap',
+  '/dashboard/billing': 'credit-card',
+  '/dashboard/intelligence': 'cpu',
+  '/dashboard/activity': 'activity',
+  '/dashboard/command-center': 'grid',
+  '/dashboard/agents': 'robot',
+  '/dashboard/leads': 'clipboard',
+  '/dashboard/demo-leads': 'target',
+  '/dashboard/landing-page/analytics': 'trending-up',
+  '/dashboard/template-center': 'inbox',
+  '/dashboard/landing-page': 'globe',
+  '/dashboard/audit': 'search',
+  '/dashboard/maintenance-flows': 'wrench',
 };
 
 const PINNED_ACCOUNTS = [
@@ -208,7 +210,7 @@ export default function AdminSidebar({
                 const active =
                   pathname === item.href ||
                   (item.href !== '/dashboard' && pathname.startsWith(item.href));
-                const icon = SECTION_ICONS[item.href] || '•';
+                const iconName = SECTION_ICONS[item.href];
 
                 return (
                   <Link
@@ -247,7 +249,11 @@ export default function AdminSidebar({
                         }}
                       />
                     )}
-                    <span style={{ fontSize: 14, lineHeight: 1, flexShrink: 0 }}>{icon}</span>
+                    <span style={{ lineHeight: 1, flexShrink: 0, opacity: active ? 1 : 0.6 }}>
+                      {iconName
+                        ? <Icon name={iconName} size={14} color={active ? '#fff' : 'rgba(255,255,255,0.75)'} />
+                        : <span style={{ fontSize: 14 }}>·</span>}
+                    </span>
                     <span style={{ flex: 1 }}>{item.label}</span>
                   </Link>
                 );

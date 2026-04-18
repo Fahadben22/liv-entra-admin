@@ -54,7 +54,7 @@ export default function ConfirmDialog({
           position: 'absolute', top: 12, left: 12, width: 28, height: 28, borderRadius: '50%',
           background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 16,
           color: colors.text.muted, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>✕</button>
+        }}>×</button>
 
         <h3 id="confirm-title" style={{ fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.text.primary, margin: `0 0 ${spacing.sm}px` }}>{title}</h3>
         <p style={{ fontSize: fontSize.md, color: colors.text.secondary, lineHeight: 1.6, margin: `0 0 ${spacing.lg}px` }}>{message}</p>

@@ -41,7 +41,7 @@ const CHANNEL_LABELS: Record<Channel, string> = {
   whatsapp: 'واتساب',
   in_app:   'إشعار داخلي',
 };
-const CHANNEL_ICONS: Record<Channel, string> = { email: '📧', whatsapp: '💬', in_app: '🔔' };
+const CHANNEL_ICONS: Record<Channel, string> = { email: 'email', whatsapp: 'WA', in_app: 'app' };
 const CHANNEL_COLORS: Record<Channel, { bg: string; border: string; text: string }> = {
   email:    { bg: 'rgba(59,130,246,.1)', border: 'rgba(59,130,246,.2)', text: '#3b82f6' },
   whatsapp: { bg: 'rgba(34,197,94,.1)', border: 'rgba(34,197,94,.2)', text: '#22c55e' },

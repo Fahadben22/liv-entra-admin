@@ -95,7 +95,7 @@ function SubscribeSuccessPage() {
 
         {status === 'provisioned' && data && (
           <div style={{ background: '#0c1535', borderRadius: 20, padding: '48px 32px', border: '1px solid #15803d' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#15803d22', border: '2px solid #15803d', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, margin: '0 auto 16px', fontSize: 18, fontWeight: 700, color: '#15803d' }}>تم</div>
             <h2 style={{ fontSize: 22, fontWeight: 700, color: '#fff', margin: '0 0 8px' }}>تم إنشاء حسابك بنجاح!</h2>
             <p style={{ fontSize: 14, color: '#94a3b8', margin: '0 0 32px' }}>
               {data.admin_email ? `تم إرسال بيانات الدخول إلى ${data.admin_email}` : 'يمكنك تسجيل الدخول الآن'}
@@ -141,7 +141,7 @@ function SubscribeSuccessPage() {
 
         {status === 'failed' && (
           <div style={{ background: '#0c1535', borderRadius: 20, padding: '48px 32px', border: '1px solid #fecaca' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>❌</div>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#dc262622', border: '2px solid #dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, margin: '0 auto 16px', fontSize: 18, fontWeight: 700, color: '#dc2626' }}>×</div>
             <h2 style={{ fontSize: 20, fontWeight: 700, color: '#fff', margin: '0 0 8px' }}>فشل عملية الدفع</h2>
             <p style={{ fontSize: 14, color: '#94a3b8', margin: '0 0 24px' }}>
               لم تتم عملية الدفع. يمكنك المحاولة مرة أخرى أو التواصل مع الدعم.

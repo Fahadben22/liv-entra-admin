@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import AgentChat, { Message } from './AgentChat';
 import { adminApi, BASE } from '@/lib/api';
+import Icon, { IconName } from '@/components/Icon';
 
 // ─── Marketing Workshop ───────────────────────────────────────────────────────
 interface WorkshopStep {
@@ -109,7 +110,7 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
     setError('تم إيقاف الورشة');
   }
 
-  const STEP_ICONS = ['🎯', '✍️', '🎨', '✅'];
+  const STEP_ICONS = ['01', '02', '03', '04'];
   const STEP_COLORS = ['#8b5cf6', '#3b82f6', '#ec4899', '#10b981'];
 
   return (
@@ -119,10 +120,10 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
         {/* Header */}
         <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>🏭 ورشة التسويق</h2>
+            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>ورشة التسويق</h2>
             <p style={{ margin: '2px 0 0', fontSize: 10, color: '#9ca3af' }}>نورة ← سارة ← ليلى — من الفكرة إلى التصميم</p>
           </div>
-          <button onClick={onClose} style={{ border: 'none', background: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af', padding: 4 }}>✕</button>
+          <button onClick={onClose} style={{ border: 'none', background: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af', padding: 4 }}>×</button>
         </div>
 
         {/* Brief input */}
@@ -142,7 +143,7 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
               onClick={runWorkshop}
               disabled={!brief.trim()}
               style={{ marginTop: 8, width: '100%', padding: '11px', borderRadius: 8, background: brief.trim() ? 'linear-gradient(135deg,#8b5cf6,#7c3aed)' : '#e2e8f0', color: brief.trim() ? '#fff' : '#9ca3af', border: 'none', fontSize: 13, fontWeight: 700, cursor: brief.trim() ? 'pointer' : 'not-allowed', transition: 'all .15s' }}>
-              🚀 ابدأ الورشة
+              ابدأ الورشة
             </button>
           </div>
         )}
@@ -150,7 +151,7 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
         {/* Running brief display */}
         {(running || result) && (
           <div style={{ padding: '10px 20px', background: '#f8fafc', borderBottom: '1px solid rgba(0,0,0,.06)', flexShrink: 0 }}>
-            <p style={{ margin: 0, fontSize: 10, color: '#64748b' }}>📋 {brief}</p>
+            <p style={{ margin: 0, fontSize: 10, color: '#64748b' }}>{brief}</p>
           </div>
         )}
 
@@ -168,7 +169,7 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
                     {s.status === 'running' ? (
                       <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', fontSize: 14 }}>⟳</span>
                     ) : s.status === 'done' ? (
-                      <span style={{ color: STEP_COLORS[i], fontSize: 14 }}>✓</span>
+                      <span style={{ color: STEP_COLORS[i], fontSize: 12, fontWeight: 700 }}>تم</span>
                     ) : (
                       STEP_ICONS[i]
                     )}
@@ -197,7 +198,7 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
           {/* Error */}
           {error && (
             <div style={{ padding: '10px 14px', borderRadius: 8, background: '#fef2f2', border: '1px solid #fecaca', marginTop: 4 }}>
-              <p style={{ margin: 0, fontSize: 11, color: '#ef4444' }}>⚠️ {error}</p>
+              <p style={{ margin: 0, fontSize: 11, color: '#ef4444' }}>{error}</p>
             </div>
           )}
 
@@ -205,7 +206,7 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
           {result?.post_url && (
             <div style={{ marginTop: 12, borderRadius: 12, overflow: 'hidden', border: '2px solid #8b5cf640', background: 'linear-gradient(135deg,#fdf4ff,#f0f9ff)' }}>
               <div style={{ padding: '12px 14px', background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)', color: '#fff' }}>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 700 }}>🎉 التصميم جاهز!</p>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 700 }}>التصميم جاهز!</p>
                 <p style={{ margin: '2px 0 0', fontSize: 9, opacity: 0.85 }}>اكتملت الورشة — من الفكرة إلى التصميم النهائي</p>
               </div>
               <div style={{ padding: '12px 14px' }}>
@@ -214,17 +215,17 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
                   {result.canva_edit_url && (
                     <a href={result.canva_edit_url} target="_blank" rel="noopener noreferrer"
                       style={{ flex: 1, padding: '9px', borderRadius: 8, background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)', color: '#fff', textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center', display: 'block' }}>
-                      ✏️ فتح في Canva
+                      فتح في Canva
                     </a>
                   )}
                   <a href={result.post_url} download target="_blank" rel="noopener noreferrer"
                     style={{ flex: 1, padding: '9px', borderRadius: 8, background: '#1e293b', color: '#fff', textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center', display: 'block' }}>
-                    ⬇️ تحميل PNG
+                    تحميل PNG
                   </a>
                 </div>
                 {result.noura_approval && (
                   <div style={{ marginTop: 8, padding: '8px 10px', background: '#f0fdf4', borderRadius: 6, border: '1px solid #bbf7d0' }}>
-                    <p style={{ margin: 0, fontSize: 10, color: '#166534', lineHeight: 1.6 }}>📊 {result.noura_approval}</p>
+                    <p style={{ margin: 0, fontSize: 10, color: '#166534', lineHeight: 1.6 }}>{result.noura_approval}</p>
                   </div>
                 )}
               </div>
@@ -236,12 +237,12 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
         <div style={{ padding: '10px 16px', borderTop: '1px solid rgba(0,0,0,.06)', display: 'flex', gap: 8, flexShrink: 0 }}>
           {running ? (
             <button onClick={handleStop} style={{ flex: 1, padding: '9px', borderRadius: 8, background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
-              ⬛ إيقاف الورشة
+              إيقاف الورشة
             </button>
           ) : result ? (
             <button onClick={() => { setResult(null); setBrief(''); setSteps(prev => prev.map(s => ({ ...s, status: 'waiting', content: undefined }))); setExpandedStep(null); }}
               style={{ flex: 1, padding: '9px', borderRadius: 8, background: 'linear-gradient(135deg,#8b5cf6,#7c3aed)', color: '#fff', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>
-              ➕ ورشة جديدة
+              ورشة جديدة
             </button>
           ) : null}
           {!running && <button onClick={onClose} style={{ padding: '9px 16px', borderRadius: 8, background: '#f1f5f9', color: '#475569', border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>إغلاق</button>}
@@ -288,7 +289,7 @@ function MorningBriefingCard({ onAskAgent }: { onAskAgent: (agentType: string, m
       <button onClick={() => setExpanded(!expanded)}
         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: 'none', background: expanded ? 'rgba(37,99,235,.04)' : 'transparent', cursor: 'pointer' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span style={{ fontSize: 16 }}>☀️</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>●</span>
           <div style={{ textAlign: 'right' }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: '#1E293B', margin: 0 }}>ملخص اليوم</p>
             <p style={{ fontSize: 9, color: '#9ca3af', margin: 0 }}>{today}</p>
@@ -345,12 +346,12 @@ function MorningBriefingCard({ onAskAgent }: { onAskAgent: (agentType: string, m
 
 // ─── Agent Registry (fixed order = spatial memory) ───────────────────────────
 const AGENTS = [
-  { type: 'meeting_room', name: 'الاجتماعات', icon: '🏛️', color: '#2563EB', role: 'غرفة الاجتماعات', quickActions: ['نظرة شاملة على كل الأقسام', 'KPIs اليوم', 'أنشئ تقرير تنفيذي', 'الخطط النشطة', 'مشاكل تحتاج انتباهي'] },
-  { type: 'it', name: 'سالم', icon: '🛡️', color: '#3b82f6', role: 'IT', spec: 'it_specialist', specName: 'طارق', specIcon: '🔧', quickActions: ['حالة النظام', 'Cloudflare', 'أنماط الأخطاء', 'أحداث أمنية', 'SSL'] },
-  { type: 'sales', name: 'خالد', icon: '💼', color: '#22c55e', role: 'مبيعات', spec: 'sales_specialist', specName: 'عمر', specIcon: '📞', quickActions: ['تجارب قريبة الانتهاء — من منهم يستحق تمديداً؟', 'عملاء خاملون — من نحتاج نبعث لهم إيميل تفعيل؟', 'خط أنابيب المبيعات', 'MRR والاشتراكات', 'ملخص الأسبوع'] },
-  { type: 'marketing', name: 'نورة', icon: '📊', color: '#8b5cf6', role: 'تسويق', spec: 'marketing_specialist', specName: 'سارة', specIcon: '📱', spec2: 'design_specialist', specName2: 'ليلى', specIcon2: '🎨', quickActions: ['KPIs الأسبوع', 'الحملات', 'الزوار', 'التحويل', 'المصادر'] },
-  { type: 'finance', name: 'ريم', icon: '💰', color: '#f59e0b', role: 'مالية', spec: 'finance_specialist', specName: 'ماجد', specIcon: '📋', quickActions: ['معدل التحصيل هذا الشهر لكل شركة', 'المتأخرات', 'MRR', 'المصروفات', 'التوقعات'] },
-  { type: 'product', name: 'يوسف', icon: '🚀', color: '#06b6d4', role: 'منتج', spec: 'product_specialist', specName: 'لينا', specIcon: '🔍', quickActions: ['عملاء خاملون — قائمة مع توصية لكل منهم', 'شركات تواجه مشاكل تشغيلية أو مالية', 'تبني الميزات — أيها مُستخدم وأيها مهجور', 'الشركات الجديدة خلال آخر 14 يوم وحال انطلاقها', 'NPS والمغادرة'] },
+  { type: 'meeting_room', name: 'الاجتماعات', icon: 'grid',        color: '#2563EB', role: 'غرفة الاجتماعات', quickActions: ['نظرة شاملة على كل الأقسام', 'KPIs اليوم', 'أنشئ تقرير تنفيذي', 'الخطط النشطة', 'مشاكل تحتاج انتباهي'] },
+  { type: 'it',           name: 'سالم',       icon: 'shield',       color: '#3b82f6', role: 'IT', spec: 'it_specialist', specName: 'طارق', specIcon: 'wrench', quickActions: ['حالة النظام', 'Cloudflare', 'أنماط الأخطاء', 'أحداث أمنية', 'SSL'] },
+  { type: 'sales',        name: 'خالد',       icon: 'briefcase',    color: '#22c55e', role: 'مبيعات', spec: 'sales_specialist', specName: 'عمر', specIcon: 'phone', quickActions: ['تجارب قريبة الانتهاء — من منهم يستحق تمديداً؟', 'عملاء خاملون — من نحتاج نبعث لهم إيميل تفعيل؟', 'خط أنابيب المبيعات', 'MRR والاشتراكات', 'ملخص الأسبوع'] },
+  { type: 'marketing',    name: 'نورة',       icon: 'bar-chart',    color: '#8b5cf6', role: 'تسويق', spec: 'marketing_specialist', specName: 'سارة', specIcon: 'send', spec2: 'design_specialist', specName2: 'ليلى', specIcon2: 'sparkles', quickActions: ['KPIs الأسبوع', 'الحملات', 'الزوار', 'التحويل', 'المصادر'] },
+  { type: 'finance',      name: 'ريم',        icon: 'dollar',       color: '#f59e0b', role: 'مالية', spec: 'finance_specialist', specName: 'ماجد', specIcon: 'receipt', quickActions: ['معدل التحصيل هذا الشهر لكل شركة', 'المتأخرات', 'MRR', 'المصروفات', 'التوقعات'] },
+  { type: 'product',      name: 'يوسف',       icon: 'zap',          color: '#06b6d4', role: 'منتج', spec: 'product_specialist', specName: 'لينا', specIcon: 'search', quickActions: ['عملاء خاملون — قائمة مع توصية لكل منهم', 'شركات تواجه مشاكل تشغيلية أو مالية', 'تبني الميزات — أيها مُستخدم وأيها مهجور', 'الشركات الجديدة خلال آخر 14 يوم وحال انطلاقها', 'NPS والمغادرة'] },
 ];
 
 // Specialist quick actions
@@ -437,7 +438,9 @@ export default function AgentsWorkspace() {
               {/* Manager */}
               <button onClick={() => setActiveAgent(a.type)}
                 style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', border: 'none', background: isActive ? `${a.color}08` : 'transparent', cursor: 'pointer', borderRight: isActive ? `3px solid ${a.color}` : '3px solid transparent', transition: 'all .1s' }}>
-                <span style={{ fontSize: 18, flexShrink: 0 }}>{a.icon}</span>
+                <div style={{ width: 28, height: 28, borderRadius: 7, background: `${a.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Icon name={a.icon as IconName} size={14} color={a.color} />
+                </div>
                 <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? a.color : '#1E293B' }}>{a.name}</span>
@@ -452,7 +455,7 @@ export default function AgentsWorkspace() {
               {a.spec && (
                 <button onClick={() => setActiveAgent(a.spec!)}
                   style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px 6px 28px', border: 'none', background: specActive ? `${a.color}08` : 'transparent', cursor: 'pointer', borderRight: specActive ? `3px solid ${a.color}` : '3px solid transparent', transition: 'all .1s' }}>
-                  <span style={{ fontSize: 13 }}>{a.specIcon}</span>
+                  <Icon name={a.specIcon as IconName} size={12} color={specActive ? a.color : '#9ca3af'} />
                   <span style={{ fontSize: 10, color: specActive ? a.color : '#9ca3af', fontWeight: specActive ? 600 : 400 }}>{a.specName}</span>
                 </button>
               )}
@@ -462,7 +465,7 @@ export default function AgentsWorkspace() {
                 return (
                   <button onClick={() => setActiveAgent((a as any).spec2)}
                     style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px 6px 28px', border: 'none', background: spec2Active ? `${a.color}08` : 'transparent', cursor: 'pointer', borderRight: spec2Active ? `3px solid ${a.color}` : '3px solid transparent', transition: 'all .1s' }}>
-                    <span style={{ fontSize: 13 }}>{(a as any).specIcon2}</span>
+                  <Icon name={(a as any).specIcon2 as IconName} size={12} color={spec2Active ? a.color : '#9ca3af'} />
                     <span style={{ fontSize: 10, color: spec2Active ? a.color : '#9ca3af', fontWeight: spec2Active ? 600 : 400 }}>{(a as any).specName2}</span>
                   </button>
                 );
@@ -473,7 +476,7 @@ export default function AgentsWorkspace() {
                   style={{ width: 'calc(100% - 24px)', margin: '4px 12px 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, padding: '7px 10px', border: 'none', borderRadius: 8, background: 'linear-gradient(135deg,#8b5cf620,#7c3aed15)', cursor: 'pointer', transition: 'all .15s' }}
                   onMouseEnter={e => (e.currentTarget.style.background = 'linear-gradient(135deg,#8b5cf630,#7c3aed25)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'linear-gradient(135deg,#8b5cf620,#7c3aed15)')}>
-                  <span style={{ fontSize: 11 }}>🏭</span>
+                  <Icon name="layers" size={11} color="#7c3aed" />
                   <span style={{ fontSize: 10, fontWeight: 700, color: '#7c3aed' }}>ورشة تسويق</span>
                 </button>
               )}
@@ -486,7 +489,7 @@ export default function AgentsWorkspace() {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         <AgentChat
           agentType={activeAgent}
-          agentName={`${info.icon} ${info.name}`}
+          agentName={info.name}
           agentIcon={info.icon}
           accentColor={info.color}
           quickActions={info.quickActions || []}

@@ -27,15 +27,15 @@ interface LandingContent {
 }
 
 // ─── Country config ───────────────────────────────────────────────────────────
-const COUNTRIES: { code: string; flag: string; label: string; cur_ar: string; cur_en: string }[] = [
-  { code: 'SA', flag: '🇸🇦', label: 'السعودية', cur_ar: 'ريال',   cur_en: 'SAR' },
-  { code: 'AE', flag: '🇦🇪', label: 'الإمارات', cur_ar: 'درهم',   cur_en: 'AED' },
-  { code: 'KW', flag: '🇰🇼', label: 'الكويت',   cur_ar: 'دينار',  cur_en: 'KWD' },
-  { code: 'QA', flag: '🇶🇦', label: 'قطر',      cur_ar: 'ريال',   cur_en: 'QAR' },
-  { code: 'OM', flag: '🇴🇲', label: 'عُمان',    cur_ar: 'ريال',   cur_en: 'OMR' },
-  { code: 'BH', flag: '🇧🇭', label: 'البحرين',  cur_ar: 'دينار',  cur_en: 'BHD' },
-  { code: 'JO', flag: '🇯🇴', label: 'الأردن',   cur_ar: 'دينار',  cur_en: 'JOD' },
-  { code: 'EG', flag: '🇪🇬', label: 'مصر',      cur_ar: 'جنيه',   cur_en: 'EGP' },
+const COUNTRIES: { code: string; label: string; cur_ar: string; cur_en: string }[] = [
+  { code: 'SA', label: 'السعودية', cur_ar: 'ريال',   cur_en: 'SAR' },
+  { code: 'AE', label: 'الإمارات', cur_ar: 'درهم',   cur_en: 'AED' },
+  { code: 'KW', label: 'الكويت',   cur_ar: 'دينار',  cur_en: 'KWD' },
+  { code: 'QA', label: 'قطر',      cur_ar: 'ريال',   cur_en: 'QAR' },
+  { code: 'OM', label: 'عُمان',    cur_ar: 'ريال',   cur_en: 'OMR' },
+  { code: 'BH', label: 'البحرين',  cur_ar: 'دينار',  cur_en: 'BHD' },
+  { code: 'JO', label: 'الأردن',   cur_ar: 'دينار',  cur_en: 'JOD' },
+  { code: 'EG', label: 'مصر',      cur_ar: 'جنيه',   cur_en: 'EGP' },
 ];
 
 const EMPTY_PRICES: Record<string, CountryPrice> = Object.fromEntries(
@@ -101,7 +101,7 @@ export default function LandingPageCMS() {
     setSaving(true); setMsg('');
     try {
       await adminApi.sa.updateLanding(data);
-      setMsg('تم الحفظ بنجاح ✓');
+      setMsg('تم الحفظ بنجاح');
     } catch { setMsg('فشل الحفظ'); }
     finally { setSaving(false); }
   };
@@ -233,7 +233,7 @@ export default function LandingPageCMS() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <p style={{ ...S.sectionTitle, marginBottom: 0 }}>الإحصائيات</p>
               <button style={S.addBtn} onClick={() =>
-                setData(d => d ? { ...d, stats: [...d.stats, { label_ar: '', label_en: '', value: '', icon: '📊' }] } : d)
+                setData(d => d ? { ...d, stats: [...d.stats, { label_ar: '', label_en: '', value: '', icon: 'chart' }] } : d)
               }>+ إضافة</button>
             </div>
             {data.stats.map((s, i) => (
@@ -257,7 +257,7 @@ export default function LandingPageCMS() {
                   </div>
                   <button style={S.removeBtn} onClick={() =>
                     setData(d => d ? { ...d, stats: d.stats.filter((_, j) => j !== i) } : d)
-                  }>✕</button>
+                  }>×</button>
                 </div>
               </div>
             ))}
@@ -270,7 +270,7 @@ export default function LandingPageCMS() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <p style={{ ...S.sectionTitle, marginBottom: 0 }}>مميزات المنتج ({data.features.length})</p>
               <button style={S.addBtn} onClick={() =>
-                setData(d => d ? { ...d, features: [...d.features, { title_ar: '', title_en: '', desc_ar: '', desc_en: '', icon: '✨' }] } : d)
+                setData(d => d ? { ...d, features: [...d.features, { title_ar: '', title_en: '', desc_ar: '', desc_en: '', icon: 'star' }] } : d)
               }>+ إضافة ميزة</button>
             </div>
             {data.features.map((f, i) => (
@@ -347,7 +347,7 @@ export default function LandingPageCMS() {
                       </label>
                       <button style={S.removeBtn} onClick={() =>
                         setData(d => d ? { ...d, pricing_plans: d.pricing_plans.filter((_, j) => j !== i) } : d)
-                      }>✕ حذف</button>
+                      }>× حذف</button>
                     </div>
                   </div>
 
@@ -382,7 +382,7 @@ export default function LandingPageCMS() {
                         return (
                           <div key={c.code} style={S.countryCell}>
                             <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              <span>{c.flag}</span>
+                              <span style={{ fontSize: 9, fontWeight: 700, background: 'var(--lv-chip)', padding: '1px 4px', borderRadius: 3, color: 'var(--lv-muted)', fontFamily: 'var(--lv-font-mono)' }}>{c.code}</span>
                               <span>{c.label}</span>
                               <span style={{ marginRight: 'auto', color: '#9ca3af', fontSize: 10 }}>{c.cur_en}</span>
                             </div>
@@ -462,7 +462,7 @@ export default function LandingPageCMS() {
             {saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
           </button>
           {msg && (
-            <span style={{ fontSize: 13, color: msg.includes('نجاح') || msg.includes('تم') || msg.includes('✓') ? '#16a34a' : '#dc2626' }}>
+            <span style={{ fontSize: 13, color: msg.includes('نجاح') || msg.includes('تم') ? '#16a34a' : '#dc2626' }}>
               {msg}
             </span>
           )}

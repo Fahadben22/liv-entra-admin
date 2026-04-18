@@ -65,10 +65,10 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
     <div style={{ padding: '16px 20px', background: '#F1F5F9', borderTop: '1px solid rgba(0,0,0,.06)' }}>
       {/* Context from intake */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-        {lead.city && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#eff6ff', color: '#1d4070', fontWeight: 600 }}>📍 {lead.city}</span>}
-        {lead.property_count && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#f0fdf4', color: '#15803d', fontWeight: 600 }}>🏢 {lead.property_count} عقار</span>}
-        {lead.unit_count && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#fef3c7', color: '#92400e', fontWeight: 600 }}>🏠 {lead.unit_count} وحدة</span>}
-        {(lead.pain_points || []).map(p => <span key={p} style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#fef2f2', color: '#dc2626', fontWeight: 600 }}>⚡ {p}</span>)}
+        {lead.city && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#eff6ff', color: '#1d4070', fontWeight: 600 }}>{lead.city}</span>}
+        {lead.property_count && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#f0fdf4', color: '#15803d', fontWeight: 600 }}>{lead.property_count} عقار</span>}
+        {lead.unit_count && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#fef3c7', color: '#92400e', fontWeight: 600 }}>{lead.unit_count} وحدة</span>}
+        {(lead.pain_points || []).map(p => <span key={p} style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#fef2f2', color: '#dc2626', fontWeight: 600 }}>{p}</span>)}
       </div>
 
       {/* Behavioral stats */}
@@ -350,7 +350,7 @@ export default function DemoLeadsPage() {
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <span style={{ fontSize: 13, fontWeight: 500, color: '#1E293B' }}>{item.name || '—'}</span>
-                      {hasData && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 6, background: isExpanded ? '#2563EB' : 'rgba(124,92,252,0.1)', color: isExpanded ? '#fff' : '#2563EB', fontWeight: 700 }}>📊</span>}
+                      {hasData && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 6, background: isExpanded ? '#2563EB' : 'rgba(124,92,252,0.1)', color: isExpanded ? '#fff' : '#2563EB', fontWeight: 700 }}>بيانات</span>}
                     </div>
                     {item.demo_session_id && (
                       <div style={{ fontSize: 11, color: '#6b7280', fontFamily: 'Inter, monospace', marginTop: 2, fontWeight: 500 }}>

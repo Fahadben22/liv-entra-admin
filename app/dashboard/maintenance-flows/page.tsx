@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { adminApi } from '@/lib/api';
 
 const FLOW_TYPE_AR: Record<string, string> = {
-  emergency:  '⚡ طوارئ',
-  standard:   '📋 قياسي',
-  preventive: '🔄 وقائي',
-  inspection: '🔍 فحص',
+  emergency:  'طوارئ',
+  standard:   'قياسي',
+  preventive: 'وقائي',
+  inspection: 'فحص',
 };
 
 const FLOW_TYPE_COLOR: Record<string, { bg: string; color: string; border: string }> = {
@@ -66,7 +66,7 @@ export default function MaintenanceFlowsPage() {
     try {
       const res = await adminApi.maintenanceFlows.update(id, { [field]: value });
       setFlows(prev => prev.map(f => f.id === id ? { ...f, ...(res.data || { [field]: value }) } : f));
-      showToast('تم الحفظ ✔');
+      showToast('تم الحفظ');
     } catch (e: any) { showToast(e.message); }
     finally { setSaving(null); }
   }

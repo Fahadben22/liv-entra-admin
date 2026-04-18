@@ -195,7 +195,7 @@ export default function ConversationsPage() {
                       <div>{msg.body}</div>
                       <div style={{ fontSize: 10, opacity: 0.6, marginTop: 4, textAlign: 'left' }}>
                         {new Date(msg.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
-                        {msg.direction === 'outbound' && (msg.read_at ? ' ✓✓' : msg.delivered_at ? ' ✓' : '')}
+                        {msg.direction === 'outbound' && (msg.read_at ? ' قُرئ' : msg.delivered_at ? ' وصل' : '')}
                       </div>
                     </div>
                   </div>

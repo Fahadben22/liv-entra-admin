@@ -6,7 +6,7 @@ export default function ITAgentPage() {
     <AgentChat
       agentType="it"
       agentName="سالم — المهندس الأول"
-      agentIcon="🛡️"
+      agentIcon="shield"
       accentColor="#3b82f6"
       quickActions={[
         'ما حالة النظام الآن؟',

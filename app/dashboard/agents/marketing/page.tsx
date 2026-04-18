@@ -6,7 +6,7 @@ export default function MarketingAgentPage() {
     <AgentChat
       agentType="marketing"
       agentName="نورة — محللة التسويق"
-      agentIcon="📊"
+      agentIcon="bar-chart"
       accentColor="#8b5cf6"
       quickActions={[
         'كيف أداء هذا الأسبوع؟',

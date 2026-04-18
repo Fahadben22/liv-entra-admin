@@ -288,7 +288,7 @@ export default function CompanyDetailPage() {
             {/* ── Hatif.io Integration Config ── */}
             <div style={{ marginTop: 20, borderTop: '1px solid rgba(0,0,0,.04)', paddingTop: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <span style={{ fontSize: 18 }}>📞</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--lv-accent)' }}>هاتف</span>
                 <div>
                   <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>تكامل هاتف — رعاية العملاء</p>
                   <p style={{ fontSize: 11, color: '#9ca3af', margin: '2px 0 0', fontWeight: 500 }}>Hatif.io Customer Care Integration</p>
@@ -559,9 +559,9 @@ function HatifConfigForm({ companyId, current, onSave, showToast }: { companyId:
 
       {/* Hatif info pill */}
       <div style={{ background: 'rgba(0,0,0,.04)', borderRadius: 8, padding: '8px 12px', marginBottom: 14, display: 'flex', gap: 16, fontSize: 11, color: '#6b7280', flexWrap: 'wrap' }}>
-        <span>📞 299 ر.س/شهر (3 مستخدمين)</span>
-        <span>💬 واتساب مشترك للفريق</span>
-        <span>🤖 تلخيص المكالمات بالذكاء الاصطناعي</span>
+        <span>299 ر.س/شهر (3 مستخدمين)</span>
+        <span>واتساب مشترك للفريق</span>
+        <span>تلخيص المكالمات بالذكاء الاصطناعي</span>
         <a href="https://www.hatif.io" target="_blank" rel="noopener noreferrer" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 500 }}>موقع هاتف ←</a>
       </div>
 

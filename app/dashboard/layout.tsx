@@ -6,6 +6,7 @@ import { getAdminUser, getAdminToken, clearAdminSession } from '@/lib/auth';
 import { ToastProvider } from '@/components/Toast';
 import { NAV_ITEMS } from '@/lib/constants';
 import AdminSidebar from '@/components/AdminSidebar';
+import Icon from '@/components/Icon';
 
 const ACCENT_COLORS = [
   { name: 'Indigo',  value: '#4f46e5' },
@@ -154,9 +155,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               width: 32, height: 32, borderRadius: 8,
               border: '1px solid var(--lv-line-strong)', background: 'transparent',
               cursor: 'pointer', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', color: 'var(--lv-muted)', fontSize: 14,
+              justifyContent: 'center', color: 'var(--lv-muted)',
             }}>
-              🔔
+              <Icon name="bell" size={15} color="var(--lv-muted)" />
             </button>
 
             {/* Docs */}

@@ -41,7 +41,7 @@ export default function AdminLogin() {
       <div style={{ background: colors.bg.card, borderRadius: radius.xl, padding: spacing.xxxl + 8, width: '100%', maxWidth: 380, boxShadow: shadow.lg }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: spacing.xxxl }}>
-          <div style={{ width: 56, height: 56, borderRadius: radius.lg, background: colors.bg.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 24 }}>⚡</div>
+          <div style={{ width: 56, height: 56, borderRadius: radius.lg, background: colors.bg.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: 'var(--font-fraunces, serif)' }}>ل</div>
           <h1 style={{ fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text.primary, margin: 0 }}>Liventra OS</h1>
           <p style={{ fontSize: fontSize.sm, color: colors.text.muted, marginTop: spacing.xs }}>لوحة التحكم — Super Admin</p>
         </div>

@@ -77,7 +77,7 @@ export default function MeetingRoomPage() {
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
       {/* Left: Chat */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <AgentChat agentType="meeting_room" agentName="غرفة الاجتماعات" agentIcon="🏛️" accentColor="#2563EB"
+        <AgentChat agentType="meeting_room" agentName="غرفة الاجتماعات" agentIcon="users" accentColor="#2563EB"
           quickActions={['أعطيني نظرة شاملة على كل الأقسام', 'وش KPIs اليوم؟', 'أنشئ تقرير تنفيذي', 'وش الخطط النشطة؟', 'فيه مشاكل تحتاج انتباهي؟']} />
       </div>
 
@@ -131,11 +131,11 @@ export default function MeetingRoomPage() {
                     <div style={{ display: 'flex', gap: 6 }}>
                       <button onClick={() => handleApprove(a.id)} disabled={acting === a.id}
                         style={{ flex: 1, padding: '7px', borderRadius: 8, fontSize: 11, fontWeight: 600, border: 'none', background: '#10b981', color: '#fff', cursor: 'pointer', opacity: acting === a.id ? 0.5 : 1 }}>
-                        موافقة ✓
+                        موافقة
                       </button>
                       <button onClick={() => handleReject(a.id)} disabled={acting === a.id}
                         style={{ flex: 1, padding: '7px', borderRadius: 8, fontSize: 11, fontWeight: 600, border: '1px solid #fecaca', background: '#fff', color: '#ef4444', cursor: 'pointer', opacity: acting === a.id ? 0.5 : 1 }}>
-                        رفض ✗
+                        رفض
                       </button>
                     </div>
                   )}
@@ -172,7 +172,7 @@ export default function MeetingRoomPage() {
                   {r.status === 'pending' && (
                     <button onClick={() => handleApproveReport(r.id)} disabled={acting === r.id}
                       style={{ width: '100%', padding: '8px', borderRadius: 8, fontSize: 12, fontWeight: 600, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', opacity: acting === r.id ? 0.5 : 1 }}>
-                      اعتماد التقرير ✓
+                      اعتماد التقرير
                     </button>
                   )}
                   {r.status === 'approved' && r.approved_by && (

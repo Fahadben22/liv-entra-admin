@@ -28,11 +28,11 @@ const SEV_COLORS: Record<string,{c:string;bg:string}> = {
 const TABS = [
   { id:'overview', label:'نظرة عامة',  icon:'⬡' },
   { id:'logs',     label:'السجلات',     icon:'≡' },
-  { id:'incidents',label:'الحوادث',     icon:'⚡' },
-  { id:'tenants',  label:'المستأجرون', icon:'⬢' },
-  { id:'security', label:'الأمان',      icon:'🔐' },
-  { id:'alerts',   label:'التنبيهات',   icon:'📱' },
-  { id:'simulation',label:'المحاكاة',  icon:'🧪' },
+  { id:'incidents',label:'الحوادث',     icon:'!' },
+  { id:'tenants',  label:'المستأجرون', icon:'T' },
+  { id:'security', label:'الأمان',      icon:'S' },
+  { id:'alerts',   label:'التنبيهات',   icon:'A' },
+  { id:'simulation',label:'المحاكاة',  icon:'~' },
 ];
 
 // --- Simulation scenarios ---
@@ -701,7 +701,7 @@ export default function CommandCenterPage() {
         <div style={{ display:'flex',flexDirection:'column',borderRight:`1px solid ${C.border}` }}>
           {/* Header */}
           <div style={{ padding:'12px 14px',borderBottom:`1px solid ${C.border}`,display:'flex',alignItems:'center',gap:8 }}>
-            <span style={{ fontSize:18 }}>🛡️</span>
+            <span style={{ fontSize:18, color:'var(--lv-accent)', fontWeight:700 }}>IT</span>
             <div style={{ flex:1 }}>
               <div style={{ fontSize:13,fontWeight:600,color:C.text1 }}>وكيل IT</div>
               <div style={{ fontSize:11,color:C.muted,fontWeight:500 }}>{agentTokens>0?`${agentTokens.toLocaleString()} رمز`:'جاهز'}</div>

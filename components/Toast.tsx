@@ -5,7 +5,7 @@ import { colors, fontSize, fontWeight, radius } from '@/lib/design-tokens';
 interface ToastItem { id: number; msg: string; type: 'success' | 'error' | 'info'; created: number }
 
 const DURATION = 4000;
-const ICONS = { success: '✓', error: '✗', info: 'ℹ' };
+const ICONS = { success: 'ok', error: 'err', info: 'i' };
 const BG = { success: colors.status.success, error: colors.status.error, info: colors.accent.primary };
 
 const ToastCtx = createContext<(msg: string, type?: 'success' | 'error' | 'info') => void>(() => {});
@@ -41,7 +41,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               {/* Message */}
               <span style={{ flex: 1 }}>{t.msg}</span>
               {/* Dismiss X */}
-              <button onClick={() => dismiss(t.id)} aria-label="إغلاق" style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', fontSize: 14, padding: 4, lineHeight: 1 }}>✕</button>
+              <button onClick={() => dismiss(t.id)} aria-label="إغلاق" style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,.7)', cursor: 'pointer', fontSize: 14, padding: 4, lineHeight: 1 }}>×</button>
             </div>
             {/* Progress bar — auto dismiss visual */}
             <div style={{ height: 3, background: 'rgba(255,255,255,.2)' }}>
