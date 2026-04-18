@@ -104,31 +104,31 @@ export default function ConversationsPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(0,0,0,.08)' }}>
-        <Link href="/dashboard" style={{ color: '#2563EB', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
+      <div style={{ padding: '14px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid var(--lv-line)' }}>
+        <Link href="/dashboard" style={{ color: 'var(--lv-accent)', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
         <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: '#1E293B' }}>صندوق المحادثات</div>
-          <div style={{ fontSize: 11, color: '#6b7280' }}>متعدد الشركات — واتساب</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--lv-fg)' }}>صندوق المحادثات</div>
+          <div style={{ fontSize: 11, color: 'var(--lv-muted)' }}>متعدد الشركات — واتساب</div>
         </div>
         <div style={{ marginRight: 'auto', display: 'flex', gap: 12, alignItems: 'center' }}>
-          <Link href="/dashboard/whatsapp/settings" style={{ color: '#6b7280', textDecoration: 'none', fontSize: 12 }}>الإعدادات</Link>
-          <Link href="/dashboard/whatsapp/queue" style={{ color: '#6b7280', textDecoration: 'none', fontSize: 12 }}>قائمة الإرسال</Link>
-          <Link href="/dashboard/whatsapp/analytics" style={{ color: '#6b7280', textDecoration: 'none', fontSize: 12 }}>التحليلات</Link>
+          <Link href="/dashboard/whatsapp/settings" style={{ color: 'var(--lv-muted)', textDecoration: 'none', fontSize: 12 }}>الإعدادات</Link>
+          <Link href="/dashboard/whatsapp/queue" style={{ color: 'var(--lv-muted)', textDecoration: 'none', fontSize: 12 }}>قائمة الإرسال</Link>
+          <Link href="/dashboard/whatsapp/analytics" style={{ color: 'var(--lv-muted)', textDecoration: 'none', fontSize: 12 }}>التحليلات</Link>
         </div>
       </div>
 
       {/* Company selector */}
-      <div style={{ borderBottom: '1px solid rgba(0,0,0,.08)', padding: '10px 24px', display: 'flex', gap: 12, alignItems: 'center' }}>
-        <span style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>الشركة:</span>
+      <div style={{ borderBottom: '1px solid var(--lv-line)', padding: '10px 24px', display: 'flex', gap: 12, alignItems: 'center' }}>
+        <span style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>الشركة:</span>
         <select value={selectedCompany} onChange={e => setSelectedCompany(e.target.value)}
-          style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '5px 10px', fontSize: 13, background: '#F1F5F9', color: '#1E293B' }}>
+          style={{ border: '1px solid var(--lv-line)', borderRadius: 10, padding: '5px 10px', fontSize: 13, background: 'var(--lv-bg)', color: 'var(--lv-fg)' }}>
           {companies.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
         {(['all', 'open', 'handoff', 'idle'] as ConvStatus[]).map(s => (
           <button key={s} onClick={() => setStatusFilter(s)}
-            style={{ padding: '4px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 12, cursor: 'pointer',
-              background: statusFilter === s ? '#2563EB' : 'transparent',
-              color: statusFilter === s ? '#fff' : '#6b7280' }}>
+            style={{ padding: '4px 12px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 12, cursor: 'pointer',
+              background: statusFilter === s ? 'var(--lv-accent)' : 'transparent',
+              color: statusFilter === s ? '#fff' : 'var(--lv-muted)' }}>
             {s === 'all' ? 'الكل' : s === 'open' ? 'مفتوحة' : s === 'handoff' ? 'للموظف' : 'خاملة'}
           </button>
         ))}
@@ -137,24 +137,24 @@ export default function ConversationsPage() {
       {/* Split view */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden', height: 'calc(100vh - 110px)' }}>
         {/* Conversation list */}
-        <div style={{ width: 300, background: '#fafafa', borderLeft: '1px solid rgba(0,0,0,.08)', overflowY: 'auto', flexShrink: 0 }}>
+        <div style={{ width: 300, background: 'var(--lv-bg)', borderInlineStart: '1px solid var(--lv-line)', overflowY: 'auto', flexShrink: 0 }}>
           {loading ? (
-            <div style={{ padding: 24, textAlign: 'center', color: '#6b7280', fontSize: 13 }}>جاري التحميل...</div>
+            <div style={{ padding: 24, textAlign: 'center', color: 'var(--lv-muted)', fontSize: 13 }}>جاري التحميل...</div>
           ) : filtered.length === 0 ? (
-            <div style={{ padding: 24, textAlign: 'center', color: '#6b7280', fontSize: 13 }}>لا توجد محادثات</div>
+            <div style={{ padding: 24, textAlign: 'center', color: 'var(--lv-muted)', fontSize: 13 }}>لا توجد محادثات</div>
           ) : filtered.map(conv => (
             <div key={conv.id} onClick={() => openConversation(conv)}
-              style={{ padding: '12px 16px', borderBottom: '1px solid rgba(0,0,0,.06)', cursor: 'pointer',
+              style={{ padding: '12px 16px', borderBottom: '1px solid var(--lv-line)', cursor: 'pointer',
                 background: selectedConv?.id === conv.id ? '#f0edff' : 'transparent' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#1E293B' }}>{conv.phone}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)' }}>{conv.phone}</span>
                 {conv.unread_count > 0 && (
                   <span style={{ background: '#dc2626', color: '#fff', fontSize: 10, padding: '1px 6px', borderRadius: 10, fontWeight: 600 }}>
                     {conv.unread_count}
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 3 }}>
+              <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginTop: 3 }}>
                 {conv.current_flow || conv.status || 'IDLE'} · {new Date(conv.last_active_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}
               </div>
               <div style={{ marginTop: 4 }}>{slaBadge(conv)}</div>
@@ -165,15 +165,15 @@ export default function ConversationsPage() {
         {/* Chat thread */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           {!selectedConv ? (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 13 }}>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lv-muted)', fontSize: 13 }}>
               اختر محادثة للعرض
             </div>
           ) : (
             <>
               {/* Conv header */}
-              <div style={{ borderBottom: '1px solid rgba(0,0,0,.08)', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ fontWeight: 600, fontSize: 13, color: '#1E293B' }}>{selectedConv.phone}</div>
-                <div style={{ fontSize: 11, color: '#9ca3af' }}>
+              <div style={{ borderBottom: '1px solid var(--lv-line)', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--lv-fg)' }}>{selectedConv.phone}</div>
+                <div style={{ fontSize: 11, color: 'var(--lv-muted)' }}>
                   {selectedConv.current_flow || 'لا يوجد تدفق نشط'} · {selectedConv.handled_by === 'human' ? 'موظف' : 'بوت'}
                 </div>
                 {slaBadge(selectedConv)}
@@ -182,13 +182,13 @@ export default function ConversationsPage() {
               {/* Messages */}
               <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {messages.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: 13, padding: 24 }}>لا توجد رسائل</div>
+                  <div style={{ textAlign: 'center', color: 'var(--lv-muted)', fontSize: 13, padding: 24 }}>لا توجد رسائل</div>
                 ) : messages.map((msg: Message) => (
                   <div key={msg.id} style={{ display: 'flex', justifyContent: msg.direction === 'inbound' ? 'flex-end' : 'flex-start' }}>
                     <div style={{
                       maxWidth: '70%', padding: '8px 12px', borderRadius: 8,
-                      background: msg.direction === 'inbound' ? '#DBEAFE' : '#2563EB',
-                      color: msg.direction === 'inbound' ? '#1E293B' : '#fff',
+                      background: msg.direction === 'inbound' ? '#DBEAFE' : 'var(--lv-accent)',
+                      color: msg.direction === 'inbound' ? 'var(--lv-fg)' : '#fff',
                       border: msg.direction === 'inbound' ? '1px solid rgba(124,92,252,.15)' : 'none',
                       fontSize: 13, lineHeight: 1.5,
                     }}>
@@ -204,16 +204,16 @@ export default function ConversationsPage() {
               </div>
 
               {/* Input */}
-              <div style={{ borderTop: '1px solid rgba(0,0,0,.08)', padding: '12px 20px', display: 'flex', gap: 8 }}>
+              <div style={{ borderTop: '1px solid var(--lv-line)', padding: '12px 20px', display: 'flex', gap: 8 }}>
                 <input
                   value={inputText}
                   onChange={e => setInputText(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
                   placeholder="اكتب رسالة..."
-                  style={{ flex: 1, border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '8px 12px', fontSize: 13, outline: 'none', background: '#F1F5F9', color: '#1E293B' }}
+                  style={{ flex: 1, border: '1px solid var(--lv-line)', borderRadius: 10, padding: '8px 12px', fontSize: 13, outline: 'none', background: 'var(--lv-bg)', color: 'var(--lv-fg)' }}
                 />
                 <button onClick={handleSend} disabled={sending || !inputText.trim()}
-                  style={{ background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.7 : 1 }}>
+                  style={{ background: 'var(--lv-accent)', color: '#fff', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.7 : 1 }}>
                   {sending ? '...' : 'إرسال'}
                 </button>
               </div>

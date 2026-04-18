@@ -17,8 +17,8 @@ const LC: Record<string, { color: string; label: string }> = {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="card" style={{ background: '#fff', borderRadius: 14, border: '1px solid rgba(0,0,0,.06)', padding: '20px 24px', marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-      <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: '#1E293B' }}>{title}</h3>
+    <div className="card" style={{ background: 'var(--lv-panel)', borderRadius: 14, border: '1px solid var(--lv-line)', padding: '20px 24px', marginBottom: 20, boxShadow: 'var(--lv-shadow-sm)' }}>
+      <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 18px', color: 'var(--lv-fg)' }}>{title}</h3>
       {children}
     </div>
   );
@@ -26,9 +26,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
-      <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 500 }}>{label}</span>
-      <span style={{ fontSize: 13, fontWeight: 500, color: '#1E293B' }}>{value ?? '—'}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--lv-line)' }}>
+      <span style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--lv-fg)' }}>{value ?? '—'}</span>
     </div>
   );
 }
@@ -136,7 +136,7 @@ export default function CompanyDetailPage() {
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-      <p style={{ color: '#9ca3af', fontSize: 13 }}>جاري التحميل...</p>
+      <p style={{ color: 'var(--lv-muted)', fontSize: 13 }}>جاري التحميل...</p>
     </div>
   );
 
@@ -154,15 +154,15 @@ export default function CompanyDetailPage() {
     <div className="fade-in">
       {/* Toast */}
       {toast && (
-        <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#2563EB', color: '#fff', padding: '7px 20px', borderRadius: 7, fontSize: 12, zIndex: 9999, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+        <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: 'var(--lv-accent)', color: '#fff', padding: '7px 20px', borderRadius: 7, fontSize: 12, zIndex: 9999, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
           {toast}
         </div>
       )}
 
       {/* Header */}
-      <div style={{ borderBottom: '1px solid rgba(0,0,0,.06)', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ borderBottom: '1px solid var(--lv-line)', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <span style={{ fontSize: 18, fontWeight: 600, color: '#1E293B', letterSpacing: '-0.02em' }}>{company.name}</span>
+          <span style={{ fontSize: 18, fontWeight: 600, color: 'var(--lv-fg)', letterSpacing: '-0.02em' }}>{company.name}</span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: lc.color, display: 'inline-block', boxShadow: `0 0 6px ${lc.color}66` }} />
             <span style={{ fontSize: 11, color: lc.color, fontWeight: 500 }}>{lc.label}</span>
@@ -171,7 +171,7 @@ export default function CompanyDetailPage() {
         <div style={{ display: 'flex', gap: 8 }}>
           {lcStatus !== 'active' && lcStatus !== 'deleted' && (
             <button onClick={() => handleLifecycle('activate')} disabled={saving}
-              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 10, background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 10, background: 'var(--lv-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
               {saving ? '...' : 'تفعيل'}
             </button>
           )}
@@ -183,7 +183,7 @@ export default function CompanyDetailPage() {
           )}
           {lcStatus === 'trial' && (
             <button onClick={handleExtendTrial} disabled={saving}
-              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 10, background: 'transparent', color: '#6b7280', border: '1px solid rgba(0,0,0,.08)', cursor: 'pointer', fontWeight: 500 }}>
+              style={{ fontSize: 12, padding: '7px 16px', borderRadius: 10, background: 'transparent', color: 'var(--lv-muted)', border: '1px solid var(--lv-line)', cursor: 'pointer', fontWeight: 500 }}>
               تمديد التجربة
             </button>
           )}
@@ -191,10 +191,10 @@ export default function CompanyDetailPage() {
       </div>
 
       {/* Tab bar */}
-      <div style={{ borderBottom: '1px solid rgba(0,0,0,.06)', padding: '0 32px', display: 'flex', gap: 0 }}>
+      <div style={{ borderBottom: '1px solid var(--lv-line)', padding: '0 32px', display: 'flex', gap: 0 }}>
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)}
-            style={{ fontSize: 13, padding: '12px 18px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: tab === t ? 600 : 400, color: tab === t ? '#1E293B' : '#9ca3af', borderBottom: tab === t ? '2px solid #2563EB' : '2px solid transparent', transition: 'all .15s' }}>
+            style={{ fontSize: 13, padding: '12px 18px', border: 'none', background: 'none', cursor: 'pointer', fontWeight: tab === t ? 600 : 400, color: tab === t ? 'var(--lv-fg)' : 'var(--lv-muted)', borderBottom: tab === t ? '2px solid var(--lv-accent)' : '2px solid transparent', transition: 'all .15s' }}>
             {t}
           </button>
         ))}
@@ -214,10 +214,10 @@ export default function CompanyDetailPage() {
                   { label: 'استجابة الصيانة', value: `${company.health.maintenance}%`, sub: 'تذاكر محلولة', color: '#60A5FA' },
                   { label: 'تبني الميزات', value: `${company.health.adoption}%`, sub: 'ميزات مفعلة', color: '#f59e0b' },
                 ].map(k => (
-                  <div key={k.label} className="card" style={{ background: '#fff', border: '1px solid rgba(0,0,0,.06)', borderRadius: 14, padding: '14px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-                    <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 6px', fontWeight: 500 }}>{k.label}</p>
+                  <div key={k.label} className="card" style={{ background: 'var(--lv-panel)', border: '1px solid var(--lv-line)', borderRadius: 14, padding: '14px', textAlign: 'center', boxShadow: 'var(--lv-shadow-sm)' }}>
+                    <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 6px', fontWeight: 500 }}>{k.label}</p>
                     <p style={{ fontSize: 22, fontWeight: 600, color: k.color, margin: 0 }}>{k.value}</p>
-                    <p style={{ fontSize: 11, color: '#6b7280', margin: '4px 0 0', fontWeight: 500 }}>{k.sub}</p>
+                    <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '4px 0 0', fontWeight: 500 }}>{k.sub}</p>
                   </div>
                 ))}
               </div>
@@ -229,7 +229,7 @@ export default function CompanyDetailPage() {
                 <Row label="تاريخ التسجيل"   value={new Date(company.created_at).toLocaleDateString('ar-SA')} />
                 {company.suspended_reason && <Row label="سبب الإيقاف" value={company.suspended_reason} />}
                 <div style={{ marginTop: 16 }}>
-                  <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8, fontWeight: 500 }}>تعديل البيانات الأساسية</p>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', marginBottom: 8, fontWeight: 500 }}>تعديل البيانات الأساسية</p>
                   <CompanyInfoForm companyId={id} current={company} onSave={load} showToast={showToast} />
                 </div>
               </Section>
@@ -241,7 +241,7 @@ export default function CompanyDetailPage() {
                 <Row label="الحد الأقصى للعقود"       value={company.max_contracts ?? '∞'} />
                 <Row label="نهاية التجربة"            value={company.trial_ends_at ? new Date(company.trial_ends_at).toLocaleDateString('ar-SA') : '—'} />
                 <div style={{ marginTop: 16 }}>
-                  <p style={{ fontSize: 11, color: '#9ca3af', marginBottom: 8, fontWeight: 500 }}>تعديل الحدود</p>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', marginBottom: 8, fontWeight: 500 }}>تعديل الحدود</p>
                   <LimitsForm companyId={id} current={company} onSave={load} showToast={showToast} />
                 </div>
               </Section>
@@ -261,22 +261,22 @@ export default function CompanyDetailPage() {
                 <Row label="نهاية الفترة"     value={sub.current_period_end ? new Date(sub.current_period_end).toLocaleDateString('ar-SA') : '—'} />
               </>
             ) : (
-              <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 16 }}>لا يوجد اشتراك نشط</p>
+              <p style={{ fontSize: 13, color: 'var(--lv-muted)', marginBottom: 16 }}>لا يوجد اشتراك نشط</p>
             )}
-            <div style={{ marginTop: 20, borderTop: '1px solid rgba(0,0,0,.04)', paddingTop: 20 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: '#1E293B' }}>تغيير الخطة</p>
+            <div style={{ marginTop: 20, borderTop: '1px solid var(--lv-line)', paddingTop: 20 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 12, color: 'var(--lv-fg)' }}>تغيير الخطة</p>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {plans.filter(p => p.is_active).map(p => (
-                  <div key={p.id} style={{ border: '1px solid rgba(0,0,0,.06)', borderRadius: 14, padding: '12px 16px', background: '#fff', minWidth: 160, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-                    <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px', color: '#1E293B' }}>{p.name}</p>
-                    <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 10px', fontWeight: 500 }}>{p.price_monthly} ر.س/شهر</p>
+                  <div key={p.id} style={{ border: '1px solid var(--lv-line)', borderRadius: 14, padding: '12px 16px', background: 'var(--lv-panel)', minWidth: 160, boxShadow: 'var(--lv-shadow-sm)' }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px', color: 'var(--lv-fg)' }}>{p.name}</p>
+                    <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 10px', fontWeight: 500 }}>{p.price_monthly} ر.س/شهر</p>
                     <div style={{ display: 'flex', gap: 6 }}>
                       <button onClick={() => handleAssignPlan(p.id, 'monthly')} disabled={saving}
-                        style={{ flex: 1, fontSize: 12, padding: '7px 16px', borderRadius: 10, background: 'transparent', border: '1px solid rgba(0,0,0,.08)', color: '#6b7280', cursor: 'pointer', fontWeight: 500 }}>
+                        style={{ flex: 1, fontSize: 12, padding: '7px 16px', borderRadius: 10, background: 'transparent', border: '1px solid var(--lv-line)', color: 'var(--lv-muted)', cursor: 'pointer', fontWeight: 500 }}>
                         شهري
                       </button>
                       <button onClick={() => handleAssignPlan(p.id, 'yearly')} disabled={saving}
-                        style={{ flex: 1, fontSize: 12, padding: '7px 16px', borderRadius: 10, background: '#2563EB', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+                        style={{ flex: 1, fontSize: 12, padding: '7px 16px', borderRadius: 10, background: 'var(--lv-accent)', border: 'none', color: '#fff', cursor: 'pointer', fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
                         سنوي
                       </button>
                     </div>
@@ -286,12 +286,12 @@ export default function CompanyDetailPage() {
             </div>
 
             {/* ── Hatif.io Integration Config ── */}
-            <div style={{ marginTop: 20, borderTop: '1px solid rgba(0,0,0,.04)', paddingTop: 20 }}>
+            <div style={{ marginTop: 20, borderTop: '1px solid var(--lv-line)', paddingTop: 20 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--lv-accent)' }}>هاتف</span>
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>تكامل هاتف — رعاية العملاء</p>
-                  <p style={{ fontSize: 11, color: '#9ca3af', margin: '2px 0 0', fontWeight: 500 }}>Hatif.io Customer Care Integration</p>
+                  <p style={{ fontSize: 13, fontWeight: 600, margin: 0, color: 'var(--lv-fg)' }}>تكامل هاتف — رعاية العملاء</p>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '2px 0 0', fontWeight: 500 }}>Hatif.io Customer Care Integration</p>
                 </div>
               </div>
               <HatifConfigForm companyId={id} current={company} onSave={load} showToast={showToast} />
@@ -307,11 +307,11 @@ export default function CompanyDetailPage() {
                 const flag = flags.find(f => f.feature_key === key);
                 const enabled = flag?.is_enabled ?? false;
                 return (
-                  <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 14, border: '1px solid', borderColor: enabled ? 'rgba(34,197,94,.25)' : 'rgba(0,0,0,.06)', background: enabled ? '#ecfdf5' : '#fff', transition: 'all .15s' }}>
+                  <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', borderRadius: 14, border: '1px solid', borderColor: enabled ? 'rgba(34,197,94,.25)' : 'var(--lv-line)', background: enabled ? '#ecfdf5' : 'var(--lv-panel)', transition: 'all .15s' }}>
                     <div>
-                      <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 2px', color: '#1E293B' }}>{meta.name_ar}</p>
-                      <p style={{ fontSize: 11, color: '#6b7280', margin: 0, direction: 'ltr', fontWeight: 500 }}>{key}</p>
-                      <p style={{ fontSize: 11, color: '#6b7280', margin: '2px 0 0', fontWeight: 500 }}>الحد الأدنى: {meta.tier_min}</p>
+                      <p style={{ fontSize: 13, fontWeight: 600, margin: '0 0 2px', color: 'var(--lv-fg)' }}>{meta.name_ar}</p>
+                      <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: 0, direction: 'ltr', fontWeight: 500 }}>{key}</p>
+                      <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '2px 0 0', fontWeight: 500 }}>الحد الأدنى: {meta.tier_min}</p>
                     </div>
                     <button onClick={() => handleToggleFlag(key, enabled)} disabled={saving}
                       style={{ width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer', background: enabled ? '#22c55e' : '#d1d5db', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
@@ -339,13 +339,13 @@ export default function CompanyDetailPage() {
                 ].map(m => {
                   const pct = m.max ? Math.min(Math.round((m.v / m.max) * 100), 100) : null;
                   return (
-                    <div key={m.l} className="card" style={{ padding: '14px 16px', borderRadius: 14, border: '1px solid rgba(0,0,0,.06)', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-                      <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 6px', fontWeight: 500 }}>{m.l}</p>
-                      <p style={{ fontSize: 22, fontWeight: 600, color: '#1E293B', margin: 0 }}>{m.v ?? '—'}</p>
+                    <div key={m.l} className="card" style={{ padding: '14px 16px', borderRadius: 14, border: '1px solid var(--lv-line)', background: 'var(--lv-panel)', boxShadow: 'var(--lv-shadow-sm)' }}>
+                      <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 6px', fontWeight: 500 }}>{m.l}</p>
+                      <p style={{ fontSize: 22, fontWeight: 600, color: 'var(--lv-fg)', margin: 0 }}>{m.v ?? '—'}</p>
                       {pct !== null && (
                         <>
-                          <p style={{ fontSize: 11, color: '#6b7280', margin: '4px 0 6px', fontWeight: 500 }}>من {m.max} ({pct}%)</p>
-                          <div style={{ height: 4, borderRadius: 3, background: 'rgba(0,0,0,.06)', overflow: 'hidden' }}>
+                          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '4px 0 6px', fontWeight: 500 }}>من {m.max} ({pct}%)</p>
+                          <div style={{ height: 4, borderRadius: 3, background: 'var(--lv-line)', overflow: 'hidden' }}>
                             <div style={{ height: '100%', width: `${pct}%`, background: pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#22c55e', borderRadius: 3, transition: 'width .4s' }} />
                           </div>
                         </>
@@ -355,7 +355,7 @@ export default function CompanyDetailPage() {
                 })}
               </div>
             ) : (
-              <p style={{ color: '#9ca3af', fontSize: 13 }}>لا توجد بيانات استخدام</p>
+              <p style={{ color: 'var(--lv-muted)', fontSize: 13 }}>لا توجد بيانات استخدام</p>
             )}
           </Section>
         )}
@@ -364,25 +364,25 @@ export default function CompanyDetailPage() {
         {tab === 'التدقيق' && (
           <Section title="سجل تدقيق الشركة">
             {audit.length === 0 ? (
-              <p style={{ color: '#9ca3af', fontSize: 13 }}>لا توجد أحداث مسجلة</p>
+              <p style={{ color: 'var(--lv-muted)', fontSize: 13 }}>لا توجد أحداث مسجلة</p>
             ) : (
               <div>
                 {audit.map((a, i) => (
-                  <div key={a.id} style={{ padding: '12px 0', borderBottom: i < audit.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0, color: '#9ca3af', fontWeight: 500 }}>
+                  <div key={a.id} style={{ padding: '12px 0', borderBottom: i < audit.length - 1 ? '1px solid var(--lv-line)' : 'none', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0, color: 'var(--lv-muted)', fontWeight: 500 }}>
                       A
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: '#1E293B' }}>{a.action?.replace(/_/g, ' ')}</span>
-                          <span style={{ fontSize: 11, color: '#6b7280', marginRight: 8, fontWeight: 500 }}>بواسطة {a.actor_email}</span>
+                          <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--lv-fg)' }}>{a.action?.replace(/_/g, ' ')}</span>
+                          <span style={{ fontSize: 11, color: 'var(--lv-muted)', marginRight: 8, fontWeight: 500 }}>بواسطة {a.actor_email}</span>
                         </div>
-                        <span style={{ fontSize: 11, color: '#6b7280', direction: 'ltr', fontWeight: 500 }}>
+                        <span style={{ fontSize: 11, color: 'var(--lv-muted)', direction: 'ltr', fontWeight: 500 }}>
                           {new Date(a.created_at).toLocaleString('en-US')}
                         </span>
                       </div>
-                      <p style={{ fontSize: 11, color: '#9ca3af', margin: '4px 0 0', fontWeight: 500 }}>
+                      <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '4px 0 0', fontWeight: 500 }}>
                         {a.actor_role} · {a.ip_address}
                       </p>
                     </div>
@@ -423,43 +423,43 @@ function CompanyInfoForm({ companyId, current, onSave, showToast }: { companyId:
     setSaving(false);
   };
 
-  const inp = { padding: '7px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 12, width: '100%', background: '#F1F5F9', color: '#1E293B', boxSizing: 'border-box' as const };
+  const inp = { padding: '7px 12px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 12, width: '100%', background: 'var(--lv-bg)', color: 'var(--lv-fg)', boxSizing: 'border-box' as const };
 
   return (
     <div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
         <div>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>الاسم</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>الاسم</p>
           <input value={form.name} onChange={f('name')} style={inp} placeholder="اسم الشركة" />
         </div>
         <div>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>الاسم بالعربي</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>الاسم بالعربي</p>
           <input value={form.name_ar} onChange={f('name_ar')} style={inp} placeholder="الاسم بالعربية" />
         </div>
         <div>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>البريد</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>البريد</p>
           <input value={form.contact_email} onChange={f('contact_email')} type="email" dir="ltr" style={inp} placeholder="email@company.com" />
         </div>
         <div>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>الهاتف</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>الهاتف</p>
           <input value={form.contact_phone} onChange={f('contact_phone')} type="tel" dir="ltr" style={inp} placeholder="+966XXXXXXXXX" />
         </div>
         <div>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>المدينة</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>المدينة</p>
           <input value={form.city} onChange={f('city')} style={inp} placeholder="الرياض" />
         </div>
         <div>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>السجل التجاري</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>السجل التجاري</p>
           <input value={form.cr_number} onChange={f('cr_number')} dir="ltr" style={inp} placeholder="10XXXXXXXXX" />
         </div>
       </div>
       <div style={{ marginBottom: 10 }}>
-        <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>ملاحظات</p>
+        <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>ملاحظات</p>
         <textarea value={form.notes} onChange={f('notes')} rows={2}
           style={{ ...inp, resize: 'vertical' as const, fontFamily: 'inherit' }} placeholder="ملاحظات اختيارية" />
       </div>
       <button onClick={save} disabled={saving}
-        style={{ padding: '8px 20px', borderRadius: 10, background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+        style={{ padding: '8px 20px', borderRadius: 10, background: 'var(--lv-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
         {saving ? '...' : 'حفظ البيانات'}
       </button>
     </div>
@@ -489,7 +489,7 @@ function LimitsForm({ companyId, current, onSave, showToast }: { companyId: stri
     setSaving(false);
   };
 
-  const inp = { padding: '7px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, width: 80, textAlign: 'center' as const, background: '#F1F5F9', color: '#1E293B' };
+  const inp = { padding: '7px 12px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 13, width: 80, textAlign: 'center' as const, background: 'var(--lv-bg)', color: 'var(--lv-fg)' };
 
   return (
     <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
@@ -500,12 +500,12 @@ function LimitsForm({ companyId, current, onSave, showToast }: { companyId: stri
         { l: 'عقود',     v: maxContracts, set: setMaxContracts },
       ].map(f => (
         <div key={f.l}>
-          <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 4px', fontWeight: 500 }}>{f.l}</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>{f.l}</p>
           <input value={f.v} onChange={e => f.set(e.target.value)} type="number" style={inp} />
         </div>
       ))}
       <button onClick={save} disabled={saving}
-        style={{ padding: '7px 16px', borderRadius: 10, background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+        style={{ padding: '7px 16px', borderRadius: 10, background: 'var(--lv-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
         {saving ? '...' : 'حفظ'}
       </button>
     </div>
@@ -528,15 +528,15 @@ function HatifConfigForm({ companyId, current, onSave, showToast }: { companyId:
     setSaving(false);
   };
 
-  const inp = { padding: '7px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 12, width: '100%', background: '#F1F5F9', color: '#1E293B', boxSizing: 'border-box' as const };
+  const inp = { padding: '7px 12px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 12, width: '100%', background: 'var(--lv-bg)', color: 'var(--lv-fg)', boxSizing: 'border-box' as const };
 
   return (
     <div style={{ background: 'rgba(5,150,105,.04)', border: '1px solid rgba(5,150,105,.15)', borderRadius: 12, padding: '16px 18px' }}>
       {/* Enable toggle */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <div>
-          <p style={{ fontSize: 12, fontWeight: 600, margin: 0, color: '#1E293B' }}>تفعيل تكامل هاتف لهذه الشركة</p>
-          <p style={{ fontSize: 11, color: '#6b7280', margin: '2px 0 0', fontWeight: 400 }}>يُظهر صفحة رعاية العملاء في لوحة تحكم الموظفين</p>
+          <p style={{ fontSize: 12, fontWeight: 600, margin: 0, color: 'var(--lv-fg)' }}>تفعيل تكامل هاتف لهذه الشركة</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '2px 0 0', fontWeight: 400 }}>يُظهر صفحة رعاية العملاء في لوحة تحكم الموظفين</p>
         </div>
         <button onClick={() => setEnabled(v => !v)}
           style={{ width: 44, height: 24, borderRadius: 12, border: 'none', cursor: 'pointer', background: enabled ? '#22c55e' : '#d1d5db', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
@@ -546,7 +546,7 @@ function HatifConfigForm({ companyId, current, onSave, showToast }: { companyId:
 
       {/* Portal URL */}
       <div style={{ marginBottom: 12 }}>
-        <p style={{ fontSize: 11, color: '#9ca3af', margin: '0 0 5px', fontWeight: 500 }}>رابط بوابة هاتف (اختياري)</p>
+        <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 5px', fontWeight: 500 }}>رابط بوابة هاتف (اختياري)</p>
         <input
           value={portalUrl}
           onChange={e => setPortalUrl(e.target.value)}
@@ -554,15 +554,15 @@ function HatifConfigForm({ companyId, current, onSave, showToast }: { companyId:
           placeholder="https://app.hatif.io/org/XXXXX"
           style={inp}
         />
-        <p style={{ fontSize: 10, color: '#9ca3af', margin: '3px 0 0' }}>إذا تُرك فارغاً تظهر صفحة التعريف بهاتف مع زر الانتقال لموقعهم</p>
+        <p style={{ fontSize: 10, color: 'var(--lv-muted)', margin: '3px 0 0' }}>إذا تُرك فارغاً تظهر صفحة التعريف بهاتف مع زر الانتقال لموقعهم</p>
       </div>
 
       {/* Hatif info pill */}
-      <div style={{ background: 'rgba(0,0,0,.04)', borderRadius: 8, padding: '8px 12px', marginBottom: 14, display: 'flex', gap: 16, fontSize: 11, color: '#6b7280', flexWrap: 'wrap' }}>
+      <div style={{ background: 'rgba(0,0,0,.04)', borderRadius: 8, padding: '8px 12px', marginBottom: 14, display: 'flex', gap: 16, fontSize: 11, color: 'var(--lv-muted)', flexWrap: 'wrap' }}>
         <span>299 ر.س/شهر (3 مستخدمين)</span>
         <span>واتساب مشترك للفريق</span>
         <span>تلخيص المكالمات بالذكاء الاصطناعي</span>
-        <a href="https://www.hatif.io" target="_blank" rel="noopener noreferrer" style={{ color: '#2563EB', textDecoration: 'none', fontWeight: 500 }}>موقع هاتف ←</a>
+        <a href="https://www.hatif.io" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--lv-accent)', textDecoration: 'none', fontWeight: 500 }}>موقع هاتف ←</a>
       </div>
 
       <button onClick={save} disabled={saving}

@@ -39,14 +39,14 @@ export default function CouponsPage() {
     } catch (e: any) { showToast(`خطأ: ${e.message}`); }
   };
 
-  const ghostBtn: React.CSSProperties = { fontSize: 10, padding: '5px 8px', borderRadius: 7, background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', cursor: 'pointer' };
+  const ghostBtn: React.CSSProperties = { fontSize: 10, padding: '5px 8px', borderRadius: 7, background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', cursor: 'pointer' };
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1E293B' }}>أكواد الخصم</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: 'var(--lv-fg)' }}>أكواد الخصم</h2>
         <button onClick={() => setShowCreate(true)}
-          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: 'var(--lv-accent)', color: 'var(--lv-panel)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           + كود جديد
         </button>
       </div>
@@ -54,51 +54,51 @@ export default function CouponsPage() {
       {showCreate && <CreateCouponModal onClose={() => setShowCreate(false)} onDone={() => { setShowCreate(false); load(); showToast('تم إنشاء كود الخصم'); }} />}
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px 0', color: '#6b7280' }}>جاري التحميل...</div>
+        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--lv-muted)' }}>جاري التحميل...</div>
       ) : coupons.length === 0 ? (
-        <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '60px', textAlign: 'center', color: '#6b7280', fontSize: 13 }}>
+        <div className="card" style={{ background: 'var(--lv-panel)', borderRadius: 14, boxShadow: 'var(--lv-shadow-sm)', padding: '60px', textAlign: 'center', color: 'var(--lv-muted)', fontSize: 13 }}>
           لا توجد أكواد خصم — أنشئ كودك الأول
         </div>
       ) : (
-        <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', overflow: 'hidden' }}>
+        <div className="card" style={{ background: 'var(--lv-panel)', borderRadius: 14, boxShadow: 'var(--lv-shadow-sm)', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#F1F5F9' }}>
+              <tr style={{ background: 'var(--lv-bg)' }}>
                 {['الكود', 'الخصم', 'الاستخدام', 'صالح حتى', 'الحالة', 'إجراء'].map(h => (
-                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#6b7280', borderBottom: '1px solid rgba(0,0,0,.06)' }}>{h}</th>
+                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: 'var(--lv-muted)', borderBottom: '1px solid var(--lv-line)' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {coupons.map((c, i) => (
-                <tr key={c.id} style={{ borderBottom: i < coupons.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
+                <tr key={c.id} style={{ borderBottom: i < coupons.length - 1 ? '1px solid var(--lv-line)' : 'none', background: i % 2 === 1 ? 'var(--lv-bg)' : 'var(--lv-panel)' }}>
                   <td style={{ padding: '12px 18px' }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', fontFamily: 'monospace', background: '#F1F5F9', padding: '3px 8px', borderRadius: 7, border: '1px solid rgba(0,0,0,.06)' }}>{c.code}</span>
-                    {c.description_ar && <p style={{ fontSize: 10, color: '#9ca3af', margin: '4px 0 0' }}>{c.description_ar}</p>}
+                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)', fontFamily: 'monospace', background: 'var(--lv-bg)', padding: '3px 8px', borderRadius: 7, border: '1px solid var(--lv-line)' }}>{c.code}</span>
+                    {c.description_ar && <p style={{ fontSize: 10, color: 'var(--lv-muted)', margin: '4px 0 0' }}>{c.description_ar}</p>}
                   </td>
-                  <td style={{ padding: '12px 18px', fontSize: 13, fontWeight: 600, color: '#1E293B' }}>
+                  <td style={{ padding: '12px 18px', fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)' }}>
                     {c.discount_type === 'percentage' ? `${c.discount_value}%` : `${c.discount_value} ر.س`}
                   </td>
-                  <td style={{ padding: '12px 18px', fontSize: 12, color: '#9ca3af' }}>
+                  <td style={{ padding: '12px 18px', fontSize: 12, color: 'var(--lv-muted)' }}>
                     {c.current_uses}/{c.max_uses || '∞'}
                   </td>
-                  <td style={{ padding: '12px 18px', fontSize: 12, color: '#9ca3af' }}>
+                  <td style={{ padding: '12px 18px', fontSize: 12, color: 'var(--lv-muted)' }}>
                     {c.valid_until ? fmtDate(c.valid_until) : 'غير محدد'}
                   </td>
                   <td style={{ padding: '12px 18px' }}>
-                    <span style={{ fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 5, color: c.is_active ? '#16a34a' : '#9ca3af', fontWeight: 500 }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: c.is_active ? '#16a34a' : '#9ca3af', display: 'inline-block' }} />
+                    <span style={{ fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 5, color: c.is_active ? '#16a34a' : 'var(--lv-muted)', fontWeight: 500 }}>
+                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: c.is_active ? '#16a34a' : 'var(--lv-muted)', display: 'inline-block' }} />
                       {c.is_active ? 'نشط' : 'معطّل'}
                     </span>
                   </td>
                   <td style={{ padding: '12px 18px' }}>
                     <div style={{ display: 'flex', gap: 6 }}>
                       <button onClick={() => handleToggle(c.id, c.is_active)}
-                        style={{ ...ghostBtn, color: '#6b7280' }}>
+                        style={{ ...ghostBtn, color: 'var(--lv-muted)' }}>
                         {c.is_active ? 'تعطيل' : 'تفعيل'}
                       </button>
                       <button onClick={() => handleDelete(c.id, c.code)}
-                        style={{ ...ghostBtn, color: '#dc2626' }}>
+                        style={{ ...ghostBtn, color: 'var(--lv-danger)' }}>
                         حذف
                       </button>
                     </div>
@@ -137,26 +137,26 @@ function CreateCouponModal({ onClose, onDone }: { onClose: () => void; onDone: (
     } catch (e: any) { setErr(e.message || 'خطأ'); setLoading(false); }
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 13, boxSizing: 'border-box', background: 'var(--lv-bg)', color: 'var(--lv-fg)' };
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: '28px 32px', width: 400, boxShadow: '0 20px 60px rgba(0,0,0,.12)' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1E293B' }}>إنشاء كود خصم</h3>
+      <div style={{ background: 'var(--lv-panel)', borderRadius: 16, padding: '28px 32px', width: 400, boxShadow: 'var(--lv-shadow-panel)' }} onClick={e => e.stopPropagation()}>
+        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: 'var(--lv-fg)' }}>إنشاء كود خصم</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>الكود *</label>
+            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>الكود *</label>
             <input value={form.code} onChange={e => set('code', e.target.value.toUpperCase())} placeholder="WELCOME2026"
               style={{ ...inputStyle, direction: 'ltr', fontFamily: 'monospace' }} />
           </div>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>الوصف</label>
+            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>الوصف</label>
             <input value={form.description_ar} onChange={e => set('description_ar', e.target.value)} placeholder="خصم ترحيبي 20%"
               style={inputStyle} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>نوع الخصم</label>
+              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>نوع الخصم</label>
               <select value={form.discount_type} onChange={e => set('discount_type', e.target.value)}
                 style={inputStyle}>
                 <option value="percentage">نسبة مئوية (%)</option>
@@ -164,7 +164,7 @@ function CreateCouponModal({ onClose, onDone }: { onClose: () => void; onDone: (
               </select>
             </div>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>القيمة *</label>
+              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>القيمة *</label>
               <input type="number" value={form.discount_value} onChange={e => set('discount_value', e.target.value)}
                 placeholder={form.discount_type === 'percentage' ? '20' : '100'}
                 style={inputStyle} />
@@ -172,7 +172,7 @@ function CreateCouponModal({ onClose, onDone }: { onClose: () => void; onDone: (
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>يطبق على</label>
+              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>يطبق على</label>
               <select value={form.applies_to} onChange={e => set('applies_to', e.target.value)}
                 style={inputStyle}>
                 <option value="all">الكل</option>
@@ -181,22 +181,22 @@ function CreateCouponModal({ onClose, onDone }: { onClose: () => void; onDone: (
               </select>
             </div>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>حد الاستخدام</label>
+              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>حد الاستخدام</label>
               <input type="number" value={form.max_uses} onChange={e => set('max_uses', e.target.value)} placeholder="∞"
                 style={inputStyle} />
             </div>
           </div>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>صالح حتى</label>
+            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>صالح حتى</label>
             <input type="date" value={form.valid_until} onChange={e => set('valid_until', e.target.value)}
               style={inputStyle} />
           </div>
         </div>
-        {err && <p style={{ fontSize: 12, color: '#dc2626', margin: '12px 0 0' }}>{err}</p>}
+        {err && <p style={{ fontSize: 12, color: 'var(--lv-danger)', margin: '12px 0 0' }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 20 }}>
-          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#F1F5F9', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
+          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid var(--lv-line)', background: 'var(--lv-bg)', cursor: 'pointer', fontSize: 13, color: 'var(--lv-muted)' }}>إلغاء</button>
           <button onClick={submit} disabled={loading}
-            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: 'var(--lv-accent)', color: 'var(--lv-panel)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             {loading ? '...' : 'إنشاء'}
           </button>
         </div>

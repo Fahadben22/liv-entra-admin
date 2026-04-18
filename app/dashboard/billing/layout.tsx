@@ -25,7 +25,7 @@ const BillingContext = createContext<BillingCtx>({
 export const useBilling = () => useContext(BillingContext);
 
 // ─── Navigation links ────────────────────────────────────────────────────────
-const NAV_ITEMS = [
+const BILLING_NAV = [
   { href: '/dashboard/billing',               label: 'نظرة عامة' },
   { href: '/dashboard/billing/invoices',       label: 'الفواتير' },
   { href: '/dashboard/billing/quotations',     label: 'عروض الأسعار' },
@@ -33,10 +33,7 @@ const NAV_ITEMS = [
   { href: '/dashboard/billing/subscriptions',  label: 'الاشتراكات' },
   { href: '/dashboard/billing/coupons',        label: 'أكواد الخصم' },
   { href: '/dashboard/billing/credit-notes',   label: 'إشعارات دائنة' },
-  { href: '/dashboard/template-center',        label: 'مركز القوالب' },
   { href: '/dashboard/billing/settings',       label: 'الإعدادات' },
-  { href: '/pricing',                          label: 'صفحة الأسعار' },
-  { href: '/subscribe',                        label: 'صفحة الاشتراك' },
 ];
 
 export default function BillingLayout({ children }: { children: React.ReactNode }) {
@@ -76,87 +73,108 @@ export default function BillingLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => { load(); }, [load]);
 
-  const safeCompanies = Array.isArray(companies) ? companies : [];
-  const safeInvoices  = Array.isArray(invoices)  ? invoices  : [];
-  const overdueCount  = safeInvoices.filter(i => i.status === 'overdue').length;
-  const trialCount    = safeCompanies.filter(c => lcOf(c) === 'trial').length;
+  const safeCompanies  = Array.isArray(companies) ? companies : [];
+  const safeInvoices   = Array.isArray(invoices)  ? invoices  : [];
+  const overdueCount   = safeInvoices.filter(i => i.status === 'overdue').length;
+  const trialCount     = safeCompanies.filter(c => lcOf(c) === 'trial').length;
   const suspendedCount = safeCompanies.filter(c => lcOf(c) === 'suspended').length;
-  const estimatedMrr  = safeCompanies.filter(c => c.plan && c.plan !== 'trial' && c.is_active)
+  const estimatedMrr   = safeCompanies
+    .filter(c => c.plan && c.plan !== 'trial' && c.is_active)
     .reduce((s, c) => s + (PLAN_PRICE[c.plan] || 0), 0);
 
   return (
     <BillingContext.Provider value={{ companies, stats, invoices, gateways, metrics, loading, reload: load, showToast }}>
-      <div style={{ background: '#fff', minHeight: '100vh' }}>
-        {/* Toast */}
-        {toast && (
-          <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)', background: '#fff', color: '#1E293B', padding: '10px 24px', borderRadius: 10, fontSize: 13, zIndex: 9999, boxShadow: '0 4px 16px rgba(0,0,0,.1)', border: '1px solid rgba(0,0,0,.08)' }}>
-            {toast}
-          </div>
-        )}
-
-        {/* Top bar */}
-        <div style={{ background: '#fff', padding: '12px 28px', display: 'flex', alignItems: 'center', gap: 16, borderBottom: '1px solid rgba(0,0,0,.06)', position: 'sticky', top: 0, zIndex: 50 }}>
-          <Link href="/dashboard" style={{ color: '#6b7280', textDecoration: 'none', fontSize: 13 }}>← الرئيسية</Link>
-          <span style={{ fontSize: 14, fontWeight: 600, color: '#1E293B' }}>الفوترة والاشتراكات</span>
+      {/* Toast */}
+      {toast && (
+        <div style={{
+          position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)',
+          background: 'var(--lv-panel)', color: 'var(--lv-fg)',
+          padding: '10px 24px', borderRadius: 10, fontSize: 13, zIndex: 9999,
+          boxShadow: 'var(--lv-shadow-panel)', border: '1px solid var(--lv-line-strong)',
+        }}>
+          {toast}
         </div>
+      )}
 
-        {/* Stats banner */}
-        <div style={{ background: '#F1F5F9', borderBottom: '1px solid rgba(0,0,0,.06)', padding: '18px 32px' }}>
-          <div style={{ display: 'flex', gap: 32, alignItems: 'center', maxWidth: 1400, margin: '0 auto', flexWrap: 'wrap' }}>
-            <div>
-              <p style={{ fontSize: 11, color: '#6b7280', margin: '0 0 4px', fontWeight: 500 }}>MRR المقدّر</p>
-              <p style={{ fontSize: 26, fontWeight: 600, color: '#1E293B', margin: 0 }}>
-                {fmt(stats?.mrr || estimatedMrr)} <span style={{ fontSize: 13, color: '#6b7280' }}>ر.س</span>
+      {/* ── Stats strip ── */}
+      <div style={{
+        background: 'var(--lv-panel)',
+        borderBottom: '1px solid var(--lv-line)',
+        padding: '14px 32px',
+        marginBottom: 0,
+      }}>
+        <div style={{ display: 'flex', gap: 28, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div>
+            <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 2px', fontWeight: 500 }}>MRR المقدّر</p>
+            <p style={{ fontSize: 22, fontWeight: 700, color: 'var(--lv-fg)', margin: 0, fontFamily: 'var(--lv-font-num)' }}>
+              <bdi dir="ltr">{fmt(stats?.mrr || estimatedMrr)}</bdi>
+              <span style={{ fontSize: 12, color: 'var(--lv-muted)', marginInlineStart: 4 }}>ر.س</span>
+            </p>
+          </div>
+          <div style={{ width: 1, height: 32, background: 'var(--lv-line)' }} />
+          {[
+            { l: 'ARR',          v: `${fmt(stats?.arr || (stats?.mrr || estimatedMrr) * 12)} ر.س`, c: 'var(--lv-success)' },
+            { l: 'فواتير معلقة', v: `${fmt(stats?.total_pending_sar || 0)} ر.س`,                  c: 'var(--lv-warn)' },
+            { l: 'متأخرة',       v: `${overdueCount} فاتورة`,                                      c: 'var(--lv-danger)' },
+            { l: 'في التجربة',   v: trialCount,                                                    c: 'var(--lv-fg)' },
+            { l: 'موقوفة',       v: suspendedCount,                                                c: 'var(--lv-danger)' },
+          ].map(k => (
+            <div key={k.l} style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: 16, fontWeight: 700, color: k.c as string, margin: 0, fontFamily: 'var(--lv-font-num)' }}>
+                <bdi dir="ltr">{k.v}</bdi>
               </p>
+              <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '2px 0 0', fontWeight: 500 }}>{k.l}</p>
             </div>
-            <div style={{ width: 1, height: 40, background: 'rgba(0,0,0,.06)' }} />
-            {[
-              { l: 'ARR',          v: `${fmt(stats?.arr || (stats?.mrr || estimatedMrr) * 12)} ر.س`, c: '#16a34a' },
-              { l: 'فواتير معلقة', v: `${fmt(stats?.total_pending_sar || 0)} ر.س`,                  c: '#d97706' },
-              { l: 'متأخرة',       v: `${overdueCount} فاتورة`,                                      c: '#dc2626' },
-              { l: 'في التجربة',   v: trialCount,                                                    c: '#1E293B' },
-              { l: 'موقوفة',       v: suspendedCount,                                                c: '#dc2626' },
-            ].map(k => (
-              <div key={k.l} style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: 18, fontWeight: 600, color: k.c as string, margin: 0 }}>{k.v}</p>
-                <p style={{ fontSize: 11, color: '#6b7280', margin: '3px 0 0', fontWeight: 500 }}>{k.l}</p>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
+      </div>
 
-        {/* Body: sidebar + content */}
-        <div style={{ display: 'flex', maxWidth: 1400, margin: '0 auto', padding: '0 16px', gap: 0 }}>
-          {/* Sidebar nav */}
-          <nav style={{ width: 200, minWidth: 200, padding: '20px 0', borderLeft: '1px solid rgba(0,0,0,.06)', background: '#F1F5F9' }}>
-            {NAV_ITEMS.map(item => {
-              const active = pathname === item.href || (item.href !== '/dashboard/billing' && pathname?.startsWith(item.href));
-              return (
-                <Link key={item.href} href={item.href}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 8,
-                    padding: '9px 16px', fontSize: 13, textDecoration: 'none',
-                    color: active ? '#2563EB' : '#6b7280',
-                    background: active ? 'rgba(124,92,252,.08)' : 'transparent',
-                    fontWeight: active ? 600 : 400,
-                    borderRadius: '0 7px 7px 0',
-                    marginBottom: 2,
-                    borderRight: active ? '2px solid #2563EB' : '2px solid transparent',
-                  }}>
-                  <span>{item.label}</span>
-                  {item.label === 'الفواتير' && overdueCount > 0 && (
-                    <span style={{ marginRight: 'auto', fontSize: 10, padding: '1px 6px', borderRadius: 20, background: 'rgba(239,68,68,.1)', color: '#dc2626', fontWeight: 600 }}>{overdueCount}</span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+      {/* ── Horizontal tab nav ── */}
+      <div style={{
+        background: 'var(--lv-panel)',
+        borderBottom: '1px solid var(--lv-line-strong)',
+        paddingInline: 32,
+        display: 'flex',
+        gap: 2,
+        overflowX: 'auto',
+      }}>
+        {BILLING_NAV.map(item => {
+          const active = pathname === item.href ||
+            (item.href !== '/dashboard/billing' && pathname?.startsWith(item.href));
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '12px 14px',
+                fontSize: 12.5,
+                fontWeight: active ? 600 : 400,
+                textDecoration: 'none',
+                color: active ? 'var(--lv-accent)' : 'var(--lv-muted)',
+                borderBottom: active ? '2px solid var(--lv-accent)' : '2px solid transparent',
+                whiteSpace: 'nowrap',
+                transition: 'color .15s',
+                position: 'relative',
+              }}
+            >
+              {item.label}
+              {item.label === 'الفواتير' && overdueCount > 0 && (
+                <span style={{
+                  fontSize: 10, padding: '1px 5px', borderRadius: 10,
+                  background: 'rgba(184,50,31,0.1)', color: 'var(--lv-danger)', fontWeight: 700,
+                }}>{overdueCount}</span>
+              )}
+            </Link>
+          );
+        })}
+      </div>
 
-          {/* Main content */}
-          <main style={{ flex: 1, padding: '24px 28px' }}>
-            {children}
-          </main>
-        </div>
+      {/* ── Page content ── */}
+      <div style={{ padding: '24px 32px' }}>
+        {children}
       </div>
     </BillingContext.Provider>
   );

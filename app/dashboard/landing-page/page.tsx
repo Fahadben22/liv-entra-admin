@@ -44,33 +44,33 @@ const EMPTY_PRICES: Record<string, CountryPrice> = Object.fromEntries(
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 const S = {
-  page:    { color: '#1E293B', fontFamily: 'system-ui, sans-serif' } as React.CSSProperties,
+  page:    { color: 'var(--lv-fg)', fontFamily: 'system-ui, sans-serif' } as React.CSSProperties,
   topbar:  { borderBottom: '1px solid rgba(0,0,0,.08)', padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' } as React.CSSProperties,
-  logo:    { color: '#1E293B', fontWeight: 600, fontSize: 18, letterSpacing: '-0.02em' as const },
+  logo:    { color: 'var(--lv-fg)', fontWeight: 600, fontSize: 18, letterSpacing: '-0.02em' as const },
   body:    { maxWidth: 1000, margin: '0 auto', padding: '32px 16px' },
-  card:    { background: '#fff', border: 'none', borderRadius: 14, padding: 24, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,.06)' },
-  sectionTitle: { fontSize: 13, fontWeight: 600 as const, color: '#1E293B', letterSpacing: '-0.02em' as const, marginBottom: 16, marginTop: 0 },
-  label:   { fontSize: 11, color: '#6b7280', fontWeight: 500 as const, marginBottom: 4, display: 'block' },
-  input:   { width: '100%', background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '10px 12px', color: '#1E293B', fontSize: 13, outline: 'none', boxSizing: 'border-box' as const },
+  card:    { background: 'var(--lv-panel)', border: 'none', borderRadius: 14, padding: 24, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,.06)' },
+  sectionTitle: { fontSize: 13, fontWeight: 600 as const, color: 'var(--lv-fg)', letterSpacing: '-0.02em' as const, marginBottom: 16, marginTop: 0 },
+  label:   { fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 as const, marginBottom: 4, display: 'block' },
+  input:   { width: '100%', background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', borderRadius: 10, padding: '10px 12px', color: 'var(--lv-fg)', fontSize: 13, outline: 'none', boxSizing: 'border-box' as const },
   row2:    { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  saveBtn: { background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 32px', fontWeight: 600, cursor: 'pointer', fontSize: 13 },
+  saveBtn: { background: 'var(--lv-accent)', color: '#fff', border: 'none', borderRadius: 10, padding: '12px 32px', fontWeight: 600, cursor: 'pointer', fontSize: 13 },
   saveRow: { display: 'flex', alignItems: 'center', gap: 16, marginTop: 24 },
   badge:   (ok: boolean) => ({ background: ok ? 'rgba(22,163,74,.1)' : 'rgba(220,38,38,.1)', color: ok ? '#16a34a' : '#dc2626', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600, border: ok ? '1px solid rgba(22,163,74,.2)' : '1px solid rgba(220,38,38,.2)' }),
-  addBtn:  { background: 'transparent', color: '#6b7280', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
+  addBtn:  { background: 'transparent', color: 'var(--lv-muted)', border: '1px solid var(--lv-line)', borderRadius: 10, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
   removeBtn: { background: 'rgba(220,38,38,.08)', color: '#dc2626', border: '1px solid rgba(220,38,38,.2)', borderRadius: 10, padding: '6px 10px', cursor: 'pointer', fontSize: 12 },
-  itemCard: { background: '#F1F5F9', border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: 16, marginBottom: 12 },
+  itemCard: { background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', borderRadius: 10, padding: 16, marginBottom: 12 },
   planCard: (highlighted: boolean) => ({
-    background: highlighted ? 'rgba(37,99,235,.03)' : '#F8FAFC',
-    border: `2px solid ${highlighted ? '#2563EB' : 'rgba(0,0,0,.06)'}`,
+    background: highlighted ? 'rgba(37,99,235,.03)' : 'var(--lv-bg)',
+    border: `2px solid ${highlighted ? 'var(--lv-accent)' : 'rgba(0,0,0,.06)'}`,
     borderRadius: 12, padding: 20, marginBottom: 16,
   }),
   countryGrid: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 },
-  countryCell: { background: '#fff', border: '1px solid rgba(0,0,0,.08)', borderRadius: 8, padding: '10px 12px' },
+  countryCell: { background: 'var(--lv-panel)', border: '1px solid var(--lv-line)', borderRadius: 8, padding: '10px 12px' },
 };
 
 // ─── PLAN TIER COLOR ──────────────────────────────────────────────────────────
 const TIER_COLORS: Record<string, string> = {
-  trial: '#22c55e', basic: '#6b7280', professional: '#2563EB', enterprise: '#f59e0b',
+  trial: '#22c55e', basic: 'var(--lv-muted)', professional: 'var(--lv-accent)', enterprise: '#f59e0b',
 };
 
 export default function LandingPageCMS() {
@@ -133,7 +133,7 @@ export default function LandingPageCMS() {
   if (!data) return (
     <div style={S.page}>
       <div style={S.topbar}><span style={S.logo}>LIVENTRA OS — CMS</span></div>
-      <div style={{ textAlign: 'center', marginTop: 80, color: '#6b7280' }}>جاري التحميل...</div>
+      <div style={{ textAlign: 'center', marginTop: 80, color: 'var(--lv-muted)' }}>جاري التحميل...</div>
     </div>
   );
 
@@ -152,7 +152,7 @@ export default function LandingPageCMS() {
         <span style={S.logo}>إدارة الصفحة الرئيسية — www.liv-entra.com</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={S.badge(data.is_published)}>{data.is_published ? 'منشور' : 'مسودة'}</span>
-          <span style={{ fontSize: 11, color: '#9ca3af' }}>
+          <span style={{ fontSize: 11, color: 'var(--lv-muted)' }}>
             آخر تحديث: {data.updated_at ? new Date(data.updated_at).toLocaleString('en-US') : '—'} بواسطة: {data.updated_by || '—'}
           </span>
         </div>
@@ -166,8 +166,8 @@ export default function LandingPageCMS() {
               padding: '12px 18px', border: 'none', cursor: 'pointer', fontSize: 13,
               fontWeight: tab === t.key ? 600 : 400,
               background: 'transparent',
-              color: tab === t.key ? '#1E293B' : '#9ca3af',
-              borderBottom: tab === t.key ? '2px solid #2563EB' : '2px solid transparent',
+              color: tab === t.key ? 'var(--lv-fg)' : 'var(--lv-muted)',
+              borderBottom: tab === t.key ? '2px solid var(--lv-accent)' : '2px solid transparent',
             }}>{t.label}</button>
           ))}
         </div>
@@ -222,7 +222,7 @@ export default function LandingPageCMS() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 8 }}>
               <input type="checkbox" id="pub" checked={data.is_published} onChange={e => set('is_published', e.target.checked)} style={{ width: 16, height: 16 }} />
-              <label htmlFor="pub" style={{ color: '#6b7280', fontSize: 13, cursor: 'pointer' }}>نشر الصفحة (مرئية على الموقع)</label>
+              <label htmlFor="pub" style={{ color: 'var(--lv-muted)', fontSize: 13, cursor: 'pointer' }}>نشر الصفحة (مرئية على الموقع)</label>
             </div>
           </div>
         )}
@@ -276,7 +276,7 @@ export default function LandingPageCMS() {
             {data.features.map((f, i) => (
               <div key={i} style={S.itemCard}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ color: '#6b7280', fontSize: 11, fontWeight: 500 }}>ميزة #{i + 1}</span>
+                  <span style={{ color: 'var(--lv-muted)', fontSize: 11, fontWeight: 500 }}>ميزة #{i + 1}</span>
                   <button style={S.removeBtn} onClick={() =>
                     setData(d => d ? { ...d, features: d.features.filter((_, j) => j !== i) } : d)
                   }>حذف</button>
@@ -326,22 +326,22 @@ export default function LandingPageCMS() {
             </div>
 
             {data.pricing_plans.map((p, i) => {
-              const tierColor = p.slug ? TIER_COLORS[p.slug] || '#2563EB' : '#2563EB';
+              const tierColor = p.slug ? TIER_COLORS[p.slug] || 'var(--lv-accent)' : 'var(--lv-accent)';
               return (
                 <div key={i} style={S.planCard(!!p.highlighted)}>
                   {/* Plan header */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       <span style={{ width: 10, height: 10, borderRadius: '50%', background: tierColor, display: 'inline-block' }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#1E293B' }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)' }}>
                         {p.name_ar || p.name_en || `خطة #${i + 1}`}
                       </span>
                       {p.highlighted && (
-                        <span style={{ background: 'rgba(37,99,235,.1)', color: '#2563EB', fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4 }}>مميزة</span>
+                        <span style={{ background: 'rgba(37,99,235,.1)', color: 'var(--lv-accent)', fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 4 }}>مميزة</span>
                       )}
                     </div>
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                      <label style={{ fontSize: 12, color: '#6b7280', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <label style={{ fontSize: 12, color: 'var(--lv-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                         <input type="checkbox" checked={!!p.highlighted} onChange={e => updatePlan(i, 'highlighted', e.target.checked)} />
                         تمييز
                       </label>
@@ -373,7 +373,7 @@ export default function LandingPageCMS() {
 
                   {/* Per-country prices */}
                   <div style={{ marginBottom: 16 }}>
-                    <label style={{ ...S.label, marginBottom: 10, fontSize: 12, color: '#1E293B', fontWeight: 600 }}>
+                    <label style={{ ...S.label, marginBottom: 10, fontSize: 12, color: 'var(--lv-fg)', fontWeight: 600 }}>
                       الأسعار حسب الدولة
                     </label>
                     <div style={S.countryGrid}>
@@ -381,10 +381,10 @@ export default function LandingPageCMS() {
                         const cp = (p.prices || {})[c.code] || { amount: 0, cur_ar: c.cur_ar, cur_en: c.cur_en };
                         return (
                           <div key={c.code} style={S.countryCell}>
-                            <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
                               <span style={{ fontSize: 9, fontWeight: 700, background: 'var(--lv-chip)', padding: '1px 4px', borderRadius: 3, color: 'var(--lv-muted)', fontFamily: 'var(--lv-font-mono)' }}>{c.code}</span>
                               <span>{c.label}</span>
-                              <span style={{ marginRight: 'auto', color: '#9ca3af', fontSize: 10 }}>{c.cur_en}</span>
+                              <span style={{ marginRight: 'auto', color: 'var(--lv-muted)', fontSize: 10 }}>{c.cur_en}</span>
                             </div>
                             <input
                               style={{ ...S.input, padding: '7px 10px', direction: 'ltr', fontSize: 13 }}
@@ -408,7 +408,7 @@ export default function LandingPageCMS() {
                         onChange={e => updatePlan(i, 'features_ar', e.target.value.split('\n'))}
                         placeholder={'إدارة العقود\nتتبع المدفوعات\n...'}
                       />
-                      <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 3 }}>{p.features_ar.filter(Boolean).length} ميزة</div>
+                      <div style={{ fontSize: 10, color: 'var(--lv-muted)', marginTop: 3 }}>{p.features_ar.filter(Boolean).length} ميزة</div>
                     </div>
                     <div>
                       <label style={S.label}>Features (EN) — one per line</label>
@@ -418,7 +418,7 @@ export default function LandingPageCMS() {
                         onChange={e => updatePlan(i, 'features_en', e.target.value.split('\n'))}
                         placeholder={'Contract Management\nPayments Tracking\n...'}
                       />
-                      <div style={{ fontSize: 10, color: '#9ca3af', marginTop: 3 }}>{p.features_en.filter(Boolean).length} features</div>
+                      <div style={{ fontSize: 10, color: 'var(--lv-muted)', marginTop: 3 }}>{p.features_en.filter(Boolean).length} features</div>
                     </div>
                   </div>
                 </div>
@@ -435,15 +435,15 @@ export default function LandingPageCMS() {
               <div>
                 <label style={S.label}>رقم واتساب (بدون + — مثال: 966501234567)</label>
                 <input style={{ ...S.input, direction: 'ltr' }} value={data.contact_whatsapp} onChange={e => set('contact_whatsapp', e.target.value)} placeholder="966501234567" />
-                <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 4 }}>هذا الرقم يُستخدم في زر واتساب الطائر على الموقع</div>
+                <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginTop: 4 }}>هذا الرقم يُستخدم في زر واتساب الطائر على الموقع</div>
               </div>
               <div>
                 <label style={S.label}>البريد الإلكتروني</label>
                 <input style={{ ...S.input, direction: 'ltr' }} value={data.contact_email} onChange={e => set('contact_email', e.target.value)} />
               </div>
             </div>
-            <div style={{ background: '#F1F5F9', borderRadius: 8, padding: 16, border: '1px solid rgba(0,0,0,.06)' }}>
-              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 8, fontWeight: 500 }}>معاينة زر واتساب:</div>
+            <div style={{ background: 'var(--lv-bg)', borderRadius: 8, padding: 16, border: '1px solid var(--lv-line)' }}>
+              <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginBottom: 8, fontWeight: 500 }}>معاينة زر واتساب:</div>
               <a
                 href={`https://wa.me/${data.contact_whatsapp}`}
                 target="_blank"
@@ -467,7 +467,7 @@ export default function LandingPageCMS() {
             </span>
           )}
           <a href="https://www.liv-entra.com" target="_blank" rel="noreferrer"
-            style={{ fontSize: 13, color: '#2563EB', textDecoration: 'underline', marginRight: 'auto' }}>
+            style={{ fontSize: 13, color: 'var(--lv-accent)', textDecoration: 'underline', marginRight: 'auto' }}>
             عرض الموقع ↗
           </a>
         </div>

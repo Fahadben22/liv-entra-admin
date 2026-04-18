@@ -84,15 +84,15 @@ export default function PlansPage() {
     }));
   }
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 80, color: '#6b7280' }}>جاري التحميل...</div>;
+  if (loading) return <div style={{ textAlign: 'center', padding: 80, color: 'var(--lv-muted)' }}>جاري التحميل...</div>;
 
   const allFeatureKeys = Object.keys(registry);
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, color: '#1E293B' }}>إدارة الخطط</h2>
-        <button onClick={openCreate} style={{ padding: '8px 18px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--lv-fg)' }}>إدارة الخطط</h2>
+        <button onClick={openCreate} style={{ padding: '8px 18px', background: 'var(--lv-accent)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
           + خطة جديدة
         </button>
       </div>
@@ -102,43 +102,43 @@ export default function PlansPage() {
         {plans.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map(plan => {
           const tc = TIER_COLORS[plan.name] || TIER_COLORS.basic;
           return (
-            <div key={plan.id} className="card" style={{ background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)', borderRadius: 14, padding: 20, position: 'relative' }}>
+            <div key={plan.id} className="card" style={{ background: 'var(--lv-panel)', boxShadow: 'var(--lv-shadow-sm)', borderRadius: 14, padding: 20, position: 'relative' }}>
               {!plan.is_active && (
-                <div style={{ position: 'absolute', top: 10, left: 10, fontSize: 9, padding: '2px 8px', borderRadius: 7, background: 'rgba(239,68,68,.1)', color: '#dc2626', fontWeight: 600 }}>غير نشط</div>
+                <div style={{ position: 'absolute', top: 10, left: 10, fontSize: 9, padding: '2px 8px', borderRadius: 7, background: 'rgba(239,68,68,.1)', color: 'var(--lv-danger)', fontWeight: 600 }}>غير نشط</div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: tc.color }} />
                 <span style={{ fontSize: 14, fontWeight: 600, color: tc.color }}>{plan.name_ar || TIER_AR[plan.name] || plan.name}</span>
-                <span style={{ fontSize: 11, color: '#9ca3af' }}>({plan.name})</span>
+                <span style={{ fontSize: 11, color: 'var(--lv-muted)' }}>({plan.name})</span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
-                <div style={{ background: '#F1F5F9', borderRadius: 7, padding: '8px 10px', border: '1px solid rgba(0,0,0,.06)' }}>
-                  <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>شهري</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#1E293B' }}>{Number(plan.price_monthly || 0).toLocaleString()} ر.س</div>
+                <div style={{ background: 'var(--lv-bg)', borderRadius: 7, padding: '8px 10px', border: '1px solid var(--lv-line)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>شهري</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--lv-fg)' }}>{Number(plan.price_monthly || 0).toLocaleString()} ر.س</div>
                 </div>
-                <div style={{ background: '#F1F5F9', borderRadius: 7, padding: '8px 10px', border: '1px solid rgba(0,0,0,.06)' }}>
-                  <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>سنوي</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#1E293B' }}>{Number(plan.price_yearly || 0).toLocaleString()} ر.س</div>
+                <div style={{ background: 'var(--lv-bg)', borderRadius: 7, padding: '8px 10px', border: '1px solid var(--lv-line)' }}>
+                  <div style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>سنوي</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--lv-fg)' }}>{Number(plan.price_yearly || 0).toLocaleString()} ر.س</div>
                 </div>
               </div>
 
-              <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 12 }}>
+              <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginBottom: 12 }}>
                 <div>الوحدات: {plan.max_units || '∞'} · العقارات: {plan.max_properties || '∞'}</div>
                 <div>الموظفين: {plan.max_users || '∞'} · العقود: {plan.max_contracts || '∞'}</div>
                 <div>العملاء: {plan.max_leads ?? '∞'} · AI/شهر: {plan.max_ai_queries ?? '∞'}</div>
               </div>
 
-              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 8, fontWeight: 500 }}>الميزات ({(plan.features || []).length}):</div>
+              <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginBottom: 8, fontWeight: 500 }}>الميزات ({(plan.features || []).length}):</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                 {(plan.features || []).map((f: string) => (
-                  <span key={f} style={{ fontSize: 9, padding: '2px 7px', borderRadius: 7, background: '#F1F5F9', color: '#6b7280', border: '1px solid rgba(0,0,0,.06)' }}>
+                  <span key={f} style={{ fontSize: 9, padding: '2px 7px', borderRadius: 7, background: 'var(--lv-bg)', color: 'var(--lv-muted)', border: '1px solid var(--lv-line)' }}>
                     {registry[f]?.name_ar || f}
                   </span>
                 ))}
               </div>
 
-              <button onClick={() => openEdit(plan)} style={{ marginTop: 14, width: '100%', padding: '7px', background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, color: '#6b7280', cursor: 'pointer', fontWeight: 600 }}>
+              <button onClick={() => openEdit(plan)} style={{ marginTop: 14, width: '100%', padding: '7px', background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', borderRadius: 10, fontSize: 12, color: 'var(--lv-muted)', cursor: 'pointer', fontWeight: 600 }}>
                 تعديل
               </button>
             </div>
@@ -150,35 +150,35 @@ export default function PlansPage() {
       {modal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           onClick={e => { if (e.target === e.currentTarget) setModal(false); }}>
-          <div style={{ background: '#fff', borderRadius: 16, padding: 28, width: '100%', maxWidth: 520, maxHeight: '85vh', overflow: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,.12)' }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: '#1E293B' }}>{editing ? 'تعديل الخطة' : 'خطة جديدة'}</h3>
+          <div style={{ background: 'var(--lv-panel)', borderRadius: 16, padding: 28, width: '100%', maxWidth: 520, maxHeight: '85vh', overflow: 'auto', boxShadow: 'var(--lv-shadow-panel)' }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: 'var(--lv-fg)' }}>{editing ? 'تعديل الخطة' : 'خطة جديدة'}</h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
               <div>
-                <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (EN)</label>
+                <label style={{ fontSize: 11, color: 'var(--lv-muted)', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (EN)</label>
                 <input value={form.name} onChange={e => setForm((p: any) => ({ ...p, name: e.target.value }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, background: '#F1F5F9', color: '#1E293B' }} placeholder="basic" />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid var(--lv-line)', borderRadius: 10, fontSize: 13, background: 'var(--lv-bg)', color: 'var(--lv-fg)' }} placeholder="basic" />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (AR)</label>
+                <label style={{ fontSize: 11, color: 'var(--lv-muted)', display: 'block', marginBottom: 4, fontWeight: 500 }}>الاسم (AR)</label>
                 <input value={form.name_ar} onChange={e => setForm((p: any) => ({ ...p, name_ar: e.target.value }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, background: '#F1F5F9', color: '#1E293B' }} placeholder="أساسي" />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid var(--lv-line)', borderRadius: 10, fontSize: 13, background: 'var(--lv-bg)', color: 'var(--lv-fg)' }} placeholder="أساسي" />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر الشهري (ر.س)</label>
+                <label style={{ fontSize: 11, color: 'var(--lv-muted)', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر الشهري (ر.س)</label>
                 <input type="number" value={form.price_monthly} onChange={e => setForm((p: any) => ({ ...p, price_monthly: Number(e.target.value) }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, background: '#F1F5F9', color: '#1E293B' }} />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid var(--lv-line)', borderRadius: 10, fontSize: 13, background: 'var(--lv-bg)', color: 'var(--lv-fg)' }} />
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#6b7280', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر السنوي (ر.س)</label>
+                <label style={{ fontSize: 11, color: 'var(--lv-muted)', display: 'block', marginBottom: 4, fontWeight: 500 }}>السعر السنوي (ر.س)</label>
                 <input type="number" value={form.price_yearly} onChange={e => setForm((p: any) => ({ ...p, price_yearly: Number(e.target.value) }))}
-                  style={{ width: '100%', padding: '8px 10px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, background: '#F1F5F9', color: '#1E293B' }} />
+                  style={{ width: '100%', padding: '8px 10px', border: '1px solid var(--lv-line)', borderRadius: 10, fontSize: 13, background: 'var(--lv-bg)', color: 'var(--lv-fg)' }} />
               </div>
             </div>
 
             {/* Resource Limits Grid */}
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#1E293B', display: 'block', marginBottom: 8 }}>حدود الموارد</label>
+              <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--lv-fg)', display: 'block', marginBottom: 8 }}>حدود الموارد</label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
                 {[
                   { key: 'max_units', label: 'الوحدات' },
@@ -187,9 +187,9 @@ export default function PlansPage() {
                   { key: 'max_contracts', label: 'العقود' },
                 ].map(f => (
                   <div key={f.key}>
-                    <label style={{ fontSize: 10, color: '#6b7280', display: 'block', marginBottom: 3, fontWeight: 500 }}>{f.label}</label>
+                    <label style={{ fontSize: 10, color: 'var(--lv-muted)', display: 'block', marginBottom: 3, fontWeight: 500 }}>{f.label}</label>
                     <input type="number" value={form[f.key]} onChange={e => setForm((p: any) => ({ ...p, [f.key]: Number(e.target.value) }))}
-                      style={{ width: '100%', padding: '6px 8px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, background: '#F1F5F9', color: '#1E293B' }} />
+                      style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--lv-line)', borderRadius: 10, fontSize: 12, background: 'var(--lv-bg)', color: 'var(--lv-fg)' }} />
                   </div>
                 ))}
               </div>
@@ -200,16 +200,16 @@ export default function PlansPage() {
                   { key: 'max_inspections', label: 'المعاينات' },
                 ].map(f => (
                   <div key={f.key}>
-                    <label style={{ fontSize: 10, color: '#6b7280', display: 'block', marginBottom: 3, fontWeight: 500 }}>{f.label}</label>
+                    <label style={{ fontSize: 10, color: 'var(--lv-muted)', display: 'block', marginBottom: 3, fontWeight: 500 }}>{f.label}</label>
                     <input type="number" value={form[f.key] ?? 0} onChange={e => setForm((p: any) => ({ ...p, [f.key]: Number(e.target.value) }))}
-                      style={{ width: '100%', padding: '6px 8px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, background: '#F1F5F9', color: '#1E293B' }} />
+                      style={{ width: '100%', padding: '6px 8px', border: '1px solid var(--lv-line)', borderRadius: 10, fontSize: 12, background: 'var(--lv-bg)', color: 'var(--lv-fg)' }} />
                   </div>
                 ))}
               </div>
             </div>
 
             <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', display: 'block', marginBottom: 8 }}>الميزات المضمنة ({form.features.length} من {allFeatureKeys.length})</label>
+              <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)', display: 'block', marginBottom: 8 }}>الميزات المضمنة ({form.features.length} من {allFeatureKeys.length})</label>
               {/* Group features by category */}
               {(['core','portals','ai','integrations','enterprise'] as const).map(cat => {
                 const catKeys = allFeatureKeys.filter(k => (registry[k]?.category || 'core') === cat);
@@ -217,14 +217,14 @@ export default function PlansPage() {
                 const CAT_AR: Record<string, string> = { core:'أساسية', portals:'البوابات', ai:'AI والتحليل', integrations:'التكاملات', enterprise:'المؤسسية' };
                 return (
                   <div key={cat} style={{ marginBottom: 10 }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', letterSpacing: '.04em', marginBottom: 5, textTransform: 'uppercase' }}>{CAT_AR[cat]}</p>
+                    <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--lv-muted)', letterSpacing: '.04em', marginBottom: 5, textTransform: 'uppercase' }}>{CAT_AR[cat]}</p>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
                       {catKeys.map(key => (
-                        <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', borderRadius: 7, background: form.features.includes(key) ? 'rgba(37,99,235,.06)' : '#fafafa', border: `1px solid ${form.features.includes(key) ? '#2563EB' : 'rgba(0,0,0,.06)'}`, cursor: 'pointer', fontSize: 11 }}>
+                        <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 8px', borderRadius: 7, background: form.features.includes(key) ? 'rgba(37,99,235,.06)' : 'var(--lv-bg)', border: `1px solid ${form.features.includes(key) ? 'var(--lv-accent)' : 'var(--lv-line)'}`, cursor: 'pointer', fontSize: 11 }}>
                           <input type="checkbox" checked={form.features.includes(key)} onChange={() => toggleFeature(key)} />
-                          <span style={{ color: '#1E293B', flex: 1 }}>{registry[key]?.name_ar || key}</span>
+                          <span style={{ color: 'var(--lv-fg)', flex: 1 }}>{registry[key]?.name_ar || key}</span>
                           {registry[key]?.tier_min && (
-                            <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 5, background: '#f1f5f9', color: '#94a3b8', whiteSpace: 'nowrap' }}>
+                            <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 5, background: 'var(--lv-bg)', color: 'var(--lv-muted)', whiteSpace: 'nowrap' }}>
                               {registry[key].tier_min}
                             </span>
                           )}
@@ -237,20 +237,20 @@ export default function PlansPage() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#1E293B' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--lv-fg)' }}>
                 <input type="checkbox" checked={form.is_active} onChange={e => setForm((p: any) => ({ ...p, is_active: e.target.checked }))} />
                 نشطة
               </label>
               <div>
-                <label style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>ترتيب:</label>
+                <label style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>ترتيب:</label>
                 <input type="number" value={form.sort_order} onChange={e => setForm((p: any) => ({ ...p, sort_order: Number(e.target.value) }))}
-                  style={{ width: 50, padding: '4px 6px', border: '1px solid rgba(0,0,0,.08)', borderRadius: 7, fontSize: 12, marginRight: 4, background: '#F1F5F9', color: '#1E293B' }} />
+                  style={{ width: 50, padding: '4px 6px', border: '1px solid var(--lv-line)', borderRadius: 7, fontSize: 12, marginRight: 4, background: 'var(--lv-bg)', color: 'var(--lv-fg)' }} />
               </div>
             </div>
 
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={() => setModal(false)} style={{ flex: 1, padding: '10px', background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 13, cursor: 'pointer', color: '#6b7280' }}>إلغاء</button>
-              <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: '10px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+              <button onClick={() => setModal(false)} style={{ flex: 1, padding: '10px', background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', borderRadius: 10, fontSize: 13, cursor: 'pointer', color: 'var(--lv-muted)' }}>إلغاء</button>
+              <button onClick={handleSave} disabled={saving} style={{ flex: 1, padding: '10px', background: 'var(--lv-accent)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
                 {saving ? 'جاري الحفظ...' : editing ? 'حفظ التعديل' : 'إنشاء الخطة'}
               </button>
             </div>

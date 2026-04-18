@@ -7,10 +7,10 @@ export const CITIES = [
 ];
 
 export const STAGES = [
-  { key: 'trial',     label: 'تجريبي',  color: '#f59e0b', bg: '#fefce8', border: '#fde68a', icon: '⏳' },
-  { key: 'active',    label: 'نشط',      color: '#22c55e', bg: '#f0fdf4', border: '#bbf7d0', icon: '✅' },
-  { key: 'overdue',   label: 'متأخر',    color: '#f97316', bg: '#fff7ed', border: '#fed7aa', icon: '⚠️' },
-  { key: 'suspended', label: 'موقوف',    color: '#ef4444', bg: '#fef2f2', border: '#fecaca', icon: '🔴' },
+  { key: 'trial',     label: 'تجريبي',  color: '#f59e0b', bg: '#fefce8', border: '#fde68a', icon: 'trial' },
+  { key: 'active',    label: 'نشط',      color: '#22c55e', bg: '#f0fdf4', border: '#bbf7d0', icon: 'active' },
+  { key: 'overdue',   label: 'متأخر',    color: '#f97316', bg: '#fff7ed', border: '#fed7aa', icon: 'overdue' },
+  { key: 'suspended', label: 'موقوف',    color: '#ef4444', bg: '#fef2f2', border: '#fecaca', icon: 'suspended' },
 ] as const;
 
 export const LC_MAP: Record<string, { bg: string; color: string; dot: string; label: string }> = {

@@ -167,7 +167,7 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
                   {/* Icon */}
                   <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.status === 'waiting' ? '#f1f5f9' : s.status === 'running' ? STEP_COLORS[i] + '20' : STEP_COLORS[i] + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14, transition: 'all .2s' }}>
                     {s.status === 'running' ? (
-                      <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite', fontSize: 14 }}>⟳</span>
+                      <div style={{ animation: 'spin 1s linear infinite', display: 'flex' }}><Icon name="refresh" size={14} color={STEP_COLORS[i]} /></div>
                     ) : s.status === 'done' ? (
                       <span style={{ color: STEP_COLORS[i], fontSize: 12, fontWeight: 700 }}>تم</span>
                     ) : (
@@ -490,7 +490,7 @@ export default function AgentsWorkspace() {
         <AgentChat
           agentType={activeAgent}
           agentName={info.name}
-          agentIcon={info.icon}
+          agentIcon={info.icon as IconName}
           accentColor={info.color}
           quickActions={info.quickActions || []}
           messages={conversations[activeAgent] || []}

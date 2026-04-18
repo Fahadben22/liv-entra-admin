@@ -21,23 +21,25 @@ function MarkPaidModal({ invoice, onClose, onDone }: { invoice: any; onClose: ()
     setLoading(false);
   };
 
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 13, boxSizing: 'border-box', background: 'var(--lv-bg)', color: 'var(--lv-fg)' };
+
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: '28px 32px', width: 380, boxShadow: '0 20px 60px rgba(0,0,0,.12)' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px', color: '#1E293B' }}>تسجيل دفع</h3>
-        <p style={{ fontSize: 12, color: '#6b7280', margin: '0 0 20px' }}>{invoice.invoice_number} — {fmt(invoice.total_sar)} ر.س</p>
-        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>مرجع الدفع *</label>
+      <div style={{ background: 'var(--lv-panel)', borderRadius: 16, padding: '28px 32px', width: 380, boxShadow: 'var(--lv-shadow-panel)', border: '1px solid var(--lv-line-strong)' }} onClick={e => e.stopPropagation()}>
+        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 4px', color: 'var(--lv-fg)' }}>تسجيل دفع</h3>
+        <p style={{ fontSize: 12, color: 'var(--lv-muted)', margin: '0 0 20px' }}>{invoice.invoice_number} — {fmt(invoice.total_sar)} ر.س</p>
+        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>مرجع الدفع *</label>
         <input value={ref} onChange={e => setRef(e.target.value)} placeholder="رقم الحوالة / رقم المعاملة"
-          style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', marginBottom: 12, background: '#F1F5F9', color: '#1E293B' }} />
-        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>ملاحظات (اختياري)</label>
+          style={{ ...inputStyle, marginBottom: 12 }} />
+        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>ملاحظات (اختياري)</label>
         <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2}
-          style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', marginBottom: 16, resize: 'vertical', background: '#F1F5F9', color: '#1E293B' }} />
-        {err && <p style={{ fontSize: 12, color: '#dc2626', marginBottom: 12 }}>{err}</p>}
+          style={{ ...inputStyle, marginBottom: 16, resize: 'vertical' }} />
+        {err && <p style={{ fontSize: 12, color: 'var(--lv-danger)', marginBottom: 12 }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#F1F5F9', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
+          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid var(--lv-line)', background: 'var(--lv-bg)', cursor: 'pointer', fontSize: 13, color: 'var(--lv-muted)' }}>إلغاء</button>
           <button onClick={submit} disabled={loading}
-            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: 'var(--lv-accent)', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             {loading ? '...' : 'تأكيد الدفع'}
           </button>
         </div>
@@ -72,30 +74,30 @@ function CreateInvoiceModal({ companies, onClose, onDone }: { companies: any[]; 
     setLoading(false);
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 13, boxSizing: 'border-box', background: 'var(--lv-bg)', color: 'var(--lv-fg)' };
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: '28px 32px', width: 420, boxShadow: '0 20px 60px rgba(0,0,0,.12)' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1E293B' }}>إنشاء فاتورة</h3>
-        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>الشركة *</label>
+      <div style={{ background: 'var(--lv-panel)', borderRadius: 16, padding: '28px 32px', width: 420, boxShadow: 'var(--lv-shadow-panel)', border: '1px solid var(--lv-line-strong)' }} onClick={e => e.stopPropagation()}>
+        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: 'var(--lv-fg)' }}>إنشاء فاتورة</h3>
+        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>الشركة *</label>
         <select value={form.company_id} onChange={e => set('company_id', e.target.value)}
           style={{ ...inputStyle, marginBottom: 12 }}>
           <option value="">اختر شركة...</option>
           {(Array.isArray(companies) ? companies : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
         </select>
-        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>الوصف</label>
+        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>الوصف</label>
         <input value={form.description} onChange={e => set('description', e.target.value)} placeholder="اشتراك شهري — الخطة الاحترافية"
           style={{ ...inputStyle, marginBottom: 12 }} />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>المبلغ (ر.س) *</label>
+            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>المبلغ (ر.س) *</label>
             <input type="number" value={form.amount_sar} onChange={e => set('amount_sar', e.target.value)} placeholder="699"
               style={inputStyle} />
           </div>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>أيام السداد</label>
+            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>أيام السداد</label>
             <select value={form.payment_terms} onChange={e => set('payment_terms', e.target.value)}
               style={inputStyle}>
               {['7','10','15','30','45'].map(d => <option key={d} value={d}>{d} يوم</option>)}
@@ -104,40 +106,40 @@ function CreateInvoiceModal({ companies, onClose, onDone }: { companies: any[]; 
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>بداية الفترة</label>
+            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>بداية الفترة</label>
             <input type="date" value={form.period_start} onChange={e => set('period_start', e.target.value)}
               style={inputStyle} />
           </div>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>نهاية الفترة</label>
+            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>نهاية الفترة</label>
             <input type="date" value={form.period_end} onChange={e => set('period_end', e.target.value)}
               style={inputStyle} />
           </div>
         </div>
         {form.amount_sar && Number(form.amount_sar) > 0 && (
-          <div style={{ background: '#F1F5F9', border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
+          <div style={{ background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', borderRadius: 10, padding: '12px 16px', marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
-              <span style={{ color: '#6b7280' }}>المجموع الفرعي</span>
-              <span style={{ fontWeight: 600, color: '#1E293B' }}>{Number(form.amount_sar).toLocaleString()} ر.س</span>
+              <span style={{ color: 'var(--lv-muted)' }}>المجموع الفرعي</span>
+              <span style={{ fontWeight: 600, color: 'var(--lv-fg)' }}>{Number(form.amount_sar).toLocaleString()} ر.س</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 6 }}>
-              <span style={{ color: '#6b7280' }}>ضريبة القيمة المضافة 15%</span>
-              <span style={{ fontWeight: 600, color: '#1E293B' }}>{(Number(form.amount_sar) * 0.15).toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
+              <span style={{ color: 'var(--lv-muted)' }}>ضريبة القيمة المضافة 15%</span>
+              <span style={{ fontWeight: 600, color: 'var(--lv-fg)' }}>{(Number(form.amount_sar) * 0.15).toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, borderTop: '1px solid rgba(0,0,0,.06)', paddingTop: 6 }}>
-              <span style={{ color: '#1E293B' }}>الإجمالي شامل الضريبة</span>
-              <span style={{ color: '#16a34a' }}>{(Number(form.amount_sar) * 1.15).toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, fontWeight: 600, borderTop: '1px solid var(--lv-line)', paddingTop: 6 }}>
+              <span style={{ color: 'var(--lv-fg)' }}>الإجمالي شامل الضريبة</span>
+              <span style={{ color: 'var(--lv-success)' }}>{(Number(form.amount_sar) * 1.15).toLocaleString(undefined, { minimumFractionDigits: 2 })} ر.س</span>
             </div>
           </div>
         )}
-        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>ملاحظات</label>
+        <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>ملاحظات</label>
         <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2}
           style={{ ...inputStyle, marginBottom: 16, resize: 'vertical' }} />
-        {err && <p style={{ fontSize: 12, color: '#dc2626', marginBottom: 12 }}>{err}</p>}
+        {err && <p style={{ fontSize: 12, color: 'var(--lv-danger)', marginBottom: 12 }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#F1F5F9', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
+          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid var(--lv-line)', background: 'var(--lv-bg)', cursor: 'pointer', fontSize: 13, color: 'var(--lv-muted)' }}>إلغاء</button>
           <button onClick={submit} disabled={loading}
-            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: 'var(--lv-accent)', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             {loading ? '...' : 'إنشاء الفاتورة'}
           </button>
         </div>
@@ -160,38 +162,38 @@ function CompanyDrawer({ companyId, onClose }: { companyId: string; onClose: () 
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.2)', zIndex: 200, display: 'flex', justifyContent: 'flex-end' }} onClick={onClose}>
-      <div style={{ width: 480, background: '#fff', height: '100%', overflowY: 'auto', padding: '28px', borderLeft: '1px solid rgba(0,0,0,.08)', boxShadow: '-4px 0 20px rgba(0,0,0,.08)' }} onClick={e => e.stopPropagation()}>
+      <div style={{ width: 480, background: 'var(--lv-panel)', height: '100%', overflowY: 'auto', padding: '28px', borderInlineStart: '1px solid var(--lv-line)', boxShadow: 'var(--lv-shadow-panel)' }} onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: '#1E293B' }}>سجل الفوترة — {data?.company?.name || '...'}</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: '#6b7280' }}>×</button>
+          <h2 style={{ fontSize: 13, fontWeight: 600, margin: 0, color: 'var(--lv-fg)' }}>سجل الفوترة — {data?.company?.name || '...'}</h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20, color: 'var(--lv-muted)' }}>×</button>
         </div>
         {loading ? (
-          <p style={{ color: '#6b7280', textAlign: 'center', paddingTop: 60 }}>جاري التحميل...</p>
+          <p style={{ color: 'var(--lv-muted)', textAlign: 'center', paddingTop: 60 }}>جاري التحميل...</p>
         ) : data ? (
           <>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
-              <div className="card" style={{ background: '#F1F5F9', borderRadius: 14, padding: '14px 16px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-                <p style={{ fontSize: 18, fontWeight: 600, color: '#16a34a', margin: 0 }}>{fmt(data.total_paid || 0)}</p>
-                <p style={{ fontSize: 10, color: '#9ca3af', margin: '4px 0 0' }}>إجمالي المدفوع (ر.س)</p>
+              <div className="card" style={{ borderRadius: 14, padding: '14px 16px', textAlign: 'center' }}>
+                <p style={{ fontSize: 18, fontWeight: 600, color: 'var(--lv-success)', margin: 0 }}>{fmt(data.total_paid || 0)}</p>
+                <p style={{ fontSize: 10, color: 'var(--lv-muted)', margin: '4px 0 0' }}>إجمالي المدفوع (ر.س)</p>
               </div>
-              <div className="card" style={{ background: '#F1F5F9', borderRadius: 14, padding: '14px 16px', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-                <p style={{ fontSize: 18, fontWeight: 600, color: '#c2410c', margin: 0 }}>{fmt(data.total_outstanding || 0)}</p>
-                <p style={{ fontSize: 10, color: '#9ca3af', margin: '4px 0 0' }}>مبالغ معلقة (ر.س)</p>
+              <div className="card" style={{ borderRadius: 14, padding: '14px 16px', textAlign: 'center' }}>
+                <p style={{ fontSize: 18, fontWeight: 600, color: 'var(--lv-warn)', margin: 0 }}>{fmt(data.total_outstanding || 0)}</p>
+                <p style={{ fontSize: 10, color: 'var(--lv-muted)', margin: '4px 0 0' }}>مبالغ معلقة (ر.س)</p>
               </div>
             </div>
-            <h3 style={{ fontSize: 11, fontWeight: 500, margin: '0 0 12px', color: '#6b7280' }}>الفواتير ({data.invoices?.length || 0})</h3>
+            <h3 style={{ fontSize: 11, fontWeight: 500, margin: '0 0 12px', color: 'var(--lv-muted)' }}>الفواتير ({data.invoices?.length || 0})</h3>
             {(data.invoices || []).map((inv: any) => {
               const sc = INV_STATUS[inv.status] || INV_STATUS.draft;
               return (
-                <div key={inv.id} style={{ border: '1px solid rgba(0,0,0,.06)', borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
+                <div key={inv.id} style={{ border: '1px solid var(--lv-line)', borderRadius: 10, padding: '14px 16px', marginBottom: 10 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#1E293B' }}>{inv.invoice_number}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--lv-fg)' }}>{inv.invoice_number}</span>
                     <span style={{ fontSize: 11, display: 'flex', alignItems: 'center', gap: 5, color: sc.color, fontWeight: 500 }}>
                       <span style={{ width: 6, height: 6, borderRadius: '50%', background: sc.color, display: 'inline-block' }} />
                       {sc.label}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#9ca3af' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--lv-muted)' }}>
                     <span>{fmt(inv.total_sar)} ر.س</span>
                     <span>استحقاق: {fmtDate(inv.due_date)}</span>
                   </div>
@@ -200,7 +202,7 @@ function CompanyDrawer({ companyId, onClose }: { companyId: string; onClose: () 
             })}
           </>
         ) : (
-          <p style={{ color: '#dc2626', textAlign: 'center', paddingTop: 60 }}>فشل تحميل البيانات</p>
+          <p style={{ color: 'var(--lv-danger)', textAlign: 'center', paddingTop: 60 }}>فشل تحميل البيانات</p>
         )}
       </div>
     </div>
@@ -217,7 +219,7 @@ export default function InvoicesPage() {
   const [showCreate, setShowCreate]   = useState(false);
   const [drawerCompId, setDrawerCompId] = useState<string | null>(null);
 
-  if (loading) return <div style={{ textAlign: 'center', padding: '80px 0', color: '#6b7280' }}>جاري التحميل...</div>;
+  if (loading) return <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--lv-muted)' }}>جاري التحميل...</div>;
 
   const safeInvoices = Array.isArray(invoices) ? invoices : [];
 
@@ -264,7 +266,7 @@ export default function InvoicesPage() {
     setActioning(null);
   };
 
-  const ghostBtn: React.CSSProperties = { fontSize: 12, padding: '8px 14px', borderRadius: 10, background: '#fafafa', border: '1.5px solid rgba(0,0,0,.08)', cursor: 'pointer', whiteSpace: 'nowrap', minHeight: 36, fontWeight: 500, transition: 'all .12s' };
+  const ghostBtn: React.CSSProperties = { fontSize: 12, padding: '8px 14px', borderRadius: 10, background: 'var(--lv-chip)', border: '1.5px solid var(--lv-line)', cursor: 'pointer', whiteSpace: 'nowrap', minHeight: 36, fontWeight: 500, transition: 'all .12s', color: 'var(--lv-muted)' };
 
   return (
     <>
@@ -279,9 +281,9 @@ export default function InvoicesPage() {
       {drawerCompId && <CompanyDrawer companyId={drawerCompId} onClose={() => setDrawerCompId(null)} />}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1E293B' }}>الفواتير</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: 'var(--lv-fg)' }}>الفواتير</h2>
         <button onClick={() => setShowCreate(true)}
-          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: 'var(--lv-accent)', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           + فاتورة جديدة
         </button>
       </div>
@@ -289,15 +291,15 @@ export default function InvoicesPage() {
       {/* Filters */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالشركة أو رقم الفاتورة..."
-          style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, minWidth: 220, background: '#F1F5F9', color: '#1E293B' }} />
+          style={{ padding: '8px 14px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 13, minWidth: 220, background: 'var(--lv-bg)', color: 'var(--lv-fg)' }} />
         <div style={{ display: 'flex', gap: 6 }}>
           {(['all', 'issued', 'overdue', 'paid', 'waived', 'void'] as const).map(s => (
             <button key={s} onClick={() => setStatusFilter(s)}
               style={{
                 padding: '6px 12px', borderRadius: 7,
-                border: '1px solid rgba(0,0,0,.08)',
-                background: statusFilter === s ? '#2563EB' : '#F1F5F9',
-                color: statusFilter === s ? '#fff' : '#6b7280',
+                border: '1px solid var(--lv-line)',
+                background: statusFilter === s ? 'var(--lv-accent)' : 'var(--lv-bg)',
+                color: statusFilter === s ? '#fff' : 'var(--lv-muted)',
                 fontSize: 11, cursor: 'pointer', fontWeight: statusFilter === s ? 600 : 400,
               }}>
               {s === 'all' ? 'الكل' : INV_STATUS[s]?.label}
@@ -308,15 +310,15 @@ export default function InvoicesPage() {
       </div>
 
       {/* Invoice table */}
-      <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', overflow: 'hidden' }}>
+      <div className="card" style={{ borderRadius: 14, overflow: 'hidden' }}>
         {filteredInvoices.length === 0 ? (
-          <div style={{ padding: '60px 0', textAlign: 'center', color: '#6b7280', fontSize: 13 }}>لا توجد فواتير</div>
+          <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--lv-muted)', fontSize: 13 }}>لا توجد فواتير</div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#F1F5F9' }}>
+              <tr style={{ background: 'var(--lv-bg)' }}>
                 {['رقم الفاتورة', 'الشركة', 'المبلغ', 'الحالة', 'الاستحقاق', 'التذكير', 'إجراء'].map(h => (
-                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#6b7280', borderBottom: '1px solid rgba(0,0,0,.06)', whiteSpace: 'nowrap' }}>{h}</th>
+                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: 'var(--lv-muted)', borderBottom: '1px solid var(--lv-line)', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -327,18 +329,18 @@ export default function InvoicesPage() {
                 const isActionable = ['issued', 'sent', 'overdue'].includes(inv.status);
                 const companyName = inv.companies?.name || inv.company?.name || inv.company_id;
                 return (
-                  <tr key={inv.id} style={{ borderBottom: i < filteredInvoices.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
+                  <tr key={inv.id} style={{ borderBottom: i < filteredInvoices.length - 1 ? '1px solid var(--lv-line)' : 'none', background: i % 2 === 1 ? 'var(--lv-bg)' : 'var(--lv-panel)' }}>
                     <td style={{ padding: '12px 18px' }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#1E293B', fontFamily: 'monospace' }}>{inv.invoice_number}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--lv-fg)', fontFamily: 'monospace' }}>{inv.invoice_number}</span>
                     </td>
                     <td style={{ padding: '12px 18px' }}>
                       <button onClick={() => setDrawerCompId(inv.company_id)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'right' }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: 0 }}>{companyName}</p>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)', margin: 0 }}>{companyName}</p>
                       </button>
                     </td>
                     <td style={{ padding: '12px 18px' }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: 0 }}>{fmt(inv.total_sar)} ر.س</p>
-                      {Number(inv.vat_sar) > 0 && <p style={{ fontSize: 10, color: '#6b7280', margin: 0 }}>شامل {fmt(inv.vat_sar)} ض.ق.م</p>}
+                      <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)', margin: 0 }}>{fmt(inv.total_sar)} ر.س</p>
+                      {Number(inv.vat_sar) > 0 && <p style={{ fontSize: 10, color: 'var(--lv-muted)', margin: 0 }}>شامل {fmt(inv.vat_sar)} ض.ق.م</p>}
                     </td>
                     <td style={{ padding: '12px 18px' }}>
                       <span style={{ fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 5, color: sc.color, fontWeight: 500 }}>
@@ -346,10 +348,10 @@ export default function InvoicesPage() {
                         {sc.label}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 18px', fontSize: 12, color: inv.status === 'overdue' ? '#c2410c' : '#9ca3af', direction: 'ltr', textAlign: 'right' }}>
+                    <td style={{ padding: '12px 18px', fontSize: 12, color: inv.status === 'overdue' ? 'var(--lv-warn)' : 'var(--lv-muted)', direction: 'ltr', textAlign: 'right' }}>
                       {fmtDate(inv.due_date)}
                     </td>
-                    <td style={{ padding: '12px 18px', fontSize: 11, color: '#9ca3af' }}>
+                    <td style={{ padding: '12px 18px', fontSize: 11, color: 'var(--lv-muted)' }}>
                       {DUNNING[inv.dunning_step] || '—'}
                     </td>
                     <td style={{ padding: '12px 18px' }}>
@@ -357,24 +359,24 @@ export default function InvoicesPage() {
                         {isActionable && (
                           <>
                             <button onClick={() => setMarkPaidInv(inv)} disabled={isAct}
-                              style={{ ...ghostBtn, color: '#16a34a' }}>
+                              style={{ ...ghostBtn, color: 'var(--lv-success)' }}>
                               دفع
                             </button>
                             <button onClick={() => handleResend(inv.id)} disabled={isAct}
-                              style={{ ...ghostBtn, color: '#6b7280' }}>
+                              style={{ ...ghostBtn }}>
                               {isAct ? '...' : 'إرسال'}
                             </button>
                             <button onClick={() => handleWaive(inv.id, inv.invoice_number)} disabled={isAct}
-                              style={{ ...ghostBtn, color: '#9ca3af' }}>
+                              style={{ ...ghostBtn }}>
                               إعفاء
                             </button>
                             <button onClick={() => handleVoid(inv.id, inv.invoice_number)} disabled={isAct}
-                              style={{ ...ghostBtn, color: '#dc2626' }}>
+                              style={{ ...ghostBtn, color: 'var(--lv-danger)' }}>
                               إلغاء
                             </button>
                           </>
                         )}
-                        <button style={{ ...ghostBtn, color: '#6b7280', cursor: 'pointer' }}
+                        <button style={{ ...ghostBtn, cursor: 'pointer' }}
                           onClick={async () => {
                             try {
                               const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
@@ -388,7 +390,7 @@ export default function InvoicesPage() {
                           PDF
                         </button>
                         {inv.status === 'paid' && (
-                          <button style={{ ...ghostBtn, color: '#16a34a', cursor: 'pointer' }}
+                          <button style={{ ...ghostBtn, color: 'var(--lv-success)', cursor: 'pointer' }}
                             onClick={async () => {
                               try {
                                 const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;

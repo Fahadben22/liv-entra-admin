@@ -180,7 +180,7 @@ export default function OnboardingCommandCenter() {
               const stageCompanies = filtered.filter(c => lcOf(c) === stage.key);
               return (
                 <div key={stage.key}
-                  onDragOver={e => { e.preventDefault(); e.currentTarget.style.background = '#fafafa'; }}
+                  onDragOver={e => { e.preventDefault(); e.currentTarget.style.background = 'var(--lv-bg)'; }}
                   onDragLeave={e => { e.currentTarget.style.background = '#fff'; }}
                   onDrop={e => { e.preventDefault(); e.currentTarget.style.background = '#fff'; const id = e.dataTransfer.getData('companyId'); if (id) handleDrop(id, stage.key); }}
                   style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, padding: 12, minHeight: 200, transition: 'background .15s' }}>
@@ -379,7 +379,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
             const planIncludes = flag?.plan_includes || false;
             return (
               <div key={key} onClick={() => onToggleFlag(c.id, key, !enabled)}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 10, border: `1px solid ${enabled ? '#86efac' : '#e2e8f0'}`, background: enabled ? '#f0fdf4' : '#fafafa', cursor: 'pointer', transition: 'all .15s' }}>
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 10, border: `1px solid ${enabled ? '#86efac' : '#e2e8f0'}`, background: enabled ? '#f0fdf4' : 'var(--lv-bg)', cursor: 'pointer', transition: 'all .15s' }}>
                 <div>
                   <span style={{ fontSize: 11, fontWeight: 600, color: enabled ? '#16a34a' : '#94a3b8' }}>{meta.name_ar || key}</span>
                   <span style={{ fontSize: 9, color: '#94a3b8', marginRight: 6 }}>({meta.tier_min})</span>
@@ -424,7 +424,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
         <div style={{ maxHeight: 300, overflow: 'auto' }}>
           {(audit || []).length === 0 ? <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', padding: 20 }}>لا توجد أنشطة</p> :
             (audit || []).map((a: any, i: number) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f1f5f9', fontSize: 11 }}>
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--lv-line)', fontSize: 11 }}>
                 <span style={{ color: '#475569' }}>{a.action}</span>
                 <span style={{ color: '#94a3b8' }}>{a.actor_email || '—'} · {fmtDate(a.created_at)}</span>
               </div>
@@ -437,7 +437,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
 
 function StatCard({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div style={{ background: '#fafafa', borderRadius: 8, padding: '10px 14px', border: '1px solid #f0f0f0' }}>
+    <div style={{ background: 'var(--lv-bg)', borderRadius: 8, padding: '10px 14px', border: '1px solid #f0f0f0' }}>
       <div style={{ fontSize: 10, color: '#a1a1aa', marginBottom: 3, fontWeight: 500 }}>{label}</div>
       <div style={{ fontSize: 13, fontWeight: 600, color: color || '#18181b' }}>{value}</div>
     </div>
@@ -470,9 +470,9 @@ function MatrixTab({ companies, matrix, registry, onToggle, reload }: any) {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
           <thead>
             <tr>
-              <th style={{ position: 'sticky', top: 0, right: 0, background: '#fafafa', color: '#3f3f46', padding: '10px 12px', textAlign: 'right', zIndex: 2, minWidth: 150, borderBottom: '1px solid #e5e5e5', fontWeight: 600, fontSize: 11 }}>الشركة</th>
+              <th style={{ position: 'sticky', top: 0, right: 0, background: 'var(--lv-bg)', color: '#3f3f46', padding: '10px 12px', textAlign: 'right', zIndex: 2, minWidth: 150, borderBottom: '1px solid #e5e5e5', fontWeight: 600, fontSize: 11 }}>الشركة</th>
               {featureKeys.map(key => (
-                <th key={key} style={{ position: 'sticky', top: 0, background: '#fafafa', color: '#71717a', padding: '10px 6px', textAlign: 'center', fontSize: 9, minWidth: 70, zIndex: 1, borderBottom: '1px solid #e5e5e5', fontWeight: 500 }}>
+                <th key={key} style={{ position: 'sticky', top: 0, background: 'var(--lv-bg)', color: '#71717a', padding: '10px 6px', textAlign: 'center', fontSize: 9, minWidth: 70, zIndex: 1, borderBottom: '1px solid #e5e5e5', fontWeight: 500 }}>
                   {registry[key]?.name_ar || key}
                 </th>
               ))}
@@ -481,8 +481,8 @@ function MatrixTab({ companies, matrix, registry, onToggle, reload }: any) {
           <tbody>
             {filtered.map((c: any, idx: number) => {
               return (
-                <tr key={c.id} style={{ borderBottom: '1px solid #f4f4f5', background: idx % 2 === 0 ? '#fff' : '#fafafa' }}>
-                  <td style={{ padding: '8px 12px', fontWeight: 500, position: 'sticky', right: 0, background: idx % 2 === 0 ? '#fff' : '#fafafa', zIndex: 1, fontSize: 12, color: '#18181b' }}>
+                <tr key={c.id} style={{ borderBottom: '1px solid #f4f4f5', background: idx % 2 === 0 ? '#fff' : 'var(--lv-bg)' }}>
+                  <td style={{ padding: '8px 12px', fontWeight: 500, position: 'sticky', right: 0, background: idx % 2 === 0 ? '#fff' : 'var(--lv-bg)', zIndex: 1, fontSize: 12, color: '#18181b' }}>
                     <span>{c.name_ar || c.name}</span>
                     <span style={{ fontSize: 10, marginRight: 6, color: '#a1a1aa' }}>{PLAN_AR[c.plan]}</span>
                   </td>
@@ -540,20 +540,20 @@ function HatifInlineForm({ companyId, hatifEnabled, hatifPortalUrl, onSaved }: {
       </div>
       <div style={{ background: 'rgba(5,150,105,.04)', border: '1px solid rgba(5,150,105,.15)', borderRadius: 10, padding: '12px 14px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <p style={{ fontSize: 11, color: '#374151', margin: 0 }}>تفعيل هاتف لهذه الشركة</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-fg)', margin: 0 }}>تفعيل هاتف لهذه الشركة</p>
           <button onClick={() => setEnabled(v => !v)}
             style={{ width: 40, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer', background: enabled ? '#22c55e' : '#d1d5db', position: 'relative', transition: 'background .2s', flexShrink: 0 }}>
             <span style={{ position: 'absolute', top: 2, left: enabled ? 20 : 2, width: 18, height: 18, borderRadius: '50%', background: '#fff', transition: 'left .2s', boxShadow: '0 1px 2px rgba(0,0,0,.2)' }} />
           </button>
         </div>
         <div style={{ marginBottom: 10 }}>
-          <p style={{ fontSize: 10, color: '#9ca3af', margin: '0 0 4px' }}>رابط بوابة هاتف (اختياري)</p>
+          <p style={{ fontSize: 10, color: 'var(--lv-muted)', margin: '0 0 4px' }}>رابط بوابة هاتف (اختياري)</p>
           <input
             value={portalUrl}
             onChange={e => setPortalUrl(e.target.value)}
             dir="ltr"
             placeholder="https://app.hatif.io/org/XXXXX"
-            style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', fontSize: 11, width: '100%', background: '#fff', color: '#18181b', boxSizing: 'border-box' }}
+            style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid var(--lv-line)', fontSize: 11, width: '100%', background: 'var(--lv-panel)', color: '#18181b', boxSizing: 'border-box' }}
           />
         </div>
         <button onClick={save} disabled={saving}

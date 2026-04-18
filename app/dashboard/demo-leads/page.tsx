@@ -33,7 +33,7 @@ const ALL_STATUSES = ['new', 'contacted', 'converted', 'ignored'];
 
 function BehaviorInsights({ lead }: { lead: DemoLead }) {
   const events = lead.behavioral_data || [];
-  if (events.length === 0 && !lead.city && !lead.pain_points?.length) return <p style={{ fontSize: 11, color: '#9ca3af', padding: '12px 0' }}>لا توجد بيانات سلوكية</p>;
+  if (events.length === 0 && !lead.city && !lead.pain_points?.length) return <p style={{ fontSize: 11, color: 'var(--lv-muted)', padding: '12px 0' }}>لا توجد بيانات سلوكية</p>;
 
   // Compute insights
   const pageVisits = events.filter(e => e.type === 'page_visit');
@@ -62,7 +62,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
   };
 
   return (
-    <div style={{ padding: '16px 20px', background: '#F1F5F9', borderTop: '1px solid rgba(0,0,0,.06)' }}>
+    <div style={{ padding: '16px 20px', background: 'var(--lv-bg)', borderTop: '1px solid var(--lv-line)' }}>
       {/* Context from intake */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
         {lead.city && <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 8, background: '#eff6ff', color: '#1d4070', fontWeight: 600 }}>{lead.city}</span>}
@@ -75,14 +75,14 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
       <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 12 }}>
         {[
           { label: 'صفحات زارها', value: pageVisits.length, color: '#3b82f6' },
-          { label: 'سيناريوهات بدأها', value: scenarioStarts.length, color: '#2563EB' },
+          { label: 'سيناريوهات بدأها', value: scenarioStarts.length, color: 'var(--lv-accent)' },
           { label: 'سيناريوهات أكملها', value: scenarioCompletes.length, color: '#10b981' },
           { label: 'لحظات إعجاب', value: spotlights.length, color: '#f59e0b' },
           { label: 'فتح صفحة الاشتراك', value: conversionOpens.length, color: '#dc2626' },
         ].map(s => (
-          <div key={s.label} style={{ textAlign: 'center', padding: '8px', borderRadius: 10, background: '#fff', border: '1px solid rgba(0,0,0,.06)' }}>
+          <div key={s.label} style={{ textAlign: 'center', padding: '8px', borderRadius: 10, background: 'var(--lv-panel)', border: '1px solid var(--lv-line)' }}>
             <div style={{ fontSize: 18, fontWeight: 700, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 9, color: '#9ca3af', fontWeight: 500 }}>{s.label}</div>
+            <div style={{ fontSize: 9, color: 'var(--lv-muted)', fontWeight: 500 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -90,7 +90,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
       {/* Heatmap — top pages by dwell time */}
       {topPages.length > 0 && (
         <div style={{ marginBottom: 12 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#1E293B', marginBottom: 6 }}>خريطة الاهتمام (حسب وقت التصفح)</p>
+          <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--lv-fg)', marginBottom: 6 }}>خريطة الاهتمام (حسب وقت التصفح)</p>
           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
             {topPages.map(([page, data]) => {
               const pct = Math.min(100, Math.round((data.totalDwell / Math.max(totalDwell, 1)) * 100));
@@ -99,7 +99,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
                 <div key={page} style={{
                   padding: '4px 10px', borderRadius: 8, fontSize: 10, fontWeight: 600,
                   background: `rgba(124,92,252,${0.08 + intensity * 0.25})`,
-                  color: intensity > 0.5 ? '#2563EB' : '#6b7280',
+                  color: intensity > 0.5 ? 'var(--lv-accent)' : 'var(--lv-muted)',
                   border: `1px solid rgba(124,92,252,${intensity * 0.3})`,
                 }}>
                   {PAGE_AR[page] || page.split('/').pop()} · {Math.round(data.totalDwell / 1000)}ث
@@ -123,7 +123,7 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
         const level = score >= 60 ? { label: 'مرتفع', color: '#10b981', bg: '#ecfdf5' } : score >= 30 ? { label: 'متوسط', color: '#f59e0b', bg: '#fffbeb' } : { label: 'منخفض', color: '#6b7280', bg: '#f3f4f6' };
         return (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-            <span style={{ fontSize: 10, fontWeight: 600, color: '#1E293B' }}>مستوى الاهتمام:</span>
+            <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--lv-fg)' }}>مستوى الاهتمام:</span>
             <div style={{ flex: 1, height: 6, background: 'rgba(0,0,0,.06)', borderRadius: 3, overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${score}%`, background: level.color, borderRadius: 3, transition: 'width .3s' }} />
             </div>
@@ -135,21 +135,21 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
       {/* Scenario funnel */}
       {scenarioStarts.length > 0 && (
         <div style={{ marginBottom: 12 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: '#1E293B', marginBottom: 6 }}>مسار السيناريوهات</p>
+          <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--lv-fg)', marginBottom: 6 }}>مسار السيناريوهات</p>
           <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
             <div style={{ flex: 1, textAlign: 'center', padding: '6px', borderRadius: 8, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.15)' }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#2563EB' }}>{scenarioStarts.length}</div>
-              <div style={{ fontSize: 9, color: '#9ca3af' }}>بدأ</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--lv-accent)' }}>{scenarioStarts.length}</div>
+              <div style={{ fontSize: 9, color: 'var(--lv-muted)' }}>بدأ</div>
             </div>
             <span style={{ color: '#d1d5db', fontSize: 14 }}>→</span>
             <div style={{ flex: 1, textAlign: 'center', padding: '6px', borderRadius: 8, background: scenarioCompletes.length > 0 ? 'rgba(16,185,129,.08)' : 'rgba(0,0,0,.03)', border: `1px solid ${scenarioCompletes.length > 0 ? 'rgba(16,185,129,.15)' : 'rgba(0,0,0,.06)'}` }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: scenarioCompletes.length > 0 ? '#10b981' : '#9ca3af' }}>{scenarioCompletes.length}</div>
-              <div style={{ fontSize: 9, color: '#9ca3af' }}>أكمل</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: scenarioCompletes.length > 0 ? '#10b981' : 'var(--lv-muted)' }}>{scenarioCompletes.length}</div>
+              <div style={{ fontSize: 9, color: 'var(--lv-muted)' }}>أكمل</div>
             </div>
             <span style={{ color: '#d1d5db', fontSize: 14 }}>→</span>
             <div style={{ flex: 1, textAlign: 'center', padding: '6px', borderRadius: 8, background: conversionOpens.length > 0 ? 'rgba(245,158,11,.08)' : 'rgba(0,0,0,.03)', border: `1px solid ${conversionOpens.length > 0 ? 'rgba(245,158,11,.15)' : 'rgba(0,0,0,.06)'}` }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: conversionOpens.length > 0 ? '#f59e0b' : '#9ca3af' }}>{conversionOpens.length}</div>
-              <div style={{ fontSize: 9, color: '#9ca3af' }}>فتح الاشتراك</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: conversionOpens.length > 0 ? '#f59e0b' : 'var(--lv-muted)' }}>{conversionOpens.length}</div>
+              <div style={{ fontSize: 9, color: 'var(--lv-muted)' }}>فتح الاشتراك</div>
             </div>
           </div>
         </div>
@@ -158,8 +158,8 @@ function BehaviorInsights({ lead }: { lead: DemoLead }) {
       {/* AI Agent summary */}
       {events.length > 0 && (
         <div style={{ padding: '10px 14px', borderRadius: 10, background: 'linear-gradient(135deg, rgba(124,92,252,0.05), rgba(37,99,235,0.05))', border: '1px solid rgba(124,92,252,0.15)' }}>
-          <p style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', marginBottom: 4 }}>ملخص للوكيل الذكي</p>
-          <p style={{ fontSize: 11, color: '#6b7280', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--lv-accent)', marginBottom: 4 }}>ملخص للوكيل الذكي</p>
+          <p style={{ fontSize: 11, color: 'var(--lv-muted)', lineHeight: 1.6, margin: 0 }}>
             الزائر من {lead.city || '—'} · {lead.property_count || '—'} عقار · {lead.unit_count || '—'} وحدة ·
             تحدياته: {(lead.pain_points || []).join('، ') || 'لم يحدد'} ·
             زار {pageVisits.length} صفحة · أكمل {scenarioCompletes.length}/{scenarioStarts.length} سيناريو ·
@@ -253,14 +253,14 @@ export default function DemoLeadsPage() {
   const displayedItems = filter ? items.filter(r => r.status === filter) : items;
 
   return (
-    <div className="fade-in" style={{ color: '#1E293B', fontFamily: "'Tajawal', sans-serif" }}>
+    <div className="fade-in" style={{ color: 'var(--lv-fg)', fontFamily: "'Tajawal', sans-serif" }}>
 
       <div style={{ maxWidth: 1300, margin: '0 auto', padding: '28px 24px' }}>
 
         {/* HEADER */}
         <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, color: '#1E293B', letterSpacing: '-0.02em' }}>قيادات الديمو المباشر</h1>
-          <p style={{ color: '#9ca3af', fontSize: 13 }}>
+          <h1 style={{ fontSize: 18, fontWeight: 600, marginBottom: 4, color: 'var(--lv-fg)', letterSpacing: '-0.02em' }}>قيادات الديمو المباشر</h1>
+          <p style={{ color: 'var(--lv-muted)', fontSize: 13 }}>
             زوار استخدموا التجربة المجانية المباشرة — إجمالي {total} قيادة
           </p>
         </div>
@@ -274,20 +274,20 @@ export default function DemoLeadsPage() {
         {/* STATS STRIP */}
         <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 24 }}>
           {[
-            { label: 'إجمالي',      value: total,                       color: '#1E293B' },
+            { label: 'إجمالي',      value: total,                       color: 'var(--lv-fg)' },
             { label: 'جديد',        value: statusCounts.new || 0,       color: '#3b82f6' },
             { label: 'تم التواصل', value: statusCounts.contacted || 0,  color: '#f59e0b' },
             { label: 'تحوّل عميل', value: statusCounts.converted || 0,  color: '#10b981' },
           ].map(k => (
-            <div key={k.label} className="card card-lift" style={{ background: '#fff', border: '1px solid rgba(0,0,0,.06)', borderRadius: 14, padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
-              <div style={{ fontSize: 11, color: '#9ca3af', marginBottom: 6, fontWeight: 500 }}>{k.label}</div>
+            <div key={k.label} className="card card-lift" style={{ background: 'var(--lv-panel)', border: '1px solid var(--lv-line)', borderRadius: 14, padding: '14px 16px', boxShadow: 'var(--lv-shadow-sm)' }}>
+              <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginBottom: 6, fontWeight: 500 }}>{k.label}</div>
               <div style={{ fontSize: 22, fontWeight: 600, color: k.color }}>{k.value}</div>
             </div>
           ))}
         </div>
 
         {/* STATUS FILTER TABS */}
-        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid rgba(0,0,0,.06)' }}>
+        <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid var(--lv-line)' }}>
           {[
             { key: '', label: 'الكل', count: total },
             ...ALL_STATUSES.map(s => ({ key: s, label: STATUS_CONFIG[s].label, count: statusCounts[s] || 0 })),
@@ -297,32 +297,32 @@ export default function DemoLeadsPage() {
                 padding: '10px 18px', fontSize: 13, fontWeight: filter === tab.key ? 600 : 400,
                 cursor: 'pointer', fontFamily: 'inherit',
                 background: 'none',
-                color: filter === tab.key ? '#1E293B' : '#9ca3af',
+                color: filter === tab.key ? 'var(--lv-fg)' : 'var(--lv-muted)',
                 border: 'none',
-                borderBottom: filter === tab.key ? '2px solid #2563EB' : '2px solid transparent',
+                borderBottom: filter === tab.key ? '2px solid var(--lv-accent)' : '2px solid transparent',
               }}>
-              {tab.label} {tab.count > 0 && <span style={{ color: '#6b7280', marginRight: 4 }}>({tab.count})</span>}
+              {tab.label} {tab.count > 0 && <span style={{ color: 'var(--lv-muted)', marginRight: 4 }}>({tab.count})</span>}
             </button>
           ))}
           <button onClick={load}
-            style={{ marginRight: 'auto', padding: '7px 16px', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: '1px solid rgba(0,0,0,.08)', color: '#6b7280' }}>
+            style={{ marginRight: 'auto', padding: '7px 16px', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', background: 'transparent', border: '1px solid var(--lv-line)', color: 'var(--lv-muted)' }}>
             تحديث
           </button>
         </div>
 
         {/* TABLE */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '80px 0', color: '#9ca3af', fontSize: 13 }}>جاري التحميل...</div>
+          <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--lv-muted)', fontSize: 13 }}>جاري التحميل...</div>
         ) : displayedItems.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 0', color: '#9ca3af', fontSize: 13 }}>
+          <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--lv-muted)', fontSize: 13 }}>
             <p>لا توجد قيادات {filter ? `بحالة "${STATUS_CONFIG[filter]?.label}"` : 'بعد'}</p>
           </div>
         ) : (
-          <div style={{ borderRadius: 14, overflow: 'hidden', background: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>
+          <div style={{ borderRadius: 14, overflow: 'hidden', background: 'var(--lv-panel)', boxShadow: 'var(--lv-shadow-sm)' }}>
             {/* Table header */}
-            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: '#F1F5F9', borderBottom: '1px solid rgba(0,0,0,.06)', padding: '10px 20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px', gap: 0, background: 'var(--lv-bg)', borderBottom: '1px solid var(--lv-line)', padding: '10px 20px' }}>
               {['التاريخ', 'الزائر', 'الجوال', 'الشركة', 'الحالة', 'ملاحظات', 'إجراء'].map(h => (
-                <div key={h} style={{ fontSize: 11, fontWeight: 500, color: '#6b7280' }}>{h}</div>
+                <div key={h} style={{ fontSize: 11, fontWeight: 500, color: 'var(--lv-muted)' }}>{h}</div>
               ))}
             </div>
 
@@ -332,28 +332,28 @@ export default function DemoLeadsPage() {
               const hasData = (item.behavioral_data?.length || 0) > 0 || item.city || (item.pain_points?.length || 0) > 0;
               const isExpanded = expandedLead === item.id;
               return (
-                <div key={item.id} style={{ borderBottom: i < displayedItems.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none' }}>
+                <div key={item.id} style={{ borderBottom: i < displayedItems.length - 1 ? '1px solid var(--lv-line)' : 'none' }}>
                 <div
                   onClick={() => hasData && setExpandedLead(isExpanded ? null : item.id)}
                   style={{
                     display: 'grid', gridTemplateColumns: '150px 1fr 140px 160px 130px 120px 90px',
                     gap: 0, padding: '14px 20px', alignItems: 'center',
-                    background: isExpanded ? '#F1F5F9' : i % 2 === 0 ? '#fff' : '#fafafa',
+                    background: isExpanded ? 'var(--lv-bg)' : i % 2 === 0 ? 'var(--lv-panel)' : 'var(--lv-bg)',
                     cursor: hasData ? 'pointer' : 'default',
                     transition: 'background 0.15s',
                   }}
                 >
                   {/* Date */}
-                  <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 500 }}>{fmt(item.created_at)}</div>
+                  <div style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>{fmt(item.created_at)}</div>
 
                   {/* Name */}
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 13, fontWeight: 500, color: '#1E293B' }}>{item.name || '—'}</span>
-                      {hasData && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 6, background: isExpanded ? '#2563EB' : 'rgba(124,92,252,0.1)', color: isExpanded ? '#fff' : '#2563EB', fontWeight: 700 }}>بيانات</span>}
+                      <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--lv-fg)' }}>{item.name || '—'}</span>
+                      {hasData && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 6, background: isExpanded ? 'var(--lv-accent)' : 'rgba(124,92,252,0.1)', color: isExpanded ? '#fff' : 'var(--lv-accent)', fontWeight: 700 }}>بيانات</span>}
                     </div>
                     {item.demo_session_id && (
-                      <div style={{ fontSize: 11, color: '#6b7280', fontFamily: 'Inter, monospace', marginTop: 2, fontWeight: 500 }}>
+                      <div style={{ fontSize: 11, color: 'var(--lv-muted)', fontFamily: 'Inter, monospace', marginTop: 2, fontWeight: 500 }}>
                         {item.demo_session_id.slice(0, 8)}...
                       </div>
                     )}
@@ -361,7 +361,7 @@ export default function DemoLeadsPage() {
 
                   {/* Phone */}
                   <div>
-                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: '#1E293B', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
+                    <a href={`tel:${item.phone}`} style={{ fontSize: 13, color: 'var(--lv-fg)', textDecoration: 'none', fontFamily: 'Inter, sans-serif' }}>
                       {item.phone}
                     </a>
                     <div style={{ marginTop: 4 }}>
@@ -373,7 +373,7 @@ export default function DemoLeadsPage() {
                   </div>
 
                   {/* Company */}
-                  <div style={{ fontSize: 13, color: '#9ca3af' }}>{item.company_name || '—'}</div>
+                  <div style={{ fontSize: 13, color: 'var(--lv-muted)' }}>{item.company_name || '—'}</div>
 
                   {/* Status pill */}
                   <div>
@@ -388,8 +388,8 @@ export default function DemoLeadsPage() {
                       style={{
                         fontSize: 12, cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
                         background: 'transparent',
-                        border: '1px solid rgba(0,0,0,.08)',
-                        color: item.notes ? '#1E293B' : '#6b7280',
+                        border: '1px solid var(--lv-line)',
+                        color: item.notes ? 'var(--lv-fg)' : 'var(--lv-muted)',
                         borderRadius: 10, padding: '4px 12px',
                       }}>
                       {item.notes ? 'عرض' : '+ ملاحظة'}
@@ -403,13 +403,13 @@ export default function DemoLeadsPage() {
                       disabled={updating === item.id}
                       onChange={e => changeStatus(item.id, e.target.value)}
                       style={{
-                        background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)', color: '#1E293B',
+                        background: 'var(--lv-bg)', border: '1px solid var(--lv-line)', color: 'var(--lv-fg)',
                         borderRadius: 10, padding: '5px 8px', fontSize: 12, cursor: 'pointer',
                         fontFamily: 'inherit', outline: 'none', flex: 1,
                         opacity: updating === item.id ? .5 : 1,
                       }}>
                       {ALL_STATUSES.map(s => (
-                        <option key={s} value={s} style={{ background: '#fff', color: '#1E293B' }}>{STATUS_CONFIG[s].label}</option>
+                        <option key={s} value={s} style={{ background: 'var(--lv-panel)', color: 'var(--lv-fg)' }}>{STATUS_CONFIG[s].label}</option>
                       ))}
                     </select>
                     {item.status !== 'converted' && (
@@ -423,7 +423,7 @@ export default function DemoLeadsPage() {
                         }}
                         style={{
                           fontSize: 12, padding: '7px 16px', borderRadius: 10,
-                          background: '#2563EB', border: 'none',
+                          background: 'var(--lv-accent)', border: 'none',
                           color: '#fff', cursor: 'pointer', fontFamily: 'inherit',
                           whiteSpace: 'nowrap', fontWeight: 500,
                           boxShadow: '0 2px 8px rgba(124,92,252,.2)',
@@ -446,9 +446,9 @@ export default function DemoLeadsPage() {
       {notesModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 999 }}
           onClick={e => { if (e.target === e.currentTarget) setNotesModal(null); }}>
-          <div style={{ background: '#fff', boxShadow: '0 20px 60px rgba(0,0,0,.12)', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480 }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: '#1E293B' }}>ملاحظات</h3>
-            <p style={{ fontSize: 13, color: '#9ca3af', marginBottom: 20 }}>
+          <div style={{ background: 'var(--lv-panel)', boxShadow: 'var(--lv-shadow-panel)', borderRadius: 16, padding: 24, width: '100%', maxWidth: 480 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: 'var(--lv-fg)' }}>ملاحظات</h3>
+            <p style={{ fontSize: 13, color: 'var(--lv-muted)', marginBottom: 20 }}>
               {notesModal.name || '—'} — {notesModal.phone}
             </p>
             <textarea
@@ -457,18 +457,18 @@ export default function DemoLeadsPage() {
               rows={5}
               placeholder="أضف ملاحظات حول هذا الزائر..."
               style={{
-                width: '100%', background: '#F1F5F9', border: '1px solid rgba(0,0,0,.08)',
-                borderRadius: 10, padding: '7px 12px', color: '#1E293B', fontSize: 13,
+                width: '100%', background: 'var(--lv-bg)', border: '1px solid var(--lv-line)',
+                borderRadius: 10, padding: '7px 12px', color: 'var(--lv-fg)', fontSize: 13,
                 fontFamily: 'inherit', outline: 'none', resize: 'vertical', boxSizing: 'border-box',
               }}
             />
             <div style={{ display: 'flex', gap: 10, marginTop: 16, flexDirection: 'row' }}>
               <button onClick={saveNotes} disabled={savingNotes}
-                style={{ flex: 1, padding: '7px 16px', background: '#2563EB', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+                style={{ flex: 1, padding: '7px 16px', background: 'var(--lv-accent)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', opacity: savingNotes ? .7 : 1, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
                 {savingNotes ? 'جاري الحفظ...' : 'حفظ'}
               </button>
               <button onClick={() => setNotesModal(null)}
-                style={{ padding: '7px 16px', background: 'transparent', color: '#6b7280', border: '1px solid rgba(0,0,0,.08)', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
+                style={{ padding: '7px 16px', background: 'transparent', color: 'var(--lv-muted)', border: '1px solid var(--lv-line)', borderRadius: 10, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit' }}>
                 إلغاء
               </button>
             </div>

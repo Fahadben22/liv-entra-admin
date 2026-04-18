@@ -30,9 +30,9 @@ export default function CreditNotesPage() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: '#1E293B' }}>إشعارات دائنة</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, color: 'var(--lv-fg)' }}>إشعارات دائنة</h2>
         <button onClick={() => setShowCreate(true)}
-          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+          style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: 'var(--lv-accent)', color: 'var(--lv-panel)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           + إشعار دائن جديد
         </button>
       </div>
@@ -46,18 +46,18 @@ export default function CreditNotesPage() {
       )}
 
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '60px 0', color: '#6b7280' }}>جاري التحميل...</div>
+        <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--lv-muted)' }}>جاري التحميل...</div>
       ) : creditNotes.length === 0 ? (
-        <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', padding: '60px', textAlign: 'center', color: '#6b7280', fontSize: 13 }}>
+        <div className="card" style={{ background: 'var(--lv-panel)', borderRadius: 14, boxShadow: 'var(--lv-shadow-sm)', padding: '60px', textAlign: 'center', color: 'var(--lv-muted)', fontSize: 13 }}>
           لا توجد إشعارات دائنة
         </div>
       ) : (
-        <div className="card" style={{ background: '#fff', borderRadius: 14, boxShadow: '0 1px 3px rgba(0,0,0,.06)', overflow: 'hidden' }}>
+        <div className="card" style={{ background: 'var(--lv-panel)', borderRadius: 14, boxShadow: 'var(--lv-shadow-sm)', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#F1F5F9' }}>
+              <tr style={{ background: 'var(--lv-bg)' }}>
                 {['الرقم', 'الشركة', 'الفاتورة الأصلية', 'المبلغ', 'السبب', 'الحالة', 'التاريخ'].map(h => (
-                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: '#6b7280', borderBottom: '1px solid rgba(0,0,0,.06)' }}>{h}</th>
+                  <th key={h} style={{ padding: '10px 18px', textAlign: 'right', fontSize: 11, fontWeight: 500, color: 'var(--lv-muted)', borderBottom: '1px solid var(--lv-line)' }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -65,16 +65,16 @@ export default function CreditNotesPage() {
               {creditNotes.map((cn, i) => {
                 const sc = CN_STATUS[cn.status] || CN_STATUS.issued;
                 return (
-                  <tr key={cn.id} style={{ borderBottom: i < creditNotes.length - 1 ? '1px solid rgba(0,0,0,.04)' : 'none', background: i % 2 === 1 ? '#fafafa' : '#fff' }}>
+                  <tr key={cn.id} style={{ borderBottom: i < creditNotes.length - 1 ? '1px solid var(--lv-line)' : 'none', background: i % 2 === 1 ? 'var(--lv-bg)' : 'var(--lv-panel)' }}>
                     <td style={{ padding: '12px 18px' }}>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#1E293B', fontFamily: 'monospace' }}>{cn.credit_note_number}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--lv-fg)', fontFamily: 'monospace' }}>{cn.credit_note_number}</span>
                     </td>
-                    <td style={{ padding: '12px 18px', fontSize: 13, color: '#1E293B' }}>{cn.companies?.name || '—'}</td>
-                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#9ca3af', fontFamily: 'monospace' }}>{cn.original_invoice_id?.slice(0, 8) || '—'}</td>
+                    <td style={{ padding: '12px 18px', fontSize: 13, color: 'var(--lv-fg)' }}>{cn.companies?.name || '—'}</td>
+                    <td style={{ padding: '12px 18px', fontSize: 12, color: 'var(--lv-muted)', fontFamily: 'monospace' }}>{cn.original_invoice_id?.slice(0, 8) || '—'}</td>
                     <td style={{ padding: '12px 18px' }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#dc2626' }}>-{fmt(cn.total_sar)} ر.س</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-danger)' }}>-{fmt(cn.total_sar)} ر.س</span>
                     </td>
-                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#9ca3af', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <td style={{ padding: '12px 18px', fontSize: 12, color: 'var(--lv-muted)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {cn.reason}
                     </td>
                     <td style={{ padding: '12px 18px' }}>
@@ -83,7 +83,7 @@ export default function CreditNotesPage() {
                         {sc.label}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 18px', fontSize: 12, color: '#9ca3af' }}>{fmtDate(cn.issued_at)}</td>
+                    <td style={{ padding: '12px 18px', fontSize: 12, color: 'var(--lv-muted)' }}>{fmtDate(cn.issued_at)}</td>
                   </tr>
                 );
               })}
@@ -116,15 +116,15 @@ function CreateCreditNoteModal({ invoices, onClose, onDone }: { invoices: any[];
     } catch (e: any) { setErr(e.message || 'خطأ'); setLoading(false); }
   };
 
-  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', fontSize: 13, boxSizing: 'border-box', background: '#F1F5F9', color: '#1E293B' };
+  const inputStyle: React.CSSProperties = { width: '100%', padding: '9px 12px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 13, boxSizing: 'border-box', background: 'var(--lv-bg)', color: 'var(--lv-fg)' };
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.3)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ background: '#fff', borderRadius: 16, padding: '28px 32px', width: 420, boxShadow: '0 20px 60px rgba(0,0,0,.12)' }} onClick={e => e.stopPropagation()}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: '#1E293B' }}>إنشاء إشعار دائن</h3>
+      <div style={{ background: 'var(--lv-panel)', borderRadius: 16, padding: '28px 32px', width: 420, boxShadow: 'var(--lv-shadow-panel)' }} onClick={e => e.stopPropagation()}>
+        <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 20px', color: 'var(--lv-fg)' }}>إنشاء إشعار دائن</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>الفاتورة الأصلية *</label>
+            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>الفاتورة الأصلية *</label>
             <select value={form.invoice_id} onChange={e => set('invoice_id', e.target.value)}
               style={inputStyle}>
               <option value="">اختر فاتورة...</option>
@@ -134,19 +134,19 @@ function CreateCreditNoteModal({ invoices, onClose, onDone }: { invoices: any[];
             </select>
           </div>
           <div>
-            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>السبب *</label>
+            <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>السبب *</label>
             <textarea value={form.reason} onChange={e => set('reason', e.target.value)} rows={2} placeholder="سبب الإشعار الدائن..."
               style={{ ...inputStyle, resize: 'vertical' }} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>المبلغ (ر.س)</label>
+              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>المبلغ (ر.س)</label>
               <input type="number" value={form.amount} onChange={e => set('amount', e.target.value)}
                 placeholder={selectedInvoice ? String(selectedInvoice.total_sar) : 'كامل المبلغ'}
                 style={inputStyle} />
             </div>
             <div>
-              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: '#6b7280' }}>طريقة الاسترداد</label>
+              <label style={{ fontSize: 11, fontWeight: 500, display: 'block', marginBottom: 4, color: 'var(--lv-muted)' }}>طريقة الاسترداد</label>
               <select value={form.refund_method} onChange={e => set('refund_method', e.target.value)}
                 style={inputStyle}>
                 <option value="manual">يدوي</option>
@@ -156,11 +156,11 @@ function CreateCreditNoteModal({ invoices, onClose, onDone }: { invoices: any[];
             </div>
           </div>
         </div>
-        {err && <p style={{ fontSize: 12, color: '#dc2626', margin: '12px 0 0' }}>{err}</p>}
+        {err && <p style={{ fontSize: 12, color: 'var(--lv-danger)', margin: '12px 0 0' }}>{err}</p>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 20 }}>
-          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#F1F5F9', cursor: 'pointer', fontSize: 13, color: '#6b7280' }}>إلغاء</button>
+          <button onClick={onClose} style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid var(--lv-line)', background: 'var(--lv-bg)', cursor: 'pointer', fontSize: 13, color: 'var(--lv-muted)' }}>إلغاء</button>
           <button onClick={submit} disabled={loading}
-            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: 'var(--lv-accent)', color: 'var(--lv-panel)', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
             {loading ? '...' : 'إنشاء إشعار دائن'}
           </button>
         </div>
