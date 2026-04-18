@@ -52,14 +52,24 @@ export default function ActivityPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Auto-refresh live data every 30s
+  // Auto-refresh live data every 10s as a baseline
   useEffect(() => {
     const interval = setInterval(async () => {
       const res = await adminApi.sa.activityLive().catch(() => null);
       if (res?.data) setLive(res.data);
-    }, 30000);
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  // Also refresh immediately whenever a new client_activity SSE event arrives
+  const lastClientActivity = events.find((e: DashboardEvent) => e.type === 'client_activity');
+  useEffect(() => {
+    if (!lastClientActivity) return;
+    adminApi.sa.activityLive().then((res: any) => {
+      if (res?.data) setLive(res.data);
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastClientActivity?.at]);
 
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
