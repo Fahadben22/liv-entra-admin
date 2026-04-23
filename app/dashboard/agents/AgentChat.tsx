@@ -6,7 +6,18 @@ import Icon, { IconName } from '@/components/Icon';
 export interface Message {
   role: 'user' | 'assistant';
   content: string;
-  tools_used?: string[]; // tools that ran to produce this message
+  tools_used?: string[];
+}
+
+interface OutreachDraft {
+  draft_id: string;
+  lead_name: string;
+  lead_email: string | null;
+  lead_phone: string | null;
+  email_subject: string;
+  email_body: string;
+  whatsapp_body: string;
+  client_type: string;
 }
 
 interface AgentChatProps {
@@ -15,11 +26,10 @@ interface AgentChatProps {
   agentIcon: IconName;
   accentColor: string;
   quickActions: string[];
-  // Lifted state mode — parent controls messages
   messages?: Message[];
   onMessagesChange?: (msgs: Message[]) => void;
-  compact?: boolean; // hide header when parent provides its own
-  pendingMessage?: string; // auto-sent once when non-empty (used by briefing card)
+  compact?: boolean;
+  pendingMessage?: string;
 }
 
 interface DraftEmail {
@@ -31,7 +41,6 @@ interface DraftEmail {
 }
 
 export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions, messages: externalMessages, onMessagesChange, compact, pendingMessage }: AgentChatProps) {
-  // Use external state if provided, otherwise internal
   const [internalMessages, setInternalMessages] = useState<Message[]>([]);
   const messages = externalMessages ?? internalMessages;
   const setMessages = onMessagesChange ?? setInternalMessages;
@@ -39,17 +48,30 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
   const [input, setInput]       = useState('');
   const [loading, setLoading]   = useState(false);
   const [tokens, setTokens]     = useState(0);
+
+  // Legacy email draft (old contactLead flow)
   const [draft, setDraft]       = useState<DraftEmail | null>(null);
   const [editSubject, setEditSubject] = useState('');
   const [editBody, setEditBody]       = useState('');
   const [sending, setSending]   = useState(false);
+
+  // New outreach draft approval flow
+  const [outreachDraft, setOutreachDraft]   = useState<OutreachDraft | null>(null);
+  const [outreachTab, setOutreachTab]       = useState<'email' | 'whatsapp'>('email');
+  const [editEmailSubject, setEditEmailSubject]   = useState('');
+  const [editEmailBody, setEditEmailBody]         = useState('');
+  const [editWhatsApp, setEditWhatsApp]           = useState('');
+  const [rejectNote, setRejectNote]               = useState('');
+  const [showRejectInput, setShowRejectInput]     = useState(false);
+  const [outreachSending, setOutreachSending]     = useState(false);
+  const [outreachStatus, setOutreachStatus]       = useState<'idle' | 'sent' | 'rejected'>('idle');
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages]);
+  }, [messages, outreachDraft]);
 
-  // Auto-send pendingMessage once when it becomes non-empty
   const pendingSentRef = useRef<string>('');
   useEffect(() => {
     if (pendingMessage && pendingMessage !== pendingSentRef.current && !loading) {
@@ -73,13 +95,44 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       setTokens(prev => prev + (res?.data?.tokens_used || 0));
       setMessages([...updated, { role: 'assistant', content: reply, tools_used: toolsUsed }]);
 
-      // Check if agent drafted an email outreach
-      const draftAction = (res?.data?.actions || []).find((a: any) => {
-        try { const r = typeof a.result === 'string' ? JSON.parse(a.result) : a.result; return r?.action === 'draft_email'; } catch { return false; }
+      // Detect new outreach draft from tool actions
+      const actions = res?.data?.actions || [];
+      const draftAction = actions.find((a: any) => {
+        try {
+          const r = typeof a.result === 'string' ? JSON.parse(a.result) : a.result;
+          return r?.action === 'outreach_draft_ready';
+        } catch { return false; }
       });
       if (draftAction) {
         try {
-          const draftData = typeof draftAction.result === 'string' ? JSON.parse(draftAction.result) : draftAction.result;
+          const d = typeof draftAction.result === 'string' ? JSON.parse(draftAction.result) : draftAction.result;
+          setOutreachDraft({
+            draft_id:      d.draft_id,
+            lead_name:     d.lead_name,
+            lead_email:    d.lead_email,
+            lead_phone:    d.lead_phone,
+            email_subject: d.email_subject,
+            email_body:    d.email_body,
+            whatsapp_body: d.whatsapp_body,
+            client_type:   d.client_type,
+          });
+          setEditEmailSubject(d.email_subject);
+          setEditEmailBody(d.email_body);
+          setEditWhatsApp(d.whatsapp_body);
+          setOutreachStatus('idle');
+          setShowRejectInput(false);
+          setRejectNote('');
+          setOutreachTab('email');
+        } catch {}
+      }
+
+      // Legacy draft email detection (old flow)
+      const legacyDraft = actions.find((a: any) => {
+        try { const r = typeof a.result === 'string' ? JSON.parse(a.result) : a.result; return r?.action === 'draft_email'; } catch { return false; }
+      });
+      if (legacyDraft) {
+        try {
+          const draftData = typeof legacyDraft.result === 'string' ? JSON.parse(legacyDraft.result) : legacyDraft.result;
           const subjectMatch = reply.match(/(?:الموضوع|Subject)[:\s]*(.+)/i);
           const bodyStart = reply.indexOf('\n\n');
           const emailSubject = subjectMatch?.[1]?.trim() || `Liventra OS — ${draftData.lead_name}`;
@@ -93,6 +146,47 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       setMessages([...updated, { role: 'assistant', content: `خطأ: ${e.message}` }]);
     }
     setLoading(false);
+  }
+
+  async function approveOutreach() {
+    if (!outreachDraft) return;
+    setOutreachSending(true);
+    try {
+      const res = await request<any>('POST', '/admin/agents/sales/send-approved-outreach', {
+        draft_id:            outreachDraft.draft_id,
+        edited_subject:      editEmailSubject !== outreachDraft.email_subject ? editEmailSubject : undefined,
+        edited_email_body:   editEmailBody   !== outreachDraft.email_body    ? editEmailBody    : undefined,
+        edited_whatsapp_body: editWhatsApp   !== outreachDraft.whatsapp_body ? editWhatsApp     : undefined,
+      });
+      if (res?.success) {
+        setOutreachStatus('sent');
+        setMessages([...messages, { role: 'assistant', content: `✅ تم إرسال رسالة التعريف إلى ${outreachDraft.lead_name} بنجاح${outreachDraft.lead_email ? ` (${outreachDraft.lead_email})` : ''}${outreachDraft.lead_phone ? ' + واتساب في القائمة' : ''}` }]);
+        setTimeout(() => setOutreachDraft(null), 3000);
+      } else {
+        setMessages([...messages, { role: 'assistant', content: `❌ فشل الإرسال: ${res?.message || 'خطأ غير معروف'}` }]);
+      }
+    } catch (e: any) {
+      setMessages([...messages, { role: 'assistant', content: `❌ خطأ: ${e.message}` }]);
+    }
+    setOutreachSending(false);
+  }
+
+  async function rejectOutreach() {
+    if (!outreachDraft || !rejectNote.trim()) return;
+    setOutreachSending(true);
+    try {
+      await request<any>('POST', '/admin/agents/sales/reject-outreach', {
+        draft_id: outreachDraft.draft_id,
+        rejection_note: rejectNote,
+      });
+      setOutreachStatus('rejected');
+      // Tell خالد to revise with the rejection note
+      setOutreachDraft(null);
+      await send(`أعد صياغة رسالة التعريف لـ ${outreachDraft.lead_name}. ملاحظات: ${rejectNote}`);
+    } catch (e: any) {
+      setMessages([...messages, { role: 'assistant', content: `خطأ: ${e.message}` }]);
+    }
+    setOutreachSending(false);
   }
 
   async function sendDraftEmail() {
@@ -114,12 +208,14 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       setMessages([]);
       setTokens(0);
       setDraft(null);
+      setOutreachDraft(null);
+      setOutreachStatus('idle');
     } catch {}
   }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: compact ? '100%' : 'calc(100vh - 60px)', background: 'transparent' }}>
-      {/* Header — hidden in compact mode */}
+      {/* Header */}
       {!compact && (
         <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -135,11 +231,11 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
 
       {/* Messages */}
       <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {messages.length === 0 && (
+        {messages.length === 0 && !outreachDraft && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
             <div style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Icon name={agentIcon} size={28} color="var(--lv-accent)" />
-          </div>
+              <Icon name={agentIcon} size={28} color="var(--lv-accent)" />
+            </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center', maxWidth: 480 }}>
               {quickActions.map((q, i) => (
                 <button key={i} onClick={() => send(q)} style={{ fontSize: 11, padding: '7px 14px', borderRadius: 18, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', color: '#6b7280', cursor: 'pointer' }}>{q}</button>
@@ -155,14 +251,9 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
             {msg.role === 'assistant' && msg.tools_used && msg.tools_used.length > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, maxWidth: '85%', justifyContent: 'flex-end' }}>
                 {msg.tools_used.map((tool, ti) => (
-                  <span key={ti} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.2)', color: '#7c5cfc', fontFamily: 'monospace' }}>
-                    {tool}
-                  </span>
+                  <span key={ti} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.2)', color: '#7c5cfc', fontFamily: 'monospace' }}>{tool}</span>
                 ))}
               </div>
-            )}
-            {msg.role === 'assistant' && msg.tools_used && msg.tools_used.length === 0 && msg.content.includes('[تحذير]') && (
-              <div style={{ fontSize: 10, color: '#f59e0b', maxWidth: '85%', textAlign: 'right' }}>بدون أدوات</div>
             )}
           </div>
         ))}
@@ -177,7 +268,149 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
         )}
       </div>
 
-      {/* Draft Email */}
+      {/* ── Outreach Draft Approval Card ───────────────────────────────────── */}
+      {outreachDraft && outreachStatus === 'idle' && (
+        <div style={{ padding: '16px 20px', borderTop: '2px solid #7c5cfc', background: '#faf9ff', flexShrink: 0 }}>
+          <div style={{ maxWidth: 600, margin: '0 auto' }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#5b21b6', margin: 0 }}>
+                  مسودة رسالة تعريفية — {outreachDraft.lead_name}
+                </p>
+                <p style={{ fontSize: 11, color: '#9ca3af', margin: '2px 0 0' }}>
+                  {outreachDraft.lead_email && `📧 ${outreachDraft.lead_email}`}
+                  {outreachDraft.lead_email && outreachDraft.lead_phone && '  '}
+                  {outreachDraft.lead_phone && `📱 ${outreachDraft.lead_phone}`}
+                </p>
+              </div>
+              <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 12, background: '#ede9fe', color: '#7c5cfc', fontWeight: 600 }}>
+                بانتظار موافقتك
+              </span>
+            </div>
+
+            {/* Tabs */}
+            <div style={{ display: 'flex', gap: 0, marginBottom: 12, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(124,92,252,.2)' }}>
+              {(['email', 'whatsapp'] as const).map(tab => (
+                <button key={tab} onClick={() => setOutreachTab(tab)} style={{ flex: 1, padding: '8px', fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: outreachTab === tab ? '#7c5cfc' : '#fff', color: outreachTab === tab ? '#fff' : '#7c5cfc', transition: 'all .15s' }}>
+                  {tab === 'email' ? '📧 البريد الإلكتروني' : '💬 واتساب'}
+                </button>
+              ))}
+            </div>
+
+            {/* Email tab */}
+            {outreachTab === 'email' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <input
+                  value={editEmailSubject}
+                  onChange={e => setEditEmailSubject(e.target.value)}
+                  style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(0,0,0,.1)', fontSize: 12, direction: 'rtl' }}
+                  placeholder="موضوع البريد"
+                />
+                {/* HTML preview iframe */}
+                <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
+                  <div style={{ padding: '6px 10px', background: '#f8f7fc', borderBottom: '1px solid rgba(0,0,0,.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 10, color: '#9ca3af' }}>معاينة البريد</span>
+                    <button onClick={() => {
+                      const area = document.getElementById('email-edit-area') as HTMLTextAreaElement;
+                      if (area) area.style.display = area.style.display === 'none' ? 'block' : 'none';
+                    }} style={{ fontSize: 10, color: '#7c5cfc', background: 'none', border: 'none', cursor: 'pointer' }}>تعديل HTML</button>
+                  </div>
+                  <iframe
+                    srcDoc={editEmailBody}
+                    style={{ width: '100%', height: 240, border: 'none', display: 'block' }}
+                    sandbox="allow-same-origin"
+                    title="email preview"
+                  />
+                  <textarea
+                    id="email-edit-area"
+                    value={editEmailBody}
+                    onChange={e => setEditEmailBody(e.target.value)}
+                    rows={6}
+                    style={{ display: 'none', width: '100%', padding: '8px 12px', border: 'none', borderTop: '1px solid rgba(0,0,0,.06)', fontSize: 11, fontFamily: 'monospace', direction: 'ltr', resize: 'vertical', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* WhatsApp tab */}
+            {outreachTab === 'whatsapp' && (
+              <div>
+                <div style={{ background: '#dcfce7', borderRadius: 12, padding: '12px 14px', marginBottom: 8 }}>
+                  <p style={{ fontSize: 10, color: '#166534', margin: '0 0 6px', fontWeight: 600 }}>معاينة واتساب</p>
+                  <div style={{ background: '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: '#1e293b', lineHeight: 1.7, whiteSpace: 'pre-wrap', direction: 'rtl' }}>
+                    {editWhatsApp}
+                  </div>
+                </div>
+                <textarea
+                  value={editWhatsApp}
+                  onChange={e => setEditWhatsApp(e.target.value)}
+                  rows={5}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(0,0,0,.1)', fontSize: 12, lineHeight: 1.6, resize: 'vertical', boxSizing: 'border-box', direction: 'rtl' }}
+                  placeholder="رسالة واتساب..."
+                />
+              </div>
+            )}
+
+            {/* Reject note input */}
+            {showRejectInput && (
+              <div style={{ marginTop: 10 }}>
+                <textarea
+                  value={rejectNote}
+                  onChange={e => setRejectNote(e.target.value)}
+                  rows={2}
+                  placeholder="سبب الرفض وتعليماتك لخالد (مطلوب)..."
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #fca5a5', fontSize: 12, lineHeight: 1.6, resize: 'none', boxSizing: 'border-box', direction: 'rtl', background: '#fff5f5' }}
+                />
+              </div>
+            )}
+
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+              <button
+                onClick={approveOutreach}
+                disabled={outreachSending}
+                style={{ flex: 2, padding: '10px', borderRadius: 8, border: 'none', background: outreachSending ? '#d1d5db' : '#7c5cfc', color: '#fff', cursor: outreachSending ? 'default' : 'pointer', fontSize: 13, fontWeight: 700, opacity: outreachSending ? .6 : 1 }}
+              >
+                {outreachSending ? 'جاري الإرسال...' : '✅ موافقة وإرسال'}
+              </button>
+              {!showRejectInput ? (
+                <button
+                  onClick={() => setShowRejectInput(true)}
+                  disabled={outreachSending}
+                  style={{ flex: 1, padding: '10px', borderRadius: 8, border: '1px solid #fca5a5', background: '#fff', color: '#dc2626', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+                >
+                  ✏️ أعد الصياغة
+                </button>
+              ) : (
+                <button
+                  onClick={rejectOutreach}
+                  disabled={outreachSending || !rejectNote.trim()}
+                  style={{ flex: 1, padding: '10px', borderRadius: 8, border: 'none', background: rejectNote.trim() ? '#dc2626' : '#d1d5db', color: '#fff', cursor: rejectNote.trim() ? 'pointer' : 'default', fontSize: 12, fontWeight: 600 }}
+                >
+                  إرسال للمراجعة
+                </button>
+              )}
+              <button
+                onClick={() => { setOutreachDraft(null); setShowRejectInput(false); }}
+                disabled={outreachSending}
+                style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: '#fff', color: '#9ca3af', cursor: 'pointer', fontSize: 12 }}
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sent confirmation */}
+      {outreachDraft && outreachStatus === 'sent' && (
+        <div style={{ padding: '12px 20px', borderTop: '2px solid #10b981', background: '#f0fdf4', flexShrink: 0, textAlign: 'center' }}>
+          <p style={{ fontSize: 13, color: '#059669', fontWeight: 600, margin: 0 }}>✅ تم الإرسال إلى {outreachDraft.lead_name}</p>
+        </div>
+      )}
+
+      {/* Legacy Draft Email */}
       {draft && (
         <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(0,0,0,.06)', background: '#F1F5F9' }}>
           <div style={{ maxWidth: 550, margin: '0 auto' }}>
