@@ -6,8 +6,6 @@ import { GW_LABELS } from '@/lib/billing-helpers';
 
 const CONFIG_FIELDS: Record<string, { label: string; key: string; placeholder: string }[]> = {
   stripe:  [{ label: 'Secret Key', key: 'secret_key', placeholder: 'sk_...' }, { label: 'Webhook Secret', key: 'webhook_secret', placeholder: 'whsec_...' }],
-  payfort: [{ label: 'Merchant ID', key: 'merchant_id', placeholder: 'TESTMERCHANT' }, { label: 'Access Code', key: 'access_code', placeholder: '' }, { label: 'SHA Request Phrase', key: 'sha_request', placeholder: '' }],
-  telr:    [{ label: 'Store ID', key: 'store_id', placeholder: '12345' }, { label: 'Auth Key', key: 'auth_key', placeholder: '' }],
   tap:     [{ label: 'Secret Key', key: 'secret_key', placeholder: 'sk_test_...' }, { label: 'Publishable Key', key: 'public_key', placeholder: 'pk_test_...' }, { label: 'Webhook Secret', key: 'webhook_secret', placeholder: '' }],
   moyasar: [{ label: 'Secret Key', key: 'secret_key', placeholder: 'sk_test_...' }, { label: 'Publishable Key', key: 'public_key', placeholder: 'pk_test_...' }, { label: 'Webhook Secret', key: 'webhook_secret', placeholder: 'shared_secret' }],
 };
@@ -116,8 +114,6 @@ export default function GatewaysPage() {
     { provider: 'tap',     is_active: false, is_live: false, config: {} },
     { provider: 'moyasar', is_active: false, is_live: false, config: {} },
     { provider: 'stripe',  is_active: false, is_live: false, config: {} },
-    { provider: 'payfort', is_active: false, is_live: false, config: {} },
-    { provider: 'telr',    is_active: false, is_live: false, config: {} },
   ];
 
   // Merge: show all default gateways, but use API data if available
