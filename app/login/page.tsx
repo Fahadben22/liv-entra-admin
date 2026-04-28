@@ -1,104 +1,122 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FormField } from '@/components/ui/FormField';
-import { ButtonSpinner } from '@/components/ui/ButtonSpinner';
 import { colors, fontSize, fontWeight, radius, spacing, shadow } from '@/lib/design-tokens';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://liv-entra-api-production.up.railway.app/api/v1';
 
 export default function AdminLogin() {
-  const router = useRouter();
-  const [secret,    setSecret]    = useState('');
-  const [totpCode,  setTotpCode]  = useState('');
-  const [err,       setErr]       = useState('');
-  const [loading,   setLoading]   = useState(false);
+  const router  = useRouter();
+  const [code,    setCode]    = useState('');
+  const [err,     setErr]     = useState('');
+  const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    if (!secret.trim()) { setErr('المفتاح السري مطلوب'); return; }
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  async function submit(totp_code: string) {
+    if (loading) return;
     setLoading(true); setErr('');
     try {
       const res = await fetch(`${BASE}/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ secret, totp_code: totpCode.trim() || undefined }),
+        body: JSON.stringify({ totp_code }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'فشل تسجيل الدخول');
+
       localStorage.setItem('admin_token', json.data?.token);
-      localStorage.removeItem('admin_refresh_token');
-      // Always set the session cookie so middleware allows /dashboard access.
-      // Use refresh_token when the API provides one; fall back to the JWT itself.
-      const cookieValue = json.data?.refresh_token || json.data?.token;
-      if (cookieValue) {
-        await fetch('/api/auth/session', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh_token: cookieValue }),
-        }).catch(() => {});
-      }
       localStorage.setItem('admin_user', JSON.stringify(json.data?.user || { name: 'Admin', role: 'super_admin' }));
+
+      // Set session cookie so any cookie-based guards pass
+      await fetch('/api/auth/session', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: json.data?.token }),
+      }).catch(() => {});
+
       router.push('/dashboard');
     } catch (e: any) {
       setErr(e.message);
-    } finally {
+      setCode('');
       setLoading(false);
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   }
 
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+    setCode(val);
+    if (val.length === 6) submit(val);
+  }
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, ${colors.bg.dark} 0%, #1e3a5f 100%)` }}>
-      <div style={{ background: colors.bg.card, borderRadius: radius.xl, padding: spacing.xxxl + 8, width: '100%', maxWidth: 380, boxShadow: shadow.lg }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: spacing.xxxl }}>
-          <div style={{ width: 56, height: 56, borderRadius: radius.lg, background: colors.bg.dark, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: 'var(--font-fraunces, serif)' }}>ل</div>
-          <h1 style={{ fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text.primary, margin: 0 }}>Liventra OS</h1>
-          <p style={{ fontSize: fontSize.sm, color: colors.text.muted, marginTop: spacing.xs }}>لوحة التحكم — Super Admin</p>
-        </div>
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: `linear-gradient(135deg, ${colors.bg.dark} 0%, #1e3a5f 100%)`,
+    }}>
+      <div style={{
+        background: colors.bg.card, borderRadius: radius.xl,
+        padding: 40, width: '100%', maxWidth: 360, boxShadow: shadow.lg,
+        textAlign: 'center',
+      }}>
+        {/* Logo */}
+        <div style={{
+          width: 56, height: 56, borderRadius: radius.lg, background: colors.bg.dark,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 14px', fontSize: 22, fontWeight: 700,
+          color: '#fff', fontFamily: 'var(--font-fraunces, serif)',
+        }}>ل</div>
 
-        <form onSubmit={handleLogin}>
-          <FormField
-            label="المفتاح السري"
-            type="password"
-            value={secret}
-            onChange={e => setSecret(e.target.value)}
-            placeholder="أدخل المفتاح السري"
-            required
-            autocomplete="current-password"
-            dir="ltr"
-          />
+        <h1 style={{ fontSize: fontSize.xl, fontWeight: fontWeight.bold, color: colors.text.primary, margin: '0 0 6px' }}>
+          Liventra Admin
+        </h1>
+        <p style={{ fontSize: fontSize.sm, color: colors.text.muted, margin: '0 0 32px' }}>
+          أدخل الرمز من Google Authenticator
+        </p>
 
-          <FormField
-            label="رمز المصادقة الثنائية (TOTP)"
-            type="text"
-            value={totpCode}
-            onChange={e => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-            placeholder="• • • • • •"
-            autocomplete="one-time-code"
-            dir="ltr"
-            style={{ marginTop: spacing.sm }}
-          />
-          <p style={{ fontSize: 11, color: colors.text.muted, marginTop: 4, marginBottom: spacing.sm }}>
-            من تطبيق Google Authenticator أو Authy — اتركه فارغاً إن لم يُفعَّل بعد
+        {/* 6-digit input */}
+        <input
+          ref={inputRef}
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={code}
+          onChange={handleChange}
+          placeholder="• • • • • •"
+          disabled={loading}
+          style={{
+            width: '100%', boxSizing: 'border-box',
+            padding: '14px 16px', fontSize: 28, fontWeight: 700,
+            letterSpacing: 12, textAlign: 'center',
+            border: `2px solid ${err ? '#fca5a5' : 'var(--lv-line-strong, #e2e8f0)'}`,
+            borderRadius: radius.md, outline: 'none',
+            background: err ? '#fef2f2' : '#fff',
+            color: colors.text.primary,
+            transition: 'border-color .15s',
+          }}
+        />
+
+        {err && (
+          <p style={{
+            fontSize: fontSize.sm, color: '#ef4444',
+            background: '#fef2f2', border: '1px solid #fca5a5',
+            borderRadius: radius.md, padding: `${spacing.xs}px ${spacing.sm}px`,
+            marginTop: spacing.sm,
+          }}>
+            {err}
           </p>
+        )}
 
-          {err && (
-            <p style={{ fontSize: fontSize.sm, color: '#ef4444', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: radius.md, padding: `${spacing.xs}px ${spacing.sm}px`, marginBottom: spacing.sm }}>
-              {err}
-            </p>
-          )}
+        {loading && (
+          <p style={{ fontSize: fontSize.sm, color: colors.text.muted, marginTop: spacing.sm }}>
+            جاري التحقق...
+          </p>
+        )}
 
-          <ButtonSpinner
-            type="submit"
-            label="دخول"
-            loadingLabel="جاري الدخول..."
-            loading={loading}
-            disabled={!secret.trim()}
-            variant="primary"
-            fullWidth
-            style={{ background: colors.bg.dark, marginTop: spacing.sm }}
-          />
-        </form>
+        <p style={{ fontSize: 11, color: colors.text.muted, marginTop: 20 }}>
+          الرمز يتجدد كل 30 ثانية
+        </p>
       </div>
     </div>
   );
