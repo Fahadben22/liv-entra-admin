@@ -9,9 +9,10 @@ const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://liv-entra-api-productio
 
 export default function AdminLogin() {
   const router = useRouter();
-  const [secret,  setSecret]  = useState('');
-  const [err,     setErr]     = useState('');
-  const [loading, setLoading] = useState(false);
+  const [secret,    setSecret]    = useState('');
+  const [totpCode,  setTotpCode]  = useState('');
+  const [err,       setErr]       = useState('');
+  const [loading,   setLoading]   = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -21,12 +22,21 @@ export default function AdminLogin() {
       const res = await fetch(`${BASE}/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ secret }),
+        body: JSON.stringify({ secret, totp_code: totpCode.trim() || undefined }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'فشل تسجيل الدخول');
       localStorage.setItem('admin_token', json.data?.token);
-      if (json.data?.refresh_token) localStorage.setItem('admin_refresh_token', json.data.refresh_token);
+      localStorage.removeItem('admin_refresh_token');
+      // Always set the session cookie so middleware allows /dashboard access.
+      // Use refresh_token when the API provides one; fall back to the JWT itself.
+      const cookieValue = json.data?.refresh_token || json.data?.token;
+      if (cookieValue) {
+        await fetch('/api/auth/session', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: cookieValue }),
+        }).catch(() => {});
+      }
       localStorage.setItem('admin_user', JSON.stringify(json.data?.user || { name: 'Admin', role: 'super_admin' }));
       router.push('/dashboard');
     } catch (e: any) {
@@ -56,8 +66,27 @@ export default function AdminLogin() {
             required
             autocomplete="current-password"
             dir="ltr"
-            error={err || undefined}
           />
+
+          <FormField
+            label="رمز المصادقة الثنائية (TOTP)"
+            type="text"
+            value={totpCode}
+            onChange={e => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+            placeholder="• • • • • •"
+            autocomplete="one-time-code"
+            dir="ltr"
+            style={{ marginTop: spacing.sm }}
+          />
+          <p style={{ fontSize: 11, color: colors.text.muted, marginTop: 4, marginBottom: spacing.sm }}>
+            من تطبيق Google Authenticator أو Authy — اتركه فارغاً إن لم يُفعَّل بعد
+          </p>
+
+          {err && (
+            <p style={{ fontSize: fontSize.sm, color: '#ef4444', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: radius.md, padding: `${spacing.xs}px ${spacing.sm}px`, marginBottom: spacing.sm }}>
+              {err}
+            </p>
+          )}
 
           <ButtonSpinner
             type="submit"
