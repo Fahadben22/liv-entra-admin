@@ -7,6 +7,16 @@ export interface Message {
   role: 'user' | 'assistant';
   content: string;
   tools_used?: string[];
+  tokens_used?: number;
+}
+
+interface AgentGoal {
+  id: string;
+  goal_text: string;
+  target_value?: number;
+  current_value?: number;
+  deadline?: string;
+  status: string;
 }
 
 interface OutreachDraft {
@@ -48,6 +58,13 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
   const [input, setInput]       = useState('');
   const [loading, setLoading]   = useState(false);
   const [tokens, setTokens]     = useState(0);
+  const [goals, setGoals]       = useState<AgentGoal[]>([]);
+
+  useEffect(() => {
+    request<any>('GET', '/admin/agents/goals').then(res => {
+      if (res?.data) setGoals((res.data as AgentGoal[]).filter(g => g.status === 'active'));
+    }).catch(() => {});
+  }, []);
 
   // Legacy email draft (old contactLead flow)
   const [draft, setDraft]       = useState<DraftEmail | null>(null);
@@ -92,8 +109,9 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       const res = await request<any>('POST', `/admin/agents/${agentType}/chat`, { message: msg });
       const reply = res?.data?.reply || 'لم أتمكن من الرد.';
       const toolsUsed: string[] = res?.data?.tools_used || [];
-      setTokens(prev => prev + (res?.data?.tokens_used || 0));
-      setMessages([...updated, { role: 'assistant', content: reply, tools_used: toolsUsed }]);
+      const msgTokens: number = res?.data?.tokens_used || 0;
+      setTokens(prev => prev + msgTokens);
+      setMessages([...updated, { role: 'assistant', content: reply, tools_used: toolsUsed, tokens_used: msgTokens || undefined }]);
 
       // Detect new outreach draft from tool actions
       const actions = res?.data?.actions || [];
@@ -229,6 +247,18 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
         </div>
       )}
 
+      {/* Goals bar */}
+      {goals.length > 0 && (
+        <div style={{ padding: '8px 20px', borderBottom: '1px solid rgba(0,0,0,.04)', background: '#fafafa', display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+          <span style={{ fontSize: 10, color: '#9ca3af', marginLeft: 4 }}>الأهداف:</span>
+          {goals.map(g => (
+            <span key={g.id} style={{ fontSize: 10, padding: '3px 10px', borderRadius: 12, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.2)', color: '#7c5cfc', fontWeight: 600 }}>
+              {g.goal_text}{g.target_value ? ` (${g.current_value || 0}/${g.target_value})` : ''}{g.deadline ? ` — ${g.deadline}` : ''}
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* Messages */}
       <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.length === 0 && !outreachDraft && (
@@ -254,6 +284,9 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                   <span key={ti} style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.2)', color: '#7c5cfc', fontFamily: 'monospace' }}>{tool}</span>
                 ))}
               </div>
+            )}
+            {msg.role === 'assistant' && msg.tokens_used && (
+              <span style={{ fontSize: 9, color: '#d1d5db', alignSelf: 'flex-end' }}>{msg.tokens_used.toLocaleString()} token</span>
             )}
           </div>
         ))}
