@@ -4,7 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { adminApi } from '@/lib/api';
 
-const TABS = ['نظرة عامة', 'الاشتراك', 'الميزات', 'الاستخدام', 'الكاميرات', 'التدقيق'] as const;
+const TABS = ['نظرة عامة', 'الاشتراك', 'الميزات', 'الاستخدام', 'التدقيق'] as const;
 type Tab = typeof TABS[number];
 
 const LC: Record<string, { color: string; label: string }> = {
@@ -361,11 +361,6 @@ export default function CompanyDetailPage() {
               <p style={{ color: 'var(--lv-muted)', fontSize: 13 }}>لا توجد بيانات استخدام</p>
             )}
           </Section>
-        )}
-
-        {/* ── الكاميرات ── */}
-        {tab === 'الكاميرات' && (
-          <CamerasTab companyId={id} properties={properties} showToast={showToast} />
         )}
 
         {/* ── التدقيق ── */}

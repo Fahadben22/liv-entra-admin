@@ -42,6 +42,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/leads',          label: 'طلبات العرض',    section: 'growth' },
   { href: '/dashboard/demo-leads',     label: 'قيادات الديمو',  section: 'growth' },
   { href: '/dashboard/landing-page/analytics', label: 'تحليلات الموقع', section: 'growth' },
+  { href: '/dashboard/cameras',         label: 'الكاميرات',      section: 'settings' },
   { href: '/dashboard/template-center',label: 'القوالب',        section: 'settings' },
   { href: '/dashboard/landing-page',   label: 'الموقع',         section: 'settings' },
   { href: '/dashboard/audit',          label: 'التدقيق',        section: 'settings' },

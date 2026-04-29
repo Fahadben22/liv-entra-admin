@@ -22,6 +22,7 @@ const SECTION_ICONS: Record<string, IconName> = {
   '/dashboard/landing-page': 'globe',
   '/dashboard/audit': 'search',
   '/dashboard/maintenance-flows': 'wrench',
+  '/dashboard/cameras':           'camera',
 };
 
 

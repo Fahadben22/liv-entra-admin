@@ -89,7 +89,10 @@ export type IconName =
   | 'more-horizontal'
   | 'x'
   | 'check'
-  | 'info';
+  | 'info'
+  | 'camera'
+  | 'wifi'
+  | 'wifi-off';
 
 const PATHS: Record<IconName, string | string[]> = {
   building:       'M3 21V7a1 1 0 0 1 .293-.707l7-7a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 21 7v14M3 21h18M9 21v-6h6v6',
@@ -176,6 +179,9 @@ const PATHS: Record<IconName, string | string[]> = {
   x:                'M18 6L6 18M6 6l12 12',
   check:            'M20 6L9 17l-5-5',
   info:             'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 8h.01M11 12h1v4h1',
+  camera:           'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
+  wifi:             'M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01',
+  'wifi-off':       'M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01',
 };
 
 interface IconProps {
