@@ -183,7 +183,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
             {/* Logout */}
             <button
-              onClick={() => { clearAdminSession(); router.push('/login'); }}
+              onClick={() => { clearAdminSession().then(() => router.push('/login')); }}
               style={{
                 padding: '5px 10px', borderRadius: 8,
                 border: '1px solid var(--lv-line-strong)', background: 'transparent',

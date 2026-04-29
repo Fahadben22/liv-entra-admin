@@ -17,9 +17,11 @@ export function setAdminSession(token: string, user: any) {
   localStorage.setItem('admin_user', JSON.stringify(user));
 }
 
-export function clearAdminSession() {
+export async function clearAdminSession() {
   localStorage.removeItem('admin_token');
   localStorage.removeItem('admin_user');
+  localStorage.removeItem('admin_refresh_token');
+  await fetch('/api/auth/session', { method: 'DELETE' }).catch(() => {});
 }
 
 export function isAdminLoggedIn(): boolean {
