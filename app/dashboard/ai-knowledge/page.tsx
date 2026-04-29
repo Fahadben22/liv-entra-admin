@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { CheckCircle, Folder, Check, AlertTriangle } from 'lucide-react';
 
 const BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -166,7 +167,7 @@ export default function KnowledgePage() {
           />
           {file ? (
             <>
-              <div style={{ fontSize: 28, marginBottom: 6 }}>✅</div>
+              <div style={{ marginBottom: 6, display: 'flex', justifyContent: 'center' }}><CheckCircle size={28} color="#10b981" /></div>
               <p style={{ fontSize: 14, fontWeight: 600, color: '#065f46', margin: 0 }}>{file.name}</p>
               <p style={{ fontSize: 12, color: '#6b7280', margin: '4px 0 0' }}>
                 {(file.size / 1024).toFixed(0)} KB — انقر لاختيار ملف آخر
@@ -174,7 +175,7 @@ export default function KnowledgePage() {
             </>
           ) : (
             <>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>📂</div>
+              <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'center' }}><Folder size={32} color="#9ca3af" /></div>
               <p style={{ fontSize: 14, fontWeight: 600, color: '#374151', margin: 0 }}>
                 اسحب الملف هنا أو انقر للاختيار
               </p>
@@ -201,7 +202,7 @@ export default function KnowledgePage() {
             <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 8 }}>معاينة كيف سيُحوَّل كل صف إلى جملة للتضمين:</p>
             {preview.preview.map((p, i) => (
               <div key={i} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, padding: '8px 12px', marginBottom: 6, fontSize: 12, lineHeight: 1.6 }}>
-                <span style={{ color: '#10b981', marginLeft: 6 }}>✓</span>{p.sentence}
+                <Check size={12} color="#10b981" style={{ marginLeft: 6, flexShrink: 0, display: 'inline', verticalAlign: 'middle' }} />{p.sentence}
               </div>
             ))}
           </div>
@@ -238,8 +239,9 @@ export default function KnowledgePage() {
         )}
 
         {result && (
-          <div style={{ background: '#ecfdf5', border: '1px solid #6ee7b7', borderRadius: 8, padding: '10px 14px', marginBottom: 14, fontSize: 13, color: '#065f46' }}>
-            ✅ تم استيعاب <strong>{result.inserted.toLocaleString()}</strong> صف بنجاح في <code style={{ fontSize: 11, background: '#d1fae5', padding: '1px 5px', borderRadius: 4 }}>{result.corpus_id}</code>
+          <div style={{ background: '#ecfdf5', border: '1px solid #6ee7b7', borderRadius: 8, padding: '10px 14px', marginBottom: 14, fontSize: 13, color: '#065f46', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <CheckCircle size={14} color="#10b981" />
+            تم استيعاب <strong>{result.inserted.toLocaleString()}</strong> صف بنجاح في <code style={{ fontSize: 11, background: '#d1fae5', padding: '1px 5px', borderRadius: 4 }}>{result.corpus_id}</code>
           </div>
         )}
 
@@ -268,7 +270,7 @@ export default function KnowledgePage() {
 
           {!canUpload && disabledReason && (
             <span style={{ fontSize: 13, color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 4 }}>
-              ⚠ {disabledReason}
+              <AlertTriangle size={14} /> {disabledReason}
             </span>
           )}
         </div>

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+import { ClipboardList, Check } from 'lucide-react';
 import { adminApi } from '../../../lib/api';
 
 type BehaviorEvent = { type: string; page: string; detail: string; timestamp: string; dwell_ms: number };
@@ -404,7 +405,7 @@ export default function DemoLeadsPage() {
                         color: item.notes ? 'var(--lv-fg)' : 'var(--lv-muted)',
                         borderRadius: 8, padding: '5px 8px', whiteSpace: 'nowrap', flexShrink: 0,
                       }}>
-                      {item.notes ? '📋' : '+ ملاحظة'}
+                      {item.notes ? <ClipboardList size={14} /> : '+ ملاحظة'}
                     </button>
                     {item.status !== 'converted' && (
                       <button
@@ -423,7 +424,7 @@ export default function DemoLeadsPage() {
                           whiteSpace: 'nowrap', fontWeight: 600, flexShrink: 0,
                         }}
                       >
-                        تحويل ✓
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>تحويل <Check size={12} /></span>
                       </button>
                     )}
                   </div>

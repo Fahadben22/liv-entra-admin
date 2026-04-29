@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { request } from '@/lib/api';
 import Icon, { IconName } from '@/components/Icon';
+import { CheckCircle, Mail, Smartphone, MessageCircle, Pencil, X } from 'lucide-react';
 
 export interface Message {
   role: 'user' | 'assistant';
@@ -178,13 +179,13 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       });
       if (res?.success) {
         setOutreachStatus('sent');
-        setMessages([...messages, { role: 'assistant', content: `✅ تم إرسال رسالة التعريف إلى ${outreachDraft.lead_name} بنجاح${outreachDraft.lead_email ? ` (${outreachDraft.lead_email})` : ''}${outreachDraft.lead_phone ? ' + واتساب في القائمة' : ''}` }]);
+        setMessages([...messages, { role: 'assistant', content: `تم إرسال رسالة التعريف إلى ${outreachDraft.lead_name} بنجاح${outreachDraft.lead_email ? ` (${outreachDraft.lead_email})` : ''}${outreachDraft.lead_phone ? ' + واتساب في القائمة' : ''}` }]);
         setTimeout(() => setOutreachDraft(null), 3000);
       } else {
-        setMessages([...messages, { role: 'assistant', content: `❌ فشل الإرسال: ${res?.message || 'خطأ غير معروف'}` }]);
+        setMessages([...messages, { role: 'assistant', content: `فشل الإرسال: ${res?.message || 'خطأ غير معروف'}` }]);
       }
     } catch (e: any) {
-      setMessages([...messages, { role: 'assistant', content: `❌ خطأ: ${e.message}` }]);
+      setMessages([...messages, { role: 'assistant', content: `خطأ: ${e.message}` }]);
     }
     setOutreachSending(false);
   }
@@ -311,10 +312,10 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#5b21b6', margin: 0 }}>
                   مسودة رسالة تعريفية — {outreachDraft.lead_name}
                 </p>
-                <p style={{ fontSize: 11, color: '#9ca3af', margin: '2px 0 0' }}>
-                  {outreachDraft.lead_email && `📧 ${outreachDraft.lead_email}`}
-                  {outreachDraft.lead_email && outreachDraft.lead_phone && '  '}
-                  {outreachDraft.lead_phone && `📱 ${outreachDraft.lead_phone}`}
+                <p style={{ fontSize: 11, color: '#9ca3af', margin: '2px 0 0', display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  {outreachDraft.lead_email && <><Mail size={11} style={{ flexShrink: 0 }} /> {outreachDraft.lead_email}</>}
+                  {outreachDraft.lead_email && outreachDraft.lead_phone && <span style={{ margin: '0 2px' }}> </span>}
+                  {outreachDraft.lead_phone && <><Smartphone size={11} style={{ flexShrink: 0 }} /> {outreachDraft.lead_phone}</>}
                 </p>
               </div>
               <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 12, background: '#ede9fe', color: '#7c5cfc', fontWeight: 600 }}>
@@ -326,7 +327,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
             <div style={{ display: 'flex', gap: 0, marginBottom: 12, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(124,92,252,.2)' }}>
               {(['email', 'whatsapp'] as const).map(tab => (
                 <button key={tab} onClick={() => setOutreachTab(tab)} style={{ flex: 1, padding: '8px', fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: outreachTab === tab ? '#7c5cfc' : '#fff', color: outreachTab === tab ? '#fff' : '#7c5cfc', transition: 'all .15s' }}>
-                  {tab === 'email' ? '📧 البريد الإلكتروني' : '💬 واتساب'}
+                  {tab === 'email' ? <><Mail size={12} style={{ marginLeft: 4 }} /> البريد الإلكتروني</> : <><MessageCircle size={12} style={{ marginLeft: 4 }} /> واتساب</>}
                 </button>
               ))}
             </div>
@@ -405,7 +406,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                 disabled={outreachSending}
                 style={{ flex: 2, padding: '10px', borderRadius: 8, border: 'none', background: outreachSending ? '#d1d5db' : '#7c5cfc', color: '#fff', cursor: outreachSending ? 'default' : 'pointer', fontSize: 13, fontWeight: 700, opacity: outreachSending ? .6 : 1 }}
               >
-                {outreachSending ? 'جاري الإرسال...' : '✅ موافقة وإرسال'}
+                {outreachSending ? 'جاري الإرسال...' : <><CheckCircle size={14} style={{ marginLeft: 6, verticalAlign: 'middle' }} /> موافقة وإرسال</>}
               </button>
               {!showRejectInput ? (
                 <button
@@ -413,7 +414,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                   disabled={outreachSending}
                   style={{ flex: 1, padding: '10px', borderRadius: 8, border: '1px solid #fca5a5', background: '#fff', color: '#dc2626', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
                 >
-                  ✏️ أعد الصياغة
+                  <><Pencil size={12} style={{ marginLeft: 4, verticalAlign: 'middle' }} /> أعد الصياغة</>
                 </button>
               ) : (
                 <button
@@ -429,7 +430,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                 disabled={outreachSending}
                 style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: '#fff', color: '#9ca3af', cursor: 'pointer', fontSize: 12 }}
               >
-                ✕
+                <X size={14} />
               </button>
             </div>
           </div>
@@ -439,7 +440,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       {/* Sent confirmation */}
       {outreachDraft && outreachStatus === 'sent' && (
         <div style={{ padding: '12px 20px', borderTop: '2px solid #10b981', background: '#f0fdf4', flexShrink: 0, textAlign: 'center' }}>
-          <p style={{ fontSize: 13, color: '#059669', fontWeight: 600, margin: 0 }}>✅ تم الإرسال إلى {outreachDraft.lead_name}</p>
+          <p style={{ fontSize: 13, color: '#059669', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}><CheckCircle size={14} /> تم الإرسال إلى {outreachDraft.lead_name}</p>
         </div>
       )}
 
