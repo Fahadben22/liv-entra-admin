@@ -30,6 +30,7 @@ export default function CamerasPage() {
   const [loadingCo,   setLoadingCo]   = useState(true);
   const [loadingProp, setLoadingProp] = useState(false);
   const [loadingCam,  setLoadingCam]  = useState(false);
+  const [propError,   setPropError]   = useState('');
   const [saving,      setSaving]      = useState(false);
   const [toast,       setToast]       = useState('');
 
@@ -48,9 +49,14 @@ export default function CamerasPage() {
     setLoadingProp(true);
     setPropertyId('');
     setCameras([]);
+    setPropError('');
     adminApi.sa.listCompanyProperties(companyId).then((r: any) => {
       setProperties(r.data || []);
-    }).catch(() => setProperties([])).finally(() => setLoadingProp(false));
+      if ((r.data || []).length === 0) setPropError('لا توجد عقارات — تحقق أن الشركة لديها عقارات مسجلة في النظام');
+    }).catch((e: any) => {
+      setProperties([]);
+      setPropError(`خطأ في تحميل العقارات: ${e.message}`);
+    }).finally(() => setLoadingProp(false));
   }, [companyId]);
 
   // Load cameras when property changes
@@ -170,7 +176,7 @@ export default function CamerasPage() {
           {loadingProp ? (
             <p style={{ fontSize: 12, color: 'var(--lv-muted)' }}>جاري التحميل...</p>
           ) : properties.length === 0 ? (
-            <p style={{ fontSize: 12, color: 'var(--lv-muted)' }}>لا توجد عقارات لهذه الشركة</p>
+            <p style={{ fontSize: 12, color: propError ? '#ef4444' : 'var(--lv-muted)' }}>{propError || 'لا توجد عقارات لهذه الشركة'}</p>
           ) : (
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               {properties.map((p: any) => (
