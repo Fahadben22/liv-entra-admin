@@ -4,7 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { adminApi } from '@/lib/api';
 
-const TABS = ['نظرة عامة', 'الاشتراك', 'الميزات', 'الاستخدام', 'التدقيق'] as const;
+const TABS = ['نظرة عامة', 'الاشتراك', 'الميزات', 'الاستخدام', 'الكاميرات', 'التدقيق'] as const;
 type Tab = typeof TABS[number];
 
 const LC: Record<string, { color: string; label: string }> = {
@@ -42,10 +42,11 @@ export default function CompanyDetailPage() {
   const [flags,    setFlags]    = useState<any[]>([]);
   const [registry, setRegistry] = useState<any>({});
   const [plans,    setPlans]    = useState<any[]>([]);
-  const [audit,    setAudit]    = useState<any[]>([]);
-  const [loading,  setLoading]  = useState(true);
-  const [saving,   setSaving]   = useState(false);
-  const [toast,    setToast]    = useState('');
+  const [audit,      setAudit]      = useState<any[]>([]);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading,    setLoading]    = useState(true);
+  const [saving,     setSaving]     = useState(false);
+  const [toast,      setToast]      = useState('');
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3500); };
 
@@ -61,6 +62,7 @@ export default function CompanyDetailPage() {
       adminApi.sa.featureRegistry(),
       adminApi.sa.listPlans(),
       adminApi.sa.listAudit({ target_id: id, limit: '20' }),
+      adminApi.sa.listCompanyProperties(id),
     ]);
     if (results[0].status === 'fulfilled') {
       const d = (results[0].value as any)?.data;
@@ -80,6 +82,7 @@ export default function CompanyDetailPage() {
     if (results[3].status === 'fulfilled') setRegistry((results[3].value as any)?.data || {});
     if (results[4].status === 'fulfilled') setPlans((results[4].value as any)?.data || []);
     if (results[5].status === 'fulfilled') setAudit((results[5].value as any)?.data || []);
+    if (results[6].status === 'fulfilled') setProperties((results[6].value as any)?.data || []);
     setLoading(false);
   }, [id, router]);
 
@@ -360,6 +363,11 @@ export default function CompanyDetailPage() {
           </Section>
         )}
 
+        {/* ── الكاميرات ── */}
+        {tab === 'الكاميرات' && (
+          <CamerasTab companyId={id} properties={properties} showToast={showToast} />
+        )}
+
         {/* ── التدقيق ── */}
         {tab === 'التدقيق' && (
           <Section title="سجل تدقيق الشركة">
@@ -569,6 +577,208 @@ function HatifConfigForm({ companyId, current, onSave, showToast }: { companyId:
         style={{ padding: '8px 20px', borderRadius: 10, background: '#059669', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(5,150,105,.3)' }}>
         {saving ? '...' : 'حفظ إعدادات هاتف'}
       </button>
+    </div>
+  );
+}
+
+// ── Cameras Tab ──────────────────────────────────────────────────────────────
+function CamerasTab({ companyId, properties, showToast }: { companyId: string; properties: any[]; showToast: (m: string) => void }) {
+  const [cameras,        setCameras]        = useState<any[]>([]);
+  const [selectedPropId, setSelectedPropId] = useState('');
+  const [loading,        setLoading]        = useState(false);
+  const [saving,         setSaving]         = useState(false);
+  const [provider,       setProvider]       = useState<'ezviz' | 'rtsp'>('ezviz');
+  const [form, setForm] = useState({
+    name: '', location_tag: 'entrance',
+    device_serial: '', ezviz_email: '', ezviz_password: '', ezviz_region: 'apiisgp.ezvizlife.com',
+    rtsp_url: '', rtsp_username: '', rtsp_password: '',
+  });
+  const [snapshots, setSnapshots] = useState<Record<string, string>>({});
+
+  const loadCameras = async (propId: string) => {
+    if (!propId) return;
+    setLoading(true);
+    try {
+      const r = await adminApi.cameras.listByProperty(propId);
+      setCameras(r.data || []);
+    } catch { setCameras([]); }
+    setLoading(false);
+  };
+
+  const handleSelectProp = (propId: string) => {
+    setSelectedPropId(propId);
+    loadCameras(propId);
+  };
+
+  const handleAdd = async () => {
+    if (!selectedPropId) return showToast('اختر عقاراً أولاً');
+    setSaving(true);
+    try {
+      await adminApi.cameras.add(selectedPropId, {
+        ...form,
+        provider,
+        company_id: companyId,
+      });
+      showToast('تمت إضافة الكاميرا');
+      setForm({ name: '', location_tag: 'entrance', device_serial: '', ezviz_email: '', ezviz_password: '', ezviz_region: 'apiisgp.ezvizlife.com', rtsp_url: '', rtsp_username: '', rtsp_password: '' });
+      loadCameras(selectedPropId);
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+    setSaving(false);
+  };
+
+  const handleRemove = async (cameraId: string) => {
+    if (!confirm('حذف هذه الكاميرا؟')) return;
+    try {
+      await adminApi.cameras.remove(cameraId);
+      showToast('تم حذف الكاميرا');
+      loadCameras(selectedPropId);
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+  };
+
+  const handleSnapshot = async (cameraId: string) => {
+    try {
+      const r = await adminApi.cameras.snapshot(cameraId);
+      if (r.data?.url) setSnapshots(p => ({ ...p, [cameraId]: r.data.url }));
+      showToast('تم التقاط الصورة');
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+  };
+
+  const inp = { padding: '7px 12px', borderRadius: 10, border: '1px solid var(--lv-line)', fontSize: 12, background: 'var(--lv-bg)', color: 'var(--lv-fg)', width: '100%', boxSizing: 'border-box' as const };
+  const LOCATIONS: Record<string, string> = { entrance: 'المدخل', living: 'المعيشة', bedroom: 'النوم', exterior: 'الخارج', parking: 'المواقف', other: 'أخرى' };
+
+  return (
+    <div>
+      {/* Property selector */}
+      <div style={{ background: 'var(--lv-panel)', borderRadius: 14, border: '1px solid var(--lv-line)', padding: '16px 20px', marginBottom: 20 }}>
+        <p style={{ fontSize: 12, color: 'var(--lv-muted)', margin: '0 0 8px', fontWeight: 500 }}>اختر العقار</p>
+        {properties.length === 0 ? (
+          <p style={{ fontSize: 12, color: 'var(--lv-muted)' }}>لا توجد عقارات مسجلة لهذه الشركة</p>
+        ) : (
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {properties.map(p => (
+              <button key={p.id} onClick={() => handleSelectProp(p.id)}
+                style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid var(--lv-line)', background: selectedPropId === p.id ? 'var(--lv-accent)' : 'var(--lv-bg)', color: selectedPropId === p.id ? '#fff' : 'var(--lv-fg)', fontSize: 12, cursor: 'pointer', fontWeight: 500 }}>
+                {p.name || p.name_ar}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Camera list */}
+      {selectedPropId && (
+        <>
+          <div style={{ background: 'var(--lv-panel)', borderRadius: 14, border: '1px solid var(--lv-line)', padding: '16px 20px', marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 14px', color: 'var(--lv-fg)' }}>
+              الكاميرات المثبتة ({cameras.length})
+            </h3>
+            {loading ? (
+              <p style={{ fontSize: 12, color: 'var(--lv-muted)' }}>جاري التحميل...</p>
+            ) : cameras.length === 0 ? (
+              <p style={{ fontSize: 12, color: 'var(--lv-muted)' }}>لا توجد كاميرات لهذا العقار</p>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+                {cameras.map(cam => (
+                  <div key={cam.id} style={{ background: 'var(--lv-bg)', borderRadius: 12, border: '1px solid var(--lv-line)', overflow: 'hidden' }}>
+                    {snapshots[cam.id] && (
+                      <img src={snapshots[cam.id]} alt="snapshot" style={{ width: '100%', height: 130, objectFit: 'cover', display: 'block' }} />
+                    )}
+                    <div style={{ padding: '10px 12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)' }}>{cam.name}</span>
+                        <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 5, background: cam.provider === 'rtsp' ? 'rgba(59,130,246,.1)' : 'rgba(124,92,252,.1)', color: cam.provider === 'rtsp' ? '#3b82f6' : 'var(--lv-accent)', fontWeight: 600 }}>
+                          {cam.provider?.toUpperCase()}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 8px' }}>{LOCATIONS[cam.location_tag] || cam.location_tag}</p>
+                      {cam.device_serial && <p style={{ fontSize: 10, color: 'var(--lv-muted)', direction: 'ltr', margin: '0 0 8px' }}>{cam.device_serial}</p>}
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button onClick={() => handleSnapshot(cam.id)}
+                          style={{ flex: 1, padding: '5px 0', borderRadius: 7, background: 'var(--lv-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 500 }}>
+                          التقاط
+                        </button>
+                        <button onClick={() => handleRemove(cam.id)}
+                          style={{ padding: '5px 10px', borderRadius: 7, background: '#fef2f2', color: '#ef4444', border: '1px solid rgba(239,68,68,.2)', cursor: 'pointer', fontSize: 11, fontWeight: 500 }}>
+                          حذف
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Add camera form */}
+          <div style={{ background: 'var(--lv-panel)', borderRadius: 14, border: '1px solid var(--lv-line)', padding: '16px 20px' }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, margin: '0 0 14px', color: 'var(--lv-fg)' }}>إضافة كاميرا جديدة</h3>
+
+            {/* Provider toggle */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+              {(['ezviz', 'rtsp'] as const).map(p => (
+                <button key={p} onClick={() => setProvider(p)}
+                  style={{ padding: '6px 16px', borderRadius: 8, border: '1px solid var(--lv-line)', background: provider === p ? 'var(--lv-accent)' : 'var(--lv-bg)', color: provider === p ? '#fff' : 'var(--lv-fg)', fontSize: 12, cursor: 'pointer', fontWeight: 500 }}>
+                  {p === 'ezviz' ? 'EZVIZ' : 'RTSP (أي كاميرا)'}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+              <div>
+                <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>اسم الكاميرا</p>
+                <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} style={inp} placeholder="كاميرا المدخل" />
+              </div>
+              <div>
+                <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>الموقع</p>
+                <select value={form.location_tag} onChange={e => setForm(p => ({ ...p, location_tag: e.target.value }))} style={{ ...inp }}>
+                  {Object.entries(LOCATIONS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                </select>
+              </div>
+            </div>
+
+            {provider === 'ezviz' ? (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+                <div>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>رقم الجهاز (Serial)</p>
+                  <input value={form.device_serial} onChange={e => setForm(p => ({ ...p, device_serial: e.target.value }))} dir="ltr" style={inp} placeholder="BG8598562" />
+                </div>
+                <div>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>إيميل EZVIZ</p>
+                  <input value={form.ezviz_email} onChange={e => setForm(p => ({ ...p, ezviz_email: e.target.value }))} type="email" dir="ltr" style={inp} placeholder="owner@email.com" />
+                </div>
+                <div>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>كلمة مرور EZVIZ</p>
+                  <input value={form.ezviz_password} onChange={e => setForm(p => ({ ...p, ezviz_password: e.target.value }))} type="password" dir="ltr" style={inp} placeholder="••••••" />
+                </div>
+                <div>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>السيرفر (Region)</p>
+                  <input value={form.ezviz_region} onChange={e => setForm(p => ({ ...p, ezviz_region: e.target.value }))} dir="ltr" style={inp} />
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>RTSP URL</p>
+                  <input value={form.rtsp_url} onChange={e => setForm(p => ({ ...p, rtsp_url: e.target.value }))} dir="ltr" style={inp} placeholder="rtsp://192.168.1.100:554/stream" />
+                </div>
+                <div>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>اسم المستخدم (اختياري)</p>
+                  <input value={form.rtsp_username} onChange={e => setForm(p => ({ ...p, rtsp_username: e.target.value }))} dir="ltr" style={inp} placeholder="admin" />
+                </div>
+                <div>
+                  <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>كلمة المرور (اختياري)</p>
+                  <input value={form.rtsp_password} onChange={e => setForm(p => ({ ...p, rtsp_password: e.target.value }))} type="password" dir="ltr" style={inp} placeholder="••••••" />
+                </div>
+              </div>
+            )}
+
+            <button onClick={handleAdd} disabled={saving}
+              style={{ padding: '8px 22px', borderRadius: 10, background: 'var(--lv-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500, boxShadow: '0 2px 8px rgba(124,92,252,.2)' }}>
+              {saving ? '...' : 'إضافة الكاميرا'}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }

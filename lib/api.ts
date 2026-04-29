@@ -127,7 +127,8 @@ export const adminApi = {
       return request<any>('GET', `/superadmin/companies${qs}`);
     },
     getCompany:      (id: string)   => request<any>('GET',  `/superadmin/companies/${id}`),
-    getCompanyUsage: (id: string)   => request<any>('GET',  `/superadmin/companies/${id}/usage`),
+    getCompanyUsage:       (id: string) => request<any>('GET', `/superadmin/companies/${id}/usage`),
+    listCompanyProperties: (id: string) => request<any>('GET', `/superadmin/companies/${id}/properties`),
     activateCompany: (id: string)   => request<any>('POST', `/superadmin/companies/${id}/activate`),
     suspendCompany:  (id: string, reason: string) => request<any>('POST', `/superadmin/companies/${id}/suspend`, { reason }),
     deleteCompany:   (id: string, reason: string) => request<any>('POST', `/superadmin/companies/${id}/delete`, { reason }),
@@ -269,5 +270,21 @@ export const adminApi = {
     list:   ()                          => request<any>('GET',   '/superadmin/maintenance/flows'),
     get:    (id: string)                => request<any>('GET',   `/superadmin/maintenance/flows/${id}`),
     update: (id: string, data: any)     => request<any>('PATCH', `/superadmin/maintenance/flows/${id}`, data),
+  },
+
+  // ─── Cameras (admin manages on behalf of companies) ──────────────────────────
+  cameras: {
+    listByProperty: (propertyId: string) =>
+      request<any>('GET',    `/cameras/property/${propertyId}`),
+    add: (propertyId: string, data: any) =>
+      request<any>('POST',   `/admin/cameras/property/${propertyId}`, data),
+    remove: (cameraId: string) =>
+      request<any>('DELETE', `/admin/cameras/${cameraId}`),
+    status: (cameraId: string) =>
+      request<any>('GET',    `/cameras/${cameraId}/status`),
+    snapshot: (cameraId: string) =>
+      request<any>('POST',   `/cameras/${cameraId}/snapshot`, { reason: 'admin_manual' }),
+    snapshots: (cameraId: string) =>
+      request<any>('GET',    `/cameras/${cameraId}/snapshots`),
   },
 };
