@@ -122,6 +122,7 @@ export default function CamerasPage() {
 
   const selectedCompany = companies.find(c => c.id === companyId);
   const selectedProperty = properties.find(p => p.id === propertyId);
+  const propLabel = (p: any) => p.name_ar || p.name_en || p.id;
 
   return (
     <div style={{ padding: '28px 32px', maxWidth: 1100, margin: '0 auto' }}>
@@ -171,7 +172,7 @@ export default function CamerasPage() {
       {companyId && (
         <div style={{ background: 'var(--lv-panel)', borderRadius: 14, border: '1px solid var(--lv-line)', padding: '18px 22px', marginBottom: 16 }}>
           <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--lv-muted)', margin: '0 0 12px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-            2 — اختر العقار · {selectedCompany?.name}
+            2 — اختر العقار · {selectedCompany?.name || selectedCompany?.name_ar}
           </p>
           {loadingProp ? (
             <p style={{ fontSize: 12, color: 'var(--lv-muted)' }}>جاري التحميل...</p>
@@ -184,7 +185,7 @@ export default function CamerasPage() {
                   style={{ padding: '6px 14px', borderRadius: 8, border: '1px solid var(--lv-line)', fontSize: 12, cursor: 'pointer', fontWeight: 500, transition: 'all .1s',
                     background: propertyId === p.id ? 'var(--lv-accent)' : 'var(--lv-bg)',
                     color: propertyId === p.id ? '#fff' : 'var(--lv-fg)' }}>
-                  {p.name || p.name_ar}
+                  {propLabel(p)}
                 </button>
               ))}
             </div>
@@ -199,7 +200,7 @@ export default function CamerasPage() {
           <div style={{ background: 'var(--lv-panel)', borderRadius: 14, border: '1px solid var(--lv-line)', padding: '18px 22px', marginBottom: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--lv-muted)', margin: 0, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                3 — الكاميرات · {selectedProperty?.name} ({cameras.length})
+                3 — الكاميرات · {selectedProperty ? propLabel(selectedProperty) : ''} ({cameras.length})
               </p>
               <button onClick={() => { setShowForm(f => !f); setForm({ ...EMPTY_FORM }); }}
                 style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 8, background: 'var(--lv-accent)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 500 }}>
