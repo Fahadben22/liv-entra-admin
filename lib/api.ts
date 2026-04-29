@@ -26,32 +26,26 @@ export async function request<T>(method: string, path: string, body?: unknown): 
   const skipRedirect = skipRedirectPaths.some(p => path.startsWith(p) || path.includes(p));
   if (res.status === 401 && typeof window !== 'undefined' && !skipRedirect) {
     // Try silent refresh before redirecting to login
-    const rt = localStorage.getItem('admin_refresh_token');
-    if (rt) {
-      try {
-        const refreshRes = await fetch(`${BASE}/auth/refresh`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh_token: rt }),
-        });
-        if (refreshRes.ok) {
-          const rj = await refreshRes.json();
-          if (rj.data?.token) {
-            localStorage.setItem('admin_token', rj.data.token);
-            if (rj.data.refresh_token) localStorage.setItem('admin_refresh_token', rj.data.refresh_token);
-            const retryRes = await fetch(`${BASE}${path}`, {
-              method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${rj.data.token}` },
-              ...(body ? { body: JSON.stringify(body) } : {}),
-            });
-            const retryJson = await retryRes.json();
-            if (!retryRes.ok) throw new Error(retryJson.message || 'Request failed');
-            return retryJson;
-          }
+    try {
+      const renewRes = await fetch('/api/auth/renew', { method: 'POST' });
+      if (renewRes.ok) {
+        const rj = await renewRes.json();
+        if (rj.token) {
+          localStorage.setItem('admin_token', rj.token);
+          const retryRes = await fetch(`${BASE}${path}`, {
+            method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${rj.token}` },
+            ...(body ? { body: JSON.stringify(body) } : {}),
+          });
+          const retryJson = await retryRes.json();
+          if (!retryRes.ok) throw new Error(retryJson.message || 'Request failed');
+          return retryJson;
         }
-      } catch { /* refresh failed — fall through to redirect */ }
-    }
+      }
+    } catch { /* refresh failed — fall through to redirect */ }
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
     localStorage.removeItem('admin_refresh_token');
+    await fetch('/api/auth/session', { method: 'DELETE' }).catch(() => {});
     window.location.href = '/login';
     throw new Error('session_expired');
   }
@@ -272,8 +266,8 @@ export const adminApi = {
 
   // ─── Maintenance Flows ───────────────────────────────────────────────────────
   maintenanceFlows: {
-    list:   ()                          => request<any>('GET',   '/maintenance/flows'),
-    get:    (id: string)                => request<any>('GET',   `/maintenance/flows/${id}`),
-    update: (id: string, data: any)     => request<any>('PATCH', `/maintenance/flows/${id}`, data),
+    list:   ()                          => request<any>('GET',   '/superadmin/maintenance/flows'),
+    get:    (id: string)                => request<any>('GET',   `/superadmin/maintenance/flows/${id}`),
+    update: (id: string, data: any)     => request<any>('PATCH', `/superadmin/maintenance/flows/${id}`, data),
   },
 };
