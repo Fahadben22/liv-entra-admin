@@ -51,6 +51,17 @@ interface DraftEmail {
   body: string;
 }
 
+interface Directive {
+  id: string;
+  from_agent: string;
+  to_agent: string;
+  directive: string;
+  reply: string | null;
+  status: string;
+  created_at: string;
+  replied_at: string | null;
+}
+
 export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions, messages: externalMessages, onMessagesChange, compact, pendingMessage }: AgentChatProps) {
   const [internalMessages, setInternalMessages] = useState<Message[]>([]);
   const messages = externalMessages ?? internalMessages;
@@ -60,12 +71,24 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
   const [loading, setLoading]   = useState(false);
   const [tokens, setTokens]     = useState(0);
   const [goals, setGoals]       = useState<AgentGoal[]>([]);
+  const [activeTab, setActiveTab] = useState<'chat' | 'inbox'>('chat');
+  const [inbox, setInbox]         = useState<Directive[]>([]);
+  const [inboxLoading, setInboxLoading] = useState(false);
+  const [expandedDirective, setExpandedDirective] = useState<string | null>(null);
 
   useEffect(() => {
     request<any>('GET', '/admin/agents/goals').then(res => {
       if (res?.data) setGoals((res.data as AgentGoal[]).filter(g => g.status === 'active'));
     }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (activeTab !== 'inbox') return;
+    setInboxLoading(true);
+    request<any>('GET', `/admin/agents/${agentType}/inbox`).then(res => {
+      setInbox(res?.data || []);
+    }).catch(() => {}).finally(() => setInboxLoading(false));
+  }, [activeTab, agentType]);
 
   // Legacy email draft (old contactLead flow)
   const [draft, setDraft]       = useState<DraftEmail | null>(null);
@@ -260,8 +283,89 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
         </div>
       )}
 
+      {/* Tab switcher */}
+      <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid rgba(0,0,0,.06)', flexShrink: 0, paddingLeft: 20 }}>
+        {(['chat', 'inbox'] as const).map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              padding: '8px 16px', fontSize: 11, fontWeight: 600, border: 'none', background: 'transparent',
+              cursor: 'pointer', color: activeTab === tab ? '#2563EB' : '#9ca3af',
+              borderBottom: activeTab === tab ? '2px solid #2563EB' : '2px solid transparent',
+              transition: 'all .15s', display: 'flex', alignItems: 'center', gap: 5,
+            }}
+          >
+            {tab === 'chat' ? 'المحادثة' : (
+              <>
+                صندوق الوارد
+                {inbox.length > 0 && (
+                  <span style={{ fontSize: 9, padding: '1px 6px', borderRadius: 8, background: '#2563EB', color: '#fff', fontWeight: 700 }}>
+                    {inbox.length}
+                  </span>
+                )}
+              </>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Inbox panel */}
+      {activeTab === 'inbox' && (
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {inboxLoading && (
+            <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: 12, padding: 40 }}>جاري التحميل...</div>
+          )}
+          {!inboxLoading && inbox.length === 0 && (
+            <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: 12, padding: 40 }}>
+              لا توجد توجيهات من REEA بعد
+            </div>
+          )}
+          {inbox.map(d => (
+            <div key={d.id} style={{ borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#fff', overflow: 'hidden' }}>
+              <div
+                onClick={() => setExpandedDirective(expandedDirective === d.id ? null : d.id)}
+                style={{ padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: 10 }}
+              >
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                    <span style={{
+                      fontSize: 9, padding: '2px 8px', borderRadius: 8, fontWeight: 700,
+                      background: d.status === 'replied' ? '#dcfce7' : '#fef3c7',
+                      color: d.status === 'replied' ? '#166534' : '#92400e',
+                    }}>
+                      {d.status === 'replied' ? 'تم الرد' : 'في الانتظار'}
+                    </span>
+                    <span style={{ fontSize: 10, color: '#9ca3af' }}>
+                      {new Date(d.created_at).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' })}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 12, color: '#1e293b', margin: 0, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
+                    {d.directive.length > 120 && expandedDirective !== d.id
+                      ? d.directive.slice(0, 120) + '…'
+                      : d.directive}
+                  </p>
+                </div>
+                <span style={{ fontSize: 14, color: '#9ca3af', flexShrink: 0 }}>{expandedDirective === d.id ? '▲' : '▼'}</span>
+              </div>
+              {expandedDirective === d.id && d.reply && (
+                <div style={{ padding: '10px 14px', borderTop: '1px solid rgba(0,0,0,.06)', background: '#f8faff' }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', margin: '0 0 4px' }}>رد الوكيل:</p>
+                  <p style={{ fontSize: 12, color: '#374151', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{d.reply}</p>
+                  {d.replied_at && (
+                    <p style={{ fontSize: 10, color: '#9ca3af', margin: '6px 0 0' }}>
+                      {new Date(d.replied_at).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' })}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Messages */}
-      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', flexDirection: 'column', gap: 12, display: activeTab === 'inbox' ? 'none' : 'flex' }}>
         {messages.length === 0 && !outreachDraft && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
             <div style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
