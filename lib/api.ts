@@ -275,16 +275,16 @@ export const adminApi = {
   // ─── Cameras (admin manages on behalf of companies) ──────────────────────────
   cameras: {
     listByProperty: (propertyId: string) =>
-      request<any>('GET',    `/cameras/property/${propertyId}`),
+      request<any>('GET',    `/admin/cameras/property/${propertyId}`),
     add: (propertyId: string, data: any) =>
       request<any>('POST',   `/admin/cameras/property/${propertyId}`, data),
     remove: (cameraId: string) =>
       request<any>('DELETE', `/admin/cameras/${cameraId}`),
     status: (cameraId: string) =>
-      request<any>('GET',    `/cameras/${cameraId}/status`),
+      request<any>('GET',    `/admin/cameras/${cameraId}/status`),
     snapshot: (cameraId: string) =>
-      request<any>('POST',   `/cameras/${cameraId}/snapshot`, { reason: 'admin_manual' }),
+      request<any>('POST',   `/admin/cameras/${cameraId}/snapshot`, { reason: 'admin_manual' }),
     snapshots: (cameraId: string) =>
-      request<any>('GET',    `/cameras/${cameraId}/snapshots`),
+      request<any>('GET',    `/admin/cameras/${cameraId}/snapshots`),
   },
 };
