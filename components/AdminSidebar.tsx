@@ -16,6 +16,7 @@ const SECTION_ICONS: Record<string, IconName> = {
   '/dashboard/command-center': 'grid',
   '/dashboard/agenda': 'bell',
   '/dashboard/agents': 'robot',
+  '/dashboard/ai-knowledge': 'cpu',
   '/dashboard/leads': 'clipboard',
   '/dashboard/demo-leads': 'target',
   '/dashboard/landing-page/analytics': 'trending-up',
