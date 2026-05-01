@@ -37,6 +37,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/intelligence',    label: 'الذكاء العقاري',  section: 'ops' },
   { href: '/dashboard/activity',       label: 'نشاط العملاء',   section: 'ops' },
   { href: '/dashboard/command-center', label: 'مركز القيادة',   section: 'ops' },
+  { href: '/dashboard/agenda',         label: 'الأجندة',        section: 'ops' },
   { href: '/dashboard/agents',         label: 'الوكلاء',        section: 'ops' },
   { href: '/dashboard/ai-knowledge',   label: 'قاعدة المعرفة',  section: 'ops' },
   { href: '/dashboard/leads',          label: 'طلبات العرض',    section: 'growth' },
