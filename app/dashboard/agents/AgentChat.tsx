@@ -310,57 +310,170 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
         ))}
       </div>
 
-      {/* Inbox panel */}
+      {/* Inbox panel — Gmail style */}
       {activeTab === 'inbox' && (
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {inboxLoading && (
-            <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: 12, padding: 40 }}>جاري التحميل...</div>
-          )}
-          {!inboxLoading && inbox.length === 0 && (
-            <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: 12, padding: 40 }}>
-              لا توجد توجيهات من REEA بعد
-            </div>
-          )}
-          {inbox.map(d => (
-            <div key={d.id} style={{ borderRadius: 10, border: '1px solid rgba(0,0,0,.08)', background: '#fff', overflow: 'hidden' }}>
-              <div
-                onClick={() => setExpandedDirective(expandedDirective === d.id ? null : d.id)}
-                style={{ padding: '10px 14px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: 10 }}
-              >
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <span style={{
-                      fontSize: 9, padding: '2px 8px', borderRadius: 8, fontWeight: 700,
-                      background: d.status === 'replied' ? '#dcfce7' : '#fef3c7',
-                      color: d.status === 'replied' ? '#166534' : '#92400e',
-                    }}>
-                      {d.status === 'replied' ? 'تم الرد' : 'في الانتظار'}
-                    </span>
-                    <span style={{ fontSize: 10, color: '#9ca3af' }}>
-                      {new Date(d.created_at).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' })}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: 12, color: '#1e293b', margin: 0, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
-                    {d.directive.length > 120 && expandedDirective !== d.id
-                      ? d.directive.slice(0, 120) + '…'
-                      : d.directive}
-                  </p>
-                </div>
-                <span style={{ fontSize: 14, color: '#9ca3af', flexShrink: 0 }}>{expandedDirective === d.id ? '▲' : '▼'}</span>
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+
+          {/* Left: message list */}
+          <div style={{
+            width: expandedDirective ? 300 : '100%', flexShrink: 0,
+            borderLeft: expandedDirective ? '1px solid rgba(0,0,0,.07)' : 'none',
+            overflowY: 'auto', background: '#fff',
+            transition: 'width .2s',
+          }}>
+            {inboxLoading && (
+              <div style={{ textAlign: 'center', color: '#9ca3af', fontSize: 12, padding: 40 }}>جاري التحميل...</div>
+            )}
+            {!inboxLoading && inbox.length === 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 8, color: '#9ca3af' }}>
+                <span style={{ fontSize: 32 }}>📭</span>
+                <span style={{ fontSize: 12 }}>لا توجد توجيهات من REEA بعد</span>
               </div>
-              {expandedDirective === d.id && d.reply && (
-                <div style={{ padding: '10px 14px', borderTop: '1px solid rgba(0,0,0,.06)', background: '#f8faff' }}>
-                  <p style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', margin: '0 0 4px' }}>رد الوكيل:</p>
-                  <p style={{ fontSize: 12, color: '#374151', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{d.reply}</p>
-                  {d.replied_at && (
-                    <p style={{ fontSize: 10, color: '#9ca3af', margin: '6px 0 0' }}>
-                      {new Date(d.replied_at).toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' })}
-                    </p>
+            )}
+            {inbox.map(d => {
+              const isOpen = expandedDirective === d.id;
+              const isReplied = d.status === 'replied';
+              const ts = new Date(d.created_at);
+              const now = new Date();
+              const sameDay = ts.toDateString() === now.toDateString();
+              const timeLabel = sameDay
+                ? ts.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })
+                : ts.toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' });
+
+              return (
+                <div
+                  key={d.id}
+                  onClick={() => setExpandedDirective(isOpen ? null : d.id)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 16px', cursor: 'pointer', borderBottom: '1px solid rgba(0,0,0,.05)',
+                    background: isOpen ? '#EFF6FF' : '#fff',
+                    transition: 'background .1s',
+                  }}
+                >
+                  {/* Avatar */}
+                  <div style={{
+                    width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+                    background: 'linear-gradient(135deg,#7c5cfc,#2563EB)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 13, fontWeight: 700, color: '#fff',
+                  }}>R</div>
+
+                  {/* Content */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                      <span style={{ fontSize: 12, fontWeight: isReplied ? 400 : 700, color: '#1e293b' }}>REEA</span>
+                      <span style={{ fontSize: 10, color: '#9ca3af', flexShrink: 0 }}>{timeLabel}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: '#374151', fontWeight: isReplied ? 400 : 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {d.directive.slice(0, 60)}{d.directive.length > 60 ? '…' : ''}
+                    </div>
+                    {d.reply && (
+                      <div style={{ fontSize: 10, color: '#9ca3af', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 1 }}>
+                        الرد: {d.reply.slice(0, 50)}…
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Status dot */}
+                  {!isReplied && (
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#2563EB', flexShrink: 0 }} />
                   )}
                 </div>
-              )}
-            </div>
-          ))}
+              );
+            })}
+          </div>
+
+          {/* Right: open message thread */}
+          {expandedDirective && (() => {
+            const d = inbox.find(x => x.id === expandedDirective);
+            if (!d) return null;
+            return (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', background: '#f8faff' }}>
+                {/* Thread header */}
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(0,0,0,.07)', background: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <button
+                    onClick={() => setExpandedDirective(null)}
+                    style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', cursor: 'pointer', fontSize: 12, color: '#6b7280' }}
+                  >← رجوع</button>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', flex: 1 }}>
+                    {d.directive.slice(0, 60)}{d.directive.length > 60 ? '…' : ''}
+                  </span>
+                  <span style={{
+                    fontSize: 10, padding: '3px 10px', borderRadius: 8, fontWeight: 700,
+                    background: d.status === 'replied' ? '#dcfce7' : '#fef3c7',
+                    color: d.status === 'replied' ? '#166534' : '#92400e',
+                  }}>
+                    {d.status === 'replied' ? 'تم الرد' : 'في الانتظار'}
+                  </span>
+                </div>
+
+                {/* Directive bubble */}
+                <div style={{ padding: '20px 20px 10px' }}>
+                  <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                      background: 'linear-gradient(135deg,#7c5cfc,#2563EB)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 14, fontWeight: 700, color: '#fff',
+                    }}>R</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>REEA</span>
+                        <span style={{ fontSize: 10, color: '#9ca3af' }}>
+                          {new Date(d.created_at).toLocaleString('ar-SA', { dateStyle: 'long', timeStyle: 'short' })}
+                        </span>
+                      </div>
+                      <div style={{
+                        background: '#fff', borderRadius: '4px 14px 14px 14px',
+                        border: '1px solid rgba(0,0,0,.07)', padding: '12px 16px',
+                        fontSize: 13, lineHeight: 1.7, color: '#1e293b', whiteSpace: 'pre-wrap',
+                      }}>
+                        {d.directive}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Reply bubble */}
+                  {d.reply && (
+                    <div style={{ display: 'flex', gap: 12, flexDirection: 'row-reverse' }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                        background: 'linear-gradient(135deg,#10b981,#059669)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 11, fontWeight: 700, color: '#fff',
+                      }}>
+                        {agentName.slice(0, 2)}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexDirection: 'row-reverse' }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>{agentName}</span>
+                          {d.replied_at && (
+                            <span style={{ fontSize: 10, color: '#9ca3af' }}>
+                              {new Date(d.replied_at).toLocaleString('ar-SA', { dateStyle: 'long', timeStyle: 'short' })}
+                            </span>
+                          )}
+                        </div>
+                        <div style={{
+                          background: '#ecfdf5', borderRadius: '14px 4px 14px 14px',
+                          border: '1px solid rgba(16,185,129,.2)', padding: '12px 16px',
+                          fontSize: 13, lineHeight: 1.7, color: '#1e293b', whiteSpace: 'pre-wrap',
+                        }}>
+                          {d.reply}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {!d.reply && (
+                    <div style={{ textAlign: 'center', padding: '20px 0', color: '#9ca3af', fontSize: 12 }}>
+                      في انتظار رد الوكيل...
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       )}
 
