@@ -352,6 +352,13 @@ const AGENTS = [
   { type: 'marketing',    name: 'نورة',       icon: 'bar-chart',    color: '#8b5cf6', role: 'تسويق', spec: 'marketing_specialist', specName: 'سارة', specIcon: 'send', spec2: 'design_specialist', specName2: 'ليلى', specIcon2: 'sparkles', quickActions: ['KPIs الأسبوع', 'الحملات', 'الزوار', 'التحويل', 'المصادر'] },
   { type: 'finance',      name: 'ريم',        icon: 'dollar',       color: '#f59e0b', role: 'مالية', spec: 'finance_specialist', specName: 'ماجد', specIcon: 'receipt', quickActions: ['معدل التحصيل هذا الشهر لكل شركة', 'المتأخرات', 'MRR', 'المصروفات', 'التوقعات'] },
   { type: 'product',      name: 'يوسف',       icon: 'zap',          color: '#06b6d4', role: 'منتج', spec: 'product_specialist', specName: 'لينا', specIcon: 'search', quickActions: ['عملاء خاملون — قائمة مع توصية لكل منهم', 'شركات تواجه مشاكل تشغيلية أو مالية', 'تبني الميزات — أيها مُستخدم وأيها مهجور', 'الشركات الجديدة خلال آخر 14 يوم وحال انطلاقها', 'NPS والمغادرة'] },
+  // ─── Building Ops Agents ─────────────────────────────────────────────────
+  { type: 'leasing',    name: 'سارة',  icon: 'home',        color: '#10b981', role: 'تأجير', quickActions: ['عقود تنتهي قريباً', 'وحدات شاغرة', 'حالة التأجير', 'تسجيلات إيجار معلقة', 'أنبوب العملاء المحتملين'] },
+  { type: 'collections', name: 'بدر',  icon: 'dollar',      color: '#f97316', role: 'تحصيل', quickActions: ['من المتأخرون؟', 'تقرير التحصيل', 'خطط الدفع', 'المتأخرون +30 يوم', 'معدل التحصيل هذا الشهر'] },
+  { type: 'ops',        name: 'فارس', icon: 'wrench',       color: '#6366f1', role: 'عمليات', quickActions: ['تذاكر مفتوحة', 'انتهاك SLA', 'طلبات الشراء المعلقة', 'تقرير تكاليف الصيانة', 'الحالات الطارئة'] },
+  { type: 'tenant_exp', name: 'لينا', icon: 'users',        color: '#ec4899', role: 'تجربة المستأجر', quickActions: ['تجديدات قادمة', 'شكاوى مفتوحة', 'إرسال إعلان', 'المستأجرون المنتهية عقودهم', 'مؤشرات رضا المستأجرين'] },
+  { type: 'owner_rel',  name: 'نادية', icon: 'key',         color: '#0ea5e9', role: 'علاقات الملاك', quickActions: ['تسويات معلقة', 'تقارير الملاك', 'أداء العقارات', 'كشف حساب مالك', 'قلق مالك جديد'] },
+  { type: 'os_finance', name: 'رضا',  icon: 'receipt',      color: '#a855f7', role: 'مراقب مالي', quickActions: ['صافي الدخل التشغيلي', 'الميزانية مقابل الفعلي', 'التدفق النقدي', 'تقرير رسوم الإدارة', 'إنشاء تقرير شهري'] },
 ];
 
 // Specialist quick actions
@@ -428,13 +435,20 @@ export default function AgentsWorkspace() {
         <div style={{ padding: '14px 12px 8px', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
           <h2 style={{ fontSize: 12, fontWeight: 700, color: '#1E293B', margin: 0 }}>الفريق</h2>
         </div>
-        {AGENTS.map(a => {
+        {AGENTS.map((a, idx) => {
           const isActive = activeAgent === a.type;
-          const specActive = activeAgent === a.spec;
+          const specActive = activeAgent === (a as any).spec;
+          // Divider before first ops agent
+          const showDivider = a.type === 'leasing';
           const msgs = conversations[a.type] || [];
           const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null;
           return (
             <div key={a.type}>
+              {showDivider && (
+                <div style={{ padding: '10px 12px 4px', borderTop: '1px solid rgba(0,0,0,.06)', marginTop: 4 }}>
+                  <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase' }}>عمليات المباني</p>
+                </div>
+              )}
               {/* Manager */}
               <button onClick={() => setActiveAgent(a.type)}
                 style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', border: 'none', background: isActive ? `${a.color}08` : 'transparent', cursor: 'pointer', borderRight: isActive ? `3px solid ${a.color}` : '3px solid transparent', transition: 'all .1s' }}>
