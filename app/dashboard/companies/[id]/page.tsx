@@ -2,9 +2,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { adminApi } from '@/lib/api';
+import { adminApi, request } from '@/lib/api';
 
-const TABS = ['نظرة عامة', 'الاشتراك', 'الميزات', 'الاستخدام', 'التدقيق'] as const;
+const TABS = ['نظرة عامة', 'الاشتراك', 'الميزات', 'الاستخدام', 'مفاتيح API', 'التدقيق'] as const;
 type Tab = typeof TABS[number];
 
 const LC: Record<string, { color: string; label: string }> = {
@@ -361,6 +361,11 @@ export default function CompanyDetailPage() {
               <p style={{ color: 'var(--lv-muted)', fontSize: 13 }}>لا توجد بيانات استخدام</p>
             )}
           </Section>
+        )}
+
+        {/* ── مفاتيح API ── */}
+        {tab === 'مفاتيح API' && (
+          <ApiKeysTab companyId={id as string} flags={flags} />
         )}
 
         {/* ── التدقيق ── */}
@@ -773,6 +778,85 @@ function CamerasTab({ companyId, properties, showToast }: { companyId: string; p
             </button>
           </div>
         </>
+      )}
+    </div>
+  );
+}
+
+// ── API Keys Tab (admin read-only view + revoke) ───────────────────────────────
+function ApiKeysTab({ companyId, flags }: { companyId: string; flags: any[] }) {
+  const [keys,    setKeys]    = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [revoking, setRevoking] = useState<string | null>(null);
+
+  const hasApiAccess = flags.find(f => f.feature_key === 'api.access')?.is_enabled;
+
+  useEffect(() => {
+    request<any>('GET', `/admin/api-keys?company_id=${companyId}`)
+      .then(r => setKeys(r.data?.keys || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [companyId]);
+
+  async function revoke(id: string) {
+    if (!confirm('هل أنت متأكد من إلغاء هذا المفتاح؟')) return;
+    setRevoking(id);
+    try {
+      await request('DELETE', `/admin/api-keys/${id}`);
+      setKeys(prev => prev.map(k => k.id === id ? { ...k, is_active: false } : k));
+    } catch { alert('فشل الإلغاء'); }
+    finally { setRevoking(null); }
+  }
+
+  if (!hasApiAccess) {
+    return (
+      <div style={{ background: 'var(--lv-panel)', border: '1px solid var(--lv-line)', borderRadius: 14, padding: 24, textAlign: 'center', color: 'var(--lv-muted)' }}>
+        <p style={{ fontSize: 13, margin: 0 }}>ميزة "الوصول عبر API" غير مفعّلة لهذه الشركة</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ background: 'var(--lv-panel)', border: '1px solid var(--lv-line)', borderRadius: 14, overflow: 'hidden' }}>
+      <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--lv-line)' }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)', margin: 0 }}>مفاتيح API للشركة</p>
+        <p style={{ fontSize: 11, color: 'var(--lv-muted)', marginTop: 2, margin: 0 }}>قراءة فقط — يمكن إلغاء أي مفتاح من هنا</p>
+      </div>
+      {loading ? (
+        <p style={{ padding: 20, color: 'var(--lv-muted)', fontSize: 13, textAlign: 'center' }}>جاري التحميل...</p>
+      ) : keys.length === 0 ? (
+        <p style={{ padding: 20, color: 'var(--lv-muted)', fontSize: 13, textAlign: 'center' }}>لا توجد مفاتيح</p>
+      ) : (
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <thead>
+            <tr style={{ background: 'var(--lv-surface)', borderBottom: '1px solid var(--lv-line)' }}>
+              {['الاسم', 'المفتاح (مختصر)', 'آخر استخدام', 'الحالة', ''].map(h => (
+                <th key={h} style={{ padding: '9px 14px', textAlign: 'right', fontWeight: 600, color: 'var(--lv-muted)' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {keys.map((k: any, i: number) => (
+              <tr key={k.id} style={{ borderBottom: i < keys.length - 1 ? '1px solid var(--lv-line)' : 'none' }}>
+                <td style={{ padding: '10px 14px', fontWeight: 500, color: 'var(--lv-fg)' }}>{k.name}</td>
+                <td style={{ padding: '10px 14px', fontFamily: 'monospace', color: 'var(--lv-muted)', direction: 'ltr' }}>{k.key_prefix}••••••••••••</td>
+                <td style={{ padding: '10px 14px', color: 'var(--lv-muted)' }}>{k.last_used_at ? new Date(k.last_used_at).toLocaleDateString('ar-SA') : '—'}</td>
+                <td style={{ padding: '10px 14px' }}>
+                  <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 10, background: k.is_active ? '#ecfdf5' : '#fef2f2', color: k.is_active ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                    {k.is_active ? 'نشط' : 'ملغي'}
+                  </span>
+                </td>
+                <td style={{ padding: '10px 14px' }}>
+                  {k.is_active && (
+                    <button onClick={() => revoke(k.id)} disabled={revoking === k.id} style={{ fontSize: 10, padding: '4px 10px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: 6, cursor: 'pointer', opacity: revoking === k.id ? 0.5 : 1 }}>
+                      إلغاء
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

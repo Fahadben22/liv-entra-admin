@@ -32,8 +32,10 @@ export const PLAN_COLORS: Record<string, string> = {
 export const NAV_ITEMS = [
   { href: '/dashboard',                label: 'لوحة التحكم',    section: 'main' },
   { href: '/dashboard/companies',      label: 'الشركات',        section: 'main' },
+  { href: '/dashboard/companies/lifecycle', label: 'دورة الحياة', section: 'main' },
   { href: '/dashboard/features',       label: 'الميزات',        section: 'main' },
   { href: '/dashboard/billing',        label: 'الفواتير',       section: 'main' },
+  { href: '/dashboard/billing/settlements', label: 'التسويات',  section: 'main' },
   { href: '/dashboard/intelligence',    label: 'الذكاء العقاري',  section: 'ops' },
   { href: '/dashboard/activity',       label: 'نشاط العملاء',   section: 'ops' },
   { href: '/dashboard/command-center', label: 'مركز القيادة',   section: 'ops' },

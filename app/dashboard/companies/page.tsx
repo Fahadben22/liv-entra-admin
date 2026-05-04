@@ -220,7 +220,21 @@ export default function OnboardingCommandCenter() {
 
       {tab === 'matrix' && (
         <MatrixTab companies={companies} matrix={matrix} registry={registry} onToggle={handleToggleFlag}
-          reload={() => { adminApi.sa.featureMatrix().then(r => setMatrix(r?.data || [])).catch(() => {}); }} />
+          reload={() => {
+            adminApi.sa.featureMatrix().then(r => {
+              const d = r?.data;
+              if (!d) return;
+              if (Array.isArray(d)) { setMatrix(d); return; }
+              // API returns { companies, features, matrix: { [companyId]: { [featureKey]: { is_enabled, rollout_pct } } } }
+              const rows: { company_id: string; feature_key: string; is_enabled: boolean }[] = [];
+              Object.entries((d as any).matrix || {}).forEach(([compId, feats]: [string, any]) => {
+                Object.entries(feats || {}).forEach(([fKey, val]: [string, any]) => {
+                  rows.push({ company_id: compId, feature_key: fKey, is_enabled: Boolean(val?.is_enabled) });
+                });
+              });
+              setMatrix(rows);
+            }).catch(() => {});
+          }} />
       )}
 
       {tab === 'accounts' && (
