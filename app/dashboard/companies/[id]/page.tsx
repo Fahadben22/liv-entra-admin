@@ -471,7 +471,7 @@ function CompanyInfoForm({ companyId, current, onSave, showToast }: { companyId:
 
 // ── Limits inline form ──────────────────────────────────────────────────────
 function LimitsForm({ companyId, current, onSave, showToast }: { companyId: string; current: any; onSave: () => void; showToast: (m: string) => void }) {
-  const [maxUsers,      setMaxUsers]      = useState(String(current.max_users      ?? ''));
+  const [maxStaff,      setMaxStaff]      = useState(String(current.max_staff      ?? ''));
   const [maxProperties, setMaxProperties] = useState(String(current.max_properties ?? ''));
   const [maxUnits,      setMaxUnits]      = useState(String(current.max_units      ?? ''));
   const [maxContracts,  setMaxContracts]  = useState(String(current.max_contracts  ?? ''));
@@ -481,7 +481,7 @@ function LimitsForm({ companyId, current, onSave, showToast }: { companyId: stri
     setSaving(true);
     try {
       await adminApi.sa.updateLimits(companyId, {
-        max_users:       maxUsers      ? parseInt(maxUsers)      : undefined,
+        max_staff:       maxStaff      ? parseInt(maxStaff)      : undefined,
         max_properties:  maxProperties ? parseInt(maxProperties) : undefined,
         max_units:       maxUnits      ? parseInt(maxUnits)      : undefined,
         max_contracts:   maxContracts  ? parseInt(maxContracts)  : undefined,
@@ -497,7 +497,7 @@ function LimitsForm({ companyId, current, onSave, showToast }: { companyId: stri
   return (
     <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
       {[
-        { l: 'مستخدمون', v: maxUsers, set: setMaxUsers },
+        { l: 'موظفون', v: maxStaff, set: setMaxStaff },
         { l: 'عقارات',   v: maxProperties, set: setMaxProperties },
         { l: 'وحدات',    v: maxUnits, set: setMaxUnits },
         { l: 'عقود',     v: maxContracts, set: setMaxContracts },
