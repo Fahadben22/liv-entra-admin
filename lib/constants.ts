@@ -41,6 +41,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/command-center', label: 'مركز القيادة',   section: 'ops' },
   { href: '/dashboard/agenda',         label: 'الأجندة',        section: 'ops' },
   { href: '/dashboard/agents',         label: 'الوكلاء',        section: 'ops' },
+  { href: '/dashboard/reea',           label: 'REEA — AOM',     section: 'ops' },
   { href: '/dashboard/ai-knowledge',   label: 'قاعدة المعرفة',  section: 'ops' },
   { href: '/dashboard/leads',          label: 'طلبات العرض',    section: 'growth' },
   { href: '/dashboard/demo-leads',     label: 'قيادات الديمو',  section: 'growth' },
