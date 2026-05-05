@@ -102,7 +102,7 @@ export default function REEADashboard() {
 
   const load = useCallback(async () => {
     try {
-      const token = localStorage.getItem('admin_token') || localStorage.getItem('reea_api_key') || '';
+      const token = localStorage.getItem('admin_token') || '';
       const res = await fetch(`${BASE}/reea/aom/status`, {
         headers: { Authorization: `Bearer ${token}` },
       });
