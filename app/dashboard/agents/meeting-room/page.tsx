@@ -1,4 +1,5 @@
 'use client';
+// v2 — live feed tab
 import { useState, useEffect, useCallback } from 'react';
 import AgentChat from '../AgentChat';
 import { adminApi } from '@/lib/api';
