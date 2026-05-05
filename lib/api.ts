@@ -115,6 +115,7 @@ export const adminApi = {
     approveAction:        (id: string)    => request<any>('POST', `/admin/agents/meeting-room/approve-action/${id}`),
     rejectAction:         (id: string, reason?: string) => request<any>('POST', `/admin/agents/meeting-room/reject-action/${id}`, { reason }),
     approveReport:        (id: string)    => request<any>('POST', `/admin/agents/meeting-room/approve-report/${id}`),
+    getLiveDirectives:    ()              => request<any>('GET',  '/admin/agents/meeting-room/live-feed'),
 
     // Daily briefing
     getTodayBriefing:     ()             => request<any>('GET', '/admin/agents/briefing/today'),
