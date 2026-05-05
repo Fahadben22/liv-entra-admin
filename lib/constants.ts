@@ -43,6 +43,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/agents',         label: 'الوكلاء',        section: 'ops' },
   { href: '/dashboard/agents/reea',     label: 'REEA — Chat',    section: 'ops' },
   { href: '/dashboard/reea',           label: 'REEA — AOM',     section: 'ops' },
+  { href: '/dashboard/reea/authority', label: 'صلاحيات REEA',   section: 'ops' },
   { href: '/dashboard/ai-knowledge',   label: 'قاعدة المعرفة',  section: 'ops' },
   { href: '/dashboard/leads',          label: 'طلبات العرض',    section: 'growth' },
   { href: '/dashboard/demo-leads',     label: 'قيادات الديمو',  section: 'growth' },
