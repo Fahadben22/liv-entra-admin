@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { request } from '@/lib/api';
 import Icon from '@/components/Icon';
+import type { IconName } from '@/components/Icon';
 import Toggle from '@/components/Toggle';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -16,6 +17,7 @@ interface AuthorityRow {
   value: Record<string, any> | null;
   risk_level: 'low' | 'medium' | 'high' | 'critical';
   requires_fahad_approval: boolean;
+  access_type: 'read' | 'write' | 'action';
   updated_at: string;
   updated_by: string | null;
 }
@@ -45,6 +47,12 @@ const RISK_STYLES: Record<string, { bg: string; color: string; label: string }> 
   medium:   { bg: '#fffbeb', color: '#92400e', label: 'متوسط' },
   high:     { bg: '#fff7ed', color: '#c2410c', label: 'عالٍ' },
   critical: { bg: '#fef2f2', color: '#dc2626', label: 'حرج' },
+};
+
+const ACCESS_TYPE_STYLES: Record<string, { bg: string; color: string; icon: IconName; label: string }> = {
+  read:   { bg: '#f0fdf4', color: '#15803d', icon: 'eye',  label: 'قراءة فقط'    },
+  write:  { bg: '#eff6ff', color: '#1d4ed8', icon: 'edit', label: 'قراءة وكتابة' },
+  action: { bg: '#fffbeb', color: '#92400e', icon: 'zap',  label: 'إجراء خارجي'  },
 };
 
 const CORPUS_LABELS: Record<string, string> = {
@@ -82,6 +90,38 @@ function FahadBadge() {
   );
 }
 
+function AccessBadge({ type }: { type: string }) {
+  const s = ACCESS_TYPE_STYLES[type] ?? ACCESS_TYPE_STYLES.write;
+  return (
+    <span style={{ fontSize: 11, fontWeight: 600, color: s.color, background: s.bg,
+      padding: '2px 8px', borderRadius: 6, whiteSpace: 'nowrap',
+      display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+      <Icon name={s.icon} size={11} color={s.color} />
+      {s.label}
+    </span>
+  );
+}
+
+function RowFooter({ row, showKey = true }: { row: AuthorityRow; showKey?: boolean }) {
+  const dateStr = row.updated_at
+    ? new Date(row.updated_at).toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric' })
+    : '—';
+  const by = row.updated_by ?? 'غير محدد';
+  return (
+    <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {showKey && (
+        <div style={{ fontSize: 10, color: 'var(--lv-muted)', fontFamily: 'var(--lv-font-mono)',
+          direction: 'ltr', wordBreak: 'break-all' }}>
+          {row.key}
+        </div>
+      )}
+      <div style={{ fontSize: 10, color: 'var(--lv-muted)', fontFamily: 'var(--lv-font-mono)' }}>
+        <bdi>{`${by} — ${dateStr}`}</bdi>
+      </div>
+    </div>
+  );
+}
+
 function Toast({ message }: { message: string }) {
   return (
     <div style={{ position: 'fixed', top: 20, left: '50%', transform: 'translateX(-50%)',
@@ -114,13 +154,11 @@ function ToolsTab({ rows, edits, onToggle }: { rows: AuthorityRow[]; edits: Reco
               <Toggle checked={enabled} onChange={v => onToggle(row, v)} />
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+              <AccessBadge type={row.access_type} />
               <RiskBadge level={row.risk_level} />
               {row.requires_fahad_approval && <FahadBadge />}
             </div>
-            <div style={{ fontSize: 10, color: 'var(--lv-muted)', marginTop: 8,
-              fontFamily: 'var(--lv-font-mono)', direction: 'ltr', wordBreak: 'break-all' }}>
-              {row.key}
-            </div>
+            <RowFooter row={row} />
           </div>
         );
       })}
@@ -153,7 +191,9 @@ function ThresholdsTab({ rows, edits, onToggle, onValueChange }: {
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--lv-fg)' }}>{row.label_ar}</div>
               <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginTop: 2 }}>{unit}</div>
+              <RowFooter row={row} showKey={true} />
             </div>
+            <AccessBadge type={row.access_type} />
             <RiskBadge level={row.risk_level} />
             {row.requires_fahad_approval && <FahadBadge />}
             <input
@@ -190,7 +230,12 @@ function PortalsTab({ rows, edits, onToggle }: { rows: AuthorityRow[]; edits: Re
               </div>
               <Toggle checked={enabled} onChange={v => onToggle(row, v)} />
             </div>
-            <RiskBadge level={row.risk_level} />
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+              <AccessBadge type={row.access_type} />
+              <RiskBadge level={row.risk_level} />
+              {row.requires_fahad_approval && <FahadBadge />}
+            </div>
+            <RowFooter row={row} />
           </div>
         );
       })}
@@ -237,17 +282,20 @@ function KnowledgeTab({ rows, edits, onToggle, onValueChange }: {
             <div>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)' }}>{masterRow.label_ar}</div>
               <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginTop: 2 }}>تفعيل أو تعطيل البحث الكامل في قاعدة المعرفة</div>
+              <div style={{ marginTop: 8 }}><AccessBadge type={masterRow.access_type} /></div>
             </div>
             <Toggle checked={masterEnabled} onChange={v => onToggle(masterRow, v)} />
           </div>
+          <RowFooter row={masterRow} />
         </div>
       )}
 
       {corporaRow && (
         <div style={{ background: 'var(--lv-panel)', borderRadius: 12, padding: '16px 18px',
           border: '1px solid var(--lv-line)', opacity: masterEnabled ? 1 : 0.5 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)', marginBottom: 12 }}>
-            المصادر المسموح بها
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)' }}>المصادر المسموح بها</span>
+            <AccessBadge type={corporaRow.access_type} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {Object.entries(CORPUS_LABELS).map(([id, label]) => {
@@ -270,6 +318,7 @@ function KnowledgeTab({ rows, edits, onToggle, onValueChange }: {
               );
             })}
           </div>
+          <RowFooter row={corporaRow} />
         </div>
       )}
 
@@ -280,6 +329,7 @@ function KnowledgeTab({ rows, edits, onToggle, onValueChange }: {
             <div>
               <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)' }}>{threshRow.label_ar}</div>
               <div style={{ fontSize: 11, color: 'var(--lv-muted)', marginTop: 2 }}>0 = بحث حر، 1 = تطابق تام</div>
+              <div style={{ marginTop: 8 }}><AccessBadge type={threshRow.access_type} /></div>
             </div>
             <input
               type="number" min={0.1} max={0.99} step={0.05}
@@ -291,6 +341,7 @@ function KnowledgeTab({ rows, edits, onToggle, onValueChange }: {
                 textAlign: 'center' as const }}
             />
           </div>
+          <RowFooter row={threshRow} />
         </div>
       )}
     </div>
@@ -318,7 +369,9 @@ function InfraTab({ rows, edits, onToggle }: { rows: AuthorityRow[]; edits: Reco
                   يتطلب متغير البيئة: {envHint}
                 </div>
               )}
+              <RowFooter row={row} showKey={true} />
             </div>
+            <AccessBadge type={row.access_type} />
             <RiskBadge level={row.risk_level} />
           </div>
         );
