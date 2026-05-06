@@ -90,6 +90,16 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
     }).catch(() => {}).finally(() => setInboxLoading(false));
   }, [activeTab, agentType]);
 
+  useEffect(() => {
+    if ((externalMessages?.length ?? 0) > 0) return;
+    request<any>('GET', `/admin/agents/${agentType}/history`)
+      .then(res => {
+        const msgs: Message[] = (res?.data || []).filter((m: any) => m.role && m.content);
+        if (msgs.length > 0) setMessages(msgs);
+      })
+      .catch(() => {});
+  }, [agentType]);
+
   // Legacy email draft (old contactLead flow)
   const [draft, setDraft]       = useState<DraftEmail | null>(null);
   const [editSubject, setEditSubject] = useState('');
