@@ -390,20 +390,45 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
   pending: { label: 'معلق', color: '#f59e0b', bg: '#fffbeb' },
 };
 
+const AGENT_STYLE: Record<string, { label: string; color: string; bg: string }> = {
+  reea:        { label: 'REEA',    color: '#7c3aed', bg: '#f5f3ff' },
+  collections: { label: 'تحصيل',  color: '#dc2626', bg: '#fef2f2' },
+  leasing:     { label: 'تأجير',  color: '#2563eb', bg: '#eff6ff' },
+  maintenance: { label: 'صيانة',  color: '#d97706', bg: '#fffbeb' },
+  renewals:    { label: 'تجديد',  color: '#059669', bg: '#ecfdf5' },
+  onboarding:  { label: 'استقبال',color: '#0891b2', bg: '#ecfeff' },
+};
+
+const DIRECTIVE_STATUS: Record<string, { label: string; color: string }> = {
+  pending:  { label: 'بانتظار الرد', color: '#f59e0b' },
+  replied:  { label: 'تم الرد',      color: '#10b981' },
+  failed:   { label: 'فشل',          color: '#ef4444' },
+};
+
+function timeAgoFeed(iso: string) {
+  const sec = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (sec < 60) return 'الآن';
+  if (sec < 3600) return `${Math.floor(sec / 60)}د`;
+  if (sec < 86400) return `${Math.floor(sec / 3600)}س`;
+  return `${Math.floor(sec / 86400)}ي`;
+}
+
 export default function AgentsWorkspace() {
   const [activeAgent, setActiveAgent] = useState('meeting_room');
   const [conversations, setConversations] = useState<Record<string, Message[]>>({});
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [reports, setReports] = useState<any[]>([]);
   const [actions, setActions] = useState<any[]>([]);
-  const [sidebarTab, setSidebarTab] = useState<'actions' | 'reports'>('actions');
+  const [directives, setDirectives] = useState<any[]>([]);
+  const [sidebarTab, setSidebarTab] = useState<'actions' | 'reports' | 'feed'>('actions');
   const [acting, setActing] = useState<string | null>(null);
   const [workshopOpen, setWorkshopOpen] = useState(false);
 
   const loadSidebar = useCallback(async () => {
-    const [r, a] = await Promise.allSettled([adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.()]);
+    const [r, a, d] = await Promise.allSettled([adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.(), adminApi.sa.getLiveDirectives?.()]);
     if (r.status === 'fulfilled') setReports((r.value as any)?.data || []);
     if (a.status === 'fulfilled') setActions((a.value as any)?.data || []);
+    if (d.status === 'fulfilled') setDirectives((d.value as any)?.data || []);
   }, []);
   useEffect(() => { loadSidebar(); const iv = setInterval(loadSidebar, 30000); return () => clearInterval(iv); }, [loadSidebar]);
 
@@ -519,6 +544,9 @@ export default function AgentsWorkspace() {
         <div style={{ width: 300, borderRight: '1px solid rgba(0,0,0,.06)', background: '#fafafa', overflowY: 'auto', flexShrink: 0 }}>
           <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(0,0,0,.04)', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
             <div style={{ display: 'flex', gap: 4 }}>
+              <button onClick={() => setSidebarTab('feed')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'feed' ? 700 : 400, border: `1px solid ${sidebarTab === 'feed' ? '#7c3aed' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'feed' ? 'rgba(124,58,237,.07)' : '#fff', color: sidebarTab === 'feed' ? '#7c3aed' : '#9ca3af', cursor: 'pointer' }}>
+                مباشر <span style={{ fontSize: 9, opacity: .7 }}>({directives.length})</span>
+              </button>
               <button onClick={() => setSidebarTab('actions')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'actions' ? 700 : 400, border: `1px solid ${sidebarTab === 'actions' ? '#2563EB' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'actions' ? 'rgba(124,92,252,.06)' : '#fff', color: sidebarTab === 'actions' ? '#2563EB' : '#9ca3af', cursor: 'pointer' }}>
                 مهام {pendingCount > 0 && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', padding: '0 4px', fontSize: 8, marginRight: 2 }}>{pendingCount}</span>}
               </button>
@@ -529,6 +557,55 @@ export default function AgentsWorkspace() {
           </div>
 
           <div style={{ padding: '8px 10px' }}>
+            {sidebarTab === 'feed' && (
+              <>
+                {directives.length === 0 && (
+                  <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', padding: 24, lineHeight: 1.7 }}>
+                    لا يوجد تواصل بين الوكلاء في آخر 24 ساعة<br />
+                    <span style={{ fontSize: 10, opacity: .6 }}>سيظهر هنا كل أمر وكل رد</span>
+                  </p>
+                )}
+                {directives.map((d, idx) => {
+                  const from = AGENT_STYLE[d.from_agent] || { label: d.from_agent, color: '#6b7280', bg: '#f9fafb' };
+                  const to   = AGENT_STYLE[d.to_agent]   || { label: d.to_agent,   color: '#6b7280', bg: '#f9fafb' };
+                  const st   = DIRECTIVE_STATUS[d.status] || DIRECTIVE_STATUS.pending;
+                  const isFirst = idx === 0 || new Date(directives[idx - 1].created_at).toDateString() !== new Date(d.created_at).toDateString();
+                  return (
+                    <div key={d.id}>
+                      {isFirst && (
+                        <div style={{ textAlign: 'center', margin: '6px 0', fontSize: 9, color: '#d1d5db' }}>
+                          {new Date(d.created_at).toLocaleDateString('ar-SA', { weekday: 'long', month: 'short', day: 'numeric' })}
+                        </div>
+                      )}
+                      <div style={{ background: '#fff', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)', borderRight: `3px solid ${from.color}` }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <span style={{ fontSize: 9, fontWeight: 700, color: from.color, background: from.bg, padding: '1px 6px', borderRadius: 4 }}>{from.label}</span>
+                            <span style={{ fontSize: 9, color: '#d1d5db' }}>←</span>
+                            <span style={{ fontSize: 9, fontWeight: 600, color: to.color, background: to.bg, padding: '1px 6px', borderRadius: 4 }}>{to.label}</span>
+                          </div>
+                          <span style={{ fontSize: 9, color: '#d1d5db' }}>{timeAgoFeed(d.created_at)}</span>
+                        </div>
+                        <p style={{ fontSize: 11, color: '#1e293b', margin: '0 0 6px', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.directive}</p>
+                        {d.reply && (
+                          <div style={{ background: '#f8faff', border: '1px solid #e0e7ff', borderRadius: 6, padding: '6px 8px', borderRight: `2px solid ${to.color}` }}>
+                            <div style={{ fontSize: 9, fontWeight: 600, color: to.color, marginBottom: 3 }}>رد {to.label} {d.replied_at ? `· ${timeAgoFeed(d.replied_at)}` : ''}</div>
+                            <p style={{ fontSize: 10, color: '#374151', margin: 0, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.reply}</p>
+                          </div>
+                        )}
+                        <div style={{ marginTop: 4, textAlign: 'left' }}>
+                          <span style={{ fontSize: 9, color: st.color, fontWeight: 600 }}>{st.label}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                {directives.length > 0 && (
+                  <p style={{ textAlign: 'center', fontSize: 9, color: '#d1d5db', margin: '4px 0 0' }}>آخر 24 ساعة · تحديث تلقائي كل 30 ثانية</p>
+                )}
+              </>
+            )}
+
             {sidebarTab === 'actions' && actions.map(a => {
               const st = STATUS_MAP[a.status] || STATUS_MAP.pending_approval;
               return (
