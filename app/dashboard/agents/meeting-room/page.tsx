@@ -1,5 +1,4 @@
 'use client';
-// v2 — live feed tab
 import { useState, useEffect, useCallback } from 'react';
 import AgentChat from '../AgentChat';
 import { adminApi } from '@/lib/api';
@@ -177,7 +176,7 @@ export default function MeetingRoomPage() {
             })}
             {directives.length > 0 && (
               <p style={{ textAlign: 'center', fontSize: 10, color: '#d1d5db', margin: '8px 0 0' }}>
-                يعرض آخر 24 ساعة · يتجدد كل 30 ثانية
+                آخر 24 ساعة · تحديث تلقائي كل 30 ثانية
               </p>
             )}
           </div>
