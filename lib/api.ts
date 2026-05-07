@@ -267,6 +267,13 @@ export const adminApi = {
       request<any>('GET', '/whatsapp/templates'),
   },
 
+  tg: {
+    conversations: (page = 1, limit = 50) =>
+      request<any>('GET', `/telegram/conversations?page=${page}&limit=${limit}`),
+    conversation:  (id: string) =>
+      request<any>('GET', `/telegram/conversations/${id}`),
+  },
+
   // ─── Maintenance Flows ───────────────────────────────────────────────────────
   maintenanceFlows: {
     list:   ()                          => request<any>('GET',   '/superadmin/maintenance/flows'),

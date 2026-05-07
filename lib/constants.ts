@@ -45,6 +45,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/reea',           label: 'REEA — AOM',     section: 'ops' },
   { href: '/dashboard/reea/authority', label: 'صلاحيات REEA',   section: 'ops' },
   { href: '/dashboard/ai-knowledge',   label: 'قاعدة المعرفة',  section: 'ops' },
+  { href: '/dashboard/telegram/conversations', label: 'أرشيف تيليجرام', section: 'ops' },
   { href: '/dashboard/leads',          label: 'طلبات العرض',    section: 'growth' },
   { href: '/dashboard/demo-leads',     label: 'قيادات الديمو',  section: 'growth' },
   { href: '/dashboard/landing-page/analytics', label: 'تحليلات الموقع', section: 'growth' },
