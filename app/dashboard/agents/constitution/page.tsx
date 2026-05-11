@@ -198,9 +198,9 @@ export default function ConstitutionPage() {
           <FormRow label="ملاحظات">
             <input value={String(form.rule_notes || '')} onChange={e => setForm(f => ({ ...f, rule_notes: e.target.value }))} style={inputStyle} placeholder="سبب القاعدة أو تفاصيل إضافية" />
           </FormRow>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 12px', borderRadius: 7, border: '1px solid var(--lv-card-border, rgba(255,255,255,0.1))', background: 'var(--lv-subtle-bg, rgba(255,255,255,0.05))' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 12px', borderRadius: 7, border: '1px solid #e2e8f0', background: '#f8fafc' }}>
             <input type="checkbox" checked={Boolean(form.is_active)} onChange={e => setForm(f => ({ ...f, is_active: e.target.checked }))} style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#4f46e5' }} />
-            <span style={{ fontSize: 13, color: 'var(--lv-text-primary, #fff)', fontWeight: 500 }}>تفعيل القاعدة</span>
+            <span style={{ fontSize: 13, color: '#0f172a', fontWeight: 500 }}>تفعيل القاعدة</span>
           </label>
         </Modal>
       )}
@@ -288,7 +288,7 @@ function Chip({ label }: { label: string }) {
 function FormRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-      <label style={{ fontSize: 11, color: 'var(--lv-text-muted, rgba(255,255,255,0.45))', fontWeight: 600, letterSpacing: '0.04em' }}>{label}</label>
+      <label style={{ fontSize: 11, color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>{label}</label>
       {children}
     </div>
   );
@@ -310,19 +310,19 @@ function Modal({ title, onClose, onSave, saving, error, children }: {
       }}
     >
       <div style={{
-        background: 'var(--lv-card-bg, #1e2330)',
+        background: '#ffffff',
         borderRadius: 14, padding: '24px 28px',
         width: 520, maxWidth: 'calc(100vw - 32px)',
         maxHeight: '85vh', overflowY: 'auto',
-        boxShadow: '0 24px 64px rgba(0,0,0,0.5)',
-        border: '1px solid var(--lv-card-border, rgba(255,255,255,0.08))',
+        boxShadow: '0 24px 64px rgba(0,0,0,0.25)',
+        border: '1px solid #e8ecf0',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--lv-text-primary, #fff)' }}>{title}</h2>
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer', color: 'var(--lv-text-muted, rgba(255,255,255,0.5))', fontSize: 16, width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#0f172a' }}>{title}</h2>
+          <button onClick={onClose} style={{ background: '#f1f5f9', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: 16, width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>{children}</div>
-        {error && <p style={{ fontSize: 12, color: '#f87171', marginTop: 14, padding: '8px 12px', background: 'rgba(239,68,68,0.1)', borderRadius: 6 }}>{error}</p>}
+        {error && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 14, padding: '8px 12px', background: '#fef2f2', borderRadius: 6, border: '1px solid #fecaca' }}>{error}</p>}
         <div style={{ display: 'flex', gap: 8, marginTop: 22, justifyContent: 'flex-start' }}>
           <button onClick={onSave} disabled={saving} style={btnStyle('#4f46e5')}>
             {saving ? 'جاري الحفظ...' : 'حفظ'}
@@ -346,16 +346,16 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
 
 const inputStyle: React.CSSProperties = {
   padding: '8px 12px', borderRadius: 7,
-  border: '1px solid var(--lv-card-border, rgba(255,255,255,0.1))',
-  background: 'var(--lv-subtle-bg, rgba(255,255,255,0.05))',
-  color: 'var(--lv-text-primary, #fff)',
+  border: '1px solid #e2e8f0',
+  background: '#f8fafc',
+  color: '#0f172a',
   fontSize: 13, width: '100%', boxSizing: 'border-box', fontFamily: 'inherit',
   outline: 'none',
 };
 
 const ghostBtn: React.CSSProperties = {
-  padding: '6px 12px', borderRadius: 6, border: '1px solid var(--lv-card-border)',
-  background: 'transparent', color: 'var(--lv-text-secondary)', fontSize: 12,
+  padding: '8px 16px', borderRadius: 7, border: '1px solid #e2e8f0',
+  background: '#f8fafc', color: '#475569', fontSize: 13,
   cursor: 'pointer', fontFamily: 'inherit',
 };
 
