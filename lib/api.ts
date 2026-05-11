@@ -312,5 +312,4 @@ export const adminApi = {
 
   // ─── Cross-Agent Correlations ────────────────────────────────────────────────
   getCorrelations:  (agentType?: string) => request<any>('GET', `/admin/agents/correlations${agentType ? '?agent_type=' + agentType : ''}`),
-
-
+};
