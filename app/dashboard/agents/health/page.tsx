@@ -14,6 +14,30 @@ interface AgentHealth {
   active_goals: number;
 }
 
+interface TrustScore {
+  agent_type: string;
+  score: number;
+  total_decisions: number;
+  approved_count: number;
+  rejected_count: number;
+  dismissed_count: number;
+  autonomy_tier: 'manual' | 'high_risk_manual' | 'autopilot' | 'full_autopilot';
+}
+
+const TIER_LABELS: Record<string, string> = {
+  manual: 'يدوي كامل',
+  high_risk_manual: 'يدوي جزئي',
+  autopilot: 'شبه آلي',
+  full_autopilot: 'آلي كامل',
+};
+
+const TIER_COLORS: Record<string, string> = {
+  manual: '#ef4444',
+  high_risk_manual: '#f59e0b',
+  autopilot: '#10b981',
+  full_autopilot: '#6366f1',
+};
+
 const STATUS_CONFIG = {
   healthy:    { label: 'نشط',      color: '#16a34a', bg: '#f0fdf4', dot: '#22c55e' },
   idle:       { label: 'خامل',     color: '#ca8a04', bg: '#fefce8', dot: '#eab308' },
@@ -37,7 +61,27 @@ function ActivityBar({ value, max }: { value: number; max: number }) {
   );
 }
 
-function AgentCard({ agent, maxObs }: { agent: AgentHealth; maxObs: number }) {
+function TrustBar({ score, tier }: { score: number; tier: string }) {
+  const color = score < 70 ? '#ef4444' : score < 85 ? '#f59e0b' : '#10b981';
+  return (
+    <div style={{ marginTop: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+        <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, fontWeight: 600, textTransform: 'uppercase' }}>نقاط الثقة</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color, margin: 0 }}>{score.toFixed(1)}</p>
+          <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 10, background: `${TIER_COLORS[tier]}18`, color: TIER_COLORS[tier], fontWeight: 600 }}>
+            {TIER_LABELS[tier] || tier}
+          </span>
+        </div>
+      </div>
+      <div style={{ height: 4, background: '#f1f5f9', borderRadius: 4, overflow: 'hidden' }}>
+        <div style={{ width: `${score}%`, height: '100%', background: color, borderRadius: 4, transition: 'width .4s' }} />
+      </div>
+    </div>
+  );
+}
+
+function AgentCard({ agent, maxObs, trust }: { agent: AgentHealth; maxObs: number; trust?: TrustScore }) {
   const st = STATUS_CONFIG[agent.status];
   return (
     <div style={{
@@ -86,20 +130,30 @@ function AgentCard({ agent, maxObs }: { agent: AgentHealth; maxObs: number }) {
         </div>
         <ActivityBar value={agent.observations_24h} max={maxObs} />
       </div>
+
+      {/* Trust score bar */}
+      {trust && <TrustBar score={trust.score} tier={trust.autonomy_tier} />}
     </div>
   );
 }
 
 export default function AgentHealthPage() {
   const [agents, setAgents]   = useState<AgentHealth[]>([]);
+  const [trust, setTrust]     = useState<Record<string, TrustScore>>({});
   const [loading, setLoading] = useState(true);
   const [group, setGroup]     = useState<'all' | 'saas' | 'ops'>('all');
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await request('GET', '/admin/agents/health');
-      setAgents((res as any)?.data || []);
+      const [healthRes, trustRes] = await Promise.all([
+        request('GET', '/admin/agents/health'),
+        request('GET', '/admin/agents/trust'),
+      ]);
+      setAgents((healthRes as any)?.data || []);
+      const trustMap: Record<string, TrustScore> = {};
+      for (const t of ((trustRes as any)?.data || [])) trustMap[t.agent_type] = t;
+      setTrust(trustMap);
     } finally {
       setLoading(false);
     }
@@ -171,7 +225,7 @@ export default function AgentHealthPage() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
           {filtered.map(agent => (
-            <AgentCard key={agent.type} agent={agent} maxObs={maxObs} />
+            <AgentCard key={agent.type} agent={agent} maxObs={maxObs} trust={trust[agent.type]} />
           ))}
         </div>
       )}
