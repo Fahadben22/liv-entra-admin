@@ -249,16 +249,20 @@ export default function MissionControlPage() {
   const [expanded, setExpanded]     = useState<string | null>(null);
   const [busy, setBusy]             = useState<string | null>(null);
   const [notes, setNotes]           = useState<Record<string, string>>({});
+  const [correlations, setCorrelations] = useState<any[]>([]);
+  const [intelOpen, setIntelOpen]   = useState(true);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [qRes, mRes] = await Promise.allSettled([
+      const [qRes, mRes, cRes] = await Promise.allSettled([
         request('GET', '/admin/mission-control/queue'),
         request('GET', '/admin/mission-control/metrics'),
+        request('GET', '/admin/agents/correlations'),
       ]);
       if (qRes.status === 'fulfilled') setItems((qRes.value as any)?.data || []);
       if (mRes.status === 'fulfilled') setMetrics((mRes.value as any)?.data || null);
+      if (cRes.status === 'fulfilled') setCorrelations((cRes.value as any)?.data || []);
     } finally {
       setLoading(false);
     }
@@ -331,6 +335,42 @@ export default function MissionControlPage() {
           </div>
         ))}
       </div>
+
+      {/* ── Cross-agent intel strip ── */}
+      {correlations.length > 0 && (
+        <div style={{ marginBottom: 20, border: '1px solid #fde68a', borderRadius: 14, overflow: 'hidden', background: '#fffbeb' }}>
+          <div
+            onClick={() => setIntelOpen(o => !o)}
+            style={{ padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#92400e' }}>تنبيهات الذكاء المتقاطع</span>
+              <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 10, background: '#fef3c7', color: '#b45309', fontWeight: 700 }}>{correlations.length}</span>
+            </div>
+            <span style={{ fontSize: 10, color: '#a16207' }}>{intelOpen ? 'طي' : 'عرض'}</span>
+          </div>
+          {intelOpen && (
+            <div style={{ borderTop: '1px solid #fde68a', padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {correlations.map(c => (
+                <div key={c.id} style={{
+                  padding: '10px 14px', borderRadius: 10,
+                  border: `1px solid ${c.severity === 'high' ? 'rgba(220,38,38,.2)' : 'rgba(217,119,6,.2)'}`,
+                  background: c.severity === 'high' ? '#fef2f2' : '#fff7ed',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: c.severity === 'high' ? '#dc2626' : '#d97706' }}>
+                      {c.severity === 'high' ? 'عالي' : 'متوسط'}
+                    </span>
+                    <span style={{ fontSize: 10, color: '#94a3b8' }}>{(c.agent_names || []).join(' + ')}</span>
+                  </div>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: '#1e293b', margin: '0 0 4px' }}>{c.insight}</p>
+                  <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>{c.recommendation}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Filters ── */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
