@@ -42,6 +42,8 @@ export const NAV_ITEMS = [
   { href: '/dashboard/mission-control', label: 'مركز الأوامر',  section: 'ops' },
   { href: '/dashboard/agenda',          label: 'الأجندة',        section: 'ops' },
   { href: '/dashboard/agents/health',        label: 'صحة الوكلاء',    section: 'ops' },
+  { href: '/dashboard/agents/economy',       label: 'اقتصاد الوكلاء', section: 'ops' },
+  { href: '/dashboard/agents/correlations',  label: 'الارتباطات',     section: 'ops' },
   { href: '/dashboard/agents/constitution', label: 'دستور الوكلاء',  section: 'ops' },
   { href: '/dashboard/agents/time-machine', label: 'آلة الزمن',      section: 'ops' },
   { href: '/dashboard/agents',              label: 'الوكلاء',         section: 'ops' },

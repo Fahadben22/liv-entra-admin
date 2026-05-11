@@ -296,4 +296,21 @@ export const adminApi = {
     snapshots: (cameraId: string) =>
       request<any>('GET',    `/admin/cameras/${cameraId}/snapshots`),
   },
-};
+
+  // ─── Agent Economy ─────────────────────────────────────────────────────────
+  economy: {
+    getSnapshot:    (agentType?: string) => request<any>('GET',  `/admin/agents/economy${agentType ? '?agent_type=' + agentType : ''}`),
+    recordSpend:    (data: { agent_type: string; amount: number; category?: string; description?: string; reference_id?: string; reference_type?: string }) =>
+      request<any>('POST', '/admin/agents/economy/spend', data),
+    requestTransfer:(data: { from_agent: string; to_agent: string; amount: number; reason: string }) =>
+      request<any>('POST', '/admin/agents/economy/transfer-request', data),
+    decideTransfer: (data: { request_id: string; approved: boolean; response_note?: string }) =>
+      request<any>('POST', '/admin/agents/economy/transfer-decision', data),
+    adjustBudget:   (data: { agent_type: string; budget_monthly: number; reason?: string }) =>
+      request<any>('PATCH', '/admin/agents/economy/adjust-budget', data),
+  },
+
+  // ─── Cross-Agent Correlations ────────────────────────────────────────────────
+  getCorrelations:  (agentType?: string) => request<any>('GET', `/admin/agents/correlations${agentType ? '?agent_type=' + agentType : ''}`),
+
+
