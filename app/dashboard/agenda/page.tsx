@@ -8,7 +8,7 @@ interface AgendaItem {
   agent_name: string;
   subject: string;
   message: string;
-  action_type: 'approval' | 'decision' | 'info' | 'urgent';
+  action_type: 'approval' | 'decision' | 'info' | 'urgent' | 'alert';
   status: 'pending' | 'approved' | 'rejected' | 'dismissed';
   decision_note: string | null;
   metadata: Record<string, any> | null;
@@ -17,13 +17,20 @@ interface AgendaItem {
 }
 
 const AGENT_COLORS: Record<string, string> = {
-  it:           '#2563EB',
-  sales:        '#059669',
-  marketing:    '#7c5cfc',
-  finance:      '#d97706',
-  product:      '#db2777',
-  meeting_room: '#0891b2',
-  reea:         '#1e293b',
+  it:               '#2563EB',
+  sales:            '#059669',
+  marketing:        '#7c5cfc',
+  finance:          '#d97706',
+  product:          '#db2777',
+  meeting_room:     '#0891b2',
+  reea:             '#1e293b',
+  lina_sla_monitor: '#0891b2',
+  ops:              '#64748b',
+  collections:      '#9333ea',
+  leasing:          '#16a34a',
+  'tenant-exp':     '#0d9488',
+  'owner-rel':      '#ca8a04',
+  'os-finance':     '#d97706',
 };
 
 const ACTION_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -31,6 +38,11 @@ const ACTION_LABELS: Record<string, { label: string; color: string; bg: string }
   decision: { label: 'قرار مطلوب',    color: '#d97706', bg: '#fffbeb' },
   urgent:   { label: 'عاجل',          color: '#dc2626', bg: '#fef2f2' },
   info:     { label: 'للعلم',         color: '#6b7280', bg: '#f9fafb' },
+  alert:    { label: 'تنبيه تلقائي',  color: '#0891b2', bg: '#ecfeff' },
+};
+
+const ACTION_PRIORITY: Record<string, number> = {
+  urgent: 0, approval: 1, decision: 2, info: 3, alert: 4,
 };
 
 function timeAgo(ts: string) {
@@ -38,6 +50,10 @@ function timeAgo(ts: string) {
   if (diff < 60)   return `منذ ${diff} دقيقة`;
   if (diff < 1440) return `منذ ${Math.floor(diff / 60)} ساعة`;
   return `منذ ${Math.floor(diff / 1440)} يوم`;
+}
+
+function isStale(ts: string) {
+  return Date.now() - new Date(ts).getTime() > 24 * 60 * 60 * 1000;
 }
 
 // ── ItemCard is a top-level component so it never remounts when parent state changes ──
@@ -84,6 +100,9 @@ function ItemCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDeci
             <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: actionMeta.bg, color: actionMeta.color, fontWeight: 600 }}>
               {actionMeta.label}
             </span>
+            {isPending && isStale(item.created_at) && (
+              <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 6, background: '#f1f5f9', color: '#94a3b8', fontWeight: 600 }}>قديم</span>
+            )}
             {!isPending && (
               <span style={{
                 fontSize: 10, padding: '2px 8px', borderRadius: 6, fontWeight: 600,
@@ -215,8 +234,21 @@ export default function AgendaPage() {
     setBusy(null);
   }
 
-  const pending = items.filter(i => i.status === 'pending');
+  async function dismissAllAlerts() {
+    const alertIds = items.filter(i => i.status === 'pending' && i.action_type === 'alert').map(i => i.id);
+    if (!alertIds.length) return;
+    setBusy('bulk');
+    await Promise.allSettled(alertIds.map(id => request('POST', `/admin/agenda/${id}/dismiss`, {})));
+    setItems(prev => prev.map(i => alertIds.includes(i.id) ? { ...i, status: 'dismissed' } : i));
+    setBusy(null);
+  }
+
+  const sortOrder = (i: AgendaItem) => ACTION_PRIORITY[i.action_type] ?? 3;
+  const pending = items
+    .filter(i => i.status === 'pending')
+    .sort((a, b) => sortOrder(a) - sortOrder(b) || new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   const decided = items.filter(i => i.status !== 'pending');
+  const alertCount = pending.filter(i => i.action_type === 'alert').length;
 
   return (
     <div style={{ maxWidth: 760, margin: '0 auto', padding: '24px 20px', direction: 'rtl' }}>
@@ -227,11 +259,20 @@ export default function AgendaPage() {
           <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b', margin: 0 }}>الأجندة</h1>
           <p style={{ fontSize: 12, color: '#9ca3af', margin: '4px 0 0' }}>التصعيدات والقرارات المطلوبة منك من الوكلاء</p>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {pending.length > 0 && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          {pending.filter(i => i.action_type !== 'alert').length > 0 && (
             <span style={{ fontSize: 11, padding: '4px 12px', borderRadius: 10, background: '#fef2f2', color: '#dc2626', fontWeight: 700, border: '1px solid rgba(220,38,38,.2)' }}>
-              {pending.length} بانتظار قرارك
+              {pending.filter(i => i.action_type !== 'alert').length} بانتظار قرارك
             </span>
+          )}
+          {alertCount > 0 && (
+            <button
+              onClick={dismissAllAlerts}
+              disabled={busy === 'bulk'}
+              style={{ fontSize: 11, padding: '4px 12px', borderRadius: 10, background: '#ecfeff', color: '#0891b2', fontWeight: 600, border: '1px solid rgba(8,145,178,.2)', cursor: 'pointer', opacity: busy === 'bulk' ? .6 : 1 }}
+            >
+              {busy === 'bulk' ? '...' : `تجاهل التنبيهات (${alertCount})`}
+            </button>
           )}
           <button
             onClick={() => setFilter(f => f === 'pending' ? 'all' : 'pending')}
