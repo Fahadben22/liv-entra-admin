@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 
 const API = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -183,24 +184,24 @@ export default function ConstitutionPage() {
           <FormRow label="الحد اليومي (مرة)">
             <input type="number" value={form.max_daily as string ?? ''} onChange={e => setForm(f => ({ ...f, max_daily: e.target.value }))} style={inputStyle} placeholder="فارغ = بلا حد" />
           </FormRow>
-          <FormRow label="ساعات العمل (من)">
-            <input type="number" min={0} max={23} value={form.allowed_hours_start as string ?? ''} onChange={e => setForm(f => ({ ...f, allowed_hours_start: e.target.value }))} style={inputStyle} placeholder="8" />
-          </FormRow>
-          <FormRow label="ساعات العمل (إلى)">
-            <input type="number" min={0} max={23} value={form.allowed_hours_end as string ?? ''} onChange={e => setForm(f => ({ ...f, allowed_hours_end: e.target.value }))} style={inputStyle} placeholder="21" />
-          </FormRow>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <FormRow label="ساعات العمل (من)">
+              <input type="number" min={0} max={23} value={form.allowed_hours_start as string ?? ''} onChange={e => setForm(f => ({ ...f, allowed_hours_start: e.target.value }))} style={{ ...inputStyle, width: '100%' }} placeholder="8" />
+            </FormRow>
+            <FormRow label="ساعات العمل (إلى)">
+              <input type="number" min={0} max={23} value={form.allowed_hours_end as string ?? ''} onChange={e => setForm(f => ({ ...f, allowed_hours_end: e.target.value }))} style={{ ...inputStyle, width: '100%' }} placeholder="21" />
+            </FormRow>
+          </div>
           <FormRow label="الشروط المسبقة">
             <input value={String(form.requires || '')} onChange={e => setForm(f => ({ ...f, requires: e.target.value }))} style={inputStyle} placeholder="شرط1, شرط2 (مفصولة بفاصلة)" />
           </FormRow>
           <FormRow label="ملاحظات">
             <input value={String(form.rule_notes || '')} onChange={e => setForm(f => ({ ...f, rule_notes: e.target.value }))} style={inputStyle} placeholder="سبب القاعدة أو تفاصيل إضافية" />
           </FormRow>
-          <FormRow label="مفعّلة">
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-              <input type="checkbox" checked={Boolean(form.is_active)} onChange={e => setForm(f => ({ ...f, is_active: e.target.checked }))} />
-              <span style={{ fontSize: 13, color: 'var(--lv-text-secondary)' }}>القاعدة نشطة</span>
-            </label>
-          </FormRow>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 12px', borderRadius: 7, border: '1px solid var(--lv-card-border, rgba(255,255,255,0.1))', background: 'var(--lv-subtle-bg, rgba(255,255,255,0.05))' }}>
+            <input type="checkbox" checked={Boolean(form.is_active)} onChange={e => setForm(f => ({ ...f, is_active: e.target.checked }))} style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#4f46e5' }} />
+            <span style={{ fontSize: 13, color: 'var(--lv-text-primary, #fff)', fontWeight: 500 }}>تفعيل القاعدة</span>
+          </label>
         </Modal>
       )}
     </div>
@@ -286,8 +287,8 @@ function Chip({ label }: { label: string }) {
 
 function FormRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <label style={{ fontSize: 12, color: 'var(--lv-text-muted)', fontWeight: 500 }}>{label}</label>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+      <label style={{ fontSize: 11, color: 'var(--lv-text-muted, rgba(255,255,255,0.45))', fontWeight: 600, letterSpacing: '0.04em' }}>{label}</label>
       {children}
     </div>
   );
@@ -297,23 +298,40 @@ function Modal({ title, onClose, onSave, saving, error, children }: {
   title: string; onClose: () => void; onSave: () => void;
   saving: boolean; error: string; children: React.ReactNode;
 }) {
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: 'var(--lv-card-bg)', borderRadius: 12, padding: 24, width: 440, maxHeight: '80vh', overflowY: 'auto', direction: 'rtl' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 600, margin: 0, color: 'var(--lv-text-primary)' }}>{title}</h2>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--lv-text-muted)', fontSize: 18 }}>×</button>
+  if (typeof document === 'undefined') return null;
+  return createPortal(
+    <div
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 9999,
+        background: 'rgba(0,0,0,0.65)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        direction: 'rtl',
+      }}
+    >
+      <div style={{
+        background: 'var(--lv-card-bg, #1e2330)',
+        borderRadius: 14, padding: '24px 28px',
+        width: 520, maxWidth: 'calc(100vw - 32px)',
+        maxHeight: '85vh', overflowY: 'auto',
+        boxShadow: '0 24px 64px rgba(0,0,0,0.5)',
+        border: '1px solid var(--lv-card-border, rgba(255,255,255,0.08))',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--lv-text-primary, #fff)' }}>{title}</h2>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer', color: 'var(--lv-text-muted, rgba(255,255,255,0.5))', fontSize: 16, width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>{children}</div>
-        {error && <p style={{ fontSize: 12, color: '#ef4444', marginTop: 12 }}>{error}</p>}
-        <div style={{ display: 'flex', gap: 8, marginTop: 20, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={ghostBtn}>إلغاء</button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>{children}</div>
+        {error && <p style={{ fontSize: 12, color: '#f87171', marginTop: 14, padding: '8px 12px', background: 'rgba(239,68,68,0.1)', borderRadius: 6 }}>{error}</p>}
+        <div style={{ display: 'flex', gap: 8, marginTop: 22, justifyContent: 'flex-start' }}>
           <button onClick={onSave} disabled={saving} style={btnStyle('#4f46e5')}>
             {saving ? 'جاري الحفظ...' : 'حفظ'}
           </button>
+          <button onClick={onClose} style={ghostBtn}>إلغاء</button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -327,9 +345,12 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
 }
 
 const inputStyle: React.CSSProperties = {
-  padding: '8px 10px', borderRadius: 6, border: '1px solid var(--lv-card-border)',
-  background: 'var(--lv-subtle-bg)', color: 'var(--lv-text-primary)',
+  padding: '8px 12px', borderRadius: 7,
+  border: '1px solid var(--lv-card-border, rgba(255,255,255,0.1))',
+  background: 'var(--lv-subtle-bg, rgba(255,255,255,0.05))',
+  color: 'var(--lv-text-primary, #fff)',
   fontSize: 13, width: '100%', boxSizing: 'border-box', fontFamily: 'inherit',
+  outline: 'none',
 };
 
 const ghostBtn: React.CSSProperties = {
