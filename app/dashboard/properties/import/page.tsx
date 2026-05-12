@@ -150,7 +150,11 @@ export default function PortfolioImportPage() {
       const res = await fetch(`${BASE}/admin/portfolio/import/template`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
       });
-      if (!res.ok) throw new Error('فشل تحميل القالب');
+      if (!res.ok) {
+        let msg = 'فشل تحميل القالب';
+        try { const j = await res.json(); msg = j.message || msg; } catch {}
+        throw new Error(msg);
+      }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
