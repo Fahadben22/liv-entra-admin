@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { adminApi, BASE } from '@/lib/api';
-import { UploadCloud, RefreshCw, FileText, CheckCircle, AlertCircle, Clock, Loader2, ChevronRight, Play } from 'lucide-react';
+import { UploadCloud, RefreshCw, FileText, CheckCircle, AlertCircle, Clock, Loader2, ChevronRight, Play, Download } from 'lucide-react';
 
 interface ImportSession {
   id: string;
@@ -71,6 +71,7 @@ export default function PortfolioImportPage() {
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [executing, setExecuting] = useState<string | null>(null);
   const [executeResult, setExecuteResult] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -108,12 +109,12 @@ export default function PortfolioImportPage() {
 
   function handleFiles(files: FileList | null) {
     if (!files?.length) return;
-    const allowed = ['xlsx','pdf','csv','zip'];
+    const allowed = ['xlsx','xls','pdf','csv','zip','png','jpg','jpeg'];
     const valid = Array.from(files).filter(f => {
       const ext = f.name.split('.').pop()?.toLowerCase() || '';
       return allowed.includes(ext);
     });
-    if (valid.length < files.length) setError(`بعض الملفات غير مدعومة — مسموح: Excel, PDF, CSV, ZIP`);
+    if (valid.length < files.length) setError(`بعض الملفات غير مدعومة — مسموح: Excel, CSV, PDF, ZIP, PNG, JPG`);
     else setError(null);
     setSelectedFiles(prev => [...prev, ...valid]);
   }
@@ -143,6 +144,27 @@ export default function PortfolioImportPage() {
     }
   }
 
+  async function handleDownloadTemplate() {
+    setDownloading(true);
+    try {
+      const res = await fetch(`${BASE}/admin/portfolio/import/template`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
+      });
+      if (!res.ok) throw new Error('فشل تحميل القالب');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'liventra-portfolio-template.xlsx';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'خطأ في التحميل');
+    } finally {
+      setDownloading(false);
+    }
+  }
+
   async function handleExecute(sessionId: string) {
     setExecuting(sessionId);
     setExecuteResult(null);
@@ -166,9 +188,19 @@ export default function PortfolioImportPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8" dir="rtl">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">استيراد المحافظ العقارية</h1>
-        <p className="mt-1 text-sm text-gray-500">ارفع ملفات المحفظة — REEA ستستخرج وتتحقق وتستورد البيانات تلقائياً</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">استيراد المحافظ العقارية</h1>
+          <p className="mt-1 text-sm text-gray-500">ارفع ملفات المحفظة — REEA ستستخرج وتتحقق وتستورد البيانات تلقائياً</p>
+        </div>
+        <button
+          onClick={handleDownloadTemplate}
+          disabled={downloading}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 hover:border-gray-400 text-gray-700 rounded-lg text-sm font-medium shadow-sm disabled:opacity-60"
+        >
+          {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+          تحميل قالب Excel
+        </button>
       </div>
 
       {/* Upload Zone */}
@@ -183,13 +215,13 @@ export default function PortfolioImportPage() {
           ref={fileRef}
           type="file"
           multiple
-          accept=".xlsx,.pdf,.csv,.zip"
+          accept=".xlsx,.xls,.csv,.pdf,.zip,.png,.jpg,.jpeg"
           className="hidden"
           onChange={e => handleFiles(e.target.files)}
         />
         <UploadCloud className="mx-auto h-10 w-10 text-gray-400 mb-3" />
         <p className="font-medium text-gray-700">اسحب الملفات هنا أو اضغط للاختيار</p>
-        <p className="text-sm text-gray-400 mt-1">Excel, PDF, CSV, ZIP — حتى 50 MB لكل ملف</p>
+        <p className="text-sm text-gray-400 mt-1">Excel · CSV · PDF · ZIP · PNG · JPG — حتى 50 MB لكل ملف</p>
       </div>
 
       {/* Selected files */}
