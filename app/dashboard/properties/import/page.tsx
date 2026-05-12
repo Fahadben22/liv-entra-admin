@@ -132,6 +132,7 @@ export default function PortfolioImportPage() {
         headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
         body: form,
       });
+      if (res.status === 401) { localStorage.removeItem('admin_token'); window.location.href = '/login'; return; }
       const json = await res.json();
       if (!json.success) throw new Error(json.message || 'فشل الرفع');
       setUploadResult(`تم إنشاء جلسة الاستيراد — REEA ستتولى المعالجة تلقائياً. رمز الجلسة: ${json.data.session_id.slice(0,8)}`);
@@ -150,6 +151,11 @@ export default function PortfolioImportPage() {
       const res = await fetch(`${BASE}/admin/portfolio/import/template`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
       });
+      if (res.status === 401) {
+        localStorage.removeItem('admin_token');
+        window.location.href = '/login';
+        return;
+      }
       if (!res.ok) {
         let msg = 'فشل تحميل القالب';
         try { const j = await res.json(); msg = j.message || msg; } catch {}
