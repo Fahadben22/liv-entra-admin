@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { adminApi, BASE } from '@/lib/api';
-import { UploadCloud, RefreshCw, FileText, CheckCircle, AlertCircle, Clock, Loader2, ChevronRight } from 'lucide-react';
+import { UploadCloud, RefreshCw, FileText, CheckCircle, AlertCircle, Clock, Loader2, ChevronRight, Play } from 'lucide-react';
 
 interface ImportSession {
   id: string;
@@ -69,6 +69,8 @@ export default function PortfolioImportPage() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [error, setError]         = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
+  const [executing, setExecuting] = useState<string | null>(null);
+  const [executeResult, setExecuteResult] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -141,6 +143,27 @@ export default function PortfolioImportPage() {
     }
   }
 
+  async function handleExecute(sessionId: string) {
+    setExecuting(sessionId);
+    setExecuteResult(null);
+    setError(null);
+    try {
+      const res = await fetch(`${BASE}/admin/portfolio/import/sessions/${sessionId}/execute`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${localStorage.getItem('admin_token')}` },
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message || 'فشل تنفيذ الاستيراد');
+      const r = json.data.import;
+      setExecuteResult(`اكتمل الاستيراد — مستورد: ${r.imported} | فشل: ${r.failed}`);
+      await fetchSessions();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'خطأ في التنفيذ');
+    } finally {
+      setExecuting(null);
+    }
+  }
+
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8" dir="rtl">
       <div>
@@ -210,6 +233,12 @@ export default function PortfolioImportPage() {
           {uploadResult}
         </div>
       )}
+      {executeResult && (
+        <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+          <CheckCircle className="h-4 w-4 flex-shrink-0" />
+          {executeResult}
+        </div>
+      )}
 
       {/* Sessions Table */}
       <div>
@@ -237,6 +266,7 @@ export default function PortfolioImportPage() {
                   <th className="text-right px-4 py-3 font-medium text-gray-600">مستورد / فشل</th>
                   <th className="text-right px-4 py-3 font-medium text-gray-600">الثقة</th>
                   <th className="text-right px-4 py-3 font-medium text-gray-600">التاريخ</th>
+                  <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -255,6 +285,18 @@ export default function PortfolioImportPage() {
                     </td>
                     <td className="px-4 py-3 text-gray-700">{s.confidence_score > 0 ? `${s.confidence_score}%` : '—'}</td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{new Date(s.created_at).toLocaleDateString('ar-SA')}</td>
+                    <td className="px-4 py-3">
+                      {['awaiting_review', 'validating'].includes(s.status) && (
+                        <button
+                          onClick={() => handleExecute(s.id)}
+                          disabled={executing === s.id}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium disabled:opacity-60"
+                        >
+                          {executing === s.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Play className="h-3 w-3" />}
+                          نفّذ
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
