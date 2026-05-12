@@ -312,4 +312,12 @@ export const adminApi = {
 
   // ─── Cross-Agent Correlations ────────────────────────────────────────────────
   getCorrelations:  (agentType?: string) => request<any>('GET', `/admin/agents/correlations${agentType ? '?agent_type=' + agentType : ''}`),
+
+  // ─── Portfolio Import (REEA-operated) ────────────────────────────────────────
+  portfolio: {
+    listSessions: (companyId?: string, limit = 20) =>
+      request<any>('GET', `/admin/portfolio/import/sessions?limit=${limit}${companyId ? '&company_id=' + companyId : ''}`),
+    getSession: (id: string) =>
+      request<any>('GET', `/admin/portfolio/import/sessions/${id}`),
+  },
 };
