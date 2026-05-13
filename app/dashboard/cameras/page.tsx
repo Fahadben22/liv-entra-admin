@@ -241,6 +241,10 @@ export default function CamerasPage() {
   const [propError,    setPropError]    = useState('');
   const [saving,       setSaving]       = useState(false);
   const [toast,        setToast]        = useState('');
+  const [credEdit,     setCredEdit]     = useState<string | null>(null);  // cameraId being edited
+  const [newEmail,     setNewEmail]     = useState('');
+  const [newPass,      setNewPass]      = useState('');
+  const [savingCred,   setSavingCred]   = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3500); };
   const f = (k: keyof typeof EMPTY_FORM) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -322,6 +326,17 @@ export default function CamerasPage() {
       setStreamModal({ cam, data: r.data || {} });
     } catch (e: any) { showToast(`خطأ في رابط البث: ${e.message}`); }
     setLoadingStream(null);
+  };
+
+  const handleUpdateCredentials = async (cameraId: string) => {
+    if (!newEmail || !newPass) return showToast('البريد الإلكتروني وكلمة المرور مطلوبان');
+    setSavingCred(true);
+    try {
+      await adminApi.cameras.updateCredentials(cameraId, { ezviz_email: newEmail, ezviz_password: newPass });
+      showToast('تم تحديث بيانات الاعتماد — جرّب البث مجدداً');
+      setCredEdit(null); setNewEmail(''); setNewPass('');
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+    setSavingCred(false);
   };
 
   const handleAlarms = async (cam: any) => {
@@ -534,11 +549,34 @@ export default function CamerasPage() {
                                     {loadingAlarm === cam.id ? '...' : <Icon name="bell" size={11} color="#d97706" />}
                                   </button>
                                 )}
+                                {cam.provider === 'ezviz' && (
+                                  <button onClick={() => { setCredEdit(credEdit === cam.id ? null : cam.id); setNewEmail(''); setNewPass(''); }}
+                                    style={{ padding: '5px 8px', borderRadius: 7, background: credEdit === cam.id ? '#1e293b' : 'var(--lv-panel)', color: '#94a3b8', border: '1px solid var(--lv-line)', cursor: 'pointer', fontSize: 11 }}>
+                                    <Icon name="key" size={11} color="#94a3b8" />
+                                  </button>
+                                )}
                                 <button onClick={() => handleRemove(cam.id, cam.name)}
                                   style={{ padding: '5px 8px', borderRadius: 7, background: '#fef2f2', color: '#ef4444', border: '1px solid rgba(239,68,68,.2)', cursor: 'pointer', fontSize: 11 }}>
                                   <Icon name="trash" size={11} color="#ef4444" />
                                 </button>
                               </div>
+
+                              {/* Inline credential update */}
+                              {credEdit === cam.id && (
+                                <div style={{ marginTop: 8, padding: '10px 12px', background: '#0f172a', borderRadius: 8, border: '1px solid #1e3a5f' }}>
+                                  <p style={{ fontSize: 10, color: '#64748b', margin: '0 0 6px' }}>تحديث بيانات EZVIZ</p>
+                                  <input value={newEmail} onChange={e => setNewEmail(e.target.value)} dir="ltr"
+                                    placeholder="EZVIZ Email" type="email"
+                                    style={{ ...inp, marginBottom: 6, fontSize: 11 }} />
+                                  <input value={newPass} onChange={e => setNewPass(e.target.value)} dir="ltr"
+                                    placeholder="EZVIZ Password" type="password"
+                                    style={{ ...inp, marginBottom: 8, fontSize: 11 }} />
+                                  <button onClick={() => handleUpdateCredentials(cam.id)} disabled={savingCred}
+                                    style={{ width: '100%', padding: '6px 0', borderRadius: 7, background: '#0ea5e9', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
+                                    {savingCred ? 'جاري الحفظ...' : 'حفظ'}
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </div>
                         );

@@ -309,6 +309,8 @@ export const adminApi = {
       request<any>('GET',    `/admin/cameras/oauth/status?company_id=${companyId}`),
     oauthRevoke: (companyId: string) =>
       request<any>('DELETE', `/admin/cameras/oauth/revoke?company_id=${companyId}`),
+    updateCredentials: (cameraId: string, data: Record<string, string>) =>
+      request<any>('PATCH', `/admin/cameras/${cameraId}/credentials`, data),
   },
 
   // ─── Agent Economy ─────────────────────────────────────────────────────────
