@@ -105,55 +105,62 @@ function OAuthPanel({ companyId, showToast }: { companyId: string; showToast: (m
   );
 }
 
-// ── EZUIKit Live Player ───────────────────────────────────────────────────────
+// ── HLS Live Player (replaces dead EZUIKit CDN) ───────────────────────────────
 function StreamModal({ cam, data, onClose, showToast }: {
   cam: any; data: StreamData; onClose: () => void; showToast: (m: string) => void;
 }) {
-  const playerContainerId = 'ezviz-player-container';
-  const [loading,   setLoading]   = useState(true);
+  const videoRef   = useRef<HTMLVideoElement>(null);
+  const hlsRef     = useRef<any>(null);
   const [playerErr, setPlayerErr] = useState('');
-  const playerRef = useRef<any>(null);
+  const [loading,   setLoading]   = useState(true);
+
+  const hlsUrl = data.hls || null;
 
   useEffect(() => {
+    if (!hlsUrl || !videoRef.current) {
+      if (!hlsUrl) setPlayerErr('لا يوجد رابط HLS — تحقق من اتصال الكاميرا');
+      setLoading(false);
+      return;
+    }
+
     let destroyed = false;
 
     async function init() {
       try {
-        // Fetch accessToken + deviceSerial from API
-        const r: any = await adminApi.cameras.playerToken(cam.id);
-        if (destroyed) return;
-        const { accessToken, ezOpenUrl, mode } = r.data;
-
-        // Global accounts use ezvizlife.com SDK; YS7 accounts use ys7.com SDK
-        const sdkUrl = mode === 'global'
-          ? 'https://open.ezvizlife.com/sdk/js/latest/ezuikit.js'
-          : 'https://open.ys7.com/sdk/js/latest/ezuikit.js';
-
-        // Load EZUIKit from EZVIZ CDN if not already loaded
-        if (!(window as any).EZUIKit) {
+        // Load hls.js from CDN if not already present
+        if (!(window as any).Hls) {
           await new Promise<void>((resolve, reject) => {
             const s = document.createElement('script');
-            s.src = sdkUrl;
+            s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js';
             s.onload  = () => resolve();
-            s.onerror = () => reject(new Error('فشل تحميل EZVIZ SDK'));
+            s.onerror = () => reject(new Error('فشل تحميل مكتبة البث'));
             document.head.appendChild(s);
           });
         }
 
-        if (destroyed) return;
+        if (destroyed || !videoRef.current) return;
 
-        playerRef.current = new (window as any).EZUIKitPlayer({
-          id:          playerContainerId,
-          accessToken,
-          url:         ezOpenUrl,
-          width:       660,
-          height:      380,
-          autoplay:    true,
-          handleError: (e: any) => {
-            setPlayerErr(`خطأ في البث: ${e?.msg || 'تحقق من اتصال الكاميرا'}`);
-          },
-        });
-        setLoading(false);
+        const Hls = (window as any).Hls;
+
+        if (Hls.isSupported()) {
+          const hls = new Hls({ enableWorker: false });
+          hlsRef.current = hls;
+          hls.loadSource(hlsUrl);
+          hls.attachMedia(videoRef.current);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            if (!destroyed) { setLoading(false); videoRef.current?.play().catch(() => {}); }
+          });
+          hls.on(Hls.Events.ERROR, (_: any, d: any) => {
+            if (d.fatal && !destroyed) setPlayerErr('خطأ في البث: ' + (d.details || 'تحقق من اتصال الكاميرا'));
+          });
+        } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
+          // Safari native HLS
+          videoRef.current.src = hlsUrl;
+          videoRef.current.addEventListener('loadedmetadata', () => { if (!destroyed) setLoading(false); videoRef.current?.play().catch(() => {}); });
+        } else {
+          setPlayerErr('المتصفح لا يدعم بث HLS');
+          setLoading(false);
+        }
       } catch (e: any) {
         if (!destroyed) setPlayerErr(e.message || 'فشل تهيئة المشغّل');
         setLoading(false);
@@ -163,9 +170,9 @@ function StreamModal({ cam, data, onClose, showToast }: {
     init();
     return () => {
       destroyed = true;
-      try { playerRef.current?.stop?.(); } catch {}
+      hlsRef.current?.destroy?.();
     };
-  }, [cam.id]);
+  }, [hlsUrl]);
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -184,12 +191,20 @@ function StreamModal({ cam, data, onClose, showToast }: {
         {/* Player area */}
         <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', marginBottom: 14, minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
           {loading && !playerErr && (
-            <p style={{ color: '#475569', fontSize: 12, position: 'absolute' }}>جاري تحميل البث...</p>
+            <p style={{ color: '#475569', fontSize: 12, position: 'absolute', zIndex: 1 }}>جاري تحميل البث...</p>
           )}
           {playerErr && (
-            <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px', position: 'absolute' }}>{playerErr}</p>
+            <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px', position: 'absolute', zIndex: 1 }}>{playerErr}</p>
           )}
-          <div id={playerContainerId} style={{ width: 660, height: 380 }} />
+          {hlsUrl && (
+            <video
+              ref={videoRef}
+              controls
+              muted
+              playsInline
+              style={{ width: '100%', height: 380, display: 'block', opacity: loading ? 0 : 1, transition: 'opacity 0.3s' }}
+            />
+          )}
         </div>
 
         {/* URL copy cards */}
