@@ -14,7 +14,7 @@ const EMPTY_FORM = {
   rtsp_url: '', rtsp_username: '', rtsp_password: '',
 };
 
-type StreamData = { hls?: string | null; rtmp?: string | null; flv?: string | null; rtsp?: string | null; provider?: string };
+type StreamData = { hls?: string | null; rtmp?: string | null; flv?: string | null; rtsp?: string | null; provider?: string; debug?: any[] };
 
 // ── EZVIZ OAuth Panel ─────────────────────────────────────────────────────────
 function OAuthPanel({ companyId, showToast }: { companyId: string; showToast: (m: string) => void }) {
@@ -227,6 +227,18 @@ function StreamModal({ cam, data, onClose, showToast }: {
           )}
           <p style={{ fontSize: 10, color: '#334155', margin: '2px 0 0' }}>الروابط صالحة 30 دقيقة — اضغط "بث مباشر" مجدداً للتجديد</p>
         </div>
+
+        {/* Debug panel — shows EZVIZ API responses to diagnose stream errors */}
+        {data.debug && data.debug.length > 0 && !data.hls && !data.rtmp && (
+          <div style={{ marginTop: 10, background: '#0a0f1a', borderRadius: 8, padding: '8px 12px', maxHeight: 120, overflowY: 'auto' }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#475569', margin: '0 0 4px' }}>EZVIZ API debug</p>
+            {data.debug.map((d: any, i: number) => (
+              <p key={i} style={{ fontSize: 10, color: d.code === '200' ? '#22c55e' : '#f87171', margin: '1px 0', direction: 'ltr', fontFamily: 'monospace' }}>
+                {d.base?.replace('https://', '')} proto={d.proto} → {d.code ?? 'ERR'} {d.msg || d.error || ''}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
