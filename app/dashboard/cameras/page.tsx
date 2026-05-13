@@ -10,7 +10,7 @@ const LOCATIONS: Record<string, string> = {
 
 const EMPTY_FORM = {
   name: '', location_tag: 'entrance',
-  device_serial: '', ezviz_verification_code: '',
+  device_serial: '', ezviz_email: '', ezviz_password: '',
   rtsp_url: '', rtsp_username: '', rtsp_password: '',
 };
 
@@ -278,8 +278,8 @@ export default function CamerasPage() {
   const handleAdd = async () => {
     if (!propertyId) return showToast('اختر عقاراً أولاً');
     if (!form.name) return showToast('اسم الكاميرا مطلوب');
-    if (provider === 'ezviz' && (!form.device_serial || !form.ezviz_verification_code))
-      return showToast('Serial Number ورمز التحقق مطلوبان');
+    if (provider === 'ezviz' && (!form.device_serial || !form.ezviz_email || !form.ezviz_password))
+      return showToast('Serial Number وبيانات حساب EZVIZ مطلوبة');
     if (provider === 'rtsp' && !form.rtsp_url) return showToast('RTSP URL مطلوب');
     setSaving(true);
     try {
@@ -576,17 +576,20 @@ export default function CamerasPage() {
                   {provider === 'ezviz' ? (
                     <>
                       <div style={{ background: '#f0f7ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 11, color: '#1d4ed8' }}>
-                        أدخل Serial Number ورمز التحقق (Verification Code) الموجودَين على ملصق الكاميرا — سيتم ربط الجهاز بحساب EZVIZ المطور تلقائياً
+                        أدخل Serial Number من ملصق الكاميرا، وبيانات تسجيل الدخول في تطبيق EZVIZ
+                      </div>
+                      <div style={{ marginBottom: 12 }}>
+                        <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>Serial Number *</p>
+                        <input value={form.device_serial} onChange={f('device_serial')} dir="ltr" style={inp} placeholder="BG8598562" />
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
                         <div>
-                          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>Serial Number *</p>
-                          <input value={form.device_serial} onChange={f('device_serial')} dir="ltr" style={inp} placeholder="BG8598562" />
+                          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>EZVIZ Email *</p>
+                          <input value={form.ezviz_email} onChange={f('ezviz_email')} dir="ltr" style={inp} placeholder="you@example.com" type="email" />
                         </div>
                         <div>
-                          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>Verification Code *</p>
-                          <input value={form.ezviz_verification_code} onChange={f('ezviz_verification_code')} dir="ltr" style={inp} placeholder="ABCD12" />
-                          <p style={{ fontSize: 10, color: 'var(--lv-muted)', margin: '4px 0 0' }}>الرمز المكوّن من 6 أحرف على ملصق الكاميرا</p>
+                          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>EZVIZ Password *</p>
+                          <input value={form.ezviz_password} onChange={f('ezviz_password')} dir="ltr" style={inp} placeholder="••••••••" type="password" />
                         </div>
                       </div>
                     </>
