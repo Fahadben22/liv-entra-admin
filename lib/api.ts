@@ -303,6 +303,12 @@ export const adminApi = {
       request<any>('GET',    `/admin/cameras/devices`),
     playerToken: (cameraId: string) =>
       request<any>('GET',    `/admin/cameras/${cameraId}/player-token`),
+    oauthUrl:    (companyId: string) =>
+      request<any>('GET',    `/admin/cameras/oauth/url?company_id=${companyId}&redirect_back=${encodeURIComponent(window.location.href)}`),
+    oauthStatus: (companyId: string) =>
+      request<any>('GET',    `/admin/cameras/oauth/status?company_id=${companyId}`),
+    oauthRevoke: (companyId: string) =>
+      request<any>('DELETE', `/admin/cameras/oauth/revoke?company_id=${companyId}`),
   },
 
   // ─── Agent Economy ─────────────────────────────────────────────────────────
