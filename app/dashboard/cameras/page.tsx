@@ -122,13 +122,18 @@ function StreamModal({ cam, data, onClose, showToast }: {
         // Fetch accessToken + deviceSerial from API
         const r: any = await adminApi.cameras.playerToken(cam.id);
         if (destroyed) return;
-        const { accessToken, ezOpenUrl } = r.data;
+        const { accessToken, ezOpenUrl, mode } = r.data;
+
+        // Global accounts use ezvizlife.com SDK; YS7 accounts use ys7.com SDK
+        const sdkUrl = mode === 'global'
+          ? 'https://open.ezvizlife.com/sdk/js/latest/ezuikit.js'
+          : 'https://open.ys7.com/sdk/js/latest/ezuikit.js';
 
         // Load EZUIKit from EZVIZ CDN if not already loaded
         if (!(window as any).EZUIKit) {
           await new Promise<void>((resolve, reject) => {
             const s = document.createElement('script');
-            s.src = 'https://open.ys7.com/sdk/js/latest/ezuikit.js';
+            s.src = sdkUrl;
             s.onload  = () => resolve();
             s.onerror = () => reject(new Error('فشل تحميل EZVIZ SDK'));
             document.head.appendChild(s);
