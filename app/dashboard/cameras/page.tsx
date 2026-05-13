@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { adminApi } from '@/lib/api';
 import Icon from '@/components/Icon';
-import Hls from 'hls.js';
 
 const LOCATIONS: Record<string, string> = {
   entrance: 'المدخل', exterior: 'الخارج', parking: 'الموقف',
@@ -17,44 +16,68 @@ const EMPTY_FORM = {
 
 type StreamData = { hls?: string | null; rtmp?: string | null; flv?: string | null; rtsp?: string | null; provider?: string };
 
-// ── HLS Stream Player ────────────────────────────────────────────────────────
+// ── EZUIKit Live Player ───────────────────────────────────────────────────────
 function StreamModal({ cam, data, onClose, showToast }: {
   cam: any; data: StreamData; onClose: () => void; showToast: (m: string) => void;
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef   = useRef<Hls | null>(null);
+  const playerContainerId = 'ezviz-player-container';
+  const [loading,   setLoading]   = useState(true);
   const [playerErr, setPlayerErr] = useState('');
+  const playerRef = useRef<any>(null);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !data.hls) return;
+    let destroyed = false;
 
-    setPlayerErr('');
+    async function init() {
+      try {
+        // Fetch accessToken + deviceSerial from API
+        const r: any = await adminApi.cameras.playerToken(cam.id);
+        if (destroyed) return;
+        const { accessToken, ezOpenUrl } = r.data;
 
-    if (Hls.isSupported()) {
-      const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
-      hlsRef.current = hls;
-      hls.loadSource(data.hls);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(() => {}); });
-      hls.on(Hls.Events.ERROR, (_e: any, d: any) => {
-        if (d.fatal) setPlayerErr('تعذّر تحميل البث — تحقق من اتصال الكاميرا');
-      });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      // Safari native HLS
-      video.src = data.hls;
-      video.play().catch(() => {});
-    } else {
-      setPlayerErr('المتصفح لا يدعم HLS — انسخ الرابط وافتحه في VLC');
+        // Load EZUIKit from EZVIZ CDN if not already loaded
+        if (!(window as any).EZUIKit) {
+          await new Promise<void>((resolve, reject) => {
+            const s = document.createElement('script');
+            s.src = 'https://open.ys7.com/sdk/js/latest/ezuikit.js';
+            s.onload  = () => resolve();
+            s.onerror = () => reject(new Error('فشل تحميل EZVIZ SDK'));
+            document.head.appendChild(s);
+          });
+        }
+
+        if (destroyed) return;
+
+        playerRef.current = new (window as any).EZUIKitPlayer({
+          id:          playerContainerId,
+          accessToken,
+          url:         ezOpenUrl,
+          width:       660,
+          height:      380,
+          autoplay:    true,
+          handleError: (e: any) => {
+            setPlayerErr(`خطأ في البث: ${e?.msg || 'تحقق من اتصال الكاميرا'}`);
+          },
+        });
+        setLoading(false);
+      } catch (e: any) {
+        if (!destroyed) setPlayerErr(e.message || 'فشل تهيئة المشغّل');
+        setLoading(false);
+      }
     }
 
-    return () => { hlsRef.current?.destroy(); hlsRef.current = null; };
-  }, [data.hls]);
+    init();
+    return () => {
+      destroyed = true;
+      try { playerRef.current?.stop?.(); } catch {}
+    };
+  }, [cam.id]);
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={onClose}>
       <div style={{ background: '#0f172a', borderRadius: 16, padding: 20, maxWidth: 740, width: '95%' }} onClick={e => e.stopPropagation()}>
+
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -64,33 +87,25 @@ function StreamModal({ cam, data, onClose, showToast }: {
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>×</button>
         </div>
 
-        {/* Video player */}
-        <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', marginBottom: 14, position: 'relative' }}>
-          {playerErr ? (
-            <div style={{ aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px' }}>{playerErr}</p>
-            </div>
-          ) : (
-            <video
-              ref={videoRef}
-              controls
-              muted
-              playsInline
-              style={{ width: '100%', display: 'block', borderRadius: 10, maxHeight: 420 }}
-            />
+        {/* Player area */}
+        <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', marginBottom: 14, minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+          {loading && !playerErr && (
+            <p style={{ color: '#475569', fontSize: 12, position: 'absolute' }}>جاري تحميل البث...</p>
           )}
+          {playerErr && (
+            <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px', position: 'absolute' }}>{playerErr}</p>
+          )}
+          <div id={playerContainerId} style={{ width: 660, height: 380 }} />
         </div>
 
-        {/* URL cards */}
+        {/* URL copy cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {data.hls && (
             <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 10, fontWeight: 700, color: '#38bdf8', minWidth: 36 }}>HLS</span>
               <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.hls}</p>
               <button onClick={() => { navigator.clipboard.writeText(data.hls!); showToast('تم النسخ'); }}
-                style={{ padding: '3px 10px', borderRadius: 6, background: '#0f3460', color: '#38bdf8', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>
-                نسخ
-              </button>
+                style={{ padding: '3px 10px', borderRadius: 6, background: '#0f3460', color: '#38bdf8', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>نسخ</button>
             </div>
           )}
           {data.rtmp && (
@@ -98,19 +113,7 @@ function StreamModal({ cam, data, onClose, showToast }: {
               <span style={{ fontSize: 10, fontWeight: 700, color: '#a78bfa', minWidth: 36 }}>RTMP</span>
               <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.rtmp}</p>
               <button onClick={() => { navigator.clipboard.writeText(data.rtmp!); showToast('تم النسخ'); }}
-                style={{ padding: '3px 10px', borderRadius: 6, background: '#2d1b69', color: '#a78bfa', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>
-                نسخ
-              </button>
-            </div>
-          )}
-          {data.flv && (
-            <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#34d399', minWidth: 36 }}>FLV</span>
-              <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.flv}</p>
-              <button onClick={() => { navigator.clipboard.writeText(data.flv!); showToast('تم النسخ'); }}
-                style={{ padding: '3px 10px', borderRadius: 6, background: '#064e3b', color: '#34d399', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>
-                نسخ
-              </button>
+                style={{ padding: '3px 10px', borderRadius: 6, background: '#2d1b69', color: '#a78bfa', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>نسخ</button>
             </div>
           )}
           <p style={{ fontSize: 10, color: '#334155', margin: '2px 0 0' }}>الروابط صالحة 30 دقيقة — اضغط "بث مباشر" مجدداً للتجديد</p>

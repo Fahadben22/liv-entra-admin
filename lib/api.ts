@@ -301,6 +301,8 @@ export const adminApi = {
       request<any>('GET',    `/admin/cameras/${cameraId}/alarms`),
     listBoundDevices: () =>
       request<any>('GET',    `/admin/cameras/devices`),
+    playerToken: (cameraId: string) =>
+      request<any>('GET',    `/admin/cameras/${cameraId}/player-token`),
   },
 
   // ─── Agent Economy ─────────────────────────────────────────────────────────
