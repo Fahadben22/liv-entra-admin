@@ -105,74 +105,66 @@ function OAuthPanel({ companyId, showToast }: { companyId: string; showToast: (m
   );
 }
 
-// ── HLS Live Player (replaces dead EZUIKit CDN) ───────────────────────────────
+// ── EZUIKit Live Player (npm-bundled, no CDN dependency) ─────────────────────
 function StreamModal({ cam, data, onClose, showToast }: {
   cam: any; data: StreamData; onClose: () => void; showToast: (m: string) => void;
 }) {
-  const videoRef   = useRef<HTMLVideoElement>(null);
-  const hlsRef     = useRef<any>(null);
-  const [playerErr, setPlayerErr] = useState('');
+  const containerId = `ez-player-${cam.id}`;
+  const playerRef   = useRef<any>(null);
   const [loading,   setLoading]   = useState(true);
-
-  const hlsUrl = data.hls || null;
+  const [playerErr, setPlayerErr] = useState('');
 
   useEffect(() => {
-    if (!hlsUrl || !videoRef.current) {
-      if (!hlsUrl) setPlayerErr('لا يوجد رابط HLS — تحقق من اتصال الكاميرا');
-      setLoading(false);
-      return;
-    }
-
     let destroyed = false;
 
     async function init() {
       try {
-        // Load hls.js from CDN if not already present
-        if (!(window as any).Hls) {
-          await new Promise<void>((resolve, reject) => {
-            const s = document.createElement('script');
-            s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js';
-            s.onload  = () => resolve();
-            s.onerror = () => reject(new Error('فشل تحميل مكتبة البث'));
-            document.head.appendChild(s);
-          });
-        }
+        const r: any = await (await import('@/lib/api')).adminApi.cameras.playerToken(cam.id);
+        if (destroyed) return;
+        const { accessToken, deviceSerial } = r.data;
 
-        if (destroyed || !videoRef.current) return;
+        // Dynamically import EZUIKit so it never runs on the server (browser-only)
+        const { EZUIKitPlayer } = await import('ezuikit-js');
+        if (destroyed) return;
 
-        const Hls = (window as any).Hls;
+        const ezOpenUrl = `ezopen://open.ezvizlife.com/${deviceSerial}/1.live`;
 
-        if (Hls.isSupported()) {
-          const hls = new Hls({ enableWorker: false });
-          hlsRef.current = hls;
-          hls.loadSource(hlsUrl);
-          hls.attachMedia(videoRef.current);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            if (!destroyed) { setLoading(false); videoRef.current?.play().catch(() => {}); }
-          });
-          hls.on(Hls.Events.ERROR, (_: any, d: any) => {
-            if (d.fatal && !destroyed) setPlayerErr('خطأ في البث: ' + (d.details || 'تحقق من اتصال الكاميرا'));
-          });
-        } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-          // Safari native HLS
-          videoRef.current.src = hlsUrl!;
-          videoRef.current.addEventListener('loadedmetadata', () => { if (!destroyed) setLoading(false); videoRef.current?.play().catch(() => {}); });
-        } else {
-          setPlayerErr('المتصفح لا يدعم بث HLS');
+        playerRef.current = new EZUIKitPlayer({
+          id:           containerId,
+          accessToken,
+          url:          ezOpenUrl,
+          width:        660,
+          height:       380,
+          staticPath:   '/ezuikit_static',
+          env: {
+            // Singapore Open Platform — matches apiisgp.ezvizlife.com consumer region
+            domain: 'https://isgpopen.ezvizlife.com',
+          },
+          handleError: (err: any) => {
+            console.error('[EZUIKit]', err);
+            if (!destroyed) setPlayerErr(
+              err?.data?.nErrorCode
+                ? `خطأ ${err.data.nErrorCode}: ${err.data.errorInfo || 'تحقق من اتصال الكاميرا'}`
+                : 'خطأ في البث — تحقق من اتصال الكاميرا'
+            );
+          },
+        });
+
+        if (!destroyed) setLoading(false);
+      } catch (e: any) {
+        if (!destroyed) {
+          setPlayerErr(e.message || 'فشل تهيئة المشغّل');
           setLoading(false);
         }
-      } catch (e: any) {
-        if (!destroyed) setPlayerErr(e.message || 'فشل تهيئة المشغّل');
-        setLoading(false);
       }
     }
 
     init();
     return () => {
       destroyed = true;
-      hlsRef.current?.destroy?.();
+      try { playerRef.current?.stop?.(); } catch {}
     };
-  }, [hlsUrl]);
+  }, [cam.id, containerId]);
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -196,18 +188,10 @@ function StreamModal({ cam, data, onClose, showToast }: {
           {playerErr && (
             <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px', position: 'absolute', zIndex: 1 }}>{playerErr}</p>
           )}
-          {hlsUrl && (
-            <video
-              ref={videoRef}
-              controls
-              muted
-              playsInline
-              style={{ width: '100%', height: 380, display: 'block', opacity: loading ? 0 : 1, transition: 'opacity 0.3s' }}
-            />
-          )}
+          <div id={containerId} style={{ width: 660, height: 380 }} />
         </div>
 
-        {/* URL copy cards */}
+        {/* URL copy cards from /stream-url (shown if available) */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {data.hls && (
             <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -225,20 +209,8 @@ function StreamModal({ cam, data, onClose, showToast }: {
                 style={{ padding: '3px 10px', borderRadius: 6, background: '#2d1b69', color: '#a78bfa', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>نسخ</button>
             </div>
           )}
-          <p style={{ fontSize: 10, color: '#334155', margin: '2px 0 0' }}>الروابط صالحة 30 دقيقة — اضغط "بث مباشر" مجدداً للتجديد</p>
+          <p style={{ fontSize: 10, color: '#334155', margin: '2px 0 0' }}>اضغط "بث مباشر" مجدداً لتجديد الجلسة</p>
         </div>
-
-        {/* Debug panel — shows EZVIZ API responses to diagnose stream errors */}
-        {data.debug && data.debug.length > 0 && !data.hls && !data.rtmp && (
-          <div style={{ marginTop: 10, background: '#0a0f1a', borderRadius: 8, padding: '8px 12px', maxHeight: 120, overflowY: 'auto' }}>
-            <p style={{ fontSize: 10, fontWeight: 700, color: '#475569', margin: '0 0 4px' }}>EZVIZ API debug</p>
-            {data.debug.map((d: any, i: number) => (
-              <p key={i} style={{ fontSize: 10, color: d.code === '200' ? '#22c55e' : '#f87171', margin: '1px 0', direction: 'ltr', fontFamily: 'monospace' }}>
-                {d.base?.replace('https://', '')} proto={d.proto} → {d.code ?? 'ERR'} {d.msg || d.error || ''}
-              </p>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
