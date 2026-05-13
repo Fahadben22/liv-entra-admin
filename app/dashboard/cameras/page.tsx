@@ -324,7 +324,7 @@ export default function CamerasPage() {
                                 </button>
                                 <button onClick={() => handleStatus(cam.id)}
                                   style={{ padding: '5px 8px', borderRadius: 7, background: 'var(--lv-panel)', color: 'var(--lv-muted)', border: '1px solid var(--lv-line)', cursor: 'pointer', fontSize: 11 }}>
-                                  <Icon name="refresh-cw" size={11} color="var(--lv-muted)" />
+                                  <Icon name="refresh" size={11} color="var(--lv-muted)" />
                                 </button>
                                 {cam.provider === 'ezviz' && (
                                   <button onClick={() => handleAlarms(cam)} disabled={loadingAlarm === cam.id}
