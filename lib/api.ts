@@ -283,18 +283,24 @@ export const adminApi = {
 
   // ─── Cameras (admin manages on behalf of companies) ──────────────────────────
   cameras: {
-    listByProperty: (propertyId: string) =>
+    listByProperty:   (propertyId: string) =>
       request<any>('GET',    `/admin/cameras/property/${propertyId}`),
     add: (propertyId: string, data: any) =>
       request<any>('POST',   `/admin/cameras/property/${propertyId}`, data),
-    remove: (cameraId: string) =>
+    remove:           (cameraId: string) =>
       request<any>('DELETE', `/admin/cameras/${cameraId}`),
-    status: (cameraId: string) =>
+    status:           (cameraId: string) =>
       request<any>('GET',    `/admin/cameras/${cameraId}/status`),
-    snapshot: (cameraId: string) =>
+    stream:           (cameraId: string) =>
+      request<any>('GET',    `/admin/cameras/${cameraId}/stream`),
+    snapshot:         (cameraId: string) =>
       request<any>('POST',   `/admin/cameras/${cameraId}/snapshot`, { reason: 'admin_manual' }),
-    snapshots: (cameraId: string) =>
+    snapshots:        (cameraId: string) =>
       request<any>('GET',    `/admin/cameras/${cameraId}/snapshots`),
+    alarms:           (cameraId: string) =>
+      request<any>('GET',    `/admin/cameras/${cameraId}/alarms`),
+    listBoundDevices: () =>
+      request<any>('GET',    `/admin/cameras/devices`),
   },
 
   // ─── Agent Economy ─────────────────────────────────────────────────────────
