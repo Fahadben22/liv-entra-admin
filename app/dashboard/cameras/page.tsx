@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { adminApi } from '@/lib/api';
 import Icon from '@/components/Icon';
+import Hls from 'hls.js';
 
 const LOCATIONS: Record<string, string> = {
   entrance: 'المدخل', exterior: 'الخارج', parking: 'الموقف',
@@ -15,6 +16,109 @@ const EMPTY_FORM = {
 };
 
 type StreamData = { hls?: string | null; rtmp?: string | null; flv?: string | null; rtsp?: string | null; provider?: string };
+
+// ── HLS Stream Player ────────────────────────────────────────────────────────
+function StreamModal({ cam, data, onClose, showToast }: {
+  cam: any; data: StreamData; onClose: () => void; showToast: (m: string) => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef   = useRef<Hls | null>(null);
+  const [playerErr, setPlayerErr] = useState('');
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !data.hls) return;
+
+    setPlayerErr('');
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+      hlsRef.current = hls;
+      hls.loadSource(data.hls);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(() => {}); });
+      hls.on(Hls.Events.ERROR, (_e: any, d: any) => {
+        if (d.fatal) setPlayerErr('تعذّر تحميل البث — تحقق من اتصال الكاميرا');
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari native HLS
+      video.src = data.hls;
+      video.play().catch(() => {});
+    } else {
+      setPlayerErr('المتصفح لا يدعم HLS — انسخ الرابط وافتحه في VLC');
+    }
+
+    return () => { hlsRef.current?.destroy(); hlsRef.current = null; };
+  }, [data.hls]);
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      onClick={onClose}>
+      <div style={{ background: '#0f172a', borderRadius: 16, padding: 20, maxWidth: 740, width: '95%' }} onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e', display: 'inline-block' }} />
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9', margin: 0 }}>{cam.name} — بث مباشر</p>
+          </div>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>×</button>
+        </div>
+
+        {/* Video player */}
+        <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', marginBottom: 14, position: 'relative' }}>
+          {playerErr ? (
+            <div style={{ aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px' }}>{playerErr}</p>
+            </div>
+          ) : (
+            <video
+              ref={videoRef}
+              controls
+              muted
+              playsInline
+              style={{ width: '100%', display: 'block', borderRadius: 10, maxHeight: 420 }}
+            />
+          )}
+        </div>
+
+        {/* URL cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {data.hls && (
+            <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#38bdf8', minWidth: 36 }}>HLS</span>
+              <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.hls}</p>
+              <button onClick={() => { navigator.clipboard.writeText(data.hls!); showToast('تم النسخ'); }}
+                style={{ padding: '3px 10px', borderRadius: 6, background: '#0f3460', color: '#38bdf8', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>
+                نسخ
+              </button>
+            </div>
+          )}
+          {data.rtmp && (
+            <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#a78bfa', minWidth: 36 }}>RTMP</span>
+              <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.rtmp}</p>
+              <button onClick={() => { navigator.clipboard.writeText(data.rtmp!); showToast('تم النسخ'); }}
+                style={{ padding: '3px 10px', borderRadius: 6, background: '#2d1b69', color: '#a78bfa', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>
+                نسخ
+              </button>
+            </div>
+          )}
+          {data.flv && (
+            <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#34d399', minWidth: 36 }}>FLV</span>
+              <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.flv}</p>
+              <button onClick={() => { navigator.clipboard.writeText(data.flv!); showToast('تم النسخ'); }}
+                style={{ padding: '3px 10px', borderRadius: 6, background: '#064e3b', color: '#34d399', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>
+                نسخ
+              </button>
+            </div>
+          )}
+          <p style={{ fontSize: 10, color: '#334155', margin: '2px 0 0' }}>الروابط صالحة 30 دقيقة — اضغط "بث مباشر" مجدداً للتجديد</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function CamerasPage() {
   const [companies,   setCompanies]   = useState<any[]>([]);
@@ -41,7 +145,6 @@ export default function CamerasPage() {
   const [propError,    setPropError]    = useState('');
   const [saving,       setSaving]       = useState(false);
   const [toast,        setToast]        = useState('');
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3500); };
   const f = (k: keyof typeof EMPTY_FORM) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
@@ -428,58 +531,12 @@ export default function CamerasPage() {
 
       {/* ── Stream Modal ── */}
       {streamModal && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          onClick={() => setStreamModal(null)}>
-          <div style={{ background: '#0f172a', borderRadius: 16, padding: 24, maxWidth: 700, width: '90%' }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <p style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9', margin: 0 }}>{streamModal.cam.name} — بث مباشر</p>
-              <button onClick={() => setStreamModal(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20 }}>×</button>
-            </div>
-
-            {/* HLS player placeholder */}
-            <div style={{ background: '#020617', borderRadius: 10, aspectRatio: '16/9', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, position: 'relative' }}>
-              <p style={{ color: '#475569', fontSize: 12, textAlign: 'center' }}>
-                لمشاهدة البث المباشر، استخدم VLC أو مشغّل HLS مدمج<br />
-                <span style={{ fontSize: 11, color: '#334155' }}>HLS يعمل في Safari تلقائياً · Chrome يحتاج hls.js</span>
-              </p>
-            </div>
-
-            {/* Stream URLs */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {streamModal.data.hls && (
-                <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px' }}>
-                  <p style={{ fontSize: 10, color: '#64748b', margin: '0 0 3px', fontWeight: 600 }}>HLS (m3u8) — Safari / iOS</p>
-                  <p style={{ fontSize: 11, color: '#38bdf8', margin: 0, direction: 'ltr', wordBreak: 'break-all' }}>{streamModal.data.hls}</p>
-                  <button onClick={() => { navigator.clipboard.writeText(streamModal.data.hls!); showToast('تم النسخ'); }}
-                    style={{ marginTop: 6, padding: '3px 10px', borderRadius: 6, background: '#0f3460', color: '#38bdf8', border: 'none', cursor: 'pointer', fontSize: 10 }}>
-                    نسخ الرابط
-                  </button>
-                </div>
-              )}
-              {streamModal.data.rtmp && (
-                <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px' }}>
-                  <p style={{ fontSize: 10, color: '#64748b', margin: '0 0 3px', fontWeight: 600 }}>RTMP — OBS / VLC</p>
-                  <p style={{ fontSize: 11, color: '#a78bfa', margin: 0, direction: 'ltr', wordBreak: 'break-all' }}>{streamModal.data.rtmp}</p>
-                  <button onClick={() => { navigator.clipboard.writeText(streamModal.data.rtmp!); showToast('تم النسخ'); }}
-                    style={{ marginTop: 6, padding: '3px 10px', borderRadius: 6, background: '#2d1b69', color: '#a78bfa', border: 'none', cursor: 'pointer', fontSize: 10 }}>
-                    نسخ الرابط
-                  </button>
-                </div>
-              )}
-              {streamModal.data.flv && (
-                <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px' }}>
-                  <p style={{ fontSize: 10, color: '#64748b', margin: '0 0 3px', fontWeight: 600 }}>FLV — Chrome / flv.js</p>
-                  <p style={{ fontSize: 11, color: '#34d399', margin: 0, direction: 'ltr', wordBreak: 'break-all' }}>{streamModal.data.flv}</p>
-                  <button onClick={() => { navigator.clipboard.writeText(streamModal.data.flv!); showToast('تم النسخ'); }}
-                    style={{ marginTop: 6, padding: '3px 10px', borderRadius: 6, background: '#064e3b', color: '#34d399', border: 'none', cursor: 'pointer', fontSize: 10 }}>
-                    نسخ الرابط
-                  </button>
-                </div>
-              )}
-              <p style={{ fontSize: 10, color: '#475569', margin: '4px 0 0' }}>الروابط صالحة لمدة 30 دقيقة — اضغط "بث مباشر" مرة أخرى للتجديد</p>
-            </div>
-          </div>
-        </div>
+        <StreamModal
+          cam={streamModal.cam}
+          data={streamModal.data}
+          onClose={() => setStreamModal(null)}
+          showToast={showToast}
+        />
       )}
 
       {/* ── Alarms Modal ── */}
