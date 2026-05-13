@@ -155,7 +155,7 @@ function StreamModal({ cam, data, onClose, showToast }: {
           });
         } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
           // Safari native HLS
-          videoRef.current.src = hlsUrl;
+          videoRef.current.src = hlsUrl!;
           videoRef.current.addEventListener('loadedmetadata', () => { if (!destroyed) setLoading(false); videoRef.current?.play().catch(() => {}); });
         } else {
           setPlayerErr('المتصفح لا يدعم بث HLS');
