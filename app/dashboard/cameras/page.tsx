@@ -128,16 +128,18 @@ function StreamModal({ cam, data, onClose, showToast }: {
     if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
 
     async function init() {
+      const v = videoRef.current;
+      if (!v) return;
       try {
         const Hls = (await import('hls.js')).default;
         if (Hls.isSupported()) {
           const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
           hlsRef.current = hls;
           hls.loadSource(activeUrl!);
-          hls.attachMedia(video as HTMLMediaElement);
+          hls.attachMedia(v);
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             setLoading(false);
-            video?.play().catch(() => {});
+            v.play().catch(() => {});
           });
           hls.on(Hls.Events.ERROR, (_: any, d: any) => {
             if (d.fatal) {
@@ -145,10 +147,10 @@ function StreamModal({ cam, data, onClose, showToast }: {
               setLoading(false);
             }
           });
-        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
           // Safari native HLS
-          video.src = activeUrl!;
-          video.addEventListener('loadedmetadata', () => { setLoading(false); video?.play().catch(() => {}); });
+          v.src = activeUrl!;
+          v.addEventListener('loadedmetadata', () => { setLoading(false); v.play().catch(() => {}); });
         } else {
           setPlayerErr('المتصفح لا يدعم HLS');
           setLoading(false);
