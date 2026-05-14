@@ -497,8 +497,10 @@ export default function CamerasPage() {
                         const status = statuses[cam.id];
                         return (
                           <div key={cam.id} style={{ background: 'var(--lv-bg)', borderRadius: 12, border: '1px solid var(--lv-line)', overflow: 'hidden' }}>
-                            {/* Snapshot preview */}
-                            <div style={{ background: '#0f172a', aspectRatio: '16/9', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            {/* Snapshot preview — click to open live stream */}
+                            <div
+                              onClick={() => cam.provider === 'ezviz' && handleStream(cam)}
+                              style={{ background: '#0f172a', aspectRatio: '16/9', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: cam.provider === 'ezviz' ? 'pointer' : 'default' }}>
                               {snapshots[cam.id] ? (
                                 <img src={snapshots[cam.id]} alt="snap" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                               ) : (
@@ -515,6 +517,13 @@ export default function CamerasPage() {
                                 <span style={{ position: 'absolute', top: 6, left: 6, width: 8, height: 8, borderRadius: '50%',
                                   background: status.online ? '#22c55e' : '#ef4444',
                                   boxShadow: status.online ? '0 0 6px #22c55e' : 'none' }} />
+                              )}
+                              {/* Play hint */}
+                              {cam.provider === 'ezviz' && (
+                                <div style={{ position: 'absolute', bottom: 6, left: 6, width: 28, height: 28, borderRadius: '50%',
+                                  background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <Icon name="play" size={13} color="#fff" />
+                                </div>
                               )}
                             </div>
 
