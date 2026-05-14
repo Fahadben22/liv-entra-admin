@@ -137,7 +137,7 @@ function StreamModal({ cam, data, onClose, showToast }: {
           hls.attachMedia(video as HTMLMediaElement);
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             setLoading(false);
-            video.play().catch(() => {});
+            video?.play().catch(() => {});
           });
           hls.on(Hls.Events.ERROR, (_: any, d: any) => {
             if (d.fatal) {
@@ -148,7 +148,7 @@ function StreamModal({ cam, data, onClose, showToast }: {
         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
           // Safari native HLS
           video.src = activeUrl!;
-          video.addEventListener('loadedmetadata', () => { setLoading(false); video.play().catch(() => {}); });
+          video.addEventListener('loadedmetadata', () => { setLoading(false); video?.play().catch(() => {}); });
         } else {
           setPlayerErr('المتصفح لا يدعم HLS');
           setLoading(false);
