@@ -139,6 +139,7 @@ function StreamModal({ cam, data, onClose, showToast }: {
           width:       660,
           height:      372,
           staticPath:  '/ezuikit_static',
+          env:         { domain: 'https://open.ezviz.com' },
           handleError: (err: any) => {
             console.error('[EZUIKit]', err);
             if (!destroyed) setPlayerErr(
