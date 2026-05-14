@@ -16,94 +16,6 @@ const EMPTY_FORM = {
 
 type StreamData = { hls?: string | null; hls_smooth?: string | null; rtmp?: string | null; flv?: string | null; rtsp?: string | null; provider?: string; debug?: any[] };
 
-// ── EZVIZ OAuth Panel ─────────────────────────────────────────────────────────
-function OAuthPanel({ companyId, showToast }: { companyId: string; showToast: (m: string) => void }) {
-  const [status,   setStatus]   = useState<any>(null);
-  const [loading,  setLoading]  = useState(true);
-  const [working,  setWorking]  = useState(false);
-
-  useEffect(() => {
-    setLoading(true);
-    adminApi.cameras.oauthStatus(companyId)
-      .then((r: any) => setStatus(r.data))
-      .catch(() => setStatus(null))
-      .finally(() => setLoading(false));
-  }, [companyId]);
-
-  // Handle ?oauth=success in URL after callback redirect
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('oauth') === 'success' && params.get('company_id') === companyId) {
-      showToast('تم تفويض EZVIZ بنجاح');
-      window.history.replaceState({}, '', window.location.pathname);
-      adminApi.cameras.oauthStatus(companyId).then((r: any) => setStatus(r.data)).catch(() => {});
-    }
-    if (params.get('oauth') === 'error') {
-      showToast(`خطأ في التفويض: ${params.get('msg') || 'حاول مجدداً'}`);
-      window.history.replaceState({}, '', window.location.pathname);
-    }
-  }, [companyId]);
-
-  const handleAuthorize = async () => {
-    setWorking(true);
-    try {
-      const r: any = await adminApi.cameras.oauthUrl(companyId);
-      window.open(r.data.url, '_blank', 'width=520,height=620');
-    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
-    setWorking(false);
-  };
-
-  const handleRevoke = async () => {
-    if (!confirm('إلغاء تفويض EZVIZ لهذه الشركة؟')) return;
-    setWorking(true);
-    try {
-      await adminApi.cameras.oauthRevoke(companyId);
-      setStatus({ authorized: false });
-      showToast('تم إلغاء التفويض');
-    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
-    setWorking(false);
-  };
-
-  if (loading) return null;
-
-  const authorized = status?.authorized && !status?.expired;
-  const expired    = status?.authorized && status?.expired;
-
-  return (
-    <div style={{
-      background: authorized ? '#f0fdf4' : expired ? '#fff8ee' : '#fef2f2',
-      border: `1px solid ${authorized ? '#86efac' : expired ? '#fcd34d' : '#fca5a5'}`,
-      borderRadius: 12, padding: '14px 18px', marginBottom: 16,
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap',
-    }}>
-      <div>
-        <p style={{ fontSize: 12, fontWeight: 700, margin: '0 0 3px',
-          color: authorized ? '#15803d' : expired ? '#b45309' : '#dc2626' }}>
-          {authorized ? 'مفوّض — EZVIZ' : expired ? 'انتهت صلاحية التفويض' : 'غير مفوّض — EZVIZ'}
-        </p>
-        <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>
-          {authorized
-            ? `الوصول إلى الكاميرات الشخصية مفعّل · ${status.ezviz_user_id || ''}`
-            : 'أرسل رابط التفويض لصاحب الكاميرا لتفعيل الوصول'}
-        </p>
-      </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        {!authorized && (
-          <button onClick={handleAuthorize} disabled={working}
-            style={{ padding: '7px 16px', borderRadius: 8, background: '#0071e3', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
-            {working ? '...' : expired ? 'تجديد التفويض' : 'إنشاء رابط التفويض'}
-          </button>
-        )}
-        {authorized && (
-          <button onClick={handleRevoke} disabled={working}
-            style={{ padding: '7px 14px', borderRadius: 8, background: 'white', color: '#dc2626', border: '1px solid #fca5a5', cursor: 'pointer', fontSize: 11 }}>
-            إلغاء التفويض
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ── EZUIKit Live Player ───────────────────────────────────────────────────────
 function StreamModal({ cam, data, onClose, showToast }: {
@@ -443,9 +355,6 @@ export default function CamerasPage() {
               </div>
             )}
           </div>
-
-          {/* OAuth Authorization Panel */}
-          {companyId && <OAuthPanel companyId={companyId} showToast={showToast} />}
 
           {/* Step 2 — Property */}
           {companyId && (
