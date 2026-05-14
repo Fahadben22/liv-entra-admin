@@ -105,65 +105,62 @@ function OAuthPanel({ companyId, showToast }: { companyId: string; showToast: (m
   );
 }
 
-// ── HLS Live Player ───────────────────────────────────────────────────────────
+// ── EZUIKit Live Player ───────────────────────────────────────────────────────
 function StreamModal({ cam, data, onClose, showToast }: {
   cam: any; data: StreamData; onClose: () => void; showToast: (m: string) => void;
 }) {
-  const videoRef    = useRef<HTMLVideoElement>(null);
-  const hlsRef      = useRef<any>(null);
-  const [quality,   setQuality]   = useState<'hd' | 'smooth'>('hd');
+  const containerId = `ez-player-${cam.id}`;
+  const playerRef   = useRef<any>(null);
+  const [quality,   setQuality]   = useState<'hd' | '480p'>('hd');
   const [loading,   setLoading]   = useState(true);
   const [playerErr, setPlayerErr] = useState('');
 
-  const activeUrl = quality === 'hd' ? data.hls : (data.hls_smooth || data.hls);
-
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !activeUrl) { setPlayerErr('لا يوجد رابط بث متاح'); setLoading(false); return; }
-
-    setLoading(true);
-    setPlayerErr('');
-
-    // Destroy previous hls instance
-    if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
+    let destroyed = false;
 
     async function init() {
-      const v = videoRef.current;
-      if (!v) return;
       try {
-        const Hls = (await import('hls.js')).default;
-        if (Hls.isSupported()) {
-          const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
-          hlsRef.current = hls;
-          hls.loadSource(activeUrl!);
-          hls.attachMedia(v);
-          hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            setLoading(false);
-            v.play().catch(() => {});
-          });
-          hls.on(Hls.Events.ERROR, (_: any, d: any) => {
-            if (d.fatal) {
-              setPlayerErr(`خطأ في البث: ${d.details || 'تحقق من اتصال الكاميرا'}`);
-              setLoading(false);
-            }
-          });
-        } else if (v.canPlayType('application/vnd.apple.mpegurl')) {
-          // Safari native HLS
-          v.src = activeUrl!;
-          v.addEventListener('loadedmetadata', () => { setLoading(false); v.play().catch(() => {}); });
-        } else {
-          setPlayerErr('المتصفح لا يدعم HLS');
-          setLoading(false);
-        }
+        const r: any = await (await import('@/lib/api')).adminApi.cameras.playerToken(cam.id);
+        if (destroyed) return;
+        const { accessToken, deviceSerial } = r.data;
+
+        const { EZUIKitPlayer } = await import('ezuikit-js');
+        if (destroyed) return;
+
+        // ezopen URL format confirmed from EZVIZ Open Platform portal
+        const ezOpenUrl = quality === 'hd'
+          ? `ezopen://open.ezviz.com/${deviceSerial}/1.hd.live`
+          : `ezopen://open.ezviz.com/${deviceSerial}/1.live`;
+
+        playerRef.current = new EZUIKitPlayer({
+          id:          containerId,
+          accessToken,
+          url:         ezOpenUrl,
+          width:       660,
+          height:      372,
+          staticPath:  '/ezuikit_static',
+          handleError: (err: any) => {
+            console.error('[EZUIKit]', err);
+            if (!destroyed) setPlayerErr(
+              err?.data?.nErrorCode
+                ? `خطأ ${err.data.nErrorCode}: ${err.data.errorInfo || 'تحقق من اتصال الكاميرا'}`
+                : 'خطأ في البث — تحقق من اتصال الكاميرا'
+            );
+          },
+        });
+
+        if (!destroyed) setLoading(false);
       } catch (e: any) {
-        setPlayerErr(e.message || 'فشل تهيئة المشغّل');
-        setLoading(false);
+        if (!destroyed) { setPlayerErr(e.message || 'فشل تهيئة المشغّل'); setLoading(false); }
       }
     }
 
     init();
-    return () => { if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; } };
-  }, [activeUrl]);
+    return () => {
+      destroyed = true;
+      try { playerRef.current?.stop?.(); } catch {}
+    };
+  }, [cam.id, containerId, quality]);
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -177,31 +174,25 @@ function StreamModal({ cam, data, onClose, showToast }: {
             <p style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9', margin: 0 }}>{cam.name} — بث مباشر</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {data.hls_smooth && (
-              <div style={{ display: 'flex', background: '#1e293b', borderRadius: 8, overflow: 'hidden' }}>
-                <button onClick={() => setQuality('hd')}
-                  style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === 'hd' ? '#0ea5e9' : 'transparent', color: quality === 'hd' ? '#fff' : '#64748b' }}>HD</button>
-                <button onClick={() => setQuality('smooth')}
-                  style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === 'smooth' ? '#0ea5e9' : 'transparent', color: quality === 'smooth' ? '#fff' : '#64748b' }}>Smooth</button>
-              </div>
-            )}
+            <div style={{ display: 'flex', background: '#1e293b', borderRadius: 8, overflow: 'hidden' }}>
+              <button onClick={() => setQuality('hd')}
+                style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === 'hd' ? '#0ea5e9' : 'transparent', color: quality === 'hd' ? '#fff' : '#64748b' }}>HD</button>
+              <button onClick={() => setQuality('480p')}
+                style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === '480p' ? '#0ea5e9' : 'transparent', color: quality === '480p' ? '#fff' : '#64748b' }}>480P</button>
+            </div>
             <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>×</button>
           </div>
         </div>
 
         {/* Player area */}
-        <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', marginBottom: 14, position: 'relative', aspectRatio: '16/9' }}>
+        <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', marginBottom: 14, minHeight: 372, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {loading && !playerErr && (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p style={{ color: '#475569', fontSize: 12 }}>جاري تحميل البث...</p>
-            </div>
+            <p style={{ color: '#475569', fontSize: 12, position: 'absolute', zIndex: 1 }}>جاري تحميل البث...</p>
           )}
           {playerErr && (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px' }}>{playerErr}</p>
-            </div>
+            <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px', position: 'absolute', zIndex: 1 }}>{playerErr}</p>
           )}
-          <video ref={videoRef} style={{ width: '100%', height: '100%', display: 'block' }} muted playsInline controls />
+          <div id={containerId} style={{ width: 660, height: 372 }} />
         </div>
 
         {/* URL copy cards */}
