@@ -14,7 +14,7 @@ const EMPTY_FORM = {
   rtsp_url: '', rtsp_username: '', rtsp_password: '',
 };
 
-type StreamData = { hls?: string | null; rtmp?: string | null; flv?: string | null; rtsp?: string | null; provider?: string; debug?: any[] };
+type StreamData = { hls?: string | null; hls_smooth?: string | null; rtmp?: string | null; flv?: string | null; rtsp?: string | null; provider?: string; debug?: any[] };
 
 // ── EZVIZ OAuth Panel ─────────────────────────────────────────────────────────
 function OAuthPanel({ companyId, showToast }: { companyId: string; showToast: (m: string) => void }) {
@@ -105,66 +105,63 @@ function OAuthPanel({ companyId, showToast }: { companyId: string; showToast: (m
   );
 }
 
-// ── EZUIKit Live Player (npm-bundled, no CDN dependency) ─────────────────────
+// ── HLS Live Player ───────────────────────────────────────────────────────────
 function StreamModal({ cam, data, onClose, showToast }: {
   cam: any; data: StreamData; onClose: () => void; showToast: (m: string) => void;
 }) {
-  const containerId = `ez-player-${cam.id}`;
-  const playerRef   = useRef<any>(null);
+  const videoRef    = useRef<HTMLVideoElement>(null);
+  const hlsRef      = useRef<any>(null);
+  const [quality,   setQuality]   = useState<'hd' | 'smooth'>('hd');
   const [loading,   setLoading]   = useState(true);
   const [playerErr, setPlayerErr] = useState('');
 
+  const activeUrl = quality === 'hd' ? data.hls : (data.hls_smooth || data.hls);
+
   useEffect(() => {
-    let destroyed = false;
+    const video = videoRef.current;
+    if (!video || !activeUrl) { setPlayerErr('لا يوجد رابط بث متاح'); setLoading(false); return; }
+
+    setLoading(true);
+    setPlayerErr('');
+
+    // Destroy previous hls instance
+    if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; }
 
     async function init() {
       try {
-        const r: any = await (await import('@/lib/api')).adminApi.cameras.playerToken(cam.id);
-        if (destroyed) return;
-        const { accessToken, deviceSerial } = r.data;
-
-        // Dynamically import EZUIKit so it never runs on the server (browser-only)
-        const { EZUIKitPlayer } = await import('ezuikit-js');
-        if (destroyed) return;
-
-        const ezOpenUrl = `ezopen://open.ezvizlife.com/${deviceSerial}/1.live`;
-
-        playerRef.current = new EZUIKitPlayer({
-          id:           containerId,
-          accessToken,
-          url:          ezOpenUrl,
-          width:        660,
-          height:       380,
-          staticPath:   '/ezuikit_static',
-          env: {
-            // Singapore Open Platform — matches apiisgp.ezvizlife.com consumer region
-            domain: 'https://isgpopen.ezvizlife.com',
-          },
-          handleError: (err: any) => {
-            console.error('[EZUIKit]', err);
-            if (!destroyed) setPlayerErr(
-              err?.data?.nErrorCode
-                ? `خطأ ${err.data.nErrorCode}: ${err.data.errorInfo || 'تحقق من اتصال الكاميرا'}`
-                : 'خطأ في البث — تحقق من اتصال الكاميرا'
-            );
-          },
-        });
-
-        if (!destroyed) setLoading(false);
-      } catch (e: any) {
-        if (!destroyed) {
-          setPlayerErr(e.message || 'فشل تهيئة المشغّل');
+        const Hls = (await import('hls.js')).default;
+        if (Hls.isSupported()) {
+          const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+          hlsRef.current = hls;
+          hls.loadSource(activeUrl!);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            setLoading(false);
+            video.play().catch(() => {});
+          });
+          hls.on(Hls.Events.ERROR, (_: any, d: any) => {
+            if (d.fatal) {
+              setPlayerErr(`خطأ في البث: ${d.details || 'تحقق من اتصال الكاميرا'}`);
+              setLoading(false);
+            }
+          });
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          // Safari native HLS
+          video.src = activeUrl!;
+          video.addEventListener('loadedmetadata', () => { setLoading(false); video.play().catch(() => {}); });
+        } else {
+          setPlayerErr('المتصفح لا يدعم HLS');
           setLoading(false);
         }
+      } catch (e: any) {
+        setPlayerErr(e.message || 'فشل تهيئة المشغّل');
+        setLoading(false);
       }
     }
 
     init();
-    return () => {
-      destroyed = true;
-      try { playerRef.current?.stop?.(); } catch {}
-    };
-  }, [cam.id, containerId]);
+    return () => { if (hlsRef.current) { hlsRef.current.destroy(); hlsRef.current = null; } };
+  }, [activeUrl]);
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -177,21 +174,35 @@ function StreamModal({ cam, data, onClose, showToast }: {
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e', display: 'inline-block' }} />
             <p style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9', margin: 0 }}>{cam.name} — بث مباشر</p>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>×</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {data.hls_smooth && (
+              <div style={{ display: 'flex', background: '#1e293b', borderRadius: 8, overflow: 'hidden' }}>
+                <button onClick={() => setQuality('hd')}
+                  style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === 'hd' ? '#0ea5e9' : 'transparent', color: quality === 'hd' ? '#fff' : '#64748b' }}>HD</button>
+                <button onClick={() => setQuality('smooth')}
+                  style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === 'smooth' ? '#0ea5e9' : 'transparent', color: quality === 'smooth' ? '#fff' : '#64748b' }}>Smooth</button>
+              </div>
+            )}
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>×</button>
+          </div>
         </div>
 
         {/* Player area */}
-        <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', marginBottom: 14, minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', marginBottom: 14, position: 'relative', aspectRatio: '16/9' }}>
           {loading && !playerErr && (
-            <p style={{ color: '#475569', fontSize: 12, position: 'absolute', zIndex: 1 }}>جاري تحميل البث...</p>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <p style={{ color: '#475569', fontSize: 12 }}>جاري تحميل البث...</p>
+            </div>
           )}
           {playerErr && (
-            <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px', position: 'absolute', zIndex: 1 }}>{playerErr}</p>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px' }}>{playerErr}</p>
+            </div>
           )}
-          <div id={containerId} style={{ width: 660, height: 380 }} />
+          <video ref={videoRef} style={{ width: '100%', height: '100%', display: 'block' }} muted playsInline controls />
         </div>
 
-        {/* URL copy cards from /stream-url (shown if available) */}
+        {/* URL copy cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {data.hls && (
             <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
