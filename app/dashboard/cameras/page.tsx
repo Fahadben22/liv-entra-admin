@@ -134,7 +134,7 @@ function StreamModal({ cam, data, onClose, showToast }: {
           const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
           hlsRef.current = hls;
           hls.loadSource(activeUrl!);
-          hls.attachMedia(video);
+          hls.attachMedia(video as HTMLMediaElement);
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             setLoading(false);
             video.play().catch(() => {});
