@@ -51,42 +51,39 @@
   --sh-lg: 0 12px 28px rgba(15,23,42,.10), 0 4px 8px rgba(15,23,42,.05);
   --sh-focus: 0 0 0 3px rgba(30,58,95,.15);
 
-  /* ── Liventra Admin Theme (maps old vars → new lv-* tokens) ─── */
-  --bg-root:    #fafaf9;
-  --bg-card:    #ffffff;
-  --bg-sidebar: #141210;
-  --bg-input:   #f4f4f2;
-  --bg-hover:   rgba(0,0,0,0.045);
-  --bg-active:  rgba(0,0,0,0.07);
+  /* ── Legacy alias tokens — kept for backward compat ── */
+  --bg-root:    var(--bg);
+  --bg-card:    var(--surface);
+  --bg-input:   var(--ink-100);
+  --bg-hover:   var(--ink-100);
+  --bg-active:  var(--ink-150);
 
-  --border:        rgba(0,0,0,0.10);
-  --border-hover:  rgba(0,0,0,0.18);
-  --border-active: rgba(0,0,0,0.22);
+  --border-hover:  var(--ink-300);
+  --border-active: var(--ink-400);
 
-  --text-primary:   #0a0a0a;
-  --text-secondary: #4b4b4b;
-  --text-muted:     #6b6b6b;
+  --text-primary:   var(--text-1);
+  --text-secondary: var(--text-2);
 
-  --accent:       var(--lv-accent, #4f46e5);
-  --accent-light: color-mix(in srgb, var(--lv-accent, #4f46e5) 12%, transparent);
-  --accent-hover: var(--lv-accent, #4f46e5);
+  --accent:       var(--brand-600);
+  --accent-light: var(--brand-50);
+  --accent-hover: var(--brand-700);
 
-  --success:        #0a8f5f;
-  --success-bg:     rgba(10,143,95,0.08);
-  --success-border: rgba(10,143,95,0.2);
-  --warning:        #b4630a;
-  --warning-bg:     rgba(180,99,10,0.08);
-  --danger:         #b8321f;
-  --danger-bg:      rgba(184,50,31,0.08);
-  --info:           var(--lv-accent, #4f46e5);
+  --success:        #059669;
+  --success-bg:     #ecfdf5;
+  --success-border: #a7f3d0;
+  --warning:        #b45309;
+  --warning-bg:     #fffbeb;
+  --danger:         #dc2626;
+  --danger-bg:      #fef2f2;
+  --info:           #2563eb;
 
-  --radius:    8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --shadow-card:       0 1px 4px rgba(0,0,0,0.06);
-  --shadow-card-hover: 0 4px 16px rgba(0,0,0,0.09);
+  --radius:    var(--r-md);
+  --radius-lg: var(--r-xl);
+  --radius-xl: var(--r-2xl);
+  --shadow-card:       var(--sh-xs);
+  --shadow-card-hover: var(--sh-md);
 
-  --font-sans: var(--font-cairo, var(--font-noto, 'Noto Sans Arabic')), system-ui, sans-serif;
+  --font-sans: 'Thmanyah', system-ui, sans-serif;
 }
 
 @theme inline {
@@ -107,8 +104,8 @@
 * { box-sizing: border-box; }
 
 body {
-  background: var(--lv-bg, var(--bg-root));
-  color: var(--lv-fg, var(--text-primary));
+  background: var(--bg);
+  color: var(--text-1);
   font-family: 'Thmanyah', system-ui, sans-serif;
   font-size: 14px;
   direction: rtl;
@@ -151,19 +148,19 @@ body {
   border-radius: 8px;
 }
 
-/* ─── Card base ─── */
+/* ─── Card base — uses new design tokens ─── */
 .card {
-  background: var(--lv-panel, var(--bg-card));
-  border: 1px solid var(--lv-line-strong, var(--border));
-  border-radius: var(--lv-r-card, var(--radius-lg));
-  box-shadow: var(--lv-shadow-card, var(--shadow-card));
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-xs);
   transition: box-shadow .15s ease, transform .15s ease;
 }
 .card:hover {
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--sh-sm);
 }
 .card-interactive:hover {
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--sh-md);
   transform: translateY(-1px);
 }
 
@@ -376,24 +373,24 @@ button:active:not(:disabled) {
    ═══════════════════════════════════════════ */
 
 :root {
-  /* Light mode */
-  --lv-bg:          #fafaf9;
-  --lv-panel:       #ffffff;
-  --lv-fg:          #0a0a0a;
-  --lv-muted:       #6b6b6b;
-  --lv-line:        rgba(0,0,0,0.08);
-  --lv-line-strong: rgba(0,0,0,0.14);
-  --lv-chip:        rgba(0,0,0,0.045);
-  --lv-success:     #0a8f5f;
-  --lv-warn:        #b4630a;
-  --lv-danger:      #b8321f;
+  /* lv-* tokens mapped to new design system */
+  --lv-bg:          var(--bg);
+  --lv-panel:       var(--surface);
+  --lv-fg:          var(--text-1);
+  --lv-muted:       var(--text-muted);
+  --lv-line:        var(--border);
+  --lv-line-strong: var(--border-strong);
+  --lv-chip:        var(--ink-100);
+  --lv-success:     var(--success);
+  --lv-warn:        var(--warning);
+  --lv-danger:      var(--danger);
 
-  /* Sidebar — always dark regardless of theme */
-  --lv-sidebar-bg:     #141210;
-  --lv-sidebar-border: rgba(255,255,255,0.07);
+  /* Sidebar — now light to match all portals */
+  --lv-sidebar-bg:     var(--surface);
+  --lv-sidebar-border: var(--border);
 
-  /* Accent — default indigo (can be overridden inline) */
-  --lv-accent:      #4f46e5;
+  /* Accent — maps to brand */
+  --lv-accent:      var(--brand-600);
 
   /* Font families */
   --lv-font-ui:     'Thmanyah', system-ui, sans-serif;
@@ -402,33 +399,22 @@ button:active:not(:disabled) {
   --lv-font-mono:   'JetBrains Mono', 'Courier New', monospace;
 
   /* Spacing */
-  --lv-page-pad:    36px 32px;
-  --lv-section-gap: 28px;
+  --lv-page-pad:    var(--sp-6);
+  --lv-section-gap: var(--sp-6);
 
   /* Radius */
-  --lv-r-card:   16px;
-  --lv-r-chip:   8px;
-  --lv-r-pill:   99px;
-  --lv-r-nav:    8px;
-  --lv-r-badge:  5px;
+  --lv-r-card:   var(--r-xl);
+  --lv-r-chip:   var(--r-md);
+  --lv-r-pill:   var(--r-pill);
+  --lv-r-nav:    var(--r-md);
+  --lv-r-badge:  var(--r-xs);
 
   /* Shadows */
-  --lv-shadow-card:  0 1px 4px rgba(0,0,0,0.06);
-  --lv-shadow-panel: 0 20px 60px rgba(0,0,0,0.25);
+  --lv-shadow-card:  var(--sh-xs);
+  --lv-shadow-panel: var(--sh-lg);
 }
 
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --lv-bg:          #0b0b0c;
-    --lv-panel:       #131315;
-    --lv-fg:          #eeeeec;
-    --lv-muted:       #8a8a8a;
-    --lv-line:        rgba(255,255,255,0.07);
-    --lv-line-strong: rgba(255,255,255,0.14);
-    --lv-chip:        rgba(255,255,255,0.05);
-  }
-}
+/* Dark mode intentionally disabled — admin portal uses light theme */
 
 /* ─── Liventra table row hover ─── */
 .lv-table-row {
