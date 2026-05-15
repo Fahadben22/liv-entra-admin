@@ -138,14 +138,14 @@ export default function OnboardingCommandCenter() {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 18, fontWeight: 600, color: '#18181b', margin: 0, letterSpacing: '-0.02em' }}>الشركات</h1>
-          <p style={{ fontSize: 12, color: '#a1a1aa', marginTop: 3 }}>{companies.length} شركة · {companies.filter(c => lcOf(c) === 'active').length} نشطة</p>
+          <h1 style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-1)', margin: 0, letterSpacing: '-0.02em' }}>الشركات</h1>
+          <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>{companies.length} شركة · {companies.filter(c => lcOf(c) === 'active').length} نشطة</p>
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} style={{
-              padding: '6px 14px', borderRadius: 7, border: '1px solid ' + (tab === t.key ? '#18181b' : '#e5e5e5'),
-              background: tab === t.key ? '#18181b' : '#fff', color: tab === t.key ? '#fff' : '#71717a',
+              padding: '6px 14px', borderRadius: 7, border: '1px solid ' + (tab === t.key ? 'var(--brand-600)' : 'var(--border)'),
+              background: tab === t.key ? 'var(--brand-600)' : 'var(--surface)', color: tab === t.key ? 'var(--surface)' : 'var(--text-3)',
               fontSize: 12, fontWeight: 500, cursor: 'pointer', transition: 'all .12s',
             }}>
               {t.label}
@@ -153,7 +153,7 @@ export default function OnboardingCommandCenter() {
           ))}
           <button onClick={() => router.push('/dashboard/companies/new')} style={{
             padding: '6px 16px', borderRadius: 7, border: 'none',
-            background: '#18181b', color: '#fff', fontSize: 12, fontWeight: 500, cursor: 'pointer',
+            background: 'var(--brand-600)', color: 'var(--surface)', fontSize: 12, fontWeight: 500, cursor: 'pointer',
           }}>
             + إنشاء شركة
           </button>
@@ -166,9 +166,9 @@ export default function OnboardingCommandCenter() {
           {/* Search + Filter */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث..."
-              style={{ flex: 1, padding: '7px 12px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 13, outline: 'none', background: '#fff', color: '#18181b' }} />
+              style={{ flex: 1, padding: '7px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 13, outline: 'none', background: 'var(--surface)', color: 'var(--text-1)' }} />
             <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
-              style={{ padding: '7px 12px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12, background: '#fff', color: '#71717a' }}>
+              style={{ padding: '7px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, background: 'var(--surface)', color: 'var(--text-3)' }}>
               <option value="all">كل الخطط</option>
               {['trial', 'basic', 'professional', 'enterprise'].map(p => <option key={p} value={p}>{PLAN_AR[p]}</option>)}
             </select>
@@ -181,16 +181,16 @@ export default function OnboardingCommandCenter() {
               return (
                 <div key={stage.key}
                   onDragOver={e => { e.preventDefault(); e.currentTarget.style.background = 'var(--lv-bg)'; }}
-                  onDragLeave={e => { e.currentTarget.style.background = '#fff'; }}
-                  onDrop={e => { e.preventDefault(); e.currentTarget.style.background = '#fff'; const id = e.dataTransfer.getData('companyId'); if (id) handleDrop(id, stage.key); }}
-                  style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, padding: 12, minHeight: 200, transition: 'background .15s' }}>
+                  onDragLeave={e => { e.currentTarget.style.background = 'var(--surface)'; }}
+                  onDrop={e => { e.preventDefault(); e.currentTarget.style.background = 'var(--surface)'; const id = e.dataTransfer.getData('companyId'); if (id) handleDrop(id, stage.key); }}
+                  style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 12, minHeight: 200, transition: 'background .15s' }}>
 
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, padding: '0 2px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <div style={{ width: 7, height: 7, borderRadius: '50%', background: stage.color }} />
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#3f3f46' }}>{stage.label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-2)' }}>{stage.label}</span>
                     </div>
-                    <span style={{ fontSize: 11, fontWeight: 500, color: '#a1a1aa' }}>
+                    <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)' }}>
                       {stageCompanies.length}
                     </span>
                   </div>
@@ -201,7 +201,7 @@ export default function OnboardingCommandCenter() {
                         onSelect={() => { const next = selected?.id === c.id ? null : c; setSelected(next); if (next) loadDetail(next.id); else setDetailData(null); }}
                         onAction={handleAction} />
                     ))}
-                    {stageCompanies.length === 0 && <p style={{ fontSize: 11, color: '#d4d4d8', textAlign: 'center', padding: 20 }}>فارغ</p>}
+                    {stageCompanies.length === 0 && <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>فارغ</p>}
                   </div>
                 </div>
               );
@@ -263,21 +263,21 @@ function CompanyCard({ company: c, isSelected, onSelect, onAction }: { company: 
   return (
     <div draggable onDragStart={e => e.dataTransfer.setData('companyId', c.id)} onClick={onSelect}
       style={{
-        background: '#fff', border: isSelected ? '1.5px solid #18181b' : '1px solid #f0f0f0',
+        background: 'var(--surface)', border: isSelected ? '1.5px solid var(--brand-600)' : '1px solid var(--border)',
         borderRadius: 8, padding: '10px 12px', cursor: 'pointer', transition: 'all .12s',
       }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-        <span style={{ fontSize: 12, fontWeight: 600, color: '#18181b' }}>{c.name_ar || c.name}</span>
-        <span style={{ fontSize: 10, color: '#a1a1aa', fontWeight: 500 }}>
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-1)' }}>{c.name_ar || c.name}</span>
+        <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 500 }}>
           {PLAN_AR[c.plan] || c.plan}
         </span>
       </div>
-      <p style={{ fontSize: 11, color: '#a1a1aa', margin: '0 0 6px' }}>{c.slug || '—'} · {daysSince(c.created_at)}d</p>
+      <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '0 0 6px' }}>{c.slug || '—'} · {daysSince(c.created_at)}d</p>
 
-      <div style={{ height: 3, background: '#f4f4f5', borderRadius: 2, overflow: 'hidden', marginBottom: 4 }}>
-        <div style={{ height: '100%', width: `${unitPct}%`, background: unitPct > 90 ? '#ef4444' : unitPct > 70 ? '#f59e0b' : '#18181b', borderRadius: 2, transition: 'width .3s' }} />
+      <div style={{ height: 3, background: 'var(--ink-100)', borderRadius: 2, overflow: 'hidden', marginBottom: 4 }}>
+        <div style={{ height: '100%', width: `${unitPct}%`, background: unitPct > 90 ? '#ef4444' : unitPct > 70 ? '#f59e0b' : 'var(--brand-600)', borderRadius: 2, transition: 'width .3s' }} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#a1a1aa' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)' }}>
         <span>{(c as any).unit_count || 0}/{c.max_units || '∞'}</span>
         {trialDays !== null && trialDays <= 7 && (
           <span style={{ color: trialDays <= 3 ? '#ef4444' : '#f59e0b', fontWeight: 600 }}>
@@ -303,9 +303,9 @@ function MiniBtn({ label, variant, onClick }: { label: string; variant: 'default
   return (
     <button onClick={onClick} style={{
       fontSize: 10, padding: '3px 8px', borderRadius: 5,
-      border: `1px solid ${isDanger ? '#fecaca' : '#e5e5e5'}`,
-      background: isDanger ? '#fef2f2' : '#fff',
-      color: isDanger ? '#dc2626' : '#3f3f46',
+      border: `1px solid ${isDanger ? '#fecaca' : 'var(--border)'}`,
+      background: isDanger ? '#fef2f2' : 'var(--surface)',
+      color: isDanger ? '#dc2626' : 'var(--text-2)',
       fontWeight: 500, cursor: 'pointer', transition: 'all .1s',
     }}>{label}</button>
   );
@@ -326,23 +326,23 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
   ];
 
   return (
-    <div style={{ background: '#fff', border: '1px solid #e5e5e5', borderRadius: 10, padding: 20, marginTop: 10, position: 'relative' }}>
-      <button onClick={onClose} style={{ position: 'absolute', top: 14, left: 14, background: '#f4f4f5', border: 'none', borderRadius: 6, width: 26, height: 26, cursor: 'pointer', fontSize: 12, color: '#71717a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, marginTop: 10, position: 'relative' }}>
+      <button onClick={onClose} style={{ position: 'absolute', top: 14, left: 14, background: 'var(--ink-100)', border: 'none', borderRadius: 6, width: 26, height: 26, cursor: 'pointer', fontSize: 12, color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 8, background: '#18181b', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 14, fontWeight: 600 }}>{(c.name_ar || c.name || '?').charAt(0)}</div>
+        <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--brand-600)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--surface)', fontSize: 14, fontWeight: 600 }}>{(c.name_ar || c.name || '?').charAt(0)}</div>
         <div>
-          <h2 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: '#18181b' }}>{c.name_ar || c.name}</h2>
-          <p style={{ fontSize: 11, color: '#a1a1aa', margin: 0 }}>{c.slug} · {PLAN_AR[c.plan] || c.plan} · {lcOf(c)}</p>
+          <h2 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: 'var(--text-1)' }}>{c.name_ar || c.name}</h2>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>{c.slug} · {PLAN_AR[c.plan] || c.plan} · {lcOf(c)}</p>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: 2, marginBottom: 16, borderBottom: '1px solid #f0f0f0', paddingBottom: 0 }}>
+      <div style={{ display: 'flex', gap: 2, marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 0 }}>
         {DTABS.map(t => (
           <button key={t.key} onClick={() => setDtab(t.key)} style={{
             padding: '8px 14px', borderRadius: 0, border: 'none', fontSize: 12, fontWeight: 500, cursor: 'pointer',
-            background: 'transparent', color: dtab === t.key ? '#18181b' : '#a1a1aa',
-            borderBottom: dtab === t.key ? '2px solid #18181b' : '2px solid transparent',
+            background: 'transparent', color: dtab === t.key ? 'var(--brand-600)' : 'var(--text-muted)',
+            borderBottom: dtab === t.key ? '2px solid var(--brand-600)' : '2px solid transparent',
             transition: 'all .12s',
           }}>{t.label}</button>
         ))}
@@ -370,7 +370,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
             {plans.filter((p: any) => p.is_active !== false).map((p: any) => (
               <button key={p.id} onClick={() => onAction(c.id, 'assign-plan', { plan_id: p.id, billing_cycle: 'monthly' })}
                 disabled={p.name === c.plan}
-                style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${p.name === c.plan ? '#1d4070' : '#e2e8f0'}`, background: p.name === c.plan ? '#1d4070' : 'white', color: p.name === c.plan ? 'white' : '#475569', fontSize: 11, fontWeight: 600, cursor: p.name === c.plan ? 'default' : 'pointer', opacity: p.name === c.plan ? 0.6 : 1 }}>
+                style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${p.name === c.plan ? '#1d4070' : 'var(--border)'}`, background: p.name === c.plan ? '#1d4070' : 'var(--surface)', color: p.name === c.plan ? 'white' : '#475569', fontSize: 11, fontWeight: 600, cursor: p.name === c.plan ? 'default' : 'pointer', opacity: p.name === c.plan ? 0.6 : 1 }}>
                 {p.name_ar || PLAN_AR[p.name] || p.name} {p.price_monthly ? `(${p.price_monthly} ر.س/شهر)` : ''}
               </button>
             ))}
@@ -393,10 +393,10 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
             const planIncludes = flag?.plan_includes || false;
             return (
               <div key={key} onClick={() => onToggleFlag(c.id, key, !enabled)}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 10, border: `1px solid ${enabled ? '#86efac' : '#e2e8f0'}`, background: enabled ? '#f0fdf4' : 'var(--lv-bg)', cursor: 'pointer', transition: 'all .15s' }}>
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 10, border: `1px solid ${enabled ? '#86efac' : 'var(--border)'}`, background: enabled ? '#f0fdf4' : 'var(--lv-bg)', cursor: 'pointer', transition: 'all .15s' }}>
                 <div>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: enabled ? '#16a34a' : '#94a3b8' }}>{meta.name_ar || key}</span>
-                  <span style={{ fontSize: 9, color: '#94a3b8', marginRight: 6 }}>({meta.tier_min})</span>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: enabled ? '#16a34a' : 'var(--text-muted)' }}>{meta.name_ar || key}</span>
+                  <span style={{ fontSize: 9, color: 'var(--text-muted)', marginRight: 6 }}>({meta.tier_min})</span>
                   {planIncludes && <span style={{ fontSize: 8, color: '#16a34a', marginRight: 4 }}>مُضمّن</span>}
                 </div>
                 <div style={{ width: 36, height: 20, borderRadius: 10, background: enabled ? '#22c55e' : '#d1d5db', position: 'relative', transition: 'background .2s' }}>
@@ -419,15 +419,15 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
             const pct = u.max > 0 ? Math.round(u.used / u.max * 100) : 0;
             const color = pct > 90 ? '#ef4444' : pct > 70 ? '#f59e0b' : '#22c55e';
             return (
-              <div key={u.label} style={{ background: '#f8fafc', borderRadius: 10, padding: '10px 14px' }}>
+              <div key={u.label} style={{ background: 'var(--ink-100)', borderRadius: 10, padding: '10px 14px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 6 }}>
                   <span style={{ fontWeight: 600 }}>{u.label}</span>
                   <span style={{ color, fontWeight: 700 }}>{u.used} / {u.max || '∞'}</span>
                 </div>
-                <div style={{ height: 6, background: '#e2e8f0', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ height: 6, background: 'var(--border)', borderRadius: 3, overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 3, transition: 'width .3s' }} />
                 </div>
-                <span style={{ fontSize: 9, color: '#94a3b8' }}>{pct}%</span>
+                <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>{pct}%</span>
               </div>
             );
           })}
@@ -436,11 +436,11 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
 
       {dtab === 'audit' && (
         <div style={{ maxHeight: 300, overflow: 'auto' }}>
-          {(audit || []).length === 0 ? <p style={{ fontSize: 12, color: '#94a3b8', textAlign: 'center', padding: 20 }}>لا توجد أنشطة</p> :
+          {(audit || []).length === 0 ? <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>لا توجد أنشطة</p> :
             (audit || []).map((a: any, i: number) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--lv-line)', fontSize: 11 }}>
                 <span style={{ color: '#475569' }}>{a.action}</span>
-                <span style={{ color: '#94a3b8' }}>{a.actor_email || '—'} · {fmtDate(a.created_at)}</span>
+                <span style={{ color: 'var(--text-muted)' }}>{a.actor_email || '—'} · {fmtDate(a.created_at)}</span>
               </div>
             ))}
         </div>
@@ -451,9 +451,9 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
 
 function StatCard({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div style={{ background: 'var(--lv-bg)', borderRadius: 8, padding: '10px 14px', border: '1px solid #f0f0f0' }}>
-      <div style={{ fontSize: 10, color: '#a1a1aa', marginBottom: 3, fontWeight: 500 }}>{label}</div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: color || '#18181b' }}>{value}</div>
+    <div style={{ background: 'var(--lv-bg)', borderRadius: 8, padding: '10px 14px', border: '1px solid var(--border)' }}>
+      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 3, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: color || 'var(--text-1)' }}>{value}</div>
     </div>
   );
 }
@@ -473,20 +473,20 @@ function MatrixTab({ companies, matrix, registry, onToggle, reload }: any) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#18181b' }}>مصفوفة الميزات — {filtered.length} شركة × {featureKeys.length} ميزة</p>
-        <select value={filterPlan} onChange={e => setFilterPlan(e.target.value)} style={{ padding: '6px 12px', border: '1px solid #e5e5e5', borderRadius: 7, fontSize: 12, background: '#fff', color: '#71717a' }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>مصفوفة الميزات — {filtered.length} شركة × {featureKeys.length} ميزة</p>
+        <select value={filterPlan} onChange={e => setFilterPlan(e.target.value)} style={{ padding: '6px 12px', border: '1px solid var(--border)', borderRadius: 7, fontSize: 12, background: 'var(--surface)', color: 'var(--text-3)' }}>
           <option value="all">كل الخطط</option>
           {['trial', 'basic', 'professional', 'enterprise'].map(p => <option key={p} value={p}>{PLAN_AR[p]}</option>)}
         </select>
       </div>
 
-      <div style={{ overflow: 'auto', maxHeight: 600, border: '1px solid #e5e5e5', borderRadius: 8 }}>
+      <div style={{ overflow: 'auto', maxHeight: 600, border: '1px solid var(--border)', borderRadius: 8 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
           <thead>
             <tr>
-              <th style={{ position: 'sticky', top: 0, right: 0, background: 'var(--lv-bg)', color: '#3f3f46', padding: '10px 12px', textAlign: 'right', zIndex: 2, minWidth: 150, borderBottom: '1px solid #e5e5e5', fontWeight: 600, fontSize: 11 }}>الشركة</th>
+              <th style={{ position: 'sticky', top: 0, right: 0, background: 'var(--lv-bg)', color: 'var(--text-2)', padding: '10px 12px', textAlign: 'right', zIndex: 2, minWidth: 150, borderBottom: '1px solid var(--border)', fontWeight: 600, fontSize: 11 }}>الشركة</th>
               {featureKeys.map(key => (
-                <th key={key} style={{ position: 'sticky', top: 0, background: 'var(--lv-bg)', color: '#71717a', padding: '10px 6px', textAlign: 'center', fontSize: 9, minWidth: 70, zIndex: 1, borderBottom: '1px solid #e5e5e5', fontWeight: 500 }}>
+                <th key={key} style={{ position: 'sticky', top: 0, background: 'var(--lv-bg)', color: 'var(--text-3)', padding: '10px 6px', textAlign: 'center', fontSize: 9, minWidth: 70, zIndex: 1, borderBottom: '1px solid var(--border)', fontWeight: 500 }}>
                   {registry[key]?.name_ar || key}
                 </th>
               ))}
@@ -495,18 +495,18 @@ function MatrixTab({ companies, matrix, registry, onToggle, reload }: any) {
           <tbody>
             {filtered.map((c: any, idx: number) => {
               return (
-                <tr key={c.id} style={{ borderBottom: '1px solid #f4f4f5', background: idx % 2 === 0 ? '#fff' : 'var(--lv-bg)' }}>
-                  <td style={{ padding: '8px 12px', fontWeight: 500, position: 'sticky', right: 0, background: idx % 2 === 0 ? '#fff' : 'var(--lv-bg)', zIndex: 1, fontSize: 12, color: '#18181b' }}>
+                <tr key={c.id} style={{ borderBottom: '1px solid var(--ink-100)', background: idx % 2 === 0 ? 'var(--surface)' : 'var(--lv-bg)' }}>
+                  <td style={{ padding: '8px 12px', fontWeight: 500, position: 'sticky', right: 0, background: idx % 2 === 0 ? 'var(--surface)' : 'var(--lv-bg)', zIndex: 1, fontSize: 12, color: 'var(--text-1)' }}>
                     <span>{c.name_ar || c.name}</span>
-                    <span style={{ fontSize: 10, marginRight: 6, color: '#a1a1aa' }}>{PLAN_AR[c.plan]}</span>
+                    <span style={{ fontSize: 10, marginRight: 6, color: 'var(--text-muted)' }}>{PLAN_AR[c.plan]}</span>
                   </td>
                   {featureKeys.map(key => {
                     const enabled = flagMap[c.id]?.[key] || false;
                     return (
                       <td key={key} style={{ textAlign: 'center', padding: 4 }}>
                         <button onClick={() => { onToggle(c.id, key, !enabled); setTimeout(reload, 500); }}
-                          style={{ width: 22, height: 22, borderRadius: 5, border: '1px solid ' + (enabled ? '#d1fae5' : '#f0f0f0'), cursor: 'pointer', fontSize: 11,
-                            background: enabled ? '#ecfdf5' : '#fff', color: enabled ? '#059669' : '#d4d4d8', fontWeight: 500, transition: 'all .1s' }}>
+                          style={{ width: 22, height: 22, borderRadius: 5, border: '1px solid ' + (enabled ? '#d1fae5' : 'var(--border)'), cursor: 'pointer', fontSize: 11,
+                            background: enabled ? '#ecfdf5' : 'var(--surface)', color: enabled ? '#059669' : 'var(--text-muted)', fontWeight: 500, transition: 'all .1s' }}>
                           {enabled ? 'نعم' : '—'}
                         </button>
                       </td>
@@ -546,10 +546,10 @@ function HatifInlineForm({ companyId, hatifEnabled, hatifPortalUrl, onSaved }: {
   };
 
   return (
-    <div style={{ marginTop: 16, borderTop: '1px solid #f0f0f0', paddingTop: 14 }}>
+    <div style={{ marginTop: 16, borderTop: '1px solid var(--border)', paddingTop: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
         <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--lv-accent)' }}>هاتف</span>
-        <p style={{ fontSize: 12, fontWeight: 700, margin: 0, color: '#18181b' }}>تكامل هاتف</p>
+        <p style={{ fontSize: 12, fontWeight: 700, margin: 0, color: 'var(--text-1)' }}>تكامل هاتف</p>
         {msg && <span style={{ fontSize: 11, color: msg.startsWith('خطأ') ? '#ef4444' : '#22c55e', marginRight: 'auto' }}>{msg}</span>}
       </div>
       <div style={{ background: 'rgba(5,150,105,.04)', border: '1px solid rgba(5,150,105,.15)', borderRadius: 10, padding: '12px 14px' }}>
@@ -567,7 +567,7 @@ function HatifInlineForm({ companyId, hatifEnabled, hatifPortalUrl, onSaved }: {
             onChange={e => setPortalUrl(e.target.value)}
             dir="ltr"
             placeholder="https://app.hatif.io/org/XXXXX"
-            style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid var(--lv-line)', fontSize: 11, width: '100%', background: 'var(--lv-panel)', color: '#18181b', boxSizing: 'border-box' }}
+            style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid var(--lv-line)', fontSize: 11, width: '100%', background: 'var(--lv-panel)', color: 'var(--text-1)', boxSizing: 'border-box' }}
           />
         </div>
         <button onClick={save} disabled={saving}

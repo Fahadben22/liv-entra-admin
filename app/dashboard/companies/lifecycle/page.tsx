@@ -50,13 +50,13 @@ function CompanyCard({ card, stage }: { card: PipelineCard; stage: string }) {
   }
 
   return (
-    <div style={{ background: 'white', border: `1px solid ${meta.border}`, borderRadius: 12, padding: 14, marginBottom: 10 }}>
+    <div style={{ background: 'var(--surface)', border: `1px solid ${meta.border}`, borderRadius: 12, padding: 14, marginBottom: 10 }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <Link href={`/dashboard/companies/${card.id}`} style={{ fontSize: 13, fontWeight: 700, color: '#1d4070', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Link href={`/dashboard/companies/${card.id}`} style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {card.name_ar}
           </Link>
-          <p style={{ fontSize: 11, color: '#6b7280', margin: '2px 0 0' }}>
+          <p style={{ fontSize: 11, color: 'var(--text-3)', margin: '2px 0 0' }}>
             {PLAN_LABEL[card.plan] || card.plan}
             {card.days_remaining !== null && stage === 'active' && ` · ${formatDays(card.days_remaining, 'يوم متبقي')}`}
             {card.days_remaining !== null && stage === 'trial_active' && ` · ${formatDays(card.days_remaining, 'يوم متبقي')}`}
@@ -66,7 +66,7 @@ function CompanyCard({ card, stage }: { card: PipelineCard; stage: string }) {
         </div>
         <div>
           {(stage === 'trial_active' || stage === 'trial_expiring_soon' || stage === 'trial_expired') && (
-            <button onClick={extendTrial} disabled={busy === 'extend'} style={{ fontSize: 10, padding: '4px 10px', background: '#1d4070', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', opacity: busy ? 0.6 : 1, whiteSpace: 'nowrap' }}>
+            <button onClick={extendTrial} disabled={busy === 'extend'} style={{ fontSize: 10, padding: '4px 10px', background: 'var(--brand-600)', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', opacity: busy ? 0.6 : 1, whiteSpace: 'nowrap' }}>
               {busy === 'extend' ? '...' : '+7 أيام'}
             </button>
           )}
@@ -84,10 +84,10 @@ function PipelineColumn({ stage, cards }: { stage: string; cards: PipelineCard[]
         <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}>
           {meta.label}
         </span>
-        <span style={{ fontSize: 11, fontWeight: 600, color: '#6b7280' }}>({cards.length})</span>
+        <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)' }}>({cards.length})</span>
       </div>
       {cards.length === 0 ? (
-        <div style={{ padding: '20px 12px', textAlign: 'center', color: '#9ca3af', fontSize: 12, border: '1px dashed #e5e7eb', borderRadius: 12 }}>
+        <div style={{ padding: '20px 12px', textAlign: 'center', color: '#9ca3af', fontSize: 12, border: '1px dashed var(--border)', borderRadius: 12 }}>
           لا توجد شركات
         </div>
       ) : (
@@ -99,9 +99,9 @@ function PipelineColumn({ stage, cards }: { stage: string; cards: PipelineCard[]
 
 function KpiTile({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div style={{ background: 'white', border: '1px solid #e5e7eb', borderRadius: 12, padding: '14px 18px', textAlign: 'center' }}>
+    <div style={{ background: 'var(--surface)', border: 'var(--border)', borderRadius: 12, padding: '14px 18px', textAlign: 'center' }}>
       <p style={{ fontSize: 24, fontWeight: 700, color, margin: 0 }}>{value}</p>
-      <p style={{ fontSize: 11, color: '#6b7280', marginTop: 4, margin: 0 }}>{label}</p>
+      <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4, margin: 0 }}>{label}</p>
     </div>
   );
 }
@@ -131,14 +131,14 @@ export default function LifecycleDashboardPage() {
   const stages   = Object.keys(STAGE_META);
 
   return (
-    <div style={{ padding: '28px 32px', minHeight: '100vh', background: '#f8fafc' }}>
+    <div style={{ padding: '28px 32px', minHeight: '100vh', background: 'var(--bg)' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>دورة حياة الشركات</h1>
-          <p style={{ fontSize: 13, color: '#64748b', marginTop: 4, margin: 0 }}>نظرة شاملة على جميع الشركات المشتركة</p>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-1)', margin: 0 }}>دورة حياة الشركات</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 4, margin: 0 }}>نظرة شاملة على جميع الشركات المشتركة</p>
         </div>
-        <button onClick={load} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'white', border: '1px solid #e2e8f0', borderRadius: 10, cursor: 'pointer', fontSize: 13, color: '#374151' }}>
+        <button onClick={load} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', background: 'var(--surface)', border: `1px solid var(--border)`, borderRadius: 10, cursor: 'pointer', fontSize: 13, color: 'var(--text-1)' }}>
           <RefreshCcw style={{ width: 13, height: 13 }} />
           تحديث
         </button>
@@ -156,18 +156,18 @@ export default function LifecycleDashboardPage() {
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'white', border: '1px solid #e2e8f0', borderRadius: 10, padding: '7px 12px', flex: 1, minWidth: 200 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '7px 12px', flex: 1, minWidth: 200 }}>
           <Search style={{ width: 13, height: 13, color: '#9ca3af' }} />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث باسم الشركة..." style={{ border: 'none', outline: 'none', fontSize: 13, flex: 1, background: 'transparent' }} onKeyDown={e => e.key === 'Enter' && load()} />
         </div>
-        <select value={plan} onChange={e => { setPlan(e.target.value); }} style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid #e2e8f0', fontSize: 13, background: 'white', cursor: 'pointer' }}>
+        <select value={plan} onChange={e => { setPlan(e.target.value); }} style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, background: 'var(--surface)', cursor: 'pointer' }}>
           <option value="">جميع الخطط</option>
           <option value="trial">تجريبي</option>
           <option value="basic">أساسي</option>
           <option value="professional">احترافي</option>
           <option value="enterprise">متقدم</option>
         </select>
-        <button onClick={load} style={{ padding: '8px 18px', background: '#1d4070', color: 'white', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+        <button onClick={load} style={{ padding: '8px 18px', background: 'var(--brand-600)', color: 'white', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           بحث
         </button>
       </div>

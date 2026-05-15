@@ -487,7 +487,7 @@ export default function CommandCenterPage() {
                     const lv = LVL[l.level] || LVL.info;
                     return (
                       <div key={l.id} onClick={()=>setSelectedLog(selectedLog?.id===l.id?null:l)}
-                        style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 12px',borderBottom:`1px solid ${C.lightBorder}`,cursor:'pointer',background:selectedLog?.id===l.id?'#f0edff':'transparent' }}>
+                        style={{ display:'flex',alignItems:'center',gap:8,padding:'8px 12px',borderBottom:`1px solid ${C.lightBorder}`,cursor:'pointer',background:selectedLog?.id===l.id?'var(--brand-50)':'transparent' }}>
                         <div style={{ width:6,height:6,borderRadius:'50%',background:lv.dot,boxShadow:`0 0 6px ${lv.dot}66`,flexShrink:0 }}/>
                         <span style={{ fontSize:10,color:lv.c,fontWeight:600,minWidth:36 }}>{lv.label}</span>
                         <span style={{ fontSize:10,color:C.accent,fontFamily:'monospace',minWidth:80 }}>{l.source}</span>
@@ -718,7 +718,7 @@ export default function CommandCenterPage() {
           <div ref={agentScrollRef} style={{ flex:1,overflowY:'auto',padding:'10px 12px',display:'flex',flexDirection:'column',gap:8 }}>
             {agentMsgs.length === 0 && <p style={{ textAlign:'center',color:C.muted,fontSize:11,paddingTop:40 }}>اسأل وكيل IT أي سؤال</p>}
             {agentMsgs.map((m,i) => (
-              <div key={i} style={{ alignSelf:m.role==='user'?'flex-start':'flex-end',maxWidth:'90%',padding:'10px 14px',borderRadius:12,background:m.role==='user'?'#DBEAFE':'var(--lv-bg)',border:`1px solid ${m.role==='user'?'rgba(124,92,252,.15)':C.border}`,fontSize:12,color:C.text1,lineHeight:1.7,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
+              <div key={i} style={{ alignSelf:m.role==='user'?'flex-start':'flex-end',maxWidth:'90%',padding:'10px 14px',borderRadius:12,background:m.role==='user'?'var(--info-bg)':'var(--lv-bg)',border:`1px solid ${m.role==='user'?'rgba(124,92,252,.15)':C.border}`,fontSize:12,color:C.text1,lineHeight:1.7,whiteSpace:'pre-wrap',wordBreak:'break-word' }}>
                 {m.content}
               </div>
             ))}

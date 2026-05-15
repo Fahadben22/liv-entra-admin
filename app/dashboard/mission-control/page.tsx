@@ -99,7 +99,7 @@ function QueueCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDec
 
   return (
     <div style={{
-      background: '#fff',
+      background: 'var(--surface)',
       borderRadius: 12,
       border: '1px solid rgba(220,38,38,.18)',
       overflow: 'hidden',
@@ -120,33 +120,33 @@ function QueueCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDec
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>{item.agent_name}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-1)' }}>{item.agent_name}</span>
             <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: actionMeta.bg, color: actionMeta.color, fontWeight: 600 }}>
               {actionMeta.label}
             </span>
-            <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 6, background: '#f1f5f9', color: srcColor, fontWeight: 600 }}>
+            <span style={{ fontSize: 10, padding: '2px 7px', borderRadius: 6, background: 'var(--ink-100)', color: srcColor, fontWeight: 600 }}>
               {SOURCE_LABELS[item.source]}
             </span>
             {isStale(item.created_at) && (
-              <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 6, background: '#f1f5f9', color: '#94a3b8', fontWeight: 600 }}>قديم</span>
+              <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 6, background: 'var(--ink-100)', color: 'var(--text-muted)', fontWeight: 600 }}>قديم</span>
             )}
           </div>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#0f172a', margin: '0 0 3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', margin: '0 0 3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {item.subject}
           </p>
           {!isExpanded && (
-            <p style={{ fontSize: 12, color: '#64748b', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <p style={{ fontSize: 12, color: 'var(--text-2)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.message}
             </p>
           )}
         </div>
 
-        <span style={{ fontSize: 11, color: '#94a3b8', flexShrink: 0 }}>{timeAgo(item.created_at)}</span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0 }}>{timeAgo(item.created_at)}</span>
       </div>
 
       {isExpanded && (
-        <div style={{ padding: '0 18px 16px', borderTop: '1px solid #f1f5f9' }}>
-          <p style={{ fontSize: 13, color: '#334155', lineHeight: 1.7, margin: '12px 0 14px', whiteSpace: 'pre-wrap' }}>{item.message}</p>
+        <div style={{ padding: '0 18px 16px', borderTop: '1px solid var(--border)' }}>
+          <p style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.7, margin: '12px 0 14px', whiteSpace: 'pre-wrap' }}>{item.message}</p>
 
           {item.source === 'agenda' && (
             <>
@@ -157,9 +157,9 @@ function QueueCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDec
                 rows={2}
                 style={{
                   width: '100%', boxSizing: 'border-box', resize: 'vertical',
-                  border: '1px solid #e2e8f0', borderRadius: 8, padding: '8px 10px',
+                  border: '1px solid var(--border)', borderRadius: 8, padding: '8px 10px',
                   fontSize: 12, fontFamily: 'inherit', marginBottom: 12,
-                  outline: 'none', color: '#334155',
+                  outline: 'none', color: 'var(--text-1)',
                 }}
               />
               <div style={{ display: 'flex', gap: 8 }}>
@@ -180,7 +180,7 @@ function QueueCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDec
                 <button
                   disabled={isBusy}
                   onClick={() => onDecide(item, 'dismiss')}
-                  style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid #e2e8f0', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: '#fff', color: '#64748b', opacity: isBusy ? .5 : 1 }}
+                  style={{ padding: '7px 16px', borderRadius: 8, border: '1px solid var(--border)', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: 'var(--surface)', color: 'var(--text-2)', opacity: isBusy ? .5 : 1 }}
                 >
                   تجاهل
                 </button>
@@ -310,13 +310,13 @@ export default function MissionControlPage() {
       {/* ── Header ── */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>مركز الأوامر</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>التصعيدات والموافقات المطلوبة من جميع الوكلاء</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>مركز الأوامر</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0' }}>التصعيدات والموافقات المطلوبة من جميع الوكلاء</p>
         </div>
         <button
           onClick={loadData}
           disabled={loading}
-          style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#475569', opacity: loading ? .5 : 1 }}
+          className="le-btn secondary sm"
         >
           {loading ? 'جاري التحميل...' : 'تحديث'}
         </button>
@@ -329,9 +329,9 @@ export default function MissionControlPage() {
           { label: 'تمت اليوم',  value: metrics?.totalResolvedToday ?? '—', color: '#22c55e' },
           { label: 'متوسط وقت', value: totalAvgHours,                      color: '#6366f1' },
         ].map(tile => (
-          <div key={tile.label} style={{ background: '#fff', border: '1px solid #e8ecf0', borderRadius: 14, padding: '16px 20px', textAlign: 'center' }}>
+          <div key={tile.label} className="le-card" style={{ padding: '16px 20px', textAlign: 'center', borderRadius: 14 }}>
             <p style={{ fontSize: 26, fontWeight: 800, color: tile.color, margin: '0 0 4px' }}>{String(tile.value)}</p>
-            <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{tile.label}</p>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>{tile.label}</p>
           </div>
         ))}
       </div>
@@ -361,10 +361,10 @@ export default function MissionControlPage() {
                     <span style={{ fontSize: 11, fontWeight: 700, color: c.severity === 'high' ? '#dc2626' : '#d97706' }}>
                       {c.severity === 'high' ? 'عالي' : 'متوسط'}
                     </span>
-                    <span style={{ fontSize: 10, color: '#94a3b8' }}>{(c.agent_names || []).join(' + ')}</span>
+                    <span style={{ fontSize: 10, color: 'var(--text-2)' }}>{(c.agent_names || []).join(' + ')}</span>
                   </div>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: '#1e293b', margin: '0 0 4px' }}>{c.insight}</p>
-                  <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>{c.recommendation}</p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-1)', margin: '0 0 4px' }}>{c.insight}</p>
+                  <p style={{ fontSize: 11, color: 'var(--text-2)', margin: 0 }}>{c.recommendation}</p>
                 </div>
               ))}
             </div>
@@ -380,8 +380,8 @@ export default function MissionControlPage() {
             onClick={() => setTypeFilter(f.key)}
             style={{
               padding: '5px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-              background: typeFilter === f.key ? '#0f172a' : '#f1f5f9',
-              color:      typeFilter === f.key ? '#fff'    : '#475569',
+              background: typeFilter === f.key ? 'var(--brand-600)' : 'var(--ink-100)',
+              color:      typeFilter === f.key ? '#fff'             : 'var(--text-2)',
             }}
           >
             {f.label}
@@ -395,8 +395,8 @@ export default function MissionControlPage() {
             onClick={() => setSrcFilter(f.key)}
             style={{
               padding: '5px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-              background: srcFilter === f.key ? '#6366f1' : '#f1f5f9',
-              color:      srcFilter === f.key ? '#fff'    : '#475569',
+              background: srcFilter === f.key ? 'var(--brand-600)' : 'var(--ink-100)',
+              color:      srcFilter === f.key ? '#fff'             : 'var(--text-2)',
             }}
           >
             {f.label}
@@ -406,11 +406,11 @@ export default function MissionControlPage() {
 
       {/* ── Queue ── */}
       {loading && items.length === 0 && (
-        <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8', fontSize: 14 }}>جاري التحميل...</div>
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)', fontSize: 14 }}>جاري التحميل...</div>
       )}
 
       {!loading && filtered.length === 0 && (
-        <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8', fontSize: 14 }}>
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)', fontSize: 14 }}>
           {items.length === 0 ? 'لا توجد بنود معلقة' : 'لا توجد نتائج للفلتر المحدد'}
         </div>
       )}

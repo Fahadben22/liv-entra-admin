@@ -20,7 +20,7 @@ const TIER_COLOR: Record<string, { bg: string; color: string; border: string }> 
   trial:        { bg: 'rgba(34,197,94,.08)', color: '#22c55e', border: 'rgba(34,197,94,.2)' },
   basic:        { bg: 'var(--lv-bg)', color: 'var(--lv-muted)', border: 'var(--lv-line)' },
   professional: { bg: 'rgba(124,92,252,.08)', color: 'var(--lv-accent)', border: 'rgba(124,92,252,.2)' },
-  enterprise:   { bg: 'rgba(245,158,11,.08)', color: '#f59e0b', border: 'rgba(245,158,11,.2)' },
+  enterprise:   { bg: 'rgba(245,158,11,.08)', color: 'var(--warning)', border: 'rgba(245,158,11,.2)' },
 };
 
 function timeAgo(iso: string | null): string {
@@ -282,7 +282,7 @@ export default function FeaturesPage() {
             <div key={k} onClick={() => { setView('feature'); setSelectedFeature(k); loadFeatureCompanies(k); }}
               style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', whiteSpace: 'nowrap' }}>
               <div style={{ width: 32, height: 4, borderRadius: 2, background: 'rgba(0,0,0,.06)' }}>
-                <div style={{ height: 4, borderRadius: 2, background: s.adoption_pct > 60 ? '#22c55e' : s.adoption_pct > 30 ? '#f59e0b' : 'var(--lv-muted)', width: `${s.adoption_pct}%` }} />
+                <div style={{ height: 4, borderRadius: 2, background: s.adoption_pct > 60 ? '#22c55e' : s.adoption_pct > 30 ? 'var(--warning)' : 'var(--lv-muted)', width: `${s.adoption_pct}%` }} />
               </div>
               <span style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>{s.name_ar}</span>
               <span style={{ fontSize: 11, color: s.adoption_pct > 60 ? '#22c55e' : 'var(--lv-muted)', fontWeight: 600 }}>{s.adoption_pct}%</span>
@@ -408,9 +408,9 @@ export default function FeaturesPage() {
                                 <div style={{ flex: 1 }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
                                     <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--lv-fg)' }}>{stat?.name_ar || key}</span>
-                                    {stat?.beta && <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: 'rgba(245,158,11,.1)', color: '#f59e0b', fontWeight: 500 }}>BETA</span>}
+                                    {stat?.beta && <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: 'rgba(245,158,11,.1)', color: 'var(--warning)', fontWeight: 500 }}>BETA</span>}
                                     {flag?.plan_includes === false && enabled && (
-                                      <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: '#fffbeb', color: '#f59e0b', border: '1px solid rgba(245,158,11,.2)', fontWeight: 500 }}>خارج الخطة</span>
+                                      <span style={{ fontSize: 11, padding: '1px 5px', borderRadius: 4, background: 'var(--warning-bg)', color: 'var(--warning)', border: '1px solid rgba(245,158,11,.2)', fontWeight: 500 }}>خارج الخطة</span>
                                     )}
                                   </div>
                                   <div style={{ fontSize: 11, color: 'var(--lv-muted)', fontFamily: 'monospace', fontWeight: 500 }}>{key}</div>
@@ -594,7 +594,7 @@ export default function FeaturesPage() {
                 <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block', boxShadow: '0 0 6px rgba(34,197,94,.4)' }} /> <span style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>مُفعَّل</span>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#d1d5db', display: 'inline-block' }} /> <span style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>مُعطَّل</span>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b', display: 'inline-block', boxShadow: '0 0 6px rgba(245,158,11,.4)' }} /> <span style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>طرح جزئي</span>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--warning)', display: 'inline-block', boxShadow: '0 0 6px rgba(245,158,11,.4)' }} /> <span style={{ fontSize: 11, color: 'var(--lv-muted)', fontWeight: 500 }}>طرح جزئي</span>
                 </span>
               </div>
               <div style={{ borderRadius: 14, overflow: 'auto', background: 'var(--lv-panel)', boxShadow: 'var(--lv-shadow-sm)' }}>
@@ -632,7 +632,7 @@ export default function FeaturesPage() {
                                 onClick={() => toggle(company.id, key, enabled)}>
                                 <div style={{
                                   width: 22, height: 22, borderRadius: 6, margin: '0 auto',
-                                  background: enabled ? (partial ? '#f59e0b' : '#22c55e') : '#e5e7eb',
+                                  background: enabled ? (partial ? 'var(--warning)' : '#22c55e') : '#e5e7eb',
                                   display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11,
                                   transition: 'background .15s',
                                   color: enabled ? '#fff' : 'var(--lv-muted)',
@@ -644,7 +644,7 @@ export default function FeaturesPage() {
                             );
                           })}
                           <td style={{ padding: '8px', textAlign: 'center' }}>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: enabledCount > 8 ? '#22c55e' : enabledCount > 4 ? '#f59e0b' : 'var(--lv-muted)' }}>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: enabledCount > 8 ? '#22c55e' : enabledCount > 4 ? 'var(--warning)' : 'var(--lv-muted)' }}>
                               {enabledCount}
                             </span>
                           </td>

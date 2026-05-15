@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { FileText, Download, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
-  draft:         { label: 'مسودة',          color: '#6b7280', bg: '#f9fafb' },
-  sent:          { label: 'مُرسل',           color: '#3b82f6', bg: '#eff6ff' },
-  acknowledged:  { label: 'مُقَر به',         color: '#22c55e', bg: '#f0fdf4' },
+  draft:         { label: 'مسودة',          color: '#6b7280', bg: 'var(--bg)' },
+  sent:          { label: 'مُرسل',           color: 'var(--info)', bg: 'var(--info-bg)' },
+  acknowledged:  { label: 'مُقَر به',         color: 'var(--success)', bg: 'var(--success-bg)' },
   completed:     { label: 'مكتمل',           color: '#8b5cf6', bg: '#f5f3ff' },
 };
 
@@ -74,34 +74,34 @@ export default function SettlementsAdminPage() {
   const pages: number      = data?.pages  || 1;
 
   return (
-    <div style={{ padding: '28px 32px', minHeight: '100vh', background: '#f8fafc' }}>
+    <div style={{ padding: '28px 32px', minHeight: '100vh', background: 'var(--bg)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>تسويات المُلاك</h1>
-          <p style={{ fontSize: 13, color: '#64748b', marginTop: 4, margin: 0 }}>جميع تسويات المُلاك عبر الشركات — {total} تسوية</p>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-1)', margin: 0 }}>تسويات المُلاك</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 4, margin: 0 }}>جميع تسويات المُلاك عبر الشركات — {total} تسوية</p>
         </div>
       </div>
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-        <select value={companyId} onChange={e => setCompanyId(e.target.value)} style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid #e2e8f0', fontSize: 13, background: 'white', cursor: 'pointer', minWidth: 180 }}>
+        <select value={companyId} onChange={e => setCompanyId(e.target.value)} style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, background: 'var(--surface)', cursor: 'pointer', minWidth: 180 }}>
           <option value="">جميع الشركات</option>
           {companies.map((c: any) => <option key={c.id} value={c.id}>{c.name_ar}</option>)}
         </select>
-        <select value={statusFilter} onChange={e => setStatus(e.target.value)} style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid #e2e8f0', fontSize: 13, background: 'white', cursor: 'pointer' }}>
+        <select value={statusFilter} onChange={e => setStatus(e.target.value)} style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, background: 'var(--surface)', cursor: 'pointer' }}>
           <option value="">جميع الحالات</option>
           <option value="draft">مسودة</option>
           <option value="sent">مُرسل</option>
           <option value="acknowledged">مُقَر به</option>
           <option value="completed">مكتمل</option>
         </select>
-        <button onClick={() => { setPage(1); load(1); }} style={{ padding: '8px 18px', background: '#1d4070', color: 'white', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+        <button onClick={() => { setPage(1); load(1); }} style={{ padding: '8px 18px', background: 'var(--brand-600)', color: 'white', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           بحث
         </button>
       </div>
 
       {/* Table */}
-      <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: 14, overflow: 'hidden' }}>
+      <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: 48, color: '#9ca3af', fontSize: 13 }}>جاري التحميل...</div>
         ) : settlements.length === 0 ? (
@@ -112,9 +112,9 @@ export default function SettlementsAdminPage() {
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <tr style={{ background: 'var(--bg)', borderBottom: '1px solid var(--border)' }}>
                 {['الشركة', 'المالك', 'الفترة', 'إجمالي المحصّل', 'صافي الدفع', 'الحالة', 'بتاريخ', 'إجراء'].map(h => (
-                  <th key={h} style={{ padding: '11px 14px', textAlign: 'right', fontWeight: 600, color: '#374151', fontSize: 12 }}>{h}</th>
+                  <th key={h} style={{ padding: '11px 14px', textAlign: 'right', fontWeight: 600, color: 'var(--text-1)', fontSize: 12 }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -122,18 +122,18 @@ export default function SettlementsAdminPage() {
               {settlements.map((s: any, i: number) => {
                 const statusMeta = STATUS_META[s.status] || { label: s.status, color: '#6b7280', bg: '#f9fafb' };
                 return (
-                  <tr key={s.id} style={{ borderBottom: i < settlements.length - 1 ? '1px solid #f1f5f9' : 'none' }}>
-                    <td style={{ padding: '11px 14px', fontWeight: 500, color: '#1d4070' }}>
+                  <tr key={s.id} style={{ borderBottom: i < settlements.length - 1 ? '1px solid var(--border)' : 'none' }}>
+                    <td style={{ padding: '11px 14px', fontWeight: 500, color: 'var(--text-1)' }}>
                       {s.companies?.name_ar || '—'}
                     </td>
                     <td style={{ padding: '11px 14px' }}>{s.property_owners?.full_name_ar || '—'}</td>
-                    <td style={{ padding: '11px 14px', color: '#6b7280', fontSize: 12 }}>
+                    <td style={{ padding: '11px 14px', color: 'var(--text-3)', fontSize: 12 }}>
                       {formatDate(s.period_start)} — {formatDate(s.period_end)}
                     </td>
                     <td style={{ padding: '11px 14px', color: '#16a34a', fontWeight: 500 }}>
                       {formatSAR(s.total_collected)}
                     </td>
-                    <td style={{ padding: '11px 14px', fontWeight: 700, color: '#1d4070' }}>
+                    <td style={{ padding: '11px 14px', fontWeight: 700, color: 'var(--text-1)' }}>
                       {formatSAR(s.net_payout)}
                     </td>
                     <td style={{ padding: '11px 14px' }}>
@@ -141,9 +141,9 @@ export default function SettlementsAdminPage() {
                         {statusMeta.label}
                       </span>
                     </td>
-                    <td style={{ padding: '11px 14px', color: '#6b7280', fontSize: 12 }}>{formatDate(s.created_at)}</td>
+                    <td style={{ padding: '11px 14px', color: 'var(--text-3)', fontSize: 12 }}>{formatDate(s.created_at)}</td>
                     <td style={{ padding: '11px 14px' }}>
-                      <button onClick={() => downloadPdf(s.owner_id, s.id)} disabled={downloading === s.id} title="تحميل PDF" style={{ padding: 6, borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: downloading === s.id ? 0.5 : 1 }}>
+                      <button onClick={() => downloadPdf(s.owner_id, s.id)} disabled={downloading === s.id} title="تحميل PDF" style={{ padding: 6, borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: downloading === s.id ? 0.5 : 1 }}>
                         <Download style={{ width: 13, height: 13, color: '#374151' }} />
                       </button>
                     </td>
@@ -158,11 +158,11 @@ export default function SettlementsAdminPage() {
       {/* Pagination */}
       {pages > 1 && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginTop: 20 }}>
-          <button onClick={() => { const p = Math.max(1, page - 1); setPage(p); load(p); }} disabled={page === 1} style={{ padding: '7px 12px', borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', cursor: page > 1 ? 'pointer' : 'not-allowed', opacity: page === 1 ? 0.4 : 1, display: 'flex', alignItems: 'center' }}>
+          <button onClick={() => { const p = Math.max(1, page - 1); setPage(p); load(p); }} disabled={page === 1} style={{ padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', cursor: page > 1 ? 'pointer' : 'not-allowed', opacity: page === 1 ? 0.4 : 1, display: 'flex', alignItems: 'center' }}>
             <ChevronRight style={{ width: 14, height: 14 }} />
           </button>
-          <span style={{ fontSize: 13, color: '#374151' }}>صفحة {page} من {pages}</span>
-          <button onClick={() => { const p = Math.min(pages, page + 1); setPage(p); load(p); }} disabled={page === pages} style={{ padding: '7px 12px', borderRadius: 8, border: '1px solid #e2e8f0', background: 'white', cursor: page < pages ? 'pointer' : 'not-allowed', opacity: page === pages ? 0.4 : 1, display: 'flex', alignItems: 'center' }}>
+          <span style={{ fontSize: 13, color: 'var(--text-1)' }}>صفحة {page} من {pages}</span>
+          <button onClick={() => { const p = Math.min(pages, page + 1); setPage(p); load(p); }} disabled={page === pages} style={{ padding: '7px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', cursor: page < pages ? 'pointer' : 'not-allowed', opacity: page === pages ? 0.4 : 1, display: 'flex', alignItems: 'center' }}>
             <ChevronLeft style={{ width: 14, height: 14 }} />
           </button>
         </div>
