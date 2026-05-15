@@ -1,7 +1,57 @@
 @import "tailwindcss";
 
+/* ── Thmanyah font ─────────────────────────────────────────────── */
+@font-face { font-family:'Thmanyah'; src:url('/fonts/thmanyahsans-Regular.woff2') format('woff2'); font-weight:400; font-display:swap; }
+@font-face { font-family:'Thmanyah'; src:url('/fonts/thmanyahsans-Medium.woff2')  format('woff2'); font-weight:500; font-display:swap; }
+@font-face { font-family:'Thmanyah'; src:url('/fonts/thmanyahsans-Bold.woff2')    format('woff2'); font-weight:600 700; font-display:swap; }
+@font-face { font-family:'Thmanyah'; src:url('/fonts/thmanyahsans-Black.woff2')   format('woff2'); font-weight:800 900; font-display:swap; }
+
 :root {
-  /* ─── Liventra Admin Theme (maps old vars → new lv-* tokens) ─── */
+  /* ── Design tokens ─────────────────────────────────────────── */
+  --brand-50:  #f3f6fb; --brand-100: #e4ecf6; --brand-200: #c5d4e9;
+  --brand-300: #93b0d4; --brand-400: #5c84b7; --brand-500: #366098;
+  --brand-600: #1e3a5f; --brand-700: #19314f; --brand-800: #142640; --brand-900: #0f1d31;
+
+  --accent-50:  #fdf8e7; --accent-100: #faedc1; --accent-200: #f4dc88;
+  --accent-300: #ebc647; --accent-400: #d4a017; --accent-500: #b8860b; --accent-600: #946b08;
+
+  --ink-0: #ffffff; --ink-50: #fafbfc; --ink-100: #f4f5f7; --ink-150: #eef0f3;
+  --ink-200: #e5e7eb; --ink-300: #d1d5db; --ink-400: #9ca3af;
+  --ink-500: #6b7280; --ink-600: #4b5563; --ink-700: #374151;
+  --ink-800: #1f2937; --ink-900: #0f172a;
+
+  --bg: var(--ink-50); --surface: var(--ink-0); --surface-2: var(--ink-100);
+  --surface-3: var(--ink-150); --border: var(--ink-150); --border-strong: var(--ink-200);
+  --divider: #f1f2f5;
+
+  --text: var(--ink-900); --text-1: var(--ink-800); --text-2: var(--ink-600);
+  --text-3: var(--ink-500); --text-muted: var(--ink-400); --text-on-brand: #ffffff;
+
+  --success-bg: #ecfdf5; --success-bd: #a7f3d0;
+  --warning-bg: #fffbeb; --warning-bd: #fcd34d;
+  --danger-bg:  #fef2f2; --danger-bd:  #fecaca;
+  --info:       #2563eb; --info-bg:    #eff6ff; --info-bd: #bfdbfe;
+  --violet:     #7c3aed; --violet-bg:  #f5f3ff;
+
+  --font-sans: 'Thmanyah', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --fs-xs: 11px; --fs-sm: 12px; --fs-md: 13px; --fs-base: 14px;
+  --fs-lg: 16px; --fs-xl: 18px; --fs-2xl: 22px;
+
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+
+  --r-xs: 4px; --r-sm: 6px; --r-md: 8px; --r-lg: 10px;
+  --r-xl: 12px; --r-2xl: 16px; --r-pill: 999px;
+
+  --sh-xs: 0 1px 2px rgba(15,23,42,.05);
+  --sh-sm: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+  --sh-md: 0 4px 12px rgba(15,23,42,.07), 0 2px 4px rgba(15,23,42,.04);
+  --sh-lg: 0 12px 28px rgba(15,23,42,.10), 0 4px 8px rgba(15,23,42,.05);
+  --sh-focus: 0 0 0 3px rgba(30,58,95,.15);
+
+  /* ── Liventra Admin Theme (maps old vars → new lv-* tokens) ─── */
   --bg-root:    #fafaf9;
   --bg-card:    #ffffff;
   --bg-sidebar: #141210;
@@ -42,8 +92,16 @@
 @theme inline {
   --color-background: var(--bg-root);
   --color-foreground: var(--text-primary);
-  --font-sans: var(--font-noto, 'Noto Sans Arabic'), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Thmanyah', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --color-brand-50:  #f3f6fb;
+  --color-brand-100: #e4ecf6;
+  --color-brand-200: #c5d4e9;
+  --color-brand-500: #366098;
+  --color-brand-600: #1e3a5f;
+  --color-brand-700: #19314f;
+  --color-accent-400: #d4a017;
+  --color-accent-500: #b8860b;
 }
 
 * { box-sizing: border-box; }
@@ -51,7 +109,7 @@
 body {
   background: var(--lv-bg, var(--bg-root));
   color: var(--lv-fg, var(--text-primary));
-  font-family: var(--lv-font-ar, var(--font-sans));
+  font-family: 'Thmanyah', system-ui, sans-serif;
   font-size: 14px;
   direction: rtl;
   -webkit-font-smoothing: antialiased;
@@ -338,10 +396,10 @@ button:active:not(:disabled) {
   --lv-accent:      #4f46e5;
 
   /* Font families */
-  --lv-font-ui:     var(--font-inter-tight, 'Inter Tight', system-ui, sans-serif);
-  --lv-font-ar:     var(--font-cairo, 'Cairo', var(--font-noto), system-ui, sans-serif);
-  --lv-font-num:    var(--font-fraunces, 'Fraunces', Georgia, serif);
-  --lv-font-mono:   var(--font-jetbrains-mono, 'JetBrains Mono', 'Courier New', monospace);
+  --lv-font-ui:     'Thmanyah', system-ui, sans-serif;
+  --lv-font-ar:     'Thmanyah', system-ui, sans-serif;
+  --lv-font-num:    'Thmanyah', system-ui, sans-serif;
+  --lv-font-mono:   'JetBrains Mono', 'Courier New', monospace;
 
   /* Spacing */
   --lv-page-pad:    36px 32px;
@@ -392,3 +450,91 @@ button:active:not(:disabled) {
 .lv-quick-action:hover {
   background: var(--lv-chip) !important;
 }
+
+/* ═══════════════════════════════════════════
+   LE-* COMPONENT CLASSES — design system
+   ═══════════════════════════════════════════ */
+
+.le-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; height: 36px; padding: 0 14px;
+  border-radius: var(--r-md); font-family: inherit;
+  font-size: var(--fs-md); font-weight: 500; line-height: 1;
+  border: 1px solid transparent; background: transparent;
+  cursor: pointer; white-space: nowrap;
+  transition: background .12s ease, border-color .12s ease, color .12s ease;
+}
+.le-btn:focus-visible { outline: none; box-shadow: var(--sh-focus); }
+.le-btn[disabled] { opacity: .5; cursor: not-allowed; }
+.le-btn.sm { height: 30px; padding: 0 10px; font-size: var(--fs-sm); }
+.le-btn.lg { height: 42px; padding: 0 18px; font-size: var(--fs-base); }
+.le-btn.icon { width: 36px; padding: 0; }
+.le-btn.icon.sm { width: 30px; }
+.le-btn.primary { background: var(--brand-600); color: white; }
+.le-btn.primary:hover { background: var(--brand-700); }
+.le-btn.secondary { background: var(--surface); color: var(--text-1); border-color: var(--border-strong); }
+.le-btn.secondary:hover { background: var(--ink-50); border-color: var(--ink-300); }
+.le-btn.ghost { background: transparent; color: var(--text-2); }
+.le-btn.ghost:hover { background: var(--ink-100); color: var(--text-1); }
+.le-btn.danger { background: var(--danger); color: white; }
+.le-btn.subtle-brand { background: var(--brand-50); color: var(--brand-600); }
+.le-btn.subtle-brand:hover { background: var(--brand-100); }
+
+.le-field {
+  display: flex; align-items: center; height: 36px;
+  padding: 0 12px; background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: var(--r-md);
+  font-size: var(--fs-md); color: var(--text-1); width: 100%; font-family: inherit;
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.le-field::placeholder { color: var(--text-muted); }
+.le-field:focus { outline: none; border-color: var(--brand-500); box-shadow: var(--sh-focus); }
+
+.le-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 22px; padding: 0 8px; border-radius: var(--r-pill);
+  font-size: var(--fs-xs); font-weight: 500; border: 1px solid transparent; white-space: nowrap;
+}
+.le-badge.success { background: var(--success-bg); color: var(--success); border-color: var(--success-bd); }
+.le-badge.warning { background: var(--warning-bg); color: var(--warning); border-color: var(--warning-bd); }
+.le-badge.danger  { background: var(--danger-bg);  color: var(--danger);  border-color: var(--danger-bd); }
+.le-badge.info    { background: var(--info-bg);    color: var(--info);    border-color: var(--info-bd); }
+.le-badge.violet  { background: var(--violet-bg);  color: var(--violet);  border-color: #ddd6fe; }
+.le-badge.neutral { background: var(--ink-100);    color: var(--text-2);  border-color: var(--ink-200); }
+.le-badge.brand   { background: var(--brand-50);   color: var(--brand-600); border-color: var(--brand-100); }
+.le-badge.dot::before { content: ''; width: 6px; height: 6px; border-radius: 99px; background: currentColor; }
+
+.le-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-xl); overflow: hidden;
+}
+.le-card.elevated { box-shadow: var(--sh-sm); }
+.le-card-h {
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.le-card-t { font-size: var(--fs-base); font-weight: 600; color: var(--text); }
+.le-card-st { font-size: var(--fs-sm); color: var(--text-3); margin-top: 2px; }
+.le-card-b { padding: 18px; }
+
+.le-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--fs-md); }
+.le-table th {
+  text-align: start; font-weight: 500; font-size: var(--fs-xs); color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .04em; padding: 10px 14px;
+  background: var(--ink-50); border-bottom: 1px solid var(--border); position: sticky; top: 0;
+}
+.le-table td { padding: 12px 14px; border-bottom: 1px solid var(--divider); color: var(--text-1); vertical-align: middle; }
+.le-table tr:last-child td { border-bottom: 0; }
+.le-table tr:hover td { background: var(--ink-50); }
+.le-table .num { text-align: end; font-variant-numeric: tabular-nums; }
+
+.le-avatar {
+  width: 28px; height: 28px; border-radius: 99px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600;
+  background: var(--brand-100); color: var(--brand-700); flex-shrink: 0;
+}
+.le-avatar.lg { width: 40px; height: 40px; font-size: 13px; }
+.le-avatar.sm { width: 22px; height: 22px; font-size: 10px; }
+
+.num { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum'; }

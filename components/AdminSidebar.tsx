@@ -53,11 +53,9 @@ export default function AdminSidebar({
   const pathname = usePathname();
   const isAr = lang === 'ar';
 
-  const brandName = isAr ? 'ليفنترا' : 'Liventra';
   const adminBadge = isAr ? 'إدارة' : 'ADMIN';
   const searchPlaceholder = isAr ? 'ابحث عن أي شيء…' : 'Search anything…';
   const roleLabel = isAr ? 'مدير النظام' : 'System Admin';
-  const logoChar = isAr ? 'ل' : 'L';
 
   const avatarInitials = userName
     .split(' ')
@@ -94,47 +92,32 @@ export default function AdminSidebar({
         }}
       >
         {/* Logo mark */}
-        <div
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 8,
-            background: accent,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 16,
-            fontWeight: 800,
-            color: '#fff',
-            fontFamily: 'var(--lv-font-num)',
-            flexShrink: 0,
-            boxShadow: `0 2px 8px ${accent}44`,
-          }}
-        >
-          {logoChar}
-        </div>
+        <svg width={30} height={30} viewBox="0 0 120 120" style={{ flexShrink: 0 }}>
+          <path d="M60 6 L114 60 L60 114 L6 60 Z" fill="#0E5C3F" />
+          <path d="M60 30 L90 60 L60 90 L48 78 L66 60 L48 42 Z" fill="#F4EDE0" />
+        </svg>
 
         {/* Brand name */}
         <span
           style={{
-            fontSize: 15,
+            fontSize: 13,
             fontWeight: 700,
             color: '#fff',
-            fontFamily: isAr ? 'var(--lv-font-ar)' : 'var(--lv-font-ui)',
+            fontFamily: "'Thmanyah', system-ui, sans-serif",
             flex: 1,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}
         >
-          {brandName}
+          LIV ENTRA
         </span>
 
         {/* Admin badge */}
         <span
           style={{
-            fontSize: 10,
-            fontFamily: 'var(--lv-font-mono)',
+            fontSize: 9,
+            fontFamily: "'Thmanyah', system-ui, sans-serif",
             background: 'rgba(255,255,255,0.08)',
             borderRadius: 4,
             padding: '2px 7px',
