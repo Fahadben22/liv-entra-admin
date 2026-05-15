@@ -6,6 +6,16 @@ const PUBLIC_PATHS = ['/login', '/pricing', '/subscribe'];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const host = req.headers.get('host') || '';
+
+  // Redirect raw Vercel deployment URLs to the canonical branded domain
+  const canonical = process.env.CANONICAL_HOST;
+  if (canonical && !host.includes('localhost') && host !== canonical) {
+    const dest = req.nextUrl.clone();
+    dest.host = canonical;
+    dest.protocol = 'https:';
+    return NextResponse.redirect(dest, 308);
+  }
 
   if (pathname.startsWith('/_next') || pathname.startsWith('/api')) {
     return NextResponse.next();

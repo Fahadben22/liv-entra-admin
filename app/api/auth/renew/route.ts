@@ -1,11 +1,24 @@
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'https://liv-entra-api-production.up.railway.app/api/v1';
 const COOKIE = 'admin_rt';
 const MAX_AGE = 30 * 24 * 60 * 60;
 
-export async function POST() {
+const rateLimitMap = new Map<string, { count: number; reset: number }>();
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.reset) { rateLimitMap.set(ip, { count: 1, reset: now + 60_000 }); return true; }
+  if (entry.count >= 5) return false;
+  entry.count++;
+  return true;
+}
+
+export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  if (!checkRateLimit(ip)) return NextResponse.json({ ok: false }, { status: 429 });
+
   const store = await cookies();
   const rt = store.get(COOKIE)?.value;
   if (!rt) return NextResponse.json({ ok: false }, { status: 401 });
