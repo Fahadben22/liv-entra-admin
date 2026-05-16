@@ -54,7 +54,7 @@ export default function AdminLogin() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(160deg, var(--brand-800) 0%, var(--brand-600) 100%)',
+      background: 'linear-gradient(160deg, #062b1f 0%, #0E5C3F 60%, #083325 100%)',
       fontFamily: "'Thmanyah', system-ui, sans-serif",
       direction: 'rtl',
     }}>
