@@ -193,7 +193,7 @@ export default function KnowledgePage() {
             padding: '36px 20px',
             textAlign: 'center',
             cursor: 'pointer',
-            background: dragging ? '#eff6ff' : '#fafafa',
+            background: dragging ? '#eff6ff' : 'var(--bg)',
             transition: 'all 0.15s',
             marginBottom: queue.length ? 20 : 0,
           }}
@@ -221,7 +221,7 @@ export default function KnowledgePage() {
                 const st  = STATUS_STYLE[q.status];
                 const ext = fileExt(q.file.name);
                 return (
-                  <div key={q.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#f8fafc', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+                  <div key={q.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--bg)', borderRadius: 8, border: '1px solid var(--border)' }}>
                     {/* File icon */}
                     <span style={{ fontSize: 22, flexShrink: 0 }}>{EXT_ICON[ext] || '📁'}</span>
 

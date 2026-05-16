@@ -274,7 +274,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
             <Icon name={agentIcon} size={16} color="var(--lv-accent)" />
           </div>
           <div style={{ flex: 1 }}>
-            <h2 style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: 0 }}>{agentName}</h2>
+            <h2 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', margin: 0 }}>{agentName}</h2>
             <p style={{ fontSize: 10, color: '#9ca3af', margin: 0 }}>{tokens > 0 ? `${tokens.toLocaleString()} رمز` : 'جاهز'}</p>
           </div>
           <button onClick={clearChat} style={{ fontSize: 10, padding: '5px 12px', borderRadius: 6, border: '1px solid rgba(0,0,0,.06)', background: 'transparent', color: '#9ca3af', cursor: 'pointer' }}>مسح</button>
@@ -283,7 +283,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
 
       {/* Goals bar */}
       {goals.length > 0 && (
-        <div style={{ padding: '8px 20px', borderBottom: '1px solid rgba(0,0,0,.04)', background: '#fafafa', display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+        <div style={{ padding: '8px 20px', borderBottom: '1px solid rgba(0,0,0,.04)', background: 'var(--bg)', display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', flexShrink: 0 }}>
           <span style={{ fontSize: 10, color: '#9ca3af', marginLeft: 4 }}>الأهداف:</span>
           {goals.map(g => (
             <span key={g.id} style={{ fontSize: 10, padding: '3px 10px', borderRadius: 12, background: 'rgba(124,92,252,.08)', border: '1px solid rgba(124,92,252,.2)', color: '#7c5cfc', fontWeight: 600 }}>
@@ -301,8 +301,8 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
             onClick={() => setActiveTab(tab)}
             style={{
               padding: '8px 16px', fontSize: 11, fontWeight: 600, border: 'none', background: 'transparent',
-              cursor: 'pointer', color: activeTab === tab ? '#2563EB' : '#9ca3af',
-              borderBottom: activeTab === tab ? '2px solid #2563EB' : '2px solid transparent',
+              cursor: 'pointer', color: activeTab === tab ? 'var(--brand-600)' : '#9ca3af',
+              borderBottom: activeTab === tab ? '2px solid var(--brand-600)' : '2px solid transparent',
               transition: 'all .15s', display: 'flex', alignItems: 'center', gap: 5,
             }}
           >
@@ -310,7 +310,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
               <>
                 صندوق الوارد
                 {inbox.length > 0 && (
-                  <span style={{ fontSize: 9, padding: '1px 6px', borderRadius: 8, background: '#2563EB', color: '#fff', fontWeight: 700 }}>
+                  <span style={{ fontSize: 9, padding: '1px 6px', borderRadius: 8, background: 'var(--brand-600)', color: '#fff', fontWeight: 700 }}>
                     {inbox.length}
                   </span>
                 )}
@@ -328,7 +328,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
           <div style={{
             width: expandedDirective ? 300 : '100%', flexShrink: 0,
             borderLeft: expandedDirective ? '1px solid rgba(0,0,0,.07)' : 'none',
-            overflowY: 'auto', background: '#fff',
+            overflowY: 'auto', background: 'var(--surface)',
             transition: 'width .2s',
           }}>
             {inboxLoading && (
@@ -357,7 +357,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     padding: '10px 16px', cursor: 'pointer', borderBottom: '1px solid rgba(0,0,0,.05)',
-                    background: isOpen ? '#EFF6FF' : '#fff',
+                    background: isOpen ? 'var(--ink-50)' : 'var(--surface)',
                     transition: 'background .1s',
                   }}
                 >
@@ -372,10 +372,10 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                   {/* Content */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-                      <span style={{ fontSize: 12, fontWeight: isReplied ? 400 : 700, color: '#1e293b' }}>REEA</span>
+                      <span style={{ fontSize: 12, fontWeight: isReplied ? 400 : 700, color: 'var(--text-1)' }}>REEA</span>
                       <span style={{ fontSize: 10, color: '#9ca3af', flexShrink: 0 }}>{timeLabel}</span>
                     </div>
-                    <div style={{ fontSize: 11, color: '#374151', fontWeight: isReplied ? 400 : 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div style={{ fontSize: 11, color: 'var(--text-2)', fontWeight: isReplied ? 400 : 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {d.directive.slice(0, 60)}{d.directive.length > 60 ? '…' : ''}
                     </div>
                     {d.reply && (
@@ -387,7 +387,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
 
                   {/* Status dot */}
                   {!isReplied && (
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#2563EB', flexShrink: 0 }} />
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--brand-600)', flexShrink: 0 }} />
                   )}
                 </div>
               );
@@ -399,14 +399,14 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
             const d = inbox.find(x => x.id === expandedDirective);
             if (!d) return null;
             return (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', background: '#f8faff' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', background: 'var(--bg)' }}>
                 {/* Thread header */}
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(0,0,0,.07)', background: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(0,0,0,.07)', background: 'var(--surface)', display: 'flex', alignItems: 'center', gap: 10 }}>
                   <button
                     onClick={() => setExpandedDirective(null)}
                     style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', cursor: 'pointer', fontSize: 12, color: '#6b7280' }}
                   >← رجوع</button>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', flex: 1 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', flex: 1 }}>
                     {d.directive.slice(0, 60)}{d.directive.length > 60 ? '…' : ''}
                   </span>
                   <span style={{
@@ -429,15 +429,15 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                     }}>R</div>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>REEA</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-1)' }}>REEA</span>
                         <span style={{ fontSize: 10, color: '#9ca3af' }}>
                           {new Date(d.created_at).toLocaleString('ar-SA', { dateStyle: 'long', timeStyle: 'short' })}
                         </span>
                       </div>
                       <div style={{
-                        background: '#fff', borderRadius: '4px 14px 14px 14px',
+                        background: 'var(--surface)', borderRadius: '4px 14px 14px 14px',
                         border: '1px solid rgba(0,0,0,.07)', padding: '12px 16px',
-                        fontSize: 13, lineHeight: 1.7, color: '#1e293b', whiteSpace: 'pre-wrap',
+                        fontSize: 13, lineHeight: 1.7, color: 'var(--text-1)', whiteSpace: 'pre-wrap',
                       }}>
                         {d.directive}
                       </div>
@@ -457,7 +457,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexDirection: 'row-reverse' }}>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>{agentName}</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-1)' }}>{agentName}</span>
                           {d.replied_at && (
                             <span style={{ fontSize: 10, color: '#9ca3af' }}>
                               {new Date(d.replied_at).toLocaleString('ar-SA', { dateStyle: 'long', timeStyle: 'short' })}
@@ -467,7 +467,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                         <div style={{
                           background: '#ecfdf5', borderRadius: '14px 4px 14px 14px',
                           border: '1px solid rgba(16,185,129,.2)', padding: '12px 16px',
-                          fontSize: 13, lineHeight: 1.7, color: '#1e293b', whiteSpace: 'pre-wrap',
+                          fontSize: 13, lineHeight: 1.7, color: 'var(--text-1)', whiteSpace: 'pre-wrap',
                         }}>
                           {d.reply}
                         </div>
@@ -503,7 +503,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
         )}
         {messages.map((msg, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-start' : 'flex-end', gap: 4 }}>
-            <div style={{ maxWidth: '85%', padding: '10px 14px', borderRadius: 14, background: msg.role === 'user' ? '#DBEAFE' : '#F1F5F9', border: msg.role === 'user' ? '1px solid rgba(124,92,252,.12)' : '1px solid rgba(0,0,0,.04)', color: '#1E293B', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            <div style={{ maxWidth: '85%', padding: '10px 14px', borderRadius: 14, background: msg.role === 'user' ? 'var(--ink-50)' : 'var(--bg)', border: msg.role === 'user' ? '1px solid rgba(124,92,252,.12)' : '1px solid rgba(0,0,0,.04)', color: 'var(--text-1)', fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
               {msg.content}
             </div>
             {msg.role === 'assistant' && msg.tools_used && msg.tools_used.length > 0 && (
@@ -520,7 +520,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
         ))}
         {loading && (
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <div style={{ padding: '10px 14px', borderRadius: 14, background: '#F1F5F9', border: '1px solid rgba(0,0,0,.04)' }}>
+            <div style={{ padding: '10px 14px', borderRadius: 14, background: 'var(--bg)', border: '1px solid rgba(0,0,0,.04)' }}>
               <div style={{ display: 'flex', gap: 4 }}>
                 {[0, 1, 2].map(i => (<div key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: '#9ca3af', animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`, opacity: 0.5 }} />))}
               </div>
@@ -553,7 +553,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
             {/* Tabs */}
             <div style={{ display: 'flex', gap: 0, marginBottom: 12, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(124,92,252,.2)' }}>
               {(['email', 'whatsapp'] as const).map(tab => (
-                <button key={tab} onClick={() => setOutreachTab(tab)} style={{ flex: 1, padding: '8px', fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: outreachTab === tab ? '#7c5cfc' : '#fff', color: outreachTab === tab ? '#fff' : '#7c5cfc', transition: 'all .15s' }}>
+                <button key={tab} onClick={() => setOutreachTab(tab)} style={{ flex: 1, padding: '8px', fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer', background: outreachTab === tab ? '#7c5cfc' : 'var(--surface)', color: outreachTab === tab ? '#fff' : '#7c5cfc', transition: 'all .15s' }}>
                   {tab === 'email' ? <><Mail size={12} style={{ marginLeft: 4 }} /> البريد الإلكتروني</> : <><MessageCircle size={12} style={{ marginLeft: 4 }} /> واتساب</>}
                 </button>
               ))}
@@ -569,7 +569,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                   placeholder="موضوع البريد"
                 />
                 {/* HTML preview iframe */}
-                <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 8, overflow: 'hidden', background: '#fff' }}>
+                <div style={{ border: '1px solid rgba(0,0,0,.08)', borderRadius: 8, overflow: 'hidden', background: 'var(--surface)' }}>
                   <div style={{ padding: '6px 10px', background: '#f8f7fc', borderBottom: '1px solid rgba(0,0,0,.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: 10, color: '#9ca3af' }}>معاينة البريد</span>
                     <button onClick={() => {
@@ -599,7 +599,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
               <div>
                 <div style={{ background: '#dcfce7', borderRadius: 12, padding: '12px 14px', marginBottom: 8 }}>
                   <p style={{ fontSize: 10, color: '#166534', margin: '0 0 6px', fontWeight: 600 }}>معاينة واتساب</p>
-                  <div style={{ background: '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: '#1e293b', lineHeight: 1.7, whiteSpace: 'pre-wrap', direction: 'rtl' }}>
+                  <div style={{ background: 'var(--surface)', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: 'var(--text-1)', lineHeight: 1.7, whiteSpace: 'pre-wrap', direction: 'rtl' }}>
                     {editWhatsApp}
                   </div>
                 </div>
@@ -639,7 +639,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                 <button
                   onClick={() => setShowRejectInput(true)}
                   disabled={outreachSending}
-                  style={{ flex: 1, padding: '10px', borderRadius: 8, border: '1px solid #fca5a5', background: '#fff', color: '#dc2626', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+                  style={{ flex: 1, padding: '10px', borderRadius: 8, border: '1px solid #fca5a5', background: 'var(--surface)', color: '#dc2626', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
                 >
                   <><Pencil size={12} style={{ marginLeft: 4, verticalAlign: 'middle' }} /> أعد الصياغة</>
                 </button>
@@ -655,7 +655,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
               <button
                 onClick={() => { setOutreachDraft(null); setShowRejectInput(false); }}
                 disabled={outreachSending}
-                style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: '#fff', color: '#9ca3af', cursor: 'pointer', fontSize: 12 }}
+                style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: 'var(--surface)', color: '#9ca3af', cursor: 'pointer', fontSize: 12 }}
               >
                 <X size={14} />
               </button>
@@ -673,14 +673,14 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
 
       {/* Legacy Draft Email */}
       {draft && (
-        <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(0,0,0,.06)', background: '#F1F5F9' }}>
+        <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(0,0,0,.06)', background: 'var(--bg)' }}>
           <div style={{ maxWidth: 550, margin: '0 auto' }}>
-            <p style={{ fontSize: 12, fontWeight: 600, color: '#1E293B', margin: '0 0 8px' }}>مسودة بريد — {draft.lead_name} ({draft.lead_email})</p>
+            <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-1)', margin: '0 0 8px' }}>مسودة بريد — {draft.lead_name} ({draft.lead_email})</p>
             <input value={editSubject} onChange={e => setEditSubject(e.target.value)} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(0,0,0,.06)', fontSize: 12, marginBottom: 6, boxSizing: 'border-box' }} placeholder="الموضوع" />
             <textarea value={editBody} onChange={e => setEditBody(e.target.value)} rows={4} style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(0,0,0,.06)', fontSize: 12, lineHeight: 1.6, resize: 'vertical', boxSizing: 'border-box' }} />
             <div style={{ display: 'flex', gap: 6, marginTop: 8 }}>
-              <button onClick={sendDraftEmail} disabled={sending} style={{ flex: 2, padding: '8px', borderRadius: 8, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, opacity: sending ? .5 : 1 }}>{sending ? 'جاري...' : 'إرسال'}</button>
-              <button onClick={() => setDraft(null)} style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid rgba(0,0,0,.06)', background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: 12 }}>إلغاء</button>
+              <button onClick={sendDraftEmail} disabled={sending} style={{ flex: 2, padding: '8px', borderRadius: 8, border: 'none', background: 'var(--brand-600)', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, opacity: sending ? .5 : 1 }}>{sending ? 'جاري...' : 'إرسال'}</button>
+              <button onClick={() => setDraft(null)} style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid rgba(0,0,0,.06)', background: 'var(--surface)', color: 'var(--text-3)', cursor: 'pointer', fontSize: 12 }}>إلغاء</button>
             </div>
           </div>
         </div>
@@ -689,8 +689,8 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       {/* Input */}
       <div style={{ padding: '12px 20px', borderTop: '1px solid rgba(0,0,0,.06)', flexShrink: 0 }}>
         <div style={{ display: 'flex', gap: 8 }}>
-          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }} placeholder={`اسأل ${agentName}...`} disabled={loading} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.06)', background: '#F1F5F9', color: '#1E293B', fontSize: 13, outline: 'none' }} />
-          <button onClick={() => send()} disabled={loading || !input.trim()} style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: loading ? '#d1d5db' : '#2563EB', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: loading || !input.trim() ? .5 : 1 }}>إرسال</button>
+          <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }} placeholder={`اسأل ${agentName}...`} disabled={loading} style={{ flex: 1, padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(0,0,0,.06)', background: 'var(--bg)', color: 'var(--text-1)', fontSize: 13, outline: 'none' }} />
+          <button onClick={() => send()} disabled={loading || !input.trim()} style={{ padding: '10px 20px', borderRadius: 10, border: 'none', background: loading ? '#d1d5db' : 'var(--brand-600)', color: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: loading || !input.trim() ? .5 : 1 }}>إرسال</button>
         </div>
       </div>
       <style>{`@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}`}</style>

@@ -198,9 +198,9 @@ export default function ConstitutionPage() {
           <FormRow label="ملاحظات">
             <input value={String(form.rule_notes || '')} onChange={e => setForm(f => ({ ...f, rule_notes: e.target.value }))} style={inputStyle} placeholder="سبب القاعدة أو تفاصيل إضافية" />
           </FormRow>
-          <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 12px', borderRadius: 7, border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '10px 12px', borderRadius: 7, border: '1px solid var(--border)', background: 'var(--ink-50)' }}>
             <input type="checkbox" checked={Boolean(form.is_active)} onChange={e => setForm(f => ({ ...f, is_active: e.target.checked }))} style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#4f46e5' }} />
-            <span style={{ fontSize: 13, color: '#0f172a', fontWeight: 500 }}>تفعيل القاعدة</span>
+            <span style={{ fontSize: 13, color: 'var(--text-1)', fontWeight: 500 }}>تفعيل القاعدة</span>
           </label>
         </Modal>
       )}
@@ -288,7 +288,7 @@ function Chip({ label }: { label: string }) {
 function FormRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
-      <label style={{ fontSize: 11, color: '#64748b', fontWeight: 600, letterSpacing: '0.04em' }}>{label}</label>
+      <label style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 600, letterSpacing: '0.04em' }}>{label}</label>
       {children}
     </div>
   );
@@ -310,16 +310,16 @@ function Modal({ title, onClose, onSave, saving, error, children }: {
       }}
     >
       <div style={{
-        background: '#ffffff',
+        background: 'var(--surface)',
         borderRadius: 14, padding: '24px 28px',
         width: 520, maxWidth: 'calc(100vw - 32px)',
         maxHeight: '85vh', overflowY: 'auto',
         boxShadow: '0 24px 64px rgba(0,0,0,0.25)',
-        border: '1px solid #e8ecf0',
+        border: '1px solid var(--border)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#0f172a' }}>{title}</h2>
-          <button onClick={onClose} style={{ background: '#f1f5f9', border: 'none', cursor: 'pointer', color: '#64748b', fontSize: 16, width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+          <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: 'var(--text-1)' }}>{title}</h2>
+          <button onClick={onClose} style={{ background: 'var(--bg)', border: 'none', cursor: 'pointer', color: 'var(--text-3)', fontSize: 16, width: 28, height: 28, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>{children}</div>
         {error && <p style={{ fontSize: 12, color: '#dc2626', marginTop: 14, padding: '8px 12px', background: '#fef2f2', borderRadius: 6, border: '1px solid #fecaca' }}>{error}</p>}
@@ -346,16 +346,16 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
 
 const inputStyle: React.CSSProperties = {
   padding: '8px 12px', borderRadius: 7,
-  border: '1px solid #e2e8f0',
-  background: '#f8fafc',
-  color: '#0f172a',
+  border: '1px solid var(--border)',
+  background: 'var(--ink-50)',
+  color: 'var(--text-1)',
   fontSize: 13, width: '100%', boxSizing: 'border-box', fontFamily: 'inherit',
   outline: 'none',
 };
 
 const ghostBtn: React.CSSProperties = {
-  padding: '8px 16px', borderRadius: 7, border: '1px solid #e2e8f0',
-  background: '#f8fafc', color: '#475569', fontSize: 13,
+  padding: '8px 16px', borderRadius: 7, border: '1px solid var(--border)',
+  background: 'var(--ink-50)', color: 'var(--text-2)', fontSize: 13,
   cursor: 'pointer', fontFamily: 'inherit',
 };
 

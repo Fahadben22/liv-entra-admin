@@ -115,12 +115,12 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 640, maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+      <div style={{ background: 'var(--surface)', borderRadius: 16, width: '100%', maxWidth: 640, maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
 
         {/* Header */}
         <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
           <div>
-            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>ورشة التسويق</h2>
+            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: 'var(--text-1)' }}>ورشة التسويق</h2>
             <p style={{ margin: '2px 0 0', fontSize: 10, color: '#9ca3af' }}>نورة ← سارة ← ليلى — من الفكرة إلى التصميم</p>
           </div>
           <button onClick={onClose} style={{ border: 'none', background: 'none', fontSize: 18, cursor: 'pointer', color: '#9ca3af', padding: 4 }}>×</button>
@@ -129,20 +129,20 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
         {/* Brief input */}
         {!running && !result && (
           <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(0,0,0,.06)', flexShrink: 0 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 6 }}>ما الهدف التسويقي؟</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)', display: 'block', marginBottom: 6 }}>ما الهدف التسويقي؟</label>
             <textarea
               value={brief}
               onChange={e => setBrief(e.target.value)}
               placeholder="مثال: بوست سناب ستوري لخصم 20% على باقة Liventra الاحترافية للمشتركين الجدد هذا الأسبوع فقط"
               rows={3}
-              style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0', borderRadius: 8, fontSize: 12, resize: 'none', outline: 'none', fontFamily: 'inherit', direction: 'rtl' }}
+              style={{ width: '100%', padding: '10px 12px', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: 12, resize: 'none', outline: 'none', fontFamily: 'inherit', direction: 'rtl' }}
               onFocus={e => e.target.style.borderColor = '#8b5cf6'}
-              onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+              onBlur={e => (e.target.style.borderColor = '')}
             />
             <button
               onClick={runWorkshop}
               disabled={!brief.trim()}
-              style={{ marginTop: 8, width: '100%', padding: '11px', borderRadius: 8, background: brief.trim() ? 'linear-gradient(135deg,#8b5cf6,#7c3aed)' : '#e2e8f0', color: brief.trim() ? '#fff' : '#9ca3af', border: 'none', fontSize: 13, fontWeight: 700, cursor: brief.trim() ? 'pointer' : 'not-allowed', transition: 'all .15s' }}>
+              style={{ marginTop: 8, width: '100%', padding: '11px', borderRadius: 8, background: brief.trim() ? 'linear-gradient(135deg,#8b5cf6,#7c3aed)' : 'var(--border)', color: brief.trim() ? '#fff' : 'var(--text-muted)', border: 'none', fontSize: 13, fontWeight: 700, cursor: brief.trim() ? 'pointer' : 'not-allowed', transition: 'all .15s' }}>
               ابدأ الورشة
             </button>
           </div>
@@ -150,8 +150,8 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
 
         {/* Running brief display */}
         {(running || result) && (
-          <div style={{ padding: '10px 20px', background: '#f8fafc', borderBottom: '1px solid rgba(0,0,0,.06)', flexShrink: 0 }}>
-            <p style={{ margin: 0, fontSize: 10, color: '#64748b' }}>{brief}</p>
+          <div style={{ padding: '10px 20px', background: 'var(--bg)', borderBottom: '1px solid rgba(0,0,0,.06)', flexShrink: 0 }}>
+            <p style={{ margin: 0, fontSize: 10, color: 'var(--text-3)' }}>{brief}</p>
           </div>
         )}
 
@@ -163,9 +163,9 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
               <div key={s.step} style={{ marginBottom: 8 }}>
                 <button
                   onClick={() => setExpandedStep(isExpanded ? null : s.step)}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: `1px solid ${s.status === 'done' ? STEP_COLORS[i] + '30' : s.status === 'running' ? STEP_COLORS[i] + '40' : 'rgba(0,0,0,.05)'}`, background: s.status === 'running' ? STEP_COLORS[i] + '08' : s.status === 'done' ? STEP_COLORS[i] + '05' : '#fafafa', cursor: s.content ? 'pointer' : 'default', transition: 'all .15s' }}>
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 10, border: `1px solid ${s.status === 'done' ? STEP_COLORS[i] + '30' : s.status === 'running' ? STEP_COLORS[i] + '40' : 'rgba(0,0,0,.05)'}`, background: s.status === 'running' ? STEP_COLORS[i] + '08' : s.status === 'done' ? STEP_COLORS[i] + '05' : 'var(--bg)', cursor: s.content ? 'pointer' : 'default', transition: 'all .15s' }}>
                   {/* Icon */}
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.status === 'waiting' ? '#f1f5f9' : s.status === 'running' ? STEP_COLORS[i] + '20' : STEP_COLORS[i] + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14, transition: 'all .2s' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: s.status === 'waiting' ? 'var(--bg)' : s.status === 'running' ? STEP_COLORS[i] + '20' : STEP_COLORS[i] + '15', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14, transition: 'all .2s' }}>
                     {s.status === 'running' ? (
                       <div style={{ animation: 'spin 1s linear infinite', display: 'flex' }}><Icon name="refresh" size={14} color={STEP_COLORS[i]} /></div>
                     ) : s.status === 'done' ? (
@@ -176,9 +176,9 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
                   </div>
                   {/* Title */}
                   <div style={{ flex: 1, textAlign: 'right' }}>
-                    <p style={{ margin: 0, fontSize: 12, fontWeight: s.status !== 'waiting' ? 600 : 400, color: s.status === 'waiting' ? '#94a3b8' : s.status === 'running' ? STEP_COLORS[i] : '#1e293b' }}>{s.title}</p>
+                    <p style={{ margin: 0, fontSize: 12, fontWeight: s.status !== 'waiting' ? 600 : 400, color: s.status === 'waiting' ? 'var(--text-muted)' : s.status === 'running' ? STEP_COLORS[i] : 'var(--text-1)' }}>{s.title}</p>
                     {s.status === 'running' && <p style={{ margin: '2px 0 0', fontSize: 9, color: STEP_COLORS[i] }}>جارٍ العمل...</p>}
-                    {s.status === 'done' && s.content && <p style={{ margin: '2px 0 0', fontSize: 9, color: '#94a3b8' }}>اضغط لرؤية التفاصيل ▾</p>}
+                    {s.status === 'done' && s.content && <p style={{ margin: '2px 0 0', fontSize: 9, color: 'var(--text-muted)' }}>اضغط لرؤية التفاصيل ▾</p>}
                   </div>
                   {/* Status badge */}
                   {s.status === 'done' && (
@@ -187,8 +187,8 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
                 </button>
                 {/* Expanded content */}
                 {isExpanded && s.content && (
-                  <div style={{ margin: '4px 0 0', padding: '12px 14px', background: '#f8fafc', borderRadius: '0 0 10px 10px', border: `1px solid ${STEP_COLORS[i]}20`, borderTop: 'none' }}>
-                    <p style={{ margin: 0, fontSize: 11, color: '#475569', lineHeight: 1.7, whiteSpace: 'pre-wrap', direction: 'rtl' }}>{s.content}</p>
+                  <div style={{ margin: '4px 0 0', padding: '12px 14px', background: 'var(--bg)', borderRadius: '0 0 10px 10px', border: `1px solid ${STEP_COLORS[i]}20`, borderTop: 'none' }}>
+                    <p style={{ margin: 0, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.7, whiteSpace: 'pre-wrap', direction: 'rtl' }}>{s.content}</p>
                   </div>
                 )}
               </div>
@@ -219,7 +219,7 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
                     </a>
                   )}
                   <a href={result.post_url} download target="_blank" rel="noopener noreferrer"
-                    style={{ flex: 1, padding: '9px', borderRadius: 8, background: '#1e293b', color: '#fff', textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center', display: 'block' }}>
+                    style={{ flex: 1, padding: '9px', borderRadius: 8, background: 'var(--ink-900)', color: '#fff', textDecoration: 'none', fontSize: 11, fontWeight: 700, textAlign: 'center', display: 'block' }}>
                     تحميل PNG
                   </a>
                 </div>
@@ -245,7 +245,7 @@ function MarketingWorkshop({ onClose }: { onClose: () => void }) {
               ورشة جديدة
             </button>
           ) : null}
-          {!running && <button onClick={onClose} style={{ padding: '9px 16px', borderRadius: 8, background: '#f1f5f9', color: '#475569', border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>إغلاق</button>}
+          {!running && <button onClick={onClose} style={{ padding: '9px 16px', borderRadius: 8, background: 'var(--bg)', color: 'var(--text-2)', border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>إغلاق</button>}
         </div>
       </div>
       <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
@@ -285,13 +285,13 @@ function MorningBriefingCard({ onAskAgent }: { onAskAgent: (agentType: string, m
   if (loading) return null;
 
   return (
-    <div style={{ margin: '10px 10px 0', background: '#fff', border: '1px solid rgba(37,99,235,.15)', borderRadius: 10, overflow: 'hidden' }}>
+    <div style={{ margin: '10px 10px 0', background: 'var(--surface)', border: '1px solid rgba(37,99,235,.15)', borderRadius: 10, overflow: 'hidden' }}>
       <button onClick={() => setExpanded(!expanded)}
         style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', border: 'none', background: expanded ? 'rgba(37,99,235,.04)' : 'transparent', cursor: 'pointer' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>●</span>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: '#1E293B', margin: 0 }}>ملخص اليوم</p>
+            <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>ملخص اليوم</p>
             <p style={{ fontSize: 9, color: '#9ca3af', margin: 0 }}>{today}</p>
           </div>
         </div>
@@ -333,7 +333,7 @@ function MorningBriefingCard({ onAskAgent }: { onAskAgent: (agentType: string, m
             <div style={{ textAlign: 'center', padding: '10px 0' }}>
               <p style={{ fontSize: 10, color: '#9ca3af', margin: '0 0 8px' }}>لا يوجد ملخص لليوم — يُنشأ تلقائياً في 7:15 صباحاً</p>
               <button onClick={handleTrigger} disabled={triggering}
-                style={{ padding: '5px 16px', borderRadius: 6, fontSize: 10, fontWeight: 600, border: '1px solid #2563EB', background: '#fff', color: '#2563EB', cursor: 'pointer' }}>
+                style={{ padding: '5px 16px', borderRadius: 6, fontSize: 10, fontWeight: 600, border: '1px solid #2563EB', background: 'var(--surface)', color: '#2563EB', cursor: 'pointer' }}>
                 {triggering ? 'جارٍ الإنشاء...' : 'أنشئ الآن'}
               </button>
             </div>
@@ -455,10 +455,10 @@ export default function AgentsWorkspace() {
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
 
       {/* LEFT: Agent list panel */}
-      <div style={{ width: 240, borderLeft: '1px solid rgba(0,0,0,.06)', background: '#fff', overflowY: 'auto', flexShrink: 0 }}>
+      <div style={{ width: 240, borderLeft: '1px solid rgba(0,0,0,.06)', background: 'var(--surface)', overflowY: 'auto', flexShrink: 0 }}>
         <MorningBriefingCard onAskAgent={askAgent} />
         <div style={{ padding: '14px 12px 8px', borderBottom: '1px solid rgba(0,0,0,.04)' }}>
-          <h2 style={{ fontSize: 12, fontWeight: 700, color: '#1E293B', margin: 0 }}>الفريق</h2>
+          <h2 style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>الفريق</h2>
         </div>
         {AGENTS.map((a, idx) => {
           const isActive = activeAgent === a.type;
@@ -471,7 +471,7 @@ export default function AgentsWorkspace() {
             <div key={a.type}>
               {showDivider && (
                 <div style={{ padding: '10px 12px 4px', borderTop: '1px solid rgba(0,0,0,.06)', marginTop: 4 }}>
-                  <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase' }}>عمليات المباني</p>
+                  <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>عمليات المباني</p>
                 </div>
               )}
               {/* Manager */}
@@ -482,7 +482,7 @@ export default function AgentsWorkspace() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? a.color : '#1E293B' }}>{a.name}</span>
+                    <span style={{ fontSize: 12, fontWeight: isActive ? 700 : 500, color: isActive ? a.color : 'var(--text-1)' }}>{a.name}</span>
                     <span style={{ fontSize: 9, color: '#9ca3af' }}>{a.role}</span>
                     {msgs.length > 0 && !isActive && <div style={{ width: 5, height: 5, borderRadius: '50%', background: a.color, marginRight: 'auto', flexShrink: 0 }} />}
                     {a.type === 'meeting_room' && pendingCount > 0 && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: 14, height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, marginRight: 'auto', flexShrink: 0 }}>{pendingCount}</span>}
@@ -541,16 +541,16 @@ export default function AgentsWorkspace() {
 
       {/* RIGHT: Sidebar */}
       {sidebarOpen && (
-        <div style={{ width: 300, borderRight: '1px solid rgba(0,0,0,.06)', background: '#fafafa', overflowY: 'auto', flexShrink: 0 }}>
-          <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(0,0,0,.04)', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
+        <div style={{ width: 300, borderRight: '1px solid rgba(0,0,0,.06)', background: 'var(--bg)', overflowY: 'auto', flexShrink: 0 }}>
+          <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(0,0,0,.04)', background: 'var(--surface)', position: 'sticky', top: 0, zIndex: 10 }}>
             <div style={{ display: 'flex', gap: 4 }}>
-              <button onClick={() => setSidebarTab('feed')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'feed' ? 700 : 400, border: `1px solid ${sidebarTab === 'feed' ? '#7c3aed' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'feed' ? 'rgba(124,58,237,.07)' : '#fff', color: sidebarTab === 'feed' ? '#7c3aed' : '#9ca3af', cursor: 'pointer' }}>
+              <button onClick={() => setSidebarTab('feed')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'feed' ? 700 : 400, border: `1px solid ${sidebarTab === 'feed' ? '#7c3aed' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'feed' ? 'rgba(124,58,237,.07)' : 'var(--surface)', color: sidebarTab === 'feed' ? '#7c3aed' : 'var(--text-muted)', cursor: 'pointer' }}>
                 مباشر <span style={{ fontSize: 9, opacity: .7 }}>({directives.length})</span>
               </button>
-              <button onClick={() => setSidebarTab('actions')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'actions' ? 700 : 400, border: `1px solid ${sidebarTab === 'actions' ? '#2563EB' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'actions' ? 'rgba(124,92,252,.06)' : '#fff', color: sidebarTab === 'actions' ? '#2563EB' : '#9ca3af', cursor: 'pointer' }}>
-                مهام {pendingCount > 0 && <span style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', padding: '0 4px', fontSize: 8, marginRight: 2 }}>{pendingCount}</span>}
+              <button onClick={() => setSidebarTab('actions')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'actions' ? 700 : 400, border: `1px solid ${sidebarTab === 'actions' ? '#2563EB' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'actions' ? 'rgba(124,92,252,.06)' : 'var(--surface)', color: sidebarTab === 'actions' ? '#2563EB' : 'var(--text-muted)', cursor: 'pointer' }}>
+                مهام {pendingCount > 0 && <span style={{ background: 'var(--danger)', color: '#fff', borderRadius: '50%', padding: '0 4px', fontSize: 8, marginRight: 2 }}>{pendingCount}</span>}
               </button>
-              <button onClick={() => setSidebarTab('reports')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'reports' ? 700 : 400, border: `1px solid ${sidebarTab === 'reports' ? '#2563EB' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'reports' ? 'rgba(124,92,252,.06)' : '#fff', color: sidebarTab === 'reports' ? '#2563EB' : '#9ca3af', cursor: 'pointer' }}>
+              <button onClick={() => setSidebarTab('reports')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'reports' ? 700 : 400, border: `1px solid ${sidebarTab === 'reports' ? '#2563EB' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'reports' ? 'rgba(124,92,252,.06)' : 'var(--surface)', color: sidebarTab === 'reports' ? '#2563EB' : 'var(--text-muted)', cursor: 'pointer' }}>
                 تقارير ({reports.length})
               </button>
             </div>
@@ -577,7 +577,7 @@ export default function AgentsWorkspace() {
                           {new Date(d.created_at).toLocaleDateString('ar-SA', { weekday: 'long', month: 'short', day: 'numeric' })}
                         </div>
                       )}
-                      <div style={{ background: '#fff', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)', borderRight: `3px solid ${from.color}` }}>
+                      <div style={{ background: 'var(--surface)', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)', borderRight: `3px solid ${from.color}` }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <span style={{ fontSize: 9, fontWeight: 700, color: from.color, background: from.bg, padding: '1px 6px', borderRadius: 4 }}>{from.label}</span>
@@ -586,7 +586,7 @@ export default function AgentsWorkspace() {
                           </div>
                           <span style={{ fontSize: 9, color: '#d1d5db' }}>{timeAgoFeed(d.created_at)}</span>
                         </div>
-                        <p style={{ fontSize: 11, color: '#1e293b', margin: '0 0 6px', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.directive}</p>
+                        <p style={{ fontSize: 11, color: 'var(--text-1)', margin: '0 0 6px', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.directive}</p>
                         {d.reply && (
                           <div style={{ background: '#f8faff', border: '1px solid #e0e7ff', borderRadius: 6, padding: '6px 8px', borderRight: `2px solid ${to.color}` }}>
                             <div style={{ fontSize: 9, fontWeight: 600, color: to.color, marginBottom: 3 }}>رد {to.label} {d.replied_at ? `· ${timeAgoFeed(d.replied_at)}` : ''}</div>
@@ -609,16 +609,16 @@ export default function AgentsWorkspace() {
             {sidebarTab === 'actions' && actions.map(a => {
               const st = STATUS_MAP[a.status] || STATUS_MAP.pending_approval;
               return (
-                <div key={a.id} style={{ background: '#fff', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)' }}>
+                <div key={a.id} style={{ background: 'var(--surface)', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                     <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 4, background: st.bg, color: st.color, fontWeight: 600 }}>{st.label}</span>
                   </div>
-                  <p style={{ fontSize: 11, fontWeight: 600, color: '#1E293B', margin: '0 0 2px' }}>{a.title}</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)', margin: '0 0 2px' }}>{a.title}</p>
                   {a.result && <p style={{ fontSize: 9, color: '#059669', margin: '2px 0' }}>{a.result?.slice(0, 80)}</p>}
                   {a.status === 'pending_approval' && (
                     <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
                       <button onClick={() => handleApprove(a.id)} disabled={acting === a.id} style={{ flex: 1, padding: '4px', borderRadius: 5, fontSize: 9, fontWeight: 600, border: 'none', background: '#10b981', color: '#fff', cursor: 'pointer' }}>موافقة</button>
-                      <button onClick={() => handleReject(a.id)} disabled={acting === a.id} style={{ flex: 1, padding: '4px', borderRadius: 5, fontSize: 9, fontWeight: 600, border: '1px solid #fecaca', background: '#fff', color: '#ef4444', cursor: 'pointer' }}>رفض</button>
+                      <button onClick={() => handleReject(a.id)} disabled={acting === a.id} style={{ flex: 1, padding: '4px', borderRadius: 5, fontSize: 9, fontWeight: 600, border: '1px solid #fecaca', background: 'var(--surface)', color: 'var(--danger)', cursor: 'pointer' }}>رفض</button>
                     </div>
                   )}
                 </div>
@@ -629,9 +629,9 @@ export default function AgentsWorkspace() {
             {sidebarTab === 'reports' && reports.map(r => {
               const st = STATUS_MAP[r.status] || STATUS_MAP.pending;
               return (
-                <div key={r.id} style={{ background: '#fff', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)' }}>
+                <div key={r.id} style={{ background: 'var(--surface)', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)' }}>
                   <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 4, background: st.bg, color: st.color, fontWeight: 600 }}>{st.label}</span>
-                  <h4 style={{ fontSize: 11, fontWeight: 600, color: '#1E293B', margin: '4px 0 2px' }}>{r.title}</h4>
+                  <h4 style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)', margin: '4px 0 2px' }}>{r.title}</h4>
                   <p style={{ fontSize: 9, color: '#6b7280', margin: '0 0 6px', maxHeight: 40, overflow: 'hidden' }}>{r.summary?.slice(0, 120)}</p>
                   {r.status === 'pending' && (
                     <button onClick={() => handleApproveReport(r.id)} disabled={acting === r.id} style={{ width: '100%', padding: '5px', borderRadius: 5, fontSize: 10, fontWeight: 600, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer' }}>اعتماد</button>

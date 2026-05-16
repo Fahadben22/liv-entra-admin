@@ -74,7 +74,7 @@ function ItemCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDeci
 
   return (
     <div style={{
-      background: '#fff', borderRadius: 12,
+      background: 'var(--surface)', borderRadius: 12,
       border: isPending ? '1px solid rgba(220,38,38,.2)' : '1px solid rgba(0,0,0,.06)',
       overflow: 'hidden', marginBottom: 10,
       boxShadow: isPending ? '0 2px 8px rgba(220,38,38,.06)' : '0 1px 3px rgba(0,0,0,.04)',
@@ -96,12 +96,12 @@ function ItemCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDeci
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#1e293b' }}>{item.agent_name}</span>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-1)' }}>{item.agent_name}</span>
             <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: actionMeta.bg, color: actionMeta.color, fontWeight: 600 }}>
               {actionMeta.label}
             </span>
             {isPending && isStale(item.created_at) && (
-              <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 6, background: '#f1f5f9', color: '#94a3b8', fontWeight: 600 }}>قديم</span>
+              <span style={{ fontSize: 9, padding: '2px 7px', borderRadius: 6, background: 'var(--bg)', color: 'var(--text-muted)', fontWeight: 600 }}>قديم</span>
             )}
             {!isPending && (
               <span style={{
@@ -114,11 +114,11 @@ function ItemCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDeci
             )}
             <span style={{ fontSize: 10, color: '#9ca3af', marginRight: 'auto' }}>{timeAgo(item.created_at)}</span>
           </div>
-          <p style={{ fontSize: 13, fontWeight: isPending ? 600 : 400, color: '#1e293b', margin: '0 0 2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <p style={{ fontSize: 13, fontWeight: isPending ? 600 : 400, color: 'var(--text-1)', margin: '0 0 2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
             {item.subject}
           </p>
           {!isExpanded && (
-            <p style={{ fontSize: 11, color: '#6b7280', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <p style={{ fontSize: 11, color: 'var(--text-3)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {item.message.slice(0, 90)}{item.message.length > 90 ? '…' : ''}
             </p>
           )}
@@ -132,14 +132,14 @@ function ItemCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDeci
           style={{ padding: '14px 18px 16px', borderTop: '1px solid rgba(0,0,0,.05)' }}
           onClick={e => e.stopPropagation()}
         >
-          <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.8, whiteSpace: 'pre-wrap', margin: '0 0 16px' }}>
+          <p style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.8, whiteSpace: 'pre-wrap', margin: '0 0 16px' }}>
             {item.message}
           </p>
 
           {item.decision_note && (
-            <div style={{ background: '#f8faff', borderRadius: 8, padding: '10px 14px', marginBottom: 14, border: '1px solid rgba(37,99,235,.1)' }}>
-              <p style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', margin: '0 0 4px' }}>ملاحظتك:</p>
-              <p style={{ fontSize: 12, color: '#374151', margin: 0 }}>{item.decision_note}</p>
+            <div style={{ background: 'var(--ink-50)', borderRadius: 8, padding: '10px 14px', marginBottom: 14, border: '1px solid rgba(37,99,235,.1)' }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: 'var(--brand-600)', margin: '0 0 4px' }}>ملاحظتك:</p>
+              <p style={{ fontSize: 12, color: 'var(--text-2)', margin: 0 }}>{item.decision_note}</p>
             </div>
           )}
 
@@ -156,7 +156,7 @@ function ItemCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDeci
                   width: '100%', padding: '10px 14px', borderRadius: 8,
                   border: '1px solid rgba(0,0,0,.1)', fontSize: 13, lineHeight: 1.6,
                   resize: 'vertical', boxSizing: 'border-box', direction: 'rtl',
-                  marginBottom: 12, background: '#fff', outline: 'none',
+                  marginBottom: 12, background: 'var(--surface)', outline: 'none',
                   fontFamily: 'inherit',
                 }}
               />
@@ -178,7 +178,7 @@ function ItemCard({ item, isExpanded, note, busy, onToggle, onNoteChange, onDeci
                 <button
                   onClick={e => { e.stopPropagation(); onDecide(item.id, 'dismiss'); }}
                   disabled={!!busy}
-                  style={{ flex: 1, padding: '10px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: '#fff', color: '#9ca3af', cursor: 'pointer', fontSize: 12 }}
+                  style={{ flex: 1, padding: '10px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: 'var(--surface)', color: '#9ca3af', cursor: 'pointer', fontSize: 12 }}
                 >
                   تجاهل
                 </button>
@@ -256,7 +256,7 @@ export default function AgendaPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b', margin: 0 }}>الأجندة</h1>
+          <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>الأجندة</h1>
           <p style={{ fontSize: 12, color: '#9ca3af', margin: '4px 0 0' }}>التصعيدات والقرارات المطلوبة منك من الوكلاء</p>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -276,13 +276,13 @@ export default function AgendaPage() {
           )}
           <button
             onClick={() => setFilter(f => f === 'pending' ? 'all' : 'pending')}
-            style={{ fontSize: 11, padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: '#fff', color: '#6b7280', cursor: 'pointer' }}
+            style={{ fontSize: 11, padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: 'var(--surface)', color: 'var(--text-3)', cursor: 'pointer' }}
           >
             {filter === 'pending' ? 'عرض الكل' : 'المعلقة فقط'}
           </button>
           <button
             onClick={load}
-            style={{ fontSize: 11, padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: '#fff', color: '#6b7280', cursor: 'pointer' }}
+            style={{ fontSize: 11, padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,.08)', background: 'var(--surface)', color: 'var(--text-3)', cursor: 'pointer' }}
           >
             تحديث
           </button>

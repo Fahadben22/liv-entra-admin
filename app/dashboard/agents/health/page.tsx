@@ -55,7 +55,7 @@ function timeAgo(ts: string | null) {
 function ActivityBar({ value, max }: { value: number; max: number }) {
   const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
   return (
-    <div style={{ height: 4, background: '#f1f5f9', borderRadius: 4, overflow: 'hidden', marginTop: 6 }}>
+    <div style={{ height: 4, background: 'var(--bg)', borderRadius: 4, overflow: 'hidden', marginTop: 6 }}>
       <div style={{ width: `${pct}%`, height: '100%', background: '#6366f1', borderRadius: 4, transition: 'width .3s' }} />
     </div>
   );
@@ -66,7 +66,7 @@ function TrustBar({ score, tier }: { score: number; tier: string }) {
   return (
     <div style={{ marginTop: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-        <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, fontWeight: 600, textTransform: 'uppercase' }}>نقاط الثقة</p>
+        <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: 0, fontWeight: 600, textTransform: 'uppercase' }}>نقاط الثقة</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <p style={{ fontSize: 12, fontWeight: 700, color, margin: 0 }}>{score.toFixed(1)}</p>
           <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 10, background: `${TIER_COLORS[tier]}18`, color: TIER_COLORS[tier], fontWeight: 600 }}>
@@ -74,7 +74,7 @@ function TrustBar({ score, tier }: { score: number; tier: string }) {
           </span>
         </div>
       </div>
-      <div style={{ height: 4, background: '#f1f5f9', borderRadius: 4, overflow: 'hidden' }}>
+      <div style={{ height: 4, background: 'var(--bg)', borderRadius: 4, overflow: 'hidden' }}>
         <div style={{ width: `${score}%`, height: '100%', background: color, borderRadius: 4, transition: 'width .4s' }} />
       </div>
     </div>
@@ -85,8 +85,8 @@ function AgentCard({ agent, maxObs, trust }: { agent: AgentHealth; maxObs: numbe
   const st = STATUS_CONFIG[agent.status];
   return (
     <div style={{
-      background: '#fff',
-      border: '1px solid #e8ecf0',
+      background: 'var(--surface)',
+      border: '1px solid var(--border)',
       borderRadius: 14,
       padding: '18px 20px',
       position: 'relative',
@@ -99,8 +99,8 @@ function AgentCard({ agent, maxObs, trust }: { agent: AgentHealth; maxObs: numbe
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
         <div>
-          <p style={{ fontSize: 13, fontWeight: 700, color: '#0f172a', margin: 0 }}>{agent.name}</p>
-          <p style={{ fontSize: 10, color: '#94a3b8', margin: '2px 0 0', textTransform: 'uppercase', letterSpacing: '.5px' }}>{agent.type}</p>
+          <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>{agent.name}</p>
+          <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '2px 0 0', textTransform: 'uppercase', letterSpacing: '.5px' }}>{agent.type}</p>
         </div>
         <span style={{ fontSize: 10, padding: '3px 9px', borderRadius: 20, background: st.bg, color: st.color, fontWeight: 700 }}>
           {st.label}
@@ -115,9 +115,9 @@ function AgentCard({ agent, maxObs, trust }: { agent: AgentHealth; maxObs: numbe
           { label: 'تصعيدات معلقة', value: String(agent.pending_escalations), alert: agent.pending_escalations > 3 },
           { label: 'أهداف نشطة',   value: String(agent.active_goals) },
         ].map(s => (
-          <div key={s.label} style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-            <p style={{ fontSize: 9, color: '#94a3b8', margin: '0 0 2px', fontWeight: 600, textTransform: 'uppercase' }}>{s.label}</p>
-            <p style={{ fontSize: 13, fontWeight: 700, color: (s as any).alert ? '#dc2626' : '#1e293b', margin: 0 }}>{s.value}</p>
+          <div key={s.label} style={{ background: 'var(--bg)', borderRadius: 8, padding: '8px 10px' }}>
+            <p style={{ fontSize: 9, color: 'var(--text-muted)', margin: '0 0 2px', fontWeight: 600, textTransform: 'uppercase' }}>{s.label}</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: (s as any).alert ? 'var(--danger)' : 'var(--text-1)', margin: 0 }}>{s.value}</p>
           </div>
         ))}
       </div>
@@ -125,8 +125,8 @@ function AgentCard({ agent, maxObs, trust }: { agent: AgentHealth; maxObs: numbe
       {/* Activity bar */}
       <div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <p style={{ fontSize: 10, color: '#94a3b8', margin: 0 }}>ملاحظات آخر 24 ساعة</p>
-          <p style={{ fontSize: 10, fontWeight: 600, color: '#475569', margin: 0 }}>{agent.observations_24h}</p>
+          <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: 0 }}>ملاحظات آخر 24 ساعة</p>
+          <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-2)', margin: 0 }}>{agent.observations_24h}</p>
         </div>
         <ActivityBar value={agent.observations_24h} max={maxObs} />
       </div>
@@ -176,13 +176,13 @@ export default function AgentHealthPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>صحة الوكلاء</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>مراقبة أداء جميع الوكلاء الـ 11 في الوقت الفعلي</p>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-1)', margin: 0 }}>صحة الوكلاء</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-3)', margin: '4px 0 0' }}>مراقبة أداء جميع الوكلاء الـ 11 في الوقت الفعلي</p>
         </div>
         <button
           onClick={load}
           disabled={loading}
-          style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#475569', opacity: loading ? .5 : 1 }}
+          style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--text-2)', opacity: loading ? .5 : 1 }}
         >
           {loading ? 'جاري التحديث...' : 'تحديث'}
         </button>
@@ -195,9 +195,9 @@ export default function AgentHealthPage() {
           { label: 'خامل',  value: counts.idle,       color: '#ca8a04' },
           { label: 'مثقل',  value: counts.overloaded, color: '#dc2626' },
         ].map(t => (
-          <div key={t.label} style={{ background: '#fff', border: '1px solid #e8ecf0', borderRadius: 14, padding: '16px 20px', textAlign: 'center' }}>
+          <div key={t.label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 20px', textAlign: 'center' }}>
             <p style={{ fontSize: 28, fontWeight: 800, color: t.color, margin: '0 0 4px' }}>{loading ? '—' : t.value}</p>
-            <p style={{ fontSize: 12, color: '#64748b', margin: 0 }}>{t.label}</p>
+            <p style={{ fontSize: 12, color: 'var(--text-3)', margin: 0 }}>{t.label}</p>
           </div>
         ))}
       </div>
@@ -210,8 +210,8 @@ export default function AgentHealthPage() {
             onClick={() => setGroup(key)}
             style={{
               padding: '5px 16px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-              background: group === key ? '#0f172a' : '#f1f5f9',
-              color:      group === key ? '#fff'    : '#475569',
+              background: group === key ? 'var(--text-1)' : 'var(--bg)',
+              color:      group === key ? 'var(--surface)' : 'var(--text-2)',
             }}
           >
             {label}
@@ -221,7 +221,7 @@ export default function AgentHealthPage() {
 
       {/* Agent grid */}
       {loading && agents.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>جاري التحميل...</div>
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>جاري التحميل...</div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 }}>
           {filtered.map(agent => (

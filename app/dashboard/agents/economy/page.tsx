@@ -70,7 +70,7 @@ function BudgetBar({ used, pending, remaining, warningPct, criticalPct }: {
   const usedPct = total > 0 ? (used / total) * 100 : 0;
   const pendPct = total > 0 ? (pending / total) * 100 : 0;
   return (
-    <div style={{ height: 8, background: '#f1f5f9', borderRadius: 6, overflow: 'hidden', display: 'flex', marginTop: 8 }}>
+    <div style={{ height: 8, background: 'var(--bg)', borderRadius: 6, overflow: 'hidden', display: 'flex', marginTop: 8 }}>
       <div style={{ width: usedPct + '%', height: '100%', background: usedPct > criticalPct ? '#ef4444' : usedPct > warningPct ? '#f59e0b' : '#10b981', borderRadius: '6px 0 0 6px', transition: 'width .3s' }} />
       {pendPct > 0 && <div style={{ width: pendPct + '%', height: '100%', background: '#fbbf24', opacity: 0.6 }} />}
     </div>
@@ -89,8 +89,8 @@ function AgentBudgetCard({ budget, onTransfer, onAdjust }: {
 
   return (
     <div style={{
-      background: '#fff',
-      border: '1px solid ' + (isCritical ? '#fecaca' : isWarning ? '#fde68a' : '#e8ecf0'),
+      background: 'var(--surface)',
+      border: '1px solid ' + (isCritical ? '#fecaca' : isWarning ? '#fde68a' : 'var(--border)'),
       borderRadius: 14,
       padding: '18px 20px',
       position: 'relative',
@@ -98,9 +98,9 @@ function AgentBudgetCard({ budget, onTransfer, onAdjust }: {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <div>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#0f172a', margin: 0 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>
             {budget.agent_name}
-            <span style={{ fontSize: 10, color: '#94a3b8', marginRight: 6, fontWeight: 400, textTransform: 'uppercase' }}>{budget.agent_type}</span>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 6, fontWeight: 400, textTransform: 'uppercase' }}>{budget.agent_type}</span>
           </p>
         </div>
         <span style={{
@@ -115,13 +115,13 @@ function AgentBudgetCard({ budget, onTransfer, onAdjust }: {
 
       {/* Budget numbers */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
-        <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-          <p style={{ fontSize: 9, color: '#94a3b8', margin: '0 0 2px', fontWeight: 600 }}>الميزانية</p>
-          <p style={{ fontSize: 15, fontWeight: 700, color: '#0f172a', margin: 0 }}>{budget.budget_monthly.toLocaleString()} ر.س</p>
+        <div style={{ background: 'var(--ink-50)', borderRadius: 8, padding: '8px 10px' }}>
+          <p style={{ fontSize: 9, color: 'var(--text-muted)', margin: '0 0 2px', fontWeight: 600 }}>الميزانية</p>
+          <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>{budget.budget_monthly.toLocaleString()} ر.س</p>
         </div>
-        <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 10px' }}>
-          <p style={{ fontSize: 9, color: '#94a3b8', margin: '0 0 2px', fontWeight: 600 }}>المتبقي</p>
-          <p style={{ fontSize: 15, fontWeight: 700, color: budget.budget_remaining < 0 ? '#dc2626' : '#0f172a', margin: 0 }}>
+        <div style={{ background: 'var(--ink-50)', borderRadius: 8, padding: '8px 10px' }}>
+          <p style={{ fontSize: 9, color: 'var(--text-muted)', margin: '0 0 2px', fontWeight: 600 }}>المتبقي</p>
+          <p style={{ fontSize: 15, fontWeight: 700, color: budget.budget_remaining < 0 ? '#dc2626' : 'var(--text-1)', margin: 0 }}>
             {budget.budget_remaining.toLocaleString()} ر.س
           </p>
         </div>
@@ -135,7 +135,7 @@ function AgentBudgetCard({ budget, onTransfer, onAdjust }: {
         warningPct={budget.warning_threshold}
         criticalPct={budget.critical_threshold}
       />
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94a3b8', marginTop: 4 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>
         <span>مستخدم: {budget.budget_used.toLocaleString()} ر.س</span>
         {budget.budget_pending > 0 && <span>معلق: {budget.budget_pending.toLocaleString()} ر.س</span>}
       </div>
@@ -157,8 +157,8 @@ function AgentBudgetCard({ budget, onTransfer, onAdjust }: {
         <button
           onClick={() => onTransfer(budget.agent_type)}
           style={{
-            flex: 1, padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0',
-            background: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 600, color: '#475569',
+            flex: 1, padding: '6px 12px', borderRadius: 8, border: '1px solid var(--border)',
+            background: 'var(--surface)', cursor: 'pointer', fontSize: 11, fontWeight: 600, color: 'var(--text-2)',
           }}
         >
           طلب تحويل
@@ -166,8 +166,8 @@ function AgentBudgetCard({ budget, onTransfer, onAdjust }: {
         <button
           onClick={() => onAdjust(budget.agent_type)}
           style={{
-            flex: 1, padding: '6px 12px', borderRadius: 8, border: '1px solid #e2e8f0',
-            background: '#fff', cursor: 'pointer', fontSize: 11, fontWeight: 600, color: '#475569',
+            flex: 1, padding: '6px 12px', borderRadius: 8, border: '1px solid var(--border)',
+            background: 'var(--surface)', cursor: 'pointer', fontSize: 11, fontWeight: 600, color: 'var(--text-2)',
           }}
         >
           تعديل
@@ -292,13 +292,13 @@ export default function AgentEconomyPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>اقتصاد الوكلاء</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>إدارة ميزانيات جميع الوكلاء الـ 11 وتحويلاتهم المالية</p>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-1)', margin: 0 }}>اقتصاد الوكلاء</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-3)', margin: '4px 0 0' }}>إدارة ميزانيات جميع الوكلاء الـ 11 وتحويلاتهم المالية</p>
         </div>
         <button
           onClick={load}
           disabled={loading}
-          style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#475569', opacity: loading ? .5 : 1 }}
+          style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--text-2)', opacity: loading ? .5 : 1 }}
         >
           {loading ? '...' : 'تحديث'}
         </button>
@@ -308,23 +308,23 @@ export default function AgentEconomyPage() {
       {data?.summary && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, marginBottom: 24 }}>
           {[
-            { label: 'إجمالي الميزانيات', value: data.summary.total_budget.toLocaleString() + ' ر.س', color: '#0f172a' },
+            { label: 'إجمالي الميزانيات', value: data.summary.total_budget.toLocaleString() + ' ر.س', color: 'var(--text-1)' },
             { label: 'المستخدم', value: data.summary.total_used.toLocaleString() + ' ر.س', color: '#6366f1' },
             { label: 'المتبقي', value: data.summary.total_remaining.toLocaleString() + ' ر.س', color: '#10b981' },
             { label: 'في التحذير', value: String(data.summary.agents_near_limit), color: '#f59e0b' },
             { label: 'في الحرجة', value: String(data.summary.agents_critical), color: '#ef4444' },
             { label: 'تحويلات معلقة', value: String(data.summary.pending_transfers), color: '#3b82f6' },
           ].map(s => (
-            <div key={s.label} style={{ background: '#fff', border: '1px solid #e8ecf0', borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
+            <div key={s.label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
               <p style={{ fontSize: 18, fontWeight: 800, color: s.color, margin: '0 0 3px' }}>{loading ? '...' : s.value}</p>
-              <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>{s.label}</p>
+              <p style={{ fontSize: 11, color: 'var(--text-3)', margin: 0 }}>{s.label}</p>
             </div>
           ))}
         </div>
       )}
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, borderBottom: '1px solid #e8ecf0', paddingBottom: 10 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, borderBottom: '1px solid var(--border)', paddingBottom: 10 }}>
         {([
           ['budgets', 'الميزانيات'],
           ['transactions', 'المعاملات'],
@@ -335,8 +335,8 @@ export default function AgentEconomyPage() {
             onClick={() => setTab(key as any)}
             style={{
               padding: '6px 18px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-              background: tab === key ? '#0f172a' : 'transparent',
-              color: tab === key ? '#fff' : '#64748b',
+              background: tab === key ? 'var(--text-1)' : 'transparent',
+              color: tab === key ? '#fff' : 'var(--text-3)',
             }}
           >
             {label}
@@ -370,7 +370,7 @@ export default function AgentEconomyPage() {
 
       {/* Loading */}
       {loading && !data && (
-        <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>جاري التحميل...</div>
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>جاري التحميل...</div>
       )}
 
       {/* ──────── BUDGETS TAB ──────── */}
@@ -387,8 +387,8 @@ export default function AgentEconomyPage() {
                 onClick={() => setFilter(key)}
                 style={{
                   padding: '4px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600,
-                  background: filter === key ? '#0f172a' : '#f1f5f9',
-                  color: filter === key ? '#fff' : '#475569',
+                  background: filter === key ? 'var(--text-1)' : 'var(--bg)',
+                  color: filter === key ? '#fff' : 'var(--text-2)',
                 }}
               >
                 {label}
@@ -405,43 +405,43 @@ export default function AgentEconomyPage() {
 
       {/* ──────── TRANSACTIONS TAB ──────── */}
       {tab === 'transactions' && data && (
-        <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e8ecf0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--surface)', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden' }}>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e8ecf0', background: '#f8fafc' }}>
+                <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--ink-50)' }}>
                   {['الوكيل', 'النوع', 'المبلغ', 'الطرف الآخر', 'الوصف', 'التاريخ'].map(h => (
-                    <th key={h} style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 600, color: '#475569' }}>{h}</th>
+                    <th key={h} style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 600, color: 'var(--text-2)' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {data.transactions.map(tx => (
-                  <tr key={tx.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '10px 14px', fontWeight: 600, color: '#0f172a' }}>{tx.agent_type}</td>
+                  <tr key={tx.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '10px 14px', fontWeight: 600, color: 'var(--text-1)' }}>{tx.agent_type}</td>
                     <td style={{ padding: '10px 14px' }}>
                       <span style={{
                         padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                        background: tx.transaction_type === 'spend' ? '#fef2f2' : tx.transaction_type === 'transfer_in' ? '#f0fdf4' : '#f8fafc',
-                        color: tx.transaction_type === 'spend' ? '#dc2626' : tx.transaction_type === 'transfer_in' ? '#16a34a' : '#475569',
+                        background: tx.transaction_type === 'spend' ? '#fef2f2' : tx.transaction_type === 'transfer_in' ? '#f0fdf4' : 'var(--ink-50)',
+                        color: tx.transaction_type === 'spend' ? '#dc2626' : tx.transaction_type === 'transfer_in' ? '#16a34a' : 'var(--text-2)',
                       }}>
                         {TYPE_LABELS[tx.transaction_type] || tx.transaction_type}
                       </span>
                     </td>
-                    <td style={{ padding: '10px 14px', fontWeight: 700, color: tx.amount < 0 ? '#dc2626' : '#0f172a' }}>
+                    <td style={{ padding: '10px 14px', fontWeight: 700, color: tx.amount < 0 ? '#dc2626' : 'var(--text-1)' }}>
                       {tx.amount.toLocaleString()} ر.س
                     </td>
-                    <td style={{ padding: '10px 14px', color: '#64748b' }}>{tx.counterparty || '—'}</td>
-                    <td style={{ padding: '10px 14px', color: '#64748b', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <td style={{ padding: '10px 14px', color: 'var(--text-3)' }}>{tx.counterparty || '—'}</td>
+                    <td style={{ padding: '10px 14px', color: 'var(--text-3)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {tx.description || tx.category || '—'}
                     </td>
-                    <td style={{ padding: '10px 14px', color: '#94a3b8', fontSize: 11 }}>
+                    <td style={{ padding: '10px 14px', color: 'var(--text-muted)', fontSize: 11 }}>
                       {new Date(tx.created_at).toLocaleDateString('ar-SA')}
                     </td>
                   </tr>
                 ))}
                 {data.transactions.length === 0 && (
-                  <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>لا توجد معاملات بعد</td></tr>
+                  <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>لا توجد معاملات بعد</td></tr>
                 )}
               </tbody>
             </table>
@@ -451,23 +451,23 @@ export default function AgentEconomyPage() {
 
       {/* ──────── TRANSFERS TAB ──────── */}
       {tab === 'transfers' && data && (
-        <div style={{ background: '#fff', borderRadius: 14, border: '1px solid #e8ecf0', overflow: 'hidden' }}>
+        <div style={{ background: 'var(--surface)', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden' }}>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #e8ecf0', background: '#f8fafc' }}>
+                <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--ink-50)' }}>
                   {['من', 'إلى', 'المبلغ', 'السبب', 'الحالة', 'التاريخ', 'إجراء'].map(h => (
-                    <th key={h} style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 600, color: '#475569' }}>{h}</th>
+                    <th key={h} style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 600, color: 'var(--text-2)' }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {data.transfers.map(tr => (
-                  <tr key={tr.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '10px 14px', fontWeight: 600, color: '#0f172a' }}>{tr.from_name}</td>
-                    <td style={{ padding: '10px 14px', fontWeight: 600, color: '#0f172a' }}>{tr.to_name}</td>
-                    <td style={{ padding: '10px 14px', fontWeight: 700, color: '#0f172a' }}>{tr.amount.toLocaleString()} ر.س</td>
-                    <td style={{ padding: '10px 14px', color: '#64748b', maxWidth: 200 }}>{tr.reason}</td>
+                  <tr key={tr.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                    <td style={{ padding: '10px 14px', fontWeight: 600, color: 'var(--text-1)' }}>{tr.from_name}</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 600, color: 'var(--text-1)' }}>{tr.to_name}</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 700, color: 'var(--text-1)' }}>{tr.amount.toLocaleString()} ر.س</td>
+                    <td style={{ padding: '10px 14px', color: 'var(--text-3)', maxWidth: 200 }}>{tr.reason}</td>
                     <td style={{ padding: '10px 14px' }}>
                       <span style={{
                         padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
@@ -477,7 +477,7 @@ export default function AgentEconomyPage() {
                         {tr.status === 'pending' ? 'معلق' : tr.status === 'approved' ? 'موافق' : 'مرفوض'}
                       </span>
                     </td>
-                    <td style={{ padding: '10px 14px', color: '#94a3b8', fontSize: 11 }}>
+                    <td style={{ padding: '10px 14px', color: 'var(--text-muted)', fontSize: 11 }}>
                       {new Date(tr.created_at).toLocaleDateString('ar-SA')}
                     </td>
                     <td style={{ padding: '10px 14px' }}>
@@ -501,7 +501,7 @@ export default function AgentEconomyPage() {
                   </tr>
                 ))}
                 {data.transfers.length === 0 && (
-                  <tr><td colSpan={7} style={{ padding: 40, textAlign: 'center', color: '#94a3b8' }}>لا توجد طلبات تحويل</td></tr>
+                  <tr><td colSpan={7} style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>لا توجد طلبات تحويل</td></tr>
                 )}
               </tbody>
             </table>
@@ -518,22 +518,22 @@ export default function AgentEconomyPage() {
           onClick={() => setShowTransferModal(false)}
         >
           <div style={{
-            background: '#fff', borderRadius: 16, padding: '24px', maxWidth: 420, width: '90%',
+            background: 'var(--surface)', borderRadius: 16, padding: '24px', maxWidth: 420, width: '90%',
             boxShadow: '0 20px 60px rgba(0,0,0,.15)',
           }} onClick={(e: any) => e.stopPropagation()}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '0 0 16px' }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-1)', margin: '0 0 16px' }}>
               طلب تحويل ميزانية
             </h3>
-            <p style={{ fontSize: 12, color: '#64748b', marginBottom: 16 }}>
+            <p style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 16 }}>
               {data.budgets.find(b => b.agent_type === selectedAgent)?.agent_name || selectedAgent}
               {' '}يطلب تحويل مبلغ إلى وكيل آخر
             </p>
 
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 4 }}>إلى وكيل</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)', display: 'block', marginBottom: 4 }}>إلى وكيل</label>
             <select
               value={transferForm.to_agent}
               onChange={(e) => setTransferForm({ ...transferForm, to_agent: e.target.value })}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 14, fontSize: 12 }}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', marginBottom: 14, fontSize: 12 }}
             >
               <option value="">اختر وكيل...</option>
               {allAgents.filter(a => a !== selectedAgent).map(a => (
@@ -541,33 +541,33 @@ export default function AgentEconomyPage() {
               ))}
             </select>
 
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 4 }}>المبلغ (ر.س)</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)', display: 'block', marginBottom: 4 }}>المبلغ (ر.س)</label>
             <input
               type="number"
               value={transferForm.amount || ''}
               onChange={(e) => setTransferForm({ ...transferForm, amount: Number(e.target.value) })}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 14, fontSize: 12 }}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', marginBottom: 14, fontSize: 12 }}
             />
 
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 4 }}>السبب</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)', display: 'block', marginBottom: 4 }}>السبب</label>
             <textarea
               value={transferForm.reason}
               onChange={(e) => setTransferForm({ ...transferForm, reason: e.target.value })}
               rows={3}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 20, fontSize: 12, resize: 'none' }}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', marginBottom: 20, fontSize: 12, resize: 'none' }}
               placeholder="اذكر سبب طلب التحويل..."
             />
 
             <div style={{ display: 'flex', gap: 10 }}>
               <button
                 onClick={() => setShowTransferModal(false)}
-                style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#475569' }}
+                style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--text-2)' }}
               >
                 إلغاء
               </button>
               <button
                 onClick={handleTransfer}
-                style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: '#0f172a', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+                style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: 'var(--text-1)', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
               >
                 إرسال الطلب
               </button>
@@ -585,39 +585,39 @@ export default function AgentEconomyPage() {
           onClick={() => setShowAdjustModal(false)}
         >
           <div style={{
-            background: '#fff', borderRadius: 16, padding: '24px', maxWidth: 420, width: '90%',
+            background: 'var(--surface)', borderRadius: 16, padding: '24px', maxWidth: 420, width: '90%',
             boxShadow: '0 20px 60px rgba(0,0,0,.15)',
           }} onClick={(e: any) => e.stopPropagation()}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#0f172a', margin: '0 0 16px' }}>
+            <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-1)', margin: '0 0 16px' }}>
               تعديل ميزانية {data.budgets.find(b => b.agent_type === selectedAgent)?.agent_name || selectedAgent}
             </h3>
 
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 4 }}>الميزانية الشهرية (ر.س)</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)', display: 'block', marginBottom: 4 }}>الميزانية الشهرية (ر.س)</label>
             <input
               type="number"
               value={adjustForm.budget_monthly || ''}
               onChange={(e) => setAdjustForm({ ...adjustForm, budget_monthly: Number(e.target.value) })}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 14, fontSize: 12 }}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', marginBottom: 14, fontSize: 12 }}
             />
 
-            <label style={{ fontSize: 11, fontWeight: 600, color: '#475569', display: 'block', marginBottom: 4 }}>السبب (اختياري)</label>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-2)', display: 'block', marginBottom: 4 }}>السبب (اختياري)</label>
             <textarea
               value={adjustForm.reason}
               onChange={(e) => setAdjustForm({ ...adjustForm, reason: e.target.value })}
               rows={2}
-              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 20, fontSize: 12, resize: 'none' }}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', marginBottom: 20, fontSize: 12, resize: 'none' }}
             />
 
             <div style={{ display: 'flex', gap: 10 }}>
               <button
                 onClick={() => setShowAdjustModal(false)}
-                style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#475569' }}
+                style={{ flex: 1, padding: '10px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--text-2)' }}
               >
                 إلغاء
               </button>
               <button
                 onClick={handleAdjust}
-                style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: '#0f172a', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
+                style={{ flex: 1, padding: '10px', borderRadius: 10, border: 'none', background: 'var(--text-1)', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}
               >
                 حفظ التعديل
               </button>

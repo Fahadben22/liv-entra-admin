@@ -78,29 +78,29 @@ function StreamModal({ cam, data, onClose, showToast }: {
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       onClick={onClose}>
-      <div style={{ background: '#0f172a', borderRadius: 16, padding: 20, maxWidth: 740, width: '95%' }} onClick={e => e.stopPropagation()}>
+      <div style={{ background: 'var(--bg)', borderRadius: 16, padding: 20, maxWidth: 740, width: '95%' }} onClick={e => e.stopPropagation()}>
 
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e', display: 'inline-block' }} />
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#f1f5f9', margin: 0 }}>{cam.name} — بث مباشر</p>
+            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-1)', margin: 0 }}>{cam.name} — بث مباشر</p>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ display: 'flex', background: '#1e293b', borderRadius: 8, overflow: 'hidden' }}>
+            <div style={{ display: 'flex', background: 'var(--surface)', borderRadius: 8, overflow: 'hidden' }}>
               <button onClick={() => setQuality('hd')}
-                style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === 'hd' ? '#0ea5e9' : 'transparent', color: quality === 'hd' ? '#fff' : '#64748b' }}>HD</button>
+                style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === 'hd' ? 'var(--info)' : 'transparent', color: quality === 'hd' ? '#fff' : 'var(--text-3)' }}>HD</button>
               <button onClick={() => setQuality('480p')}
-                style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === '480p' ? '#0ea5e9' : 'transparent', color: quality === '480p' ? '#fff' : '#64748b' }}>480P</button>
+                style={{ padding: '4px 12px', fontSize: 11, fontWeight: 600, border: 'none', cursor: 'pointer', background: quality === '480p' ? 'var(--info)' : 'transparent', color: quality === '480p' ? '#fff' : 'var(--text-3)' }}>480P</button>
             </div>
-            <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>×</button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>×</button>
           </div>
         </div>
 
         {/* Player area */}
         <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', marginBottom: 14, minHeight: 372, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {loading && !playerErr && (
-            <p style={{ color: '#475569', fontSize: 12, position: 'absolute', zIndex: 1 }}>جاري تحميل البث...</p>
+            <p style={{ color: 'var(--text-2)', fontSize: 12, position: 'absolute', zIndex: 1 }}>جاري تحميل البث...</p>
           )}
           {playerErr && (
             <p style={{ color: '#ef4444', fontSize: 12, textAlign: 'center', padding: '0 24px', position: 'absolute', zIndex: 1 }}>{playerErr}</p>
@@ -111,22 +111,22 @@ function StreamModal({ cam, data, onClose, showToast }: {
         {/* URL copy cards */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {data.hls && (
-            <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ background: 'var(--surface)', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 10, fontWeight: 700, color: '#38bdf8', minWidth: 36 }}>HLS</span>
-              <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.hls}</p>
+              <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.hls}</p>
               <button onClick={() => { navigator.clipboard.writeText(data.hls!); showToast('تم النسخ'); }}
-                style={{ padding: '3px 10px', borderRadius: 6, background: '#0f3460', color: '#38bdf8', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>نسخ</button>
+                style={{ padding: '3px 10px', borderRadius: 6, background: 'var(--bg)', color: '#38bdf8', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>نسخ</button>
             </div>
           )}
           {data.rtmp && (
-            <div style={{ background: '#1e293b', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ background: 'var(--surface)', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 10, fontWeight: 700, color: '#a78bfa', minWidth: 36 }}>RTMP</span>
-              <p style={{ fontSize: 10, color: '#94a3b8', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.rtmp}</p>
+              <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: 0, flex: 1, direction: 'ltr', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.rtmp}</p>
               <button onClick={() => { navigator.clipboard.writeText(data.rtmp!); showToast('تم النسخ'); }}
-                style={{ padding: '3px 10px', borderRadius: 6, background: '#2d1b69', color: '#a78bfa', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>نسخ</button>
+                style={{ padding: '3px 10px', borderRadius: 6, background: 'var(--bg)', color: '#a78bfa', border: 'none', cursor: 'pointer', fontSize: 10, flexShrink: 0 }}>نسخ</button>
             </div>
           )}
-          <p style={{ fontSize: 10, color: '#334155', margin: '2px 0 0' }}>اضغط "بث مباشر" مجدداً لتجديد الجلسة</p>
+          <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '2px 0 0' }}>اضغط "بث مباشر" مجدداً لتجديد الجلسة</p>
         </div>
       </div>
     </div>
@@ -413,7 +413,7 @@ export default function CamerasPage() {
                               {snapshots[cam.id] ? (
                                 <img src={snapshots[cam.id]} alt="snap" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                               ) : (
-                                <Icon name="camera" size={24} color="#334155" />
+                                <Icon name="camera" size={24} color="var(--text-muted)" />
                               )}
                               {/* Provider badge */}
                               <span style={{ position: 'absolute', top: 6, right: 6, fontSize: 10, padding: '2px 7px', borderRadius: 5,
@@ -454,7 +454,7 @@ export default function CamerasPage() {
                               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                                 {cam.provider === 'ezviz' && (
                                   <button onClick={() => handleStream(cam)} disabled={loadingStream === cam.id}
-                                    style={{ flex: 1, padding: '5px 0', borderRadius: 7, background: '#0f172a', color: '#38bdf8', border: '1px solid #1e3a5f', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
+                                    style={{ flex: 1, padding: '5px 0', borderRadius: 7, background: 'var(--bg)', color: '#38bdf8', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
                                     {loadingStream === cam.id ? '...' : 'بث مباشر'}
                                   </button>
                                 )}
@@ -474,8 +474,8 @@ export default function CamerasPage() {
                                 )}
                                 {cam.provider === 'ezviz' && (
                                   <button onClick={() => { setCredEdit(credEdit === cam.id ? null : cam.id); setNewEmail(''); setNewPass(''); }}
-                                    style={{ padding: '5px 8px', borderRadius: 7, background: credEdit === cam.id ? '#1e293b' : 'var(--lv-panel)', color: '#94a3b8', border: '1px solid var(--lv-line)', cursor: 'pointer', fontSize: 11 }}>
-                                    <Icon name="key" size={11} color="#94a3b8" />
+                                    style={{ padding: '5px 8px', borderRadius: 7, background: credEdit === cam.id ? 'var(--surface)' : 'var(--lv-panel)', color: 'var(--text-muted)', border: '1px solid var(--lv-line)', cursor: 'pointer', fontSize: 11 }}>
+                                    <Icon name="key" size={11} color="var(--text-muted)" />
                                   </button>
                                 )}
                                 <button onClick={() => handleRemove(cam.id, cam.name)}
@@ -486,8 +486,8 @@ export default function CamerasPage() {
 
                               {/* Inline credential update */}
                               {credEdit === cam.id && (
-                                <div style={{ marginTop: 8, padding: '10px 12px', background: '#0f172a', borderRadius: 8, border: '1px solid #1e3a5f' }}>
-                                  <p style={{ fontSize: 10, color: '#64748b', margin: '0 0 6px' }}>تحديث بيانات EZVIZ</p>
+                                <div style={{ marginTop: 8, padding: '10px 12px', background: 'var(--bg)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                                  <p style={{ fontSize: 10, color: 'var(--text-3)', margin: '0 0 6px' }}>تحديث بيانات EZVIZ</p>
                                   <input value={newEmail} onChange={e => setNewEmail(e.target.value)} dir="ltr"
                                     placeholder="EZVIZ Email" type="email"
                                     style={{ ...inp, marginBottom: 6, fontSize: 11 }} />
@@ -495,7 +495,7 @@ export default function CamerasPage() {
                                     placeholder="EZVIZ Password" type="password"
                                     style={{ ...inp, marginBottom: 8, fontSize: 11 }} />
                                   <button onClick={() => handleUpdateCredentials(cam.id)} disabled={savingCred}
-                                    style={{ width: '100%', padding: '6px 0', borderRadius: 7, background: '#0ea5e9', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
+                                    style={{ width: '100%', padding: '6px 0', borderRadius: 7, background: 'var(--info)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
                                     {savingCred ? 'جاري الحفظ...' : 'حفظ'}
                                   </button>
                                 </div>
@@ -540,7 +540,7 @@ export default function CamerasPage() {
 
                   {provider === 'ezviz' ? (
                     <>
-                      <div style={{ background: '#f0f7ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 11, color: '#1d4ed8' }}>
+                      <div style={{ background: 'var(--ink-50)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 11, color: 'var(--brand-600)' }}>
                         أدخل Serial Number من ملصق الكاميرا، وبيانات تسجيل الدخول في تطبيق EZVIZ
                       </div>
                       <div style={{ marginBottom: 12 }}>

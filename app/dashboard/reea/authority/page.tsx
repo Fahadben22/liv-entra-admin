@@ -83,8 +83,8 @@ function RiskBadge({ level }: { level: string }) {
 
 function FahadBadge() {
   return (
-    <span style={{ fontSize: 11, color: '#64748b', display: 'flex', alignItems: 'center', gap: 3 }}>
-      <Icon name="shield" size={11} color="#64748b" />
+    <span style={{ fontSize: 11, color: 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 3 }}>
+      <Icon name="shield" size={11} color="var(--text-3)" />
       يتطلب موافقة فهد
     </span>
   );

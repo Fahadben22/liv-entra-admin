@@ -39,7 +39,7 @@ interface CorrelationsData {
 }
 
 const SEVERITY_COLORS: Record<string, { bg: string; color: string }> = {
-  critical: { bg: '#fef2f2', color: '#dc2626' },
+  critical: { bg: '#fef2f2', color: 'var(--danger)' },
   warning: { bg: '#fffbeb', color: '#d97706' },
 };
 
@@ -53,13 +53,13 @@ const TYPE_ICONS: Record<string, string> = {
 };
 
 function CorrelationCard({ corr }: { corr: Correlation }) {
-  const colors = SEVERITY_COLORS[corr.severity] || { bg: '#f8fafc', color: '#475569' };
+  const colors = SEVERITY_COLORS[corr.severity] || { bg: 'var(--bg)', color: 'var(--text-2)' };
   const icon = TYPE_ICONS[corr.type] || '🔍';
 
   return (
     <div style={{
-      background: '#fff',
-      border: '1px solid ' + (corr.severity === 'critical' ? '#fecaca' : '#e8ecf0'),
+      background: 'var(--surface)',
+      border: '1px solid ' + (corr.severity === 'critical' ? '#fecaca' : 'var(--border)'),
       borderRadius: 12,
       padding: '14px 16px',
     }}>
@@ -73,43 +73,43 @@ function CorrelationCard({ corr }: { corr: Correlation }) {
             }}>
               {corr.severity === 'critical' ? 'حرج' : 'تحذير'}
             </span>
-            <span style={{ fontSize: 10, color: '#94a3b8', fontWeight: 600 }}>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600 }}>
               {corr.agent_type}
               {corr.agent_family && corr.agent_family !== 'cross' && (
-                <span style={{ marginRight: 4, color: '#64748b' }}>
+                <span style={{ marginRight: 4, color: 'var(--text-3)' }}>
                   ({corr.agent_family === 'ops' ? 'عمليات' : 'SaaS'})
                 </span>
               )}
             </span>
             {corr.from_agent && corr.to_agent && (
-              <span style={{ fontSize: 10, color: '#64748b' }}>
+              <span style={{ fontSize: 10, color: 'var(--text-3)' }}>
                 {corr.from_agent} ← {corr.to_agent}
               </span>
             )}
           </div>
 
-          <p style={{ fontSize: 12, fontWeight: 600, color: '#0f172a', margin: '0 0 4px' }}>
+          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-1)', margin: '0 0 4px' }}>
             {corr.description}
           </p>
 
           {/* Details */}
           {corr.spike_ratio && (
-            <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 2px' }}>
+            <p style={{ fontSize: 11, color: 'var(--text-3)', margin: '0 0 2px' }}>
               النشاط: {corr.today_calls} اليوم مقابل {corr.weekly_daily_avg} في المتوسط ({corr.spike_ratio}x)
             </p>
           )}
           {corr.delay_hours && (
-            <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 2px' }}>
+            <p style={{ fontSize: 11, color: 'var(--text-3)', margin: '0 0 2px' }}>
               التأخير: {corr.delay_hours} ساعة
             </p>
           )}
           {corr.cost_per_call && (
-            <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 2px' }}>
+            <p style={{ fontSize: 11, color: 'var(--text-3)', margin: '0 0 2px' }}>
               التكلفة: {corr.cost_per_call} ر.س/عملية
             </p>
           )}
           {corr.agents_involved && (
-            <p style={{ fontSize: 11, color: '#64748b', margin: '0 0 2px' }}>
+            <p style={{ fontSize: 11, color: 'var(--text-3)', margin: '0 0 2px' }}>
               الوكلاء: {corr.agents_involved.join('، ')}
             </p>
           )}
@@ -178,15 +178,15 @@ export default function AgentCorrelationsPage() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#0f172a', margin: 0 }}>ارتباطات الوكلاء</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: '4px 0 0' }}>
+          <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-1)', margin: 0 }}>ارتباطات الوكلاء</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-3)', margin: '4px 0 0' }}>
             كشف الأنماط غير الطبيعية عبر جميع الوكلاء — نشاط، تأخير، ميزانية، وتضارب
           </p>
         </div>
         <button
           onClick={load}
           disabled={loading}
-          style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#475569', opacity: loading ? .5 : 1 }}
+          style={{ padding: '8px 18px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer', fontSize: 12, fontWeight: 600, color: 'var(--text-2)', opacity: loading ? .5 : 1 }}
         >
           {loading ? '...' : 'تحديث'}
         </button>
@@ -199,11 +199,11 @@ export default function AgentCorrelationsPage() {
             { label: 'إجمالي الحالات', value: String(data.summary.total_anomalies), color: '#6366f1' },
             { label: 'حالات حرجة', value: String(data.summary.critical_count), color: '#ef4444' },
             { label: 'توصيات', value: String(data.summary.recommendation_count), color: '#10b981' },
-            { label: 'آخر تحديث', value: new Date(data.summary.generated_at).toLocaleTimeString('ar-SA'), color: '#64748b' },
+            { label: 'آخر تحديث', value: new Date(data.summary.generated_at).toLocaleTimeString('ar-SA'), color: 'var(--text-3)' },
           ].map(s => (
-            <div key={s.label} style={{ background: '#fff', border: '1px solid #e8ecf0', borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
+            <div key={s.label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
               <p style={{ fontSize: 18, fontWeight: 800, color: s.color, margin: '0 0 3px' }}>{loading ? '...' : s.value}</p>
-              <p style={{ fontSize: 11, color: '#64748b', margin: 0 }}>{s.label}</p>
+              <p style={{ fontSize: 11, color: 'var(--text-3)', margin: 0 }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -225,13 +225,13 @@ export default function AgentCorrelationsPage() {
               onClick={() => setTab(tab === cat.type ? 'all' : cat.type)}
               style={{
                 padding: '12px 16px', borderRadius: 12, border: '1px solid ' + (tab === cat.type || (tab === 'all' && cat.count > 0) ? '#6366f1' : '#e8ecf0'),
-                background: tab === cat.type ? '#eef2ff' : '#fff',
+                background: tab === cat.type ? '#eef2ff' : 'var(--surface)',
                 cursor: 'pointer', textAlign: 'center',
               }}
             >
               <span style={{ fontSize: 20, display: 'block', marginBottom: 4 }}>{cat.emoji}</span>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#0f172a', margin: '0 0 2px' }}>{cat.label}</p>
-              <p style={{ fontSize: 14, fontWeight: 800, color: cat.count > 0 ? '#6366f1' : '#94a3b8', margin: 0 }}>{cat.count}</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-1)', margin: '0 0 2px' }}>{cat.label}</p>
+              <p style={{ fontSize: 14, fontWeight: 800, color: cat.count > 0 ? '#6366f1' : 'var(--text-muted)', margin: 0 }}>{cat.count}</p>
             </button>
           ))}
         </div>
@@ -249,8 +249,8 @@ export default function AgentCorrelationsPage() {
             onClick={() => setFilterSeverity(key)}
             style={{
               padding: '4px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600,
-              background: filterSeverity === key ? '#0f172a' : '#f1f5f9',
-              color: filterSeverity === key ? '#fff' : '#475569',
+              background: filterSeverity === key ? 'var(--text-1)' : 'var(--bg)',
+              color: filterSeverity === key ? 'var(--surface)' : 'var(--text-2)',
             }}
           >
             {label}
@@ -267,7 +267,7 @@ export default function AgentCorrelationsPage() {
 
       {/* Loading */}
       {loading && !data && (
-        <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>جاري التحميل...</div>
+        <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>جاري التحميل...</div>
       )}
 
       {/* Correlations grid */}
@@ -281,8 +281,8 @@ export default function AgentCorrelationsPage() {
 
       {!loading && filteredCorrelations.length === 0 && data && (
         <div style={{
-          textAlign: 'center', padding: 60, color: '#94a3b8',
-          background: '#f8fafc', borderRadius: 16,
+          textAlign: 'center', padding: 60, color: 'var(--text-muted)',
+          background: 'var(--bg)', borderRadius: 16,
         }}>
           <span style={{ fontSize: 40, display: 'block', marginBottom: 12 }}>✅</span>
           <p style={{ fontSize: 14, fontWeight: 600, margin: '0 0 4px' }}>لا توجد مشاكل غير طبيعية</p>

@@ -102,7 +102,7 @@ export default function MeetingRoomPage() {
       </div>
 
       {/* Right: Sidebar */}
-      <div style={{ width: 360, borderRight: '1px solid rgba(0,0,0,.06)', background: '#fafafa', overflowY: 'auto', flexShrink: 0 }}>
+      <div style={{ width: 360, borderRight: '1px solid rgba(0,0,0,.06)', background: 'var(--bg)', overflowY: 'auto', flexShrink: 0 }}>
         {/* Sidebar header */}
         <div style={{ padding: '16px 18px', borderBottom: '1px solid rgba(0,0,0,.06)', background: '#fff', position: 'sticky', top: 0, zIndex: 10 }}>
           <div style={{ display: 'flex', gap: 4, marginBottom: 8 }}>
@@ -117,7 +117,7 @@ export default function MeetingRoomPage() {
             </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <button onClick={load} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 11, border: '1px solid rgba(0,0,0,.06)', background: '#F1F5F9', color: '#6b7280', cursor: 'pointer' }}>تحديث</button>
+            <button onClick={load} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 11, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text-3)', cursor: 'pointer' }}>تحديث</button>
             <span style={{ fontSize: 10, color: '#d1d5db', whiteSpace: 'nowrap' }}>آخر تحديث: {lastRefresh.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</span>
           </div>
         </div>
@@ -156,7 +156,7 @@ export default function MeetingRoomPage() {
                       <span style={{ fontSize: 10, color: '#d1d5db' }}>{timeAgo(d.created_at)}</span>
                     </div>
                     {/* Directive text */}
-                    <p style={{ fontSize: 12, color: '#1e293b', margin: '0 0 8px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{d.directive}</p>
+                    <p style={{ fontSize: 12, color: 'var(--text-1)', margin: '0 0 8px', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{d.directive}</p>
                     {/* Reply bubble */}
                     {d.reply && (
                       <div style={{ background: '#f8faff', border: '1px solid #e0e7ff', borderRadius: 8, padding: '8px 10px', marginTop: 6, borderRight: `2px solid ${to.color}` }}>
@@ -197,18 +197,18 @@ export default function MeetingRoomPage() {
                     </div>
                     <span style={{ fontSize: 10, color: '#d1d5db' }}>{timeAgo(a.created_at)}</span>
                   </div>
-                  <h4 style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: '0 0 4px' }}>{a.title}</h4>
+                  <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', margin: '0 0 4px' }}>{a.title}</h4>
                   {a.description && <p style={{ fontSize: 11, color: '#6b7280', margin: '0 0 8px', lineHeight: 1.5 }}>{a.description}</p>}
                   {a.result && (
                     <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: '8px 10px', marginBottom: 8 }}>
                       <p style={{ fontSize: 10, fontWeight: 600, color: '#15803d', margin: '0 0 2px' }}>نتيجة التنفيذ:</p>
-                      <p style={{ fontSize: 11, color: '#1E293B', margin: 0 }}>{a.result}</p>
+                      <p style={{ fontSize: 11, color: 'var(--text-1)', margin: 0 }}>{a.result}</p>
                     </div>
                   )}
                   {a.blocked_reason && (
                     <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '8px 10px', marginBottom: 8 }}>
                       <p style={{ fontSize: 10, fontWeight: 600, color: '#dc2626', margin: '0 0 2px' }}>سبب الرفض:</p>
-                      <p style={{ fontSize: 11, color: '#1E293B', margin: 0 }}>{a.blocked_reason}</p>
+                      <p style={{ fontSize: 11, color: 'var(--text-1)', margin: 0 }}>{a.blocked_reason}</p>
                     </div>
                   )}
                   {a.status === 'pending_approval' && (
@@ -241,7 +241,7 @@ export default function MeetingRoomPage() {
                     <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: st.bg, color: st.color, fontWeight: 600 }}>{st.label}</span>
                     <span style={{ fontSize: 10, color: '#d1d5db' }}>{timeAgo(r.created_at)}</span>
                   </div>
-                  <h4 style={{ fontSize: 13, fontWeight: 600, color: '#1E293B', margin: '0 0 6px' }}>{r.title}</h4>
+                  <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', margin: '0 0 6px' }}>{r.title}</h4>
                   <p style={{ fontSize: 11, color: '#6b7280', margin: '0 0 10px', lineHeight: 1.6, maxHeight: 80, overflow: 'hidden' }}>{r.summary}</p>
                   {Array.isArray(r.action_items) && r.action_items.length > 0 && (
                     <div style={{ marginBottom: 10 }}>

@@ -354,8 +354,8 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
           <StatCard label="الموظفين" value={`${usage?.staff?.used ?? 0} / ${c.max_staff || '∞'}`} color="#8b5cf6" />
           <StatCard label="العقارات" value={`${usage?.properties?.used ?? 0} / ${c.max_properties || '∞'}`} color="#f59e0b" />
           <StatCard label="العقود" value={`${usage?.contracts?.used ?? 0} / ${c.max_contracts || '∞'}`} color="#22c55e" />
-          <StatCard label="البريد" value={c.contact_email || '—'} color="#64748b" />
-          <StatCard label="الهاتف" value={c.contact_phone || '—'} color="#64748b" />
+          <StatCard label="البريد" value={c.contact_email || '—'} color="var(--text-3)" />
+          <StatCard label="الهاتف" value={c.contact_phone || '—'} color="var(--text-3)" />
         </div>
       )}
 
@@ -370,7 +370,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
             {plans.filter((p: any) => p.is_active !== false).map((p: any) => (
               <button key={p.id} onClick={() => onAction(c.id, 'assign-plan', { plan_id: p.id, billing_cycle: 'monthly' })}
                 disabled={p.name === c.plan}
-                style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${p.name === c.plan ? '#1d4070' : 'var(--border)'}`, background: p.name === c.plan ? '#1d4070' : 'var(--surface)', color: p.name === c.plan ? 'white' : '#475569', fontSize: 11, fontWeight: 600, cursor: p.name === c.plan ? 'default' : 'pointer', opacity: p.name === c.plan ? 0.6 : 1 }}>
+                style={{ padding: '6px 14px', borderRadius: 8, border: `1px solid ${p.name === c.plan ? 'var(--brand-600)' : 'var(--border)'}`, background: p.name === c.plan ? 'var(--brand-600)' : 'var(--surface)', color: p.name === c.plan ? 'var(--surface)' : 'var(--text-2)', fontSize: 11, fontWeight: 600, cursor: p.name === c.plan ? 'default' : 'pointer', opacity: p.name === c.plan ? 0.6 : 1 }}>
                 {p.name_ar || PLAN_AR[p.name] || p.name} {p.price_monthly ? `(${p.price_monthly} ر.س/شهر)` : ''}
               </button>
             ))}
@@ -439,7 +439,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
           {(audit || []).length === 0 ? <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>لا توجد أنشطة</p> :
             (audit || []).map((a: any, i: number) => (
               <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--lv-line)', fontSize: 11 }}>
-                <span style={{ color: '#475569' }}>{a.action}</span>
+                <span style={{ color: 'var(--text-2)' }}>{a.action}</span>
                 <span style={{ color: 'var(--text-muted)' }}>{a.actor_email || '—'} · {fmtDate(a.created_at)}</span>
               </div>
             ))}
