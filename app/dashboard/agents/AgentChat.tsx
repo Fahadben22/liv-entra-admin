@@ -81,8 +81,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
     request<any>('GET', '/admin/agents/goals').then(res => {
       if (res?.data) {
         const all = (res.data as AgentGoal[]).filter(g => g.status === 'active');
-        // Show goals assigned to this agent, or unassigned ones when on REEA
-        const filtered = all.filter((g: any) => !g.assigned_to || g.assigned_to === agentType);
+        const filtered = all.filter((g: any) => g.assigned_to === agentType);
         setGoals(filtered);
       }
     }).catch(() => {});
