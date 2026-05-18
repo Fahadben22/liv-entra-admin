@@ -334,6 +334,8 @@ export const adminApi = {
 
   // ─── Cross-Agent Correlations ────────────────────────────────────────────────
   getCorrelations:  (agentType?: string) => request<any>('GET', `/admin/agents/correlations${agentType ? '?agent_type=' + agentType : ''}`),
+  getSchedules:     () => request<any>('GET', '/admin/agents/schedules'),
+  updateSchedule:   (agentType: string, data: any) => request<any>('PUT', `/admin/agents/schedules/${agentType}`, data),
 
   // ─── Portfolio Import (REEA-operated) ────────────────────────────────────────
   portfolio: {
