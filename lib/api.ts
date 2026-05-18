@@ -324,6 +324,8 @@ export const adminApi = {
       request<any>('POST', '/admin/agents/economy/transfer-decision', data),
     adjustBudget:   (data: { agent_type: string; budget_monthly: number; reason?: string }) =>
       request<any>('PATCH', '/admin/agents/economy/adjust-budget', data),
+    getTransactions: (agentType?: string, limit = 50, offset = 0, referenceType?: string) =>
+      request<any>('GET', `/admin/agents/economy/transactions?limit=${limit}&offset=${offset}${agentType ? '&agent_type=' + agentType : ''}${referenceType ? '&reference_type=' + referenceType : ''}`),
   },
 
   // ─── Cross-Agent Correlations ────────────────────────────────────────────────

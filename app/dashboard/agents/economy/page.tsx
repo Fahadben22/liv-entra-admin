@@ -177,6 +177,12 @@ function AgentBudgetCard({ budget, onTransfer, onAdjust }: {
   );
 }
 
+const TX_PAGE_SIZE = 40;
+
+const REF_LABELS: Record<string, string> = {
+  aom_cycle: 'دورة AOM', chat: 'محادثة', observation: 'مراقبة', proactive: 'استباقي',
+};
+
 export default function AgentEconomyPage() {
   const [data, setData] = useState<EconomyData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -190,6 +196,12 @@ export default function AgentEconomyPage() {
   const [actionMsg, setActionMsg] = useState('');
   const [filter, setFilter] = useState('all');
 
+  // Drill-down state for transactions tab
+  const [txAgent, setTxAgent] = useState('');
+  const [txPage, setTxPage] = useState(0);
+  const [txData, setTxData] = useState<Transaction[]>([]);
+  const [txLoading, setTxLoading] = useState(false);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -202,6 +214,18 @@ export default function AgentEconomyPage() {
       setLoading(false);
     }
   }, []);
+
+  const loadTx = useCallback(async (agent: string, page: number) => {
+    setTxLoading(true);
+    try {
+      const res = await adminApi.economy.getTransactions(agent || undefined, TX_PAGE_SIZE, page * TX_PAGE_SIZE);
+      setTxData((res as any)?.data?.transactions || []);
+    } catch { setTxData([]); } finally { setTxLoading(false); }
+  }, []);
+
+  useEffect(() => {
+    if (tab === 'transactions') loadTx(txAgent, txPage);
+  }, [tab, txAgent, txPage, loadTx]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -404,49 +428,91 @@ export default function AgentEconomyPage() {
       )}
 
       {/* ──────── TRANSACTIONS TAB ──────── */}
-      {tab === 'transactions' && data && (
-        <div style={{ background: 'var(--surface)', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden' }}>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--ink-50)' }}>
-                  {['الوكيل', 'النوع', 'المبلغ', 'الطرف الآخر', 'الوصف', 'التاريخ'].map(h => (
-                    <th key={h} style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 600, color: 'var(--text-2)' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {data.transactions.map(tx => (
-                  <tr key={tx.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td style={{ padding: '10px 14px', fontWeight: 600, color: 'var(--text-1)' }}>{tx.agent_type}</td>
-                    <td style={{ padding: '10px 14px' }}>
-                      <span style={{
-                        padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
-                        background: tx.transaction_type === 'spend' ? '#fef2f2' : tx.transaction_type === 'transfer_in' ? '#f0fdf4' : 'var(--ink-50)',
-                        color: tx.transaction_type === 'spend' ? '#dc2626' : tx.transaction_type === 'transfer_in' ? '#16a34a' : 'var(--text-2)',
-                      }}>
-                        {TYPE_LABELS[tx.transaction_type] || tx.transaction_type}
-                      </span>
-                    </td>
-                    <td style={{ padding: '10px 14px', fontWeight: 700, color: tx.amount < 0 ? '#dc2626' : 'var(--text-1)' }}>
-                      {tx.amount.toLocaleString()} ر.س
-                    </td>
-                    <td style={{ padding: '10px 14px', color: 'var(--text-3)' }}>{tx.counterparty || '—'}</td>
-                    <td style={{ padding: '10px 14px', color: 'var(--text-3)', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {tx.description || tx.category || '—'}
-                    </td>
-                    <td style={{ padding: '10px 14px', color: 'var(--text-muted)', fontSize: 11 }}>
-                      {new Date(tx.created_at).toLocaleDateString('ar-SA')}
-                    </td>
-                  </tr>
-                ))}
-                {data.transactions.length === 0 && (
-                  <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>لا توجد معاملات بعد</td></tr>
-                )}
-              </tbody>
-            </table>
+      {tab === 'transactions' && (
+        <>
+          {/* Filter bar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+            <select
+              value={txAgent}
+              onChange={e => { setTxAgent(e.target.value); setTxPage(0); }}
+              style={{ padding: '6px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', fontSize: 12, color: 'var(--text-1)' }}
+            >
+              <option value="">كل الوكلاء</option>
+              {(data?.budgets || []).map(b => (
+                <option key={b.agent_type} value={b.agent_type}>{b.agent_name} ({b.agent_type})</option>
+              ))}
+            </select>
+            <div style={{ display: 'flex', gap: 6, marginRight: 'auto' }}>
+              <button disabled={txPage === 0} onClick={() => setTxPage(p => p - 1)}
+                style={{ padding: '5px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', cursor: txPage === 0 ? 'default' : 'pointer', opacity: txPage === 0 ? 0.4 : 1, fontSize: 12 }}>
+                &raquo;
+              </button>
+              <span style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: '28px' }}>صفحة {txPage + 1}</span>
+              <button disabled={txData.length < TX_PAGE_SIZE} onClick={() => setTxPage(p => p + 1)}
+                style={{ padding: '5px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', cursor: txData.length < TX_PAGE_SIZE ? 'default' : 'pointer', opacity: txData.length < TX_PAGE_SIZE ? 0.4 : 1, fontSize: 12 }}>
+                &laquo;
+              </button>
+            </div>
           </div>
-        </div>
+
+          <div style={{ background: 'var(--surface)', borderRadius: 14, border: '1px solid var(--border)', overflow: 'hidden' }}>
+            {txLoading ? (
+              <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>جاري التحميل...</div>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--ink-50)' }}>
+                      {['الوكيل', 'النوع', 'المرجع', 'المبلغ', 'الوصف', 'التاريخ'].map(h => (
+                        <th key={h} style={{ padding: '10px 14px', textAlign: 'right', fontWeight: 600, color: 'var(--text-2)' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {txData.map(tx => (
+                      <tr key={tx.id} style={{ borderBottom: '1px solid var(--border)' }}>
+                        <td style={{ padding: '10px 14px', fontWeight: 600, color: 'var(--text-1)' }}>{tx.agent_type}</td>
+                        <td style={{ padding: '10px 14px' }}>
+                          <span style={{
+                            padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 600,
+                            background: tx.transaction_type === 'spend' ? '#fef2f2' : tx.transaction_type === 'transfer_in' ? '#f0fdf4' : 'var(--ink-50)',
+                            color: tx.transaction_type === 'spend' ? '#dc2626' : tx.transaction_type === 'transfer_in' ? '#16a34a' : 'var(--text-2)',
+                          }}>
+                            {TYPE_LABELS[tx.transaction_type] || tx.transaction_type}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 14px' }}>
+                          {(tx as any).reference_type && (
+                            <span style={{ fontSize: 10, color: '#6b7280', background: 'var(--ink-50)', borderRadius: 6, padding: '1px 7px', display: 'inline-block' }}>
+                              {REF_LABELS[(tx as any).reference_type] || (tx as any).reference_type}
+                            </span>
+                          )}
+                          {(tx as any).reference_id && (
+                            <span style={{ fontSize: 10, color: 'var(--text-muted)', marginRight: 4, fontFamily: 'monospace' }}>
+                              {(tx as any).reference_id.slice(0, 8)}
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '10px 14px', fontWeight: 700, color: tx.amount < 0 ? '#dc2626' : 'var(--text-1)' }}>
+                          {tx.amount.toLocaleString()} ر.س
+                        </td>
+                        <td style={{ padding: '10px 14px', color: 'var(--text-3)', maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', direction: 'ltr', textAlign: 'left' }}>
+                          {tx.description || tx.category || '—'}
+                        </td>
+                        <td style={{ padding: '10px 14px', color: 'var(--text-muted)', fontSize: 11 }}>
+                          {new Date(tx.created_at).toLocaleDateString('ar-SA')}
+                        </td>
+                      </tr>
+                    ))}
+                    {txData.length === 0 && (
+                      <tr><td colSpan={6} style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>لا توجد معاملات</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </>
       )}
 
       {/* ──────── TRANSFERS TAB ──────── */}
