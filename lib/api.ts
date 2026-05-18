@@ -326,6 +326,10 @@ export const adminApi = {
       request<any>('PATCH', '/admin/agents/economy/adjust-budget', data),
     getTransactions: (agentType?: string, limit = 50, offset = 0, referenceType?: string) =>
       request<any>('GET', `/admin/agents/economy/transactions?limit=${limit}&offset=${offset}${agentType ? '&agent_type=' + agentType : ''}${referenceType ? '&reference_type=' + referenceType : ''}`),
+    getTools: (agentType?: string, limit = 200, referenceId?: string) =>
+      request<any>('GET', `/admin/agents/economy/tools?limit=${limit}${agentType ? '&agent_type=' + agentType : ''}${referenceId ? '&reference_id=' + referenceId : ''}`),
+    getTrend: (days = 30) =>
+      request<any>('GET', `/admin/agents/economy/trend?days=${days}`),
   },
 
   // ─── Cross-Agent Correlations ────────────────────────────────────────────────
