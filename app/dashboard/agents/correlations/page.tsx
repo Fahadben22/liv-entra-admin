@@ -43,18 +43,20 @@ const SEVERITY_COLORS: Record<string, { bg: string; color: string }> = {
   warning: { bg: '#fffbeb', color: '#d97706' },
 };
 
-const TYPE_ICONS: Record<string, string> = {
-  activity_spike: '⚡',
-  inactivity: '💤',
-  mass_correlation: '🔗',
-  handoff_delay: '⏳',
-  high_cost_per_action: '💰',
-  conflict_cascade: '⚔️',
+import { Zap, Moon, Link, Clock, DollarSign, Swords, Search, CheckCircle } from 'lucide-react';
+
+const TYPE_ICON_MAP: Record<string, React.ReactNode> = {
+  activity_spike:       <Zap size={16} />,
+  inactivity:           <Moon size={16} />,
+  mass_correlation:     <Link size={16} />,
+  handoff_delay:        <Clock size={16} />,
+  high_cost_per_action: <DollarSign size={16} />,
+  conflict_cascade:     <Swords size={16} />,
 };
 
 function CorrelationCard({ corr }: { corr: Correlation }) {
   const colors = SEVERITY_COLORS[corr.severity] || { bg: 'var(--bg)', color: 'var(--text-2)' };
-  const icon = TYPE_ICONS[corr.type] || '🔍';
+  const icon = TYPE_ICON_MAP[corr.type] || <Search size={16} />;
 
   return (
     <div style={{
@@ -64,7 +66,7 @@ function CorrelationCard({ corr }: { corr: Correlation }) {
       padding: '14px 16px',
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-        <span style={{ fontSize: 20 }}>{icon}</span>
+        <span style={{ color: 'var(--text-2)', marginTop: 2 }}>{icon}</span>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <span style={{
@@ -215,10 +217,10 @@ export default function AgentCorrelationsPage() {
           display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 20,
         }}>
           {[
-            { type: 'activity', label: 'النشاط', count: data.anomalies.length, emoji: '⚡' },
-            { type: 'handoff', label: 'التأخير في التسليم', count: data.handoff_delays.length, emoji: '⏳' },
-            { type: 'budget', label: 'كفاءة الميزانية', count: data.budget_efficiency.length, emoji: '💰' },
-            { type: 'conflict', label: 'تضارب المعرفة', count: data.conflict_cascades.length, emoji: '⚔️' },
+            { type: 'activity', label: 'النشاط', count: data.anomalies.length, icon: <Zap size={16} /> },
+            { type: 'handoff', label: 'التأخير في التسليم', count: data.handoff_delays.length, icon: <Clock size={16} /> },
+            { type: 'budget', label: 'كفاءة الميزانية', count: data.budget_efficiency.length, icon: <DollarSign size={16} /> },
+            { type: 'conflict', label: 'تضارب المعرفة', count: data.conflict_cascades.length, icon: <Swords size={16} /> },
           ].map(cat => (
             <button
               key={cat.type}
@@ -229,7 +231,7 @@ export default function AgentCorrelationsPage() {
                 cursor: 'pointer', textAlign: 'center',
               }}
             >
-              <span style={{ fontSize: 20, display: 'block', marginBottom: 4 }}>{cat.emoji}</span>
+              <span style={{ display: 'flex', justifyContent: 'center', marginBottom: 4, color: tab === cat.type ? '#6366f1' : 'var(--text-2)' }}>{cat.icon}</span>
               <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-1)', margin: '0 0 2px' }}>{cat.label}</p>
               <p style={{ fontSize: 14, fontWeight: 800, color: cat.count > 0 ? '#6366f1' : 'var(--text-muted)', margin: 0 }}>{cat.count}</p>
             </button>
@@ -284,7 +286,7 @@ export default function AgentCorrelationsPage() {
           textAlign: 'center', padding: 60, color: 'var(--text-muted)',
           background: 'var(--bg)', borderRadius: 16,
         }}>
-          <span style={{ fontSize: 40, display: 'block', marginBottom: 12 }}>✅</span>
+          <span style={{ display: 'flex', justifyContent: 'center', marginBottom: 12, color: '#10b981' }}><CheckCircle size={40} /></span>
           <p style={{ fontSize: 14, fontWeight: 600, margin: '0 0 4px' }}>لا توجد مشاكل غير طبيعية</p>
           <p style={{ fontSize: 12, margin: 0 }}>جميع الوكلاء يعملون بكفاءة طبيعية</p>
         </div>
