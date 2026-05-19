@@ -30,18 +30,21 @@ const INTENT_LABELS: Record<string, string> = {
 export default function AnalyticsPage() {
   const [data, setData] = useState<Analytics | null>(null);
   const [companies, setCompanies] = useState<any[]>([]);
+  const [aiUsage, setAiUsage] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.allSettled([
       adminApi.wa.analytics(),
       adminApi.sa.listCompanies(),
-    ]).then(([analyticsRes, companiesRes]) => {
+      adminApi.wa.aiUsage(30),
+    ]).then(([analyticsRes, companiesRes, aiRes]) => {
       if (analyticsRes.status === 'fulfilled') setData((analyticsRes.value as any)?.data || null);
       if (companiesRes.status === 'fulfilled') {
         const list = (companiesRes.value as any)?.data || (companiesRes.value as any) || [];
         setCompanies(list);
       }
+      if (aiRes.status === 'fulfilled') setAiUsage((aiRes.value as any)?.data || null);
     }).finally(() => setLoading(false));
   }, []);
 
@@ -134,6 +137,30 @@ export default function AnalyticsPage() {
                   ))}
               </div>
             </div>
+
+            {/* AI interaction volume */}
+            {aiUsage && (
+              <div className="card" style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,.06)', marginBottom: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#1E293B' }}>تفاعلات الذكاء الاصطناعي (آخر 30 يوم)</div>
+                    <div style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>عدد محادثات واتساب التي تفاعلت مع نموذج AI</div>
+                  </div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: '#2563EB' }}>{(aiUsage.total_interactions || 0).toLocaleString()}</div>
+                </div>
+                {Object.keys(aiUsage.by_day || {}).length > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 48 }}>
+                    {Object.entries(aiUsage.by_day as Record<string, number>).slice(-30).map(([day, count]) => {
+                      const maxVal = Math.max(...Object.values(aiUsage.by_day as Record<string, number>), 1);
+                      const h = Math.max((count / maxVal) * 48, 2);
+                      return (
+                        <div key={day} title={`${day}: ${count}`} style={{ flex: 1, height: h, background: '#2563EB', borderRadius: 2, opacity: 0.7 }} />
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Lead conversion table */}
             <div className="card" style={{ background: '#fff', borderRadius: 14, padding: 20, boxShadow: '0 1px 3px rgba(0,0,0,.06)' }}>

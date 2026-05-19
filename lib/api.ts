@@ -265,6 +265,8 @@ export const adminApi = {
       request<any>('POST', '/whatsapp/setup/test', { company_id: companyId }),
     templates:     () =>
       request<any>('GET', '/whatsapp/templates'),
+    aiUsage:       (days = 30) =>
+      request<any>('GET', `/admin/whatsapp/ai-usage?days=${days}`),
   },
 
   tg: {
@@ -336,6 +338,9 @@ export const adminApi = {
   getCorrelations:  (agentType?: string) => request<any>('GET', `/admin/agents/correlations${agentType ? '?agent_type=' + agentType : ''}`),
   getSchedules:     () => request<any>('GET', '/admin/agents/schedules'),
   updateSchedule:   (agentType: string, data: any) => request<any>('PUT', `/admin/agents/schedules/${agentType}`, data),
+
+  // ─── RAG Pipeline Health ─────────────────────────────────────────────────────
+  getRagPipelineStatus: () => request<any>('GET', '/admin/rag/pipeline-status'),
 
   // ─── Portfolio Import (REEA-operated) ────────────────────────────────────────
   portfolio: {

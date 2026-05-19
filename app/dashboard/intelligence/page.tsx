@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
-import { adminApi } from '@/lib/api';
+import { adminApi, request } from '@/lib/api';
 // design-tokens removed — using --lv-* CSS custom properties
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip,
@@ -111,7 +111,7 @@ export default function IntelligencePage() {
       {loading ? <Spinner /> : (
         <>
           {tab === 'overview'    && <OverviewTab data={data.overview} />}
-          {tab === 'financial'   && <FinancialTab data={data.financial} />}
+          {tab === 'financial'   && <FinancialTab data={data.financial} onRefresh={() => loadTab('financial')} />}
           {tab === 'performance' && <PerformanceTab data={data.performance} />}
           {tab === 'compliance'  && <ComplianceTab data={data.compliance} />}
           {tab === 'risk'        && <RiskTab data={data.risk} />}
@@ -437,9 +437,20 @@ function CompanyDrillDown({ companyName, drillData, onClose }: { companyName: st
   );
 }
 
-function FinancialTab({ data }: { data: any }) {
+function FinancialTab({ data, onRefresh }: { data: any; onRefresh?: () => void }) {
   if (!data) return <EmptyMsg />;
   const { companies, totals } = data;
+  const [refreshing, setRefreshing] = useState(false);
+
+  const generatedAt = data.generated_at || data.last_updated || data.updated_at || null;
+  const hoursAgo = generatedAt ? Math.round((Date.now() - new Date(generatedAt).getTime()) / 3600000) : null;
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    try { await request('POST', '/market/recalculate'); } catch { /* ignore */ }
+    if (onRefresh) await onRefresh();
+    setRefreshing(false);
+  }
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [drillData, setDrillData] = useState<any>(null);
   const [drillLoading, setDrillLoading] = useState(false);
@@ -458,6 +469,22 @@ function FinancialTab({ data }: { data: any }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Staleness banner */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', background: 'var(--lv-chip)', borderRadius: 8, border: '1px solid var(--lv-line)' }}>
+        <span style={{ fontSize: 11, color: 'var(--lv-muted)' }}>
+          {hoursAgo !== null
+            ? `بيانات محدّثة قبل ${hoursAgo} ساعة — يتم التحديث تلقائياً كل ليلة`
+            : 'بيانات مجمّعة — يتم التحديث تلقائياً كل ليلة'}
+        </span>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          style={{ fontSize: 11, padding: '4px 12px', borderRadius: 6, border: '1px solid var(--lv-line)', background: 'var(--lv-panel)', cursor: 'pointer', color: 'var(--lv-accent)', fontWeight: 600, opacity: refreshing ? 0.6 : 1 }}
+        >
+          {refreshing ? 'جاري التحديث...' : 'تحديث الآن'}
+        </button>
+      </div>
+
       {/* KPI Totals */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
         <KPICard label="إجمالي الإيرادات" value={fmtSAR(totals?.total_revenue)} color={'var(--lv-success)'} />

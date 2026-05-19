@@ -81,9 +81,10 @@ function Sparkline({ data, width = 200, height = 44, color = 'var(--brand-600)' 
 }
 
 export default function AdminDashboard() {
-  const [companies, setCompanies] = useState<any[]>([]);
-  const [metrics,   setMetrics]   = useState<any>(null);
-  const [loading,   setLoading]   = useState(true);
+  const [companies,    setCompanies]    = useState<any[]>([]);
+  const [metrics,      setMetrics]      = useState<any>(null);
+  const [platformStats, setPlatformStats] = useState<any>(null);
+  const [loading,      setLoading]      = useState(true);
   const { events, isConnected } = useEvents(15);
 
   const load = useCallback(async () => {
@@ -91,9 +92,11 @@ export default function AdminDashboard() {
     const results = await Promise.allSettled([
       adminApi.listCompanies(),
       adminApi.sa.mrrStats(),
+      adminApi.sa.platformStats(),
     ]);
     if (results[0].status === 'fulfilled') setCompanies((results[0].value as any)?.data || []);
     if (results[1].status === 'fulfilled') setMetrics((results[1].value as any)?.data);
+    if (results[2].status === 'fulfilled') setPlatformStats((results[2].value as any)?.data);
     setLoading(false);
   }, []);
 
@@ -250,6 +253,28 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* ── Platform stats row ── */}
+      {platformStats && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+          {[
+            { label: 'وحدات عقارية', value: fmt(platformStats.total_units || 0),       icon: 'building'       as const, color: 'var(--brand-600)' },
+            { label: 'عقود نشطة',    value: fmt(platformStats.active_contracts || 0),   icon: 'check-circle'   as const, color: 'var(--success)' },
+            { label: 'إجمالي المدفوعات', value: fmt(platformStats.total_payments || 0), icon: 'dollar'         as const, color: '#10b981' },
+            { label: 'تنبيهات مكتشفة', value: fmt(platformStats.anomaly_count || 0),   icon: 'alert-triangle' as const, color: platformStats.anomaly_count > 0 ? 'var(--warning)' : 'var(--success)' },
+          ].map(s => (
+            <div key={s.label} className="le-card" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 'var(--r-md)', background: `color-mix(in srgb, ${s.color} 12%, transparent)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon name={s.icon} size={16} color={s.color} />
+              </div>
+              <div>
+                <div className="num" style={{ fontSize: 20, fontWeight: 700, color: s.color, lineHeight: 1 }}>{s.value}</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>{s.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* ── Lifecycle pipeline ── */}
       <div className="le-card">
