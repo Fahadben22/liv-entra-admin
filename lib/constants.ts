@@ -61,6 +61,9 @@ export const NAV_ITEMS = [
   { href: '/dashboard/landing-page',   label: 'الموقع',         section: 'settings' },
   { href: '/dashboard/audit',          label: 'التدقيق',        section: 'settings' },
   { href: '/dashboard/maintenance-flows', label: 'مسارات الصيانة',  section: 'settings' },
+  { href: 'https://analytics.liv-entra.com', label: 'Plausible',   section: 'tools', external: true },
+  { href: 'https://n8n.liv-entra.com',       label: 'n8n',         section: 'tools', external: true },
+  { href: 'https://notes.liv-entra.com',     label: 'AppFlowy',    section: 'tools', external: true },
 ];
 
 export const NAV_SECTIONS: Record<string, string> = {
@@ -68,4 +71,5 @@ export const NAV_SECTIONS: Record<string, string> = {
   ops: 'العمليات',
   growth: 'النمو',
   settings: 'الإعدادات',
+  tools: 'الأدوات',
 };

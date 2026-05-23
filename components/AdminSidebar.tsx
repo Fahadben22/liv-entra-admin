@@ -34,6 +34,9 @@ const SECTION_ICONS: Record<string, IconName> = {
   '/dashboard/audit': 'search',
   '/dashboard/maintenance-flows': 'wrench',
   '/dashboard/cameras':           'camera',
+  'https://analytics.liv-entra.com': 'trending-up',
+  'https://n8n.liv-entra.com':       'zap',
+  'https://notes.liv-entra.com':     'book-open',
 };
 
 export interface AdminSidebarProps {
@@ -62,7 +65,7 @@ export default function AdminSidebar({
     .slice(0, 2)
     .join('');
 
-  const sections = ['main', 'ops', 'growth', 'settings'] as const;
+  const sections = ['main', 'ops', 'growth', 'settings', 'tools'] as const;
 
   return (
     <aside
@@ -132,6 +135,7 @@ export default function AdminSidebar({
                   <Link
                     key={item.href}
                     href={item.href}
+                    {...('external' in item && item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
