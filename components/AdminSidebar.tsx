@@ -34,8 +34,7 @@ const SECTION_ICONS: Record<string, IconName> = {
   '/dashboard/audit': 'search',
   '/dashboard/maintenance-flows': 'wrench',
   '/dashboard/cameras':           'camera',
-  'https://analytics.liv-entra.com/login': 'trending-up',
-  'https://n8n.liv-entra.com':       'zap',
+'https://n8n.liv-entra.com':       'zap',
   'https://notes.liv-entra.com':     'file-text',
 };
 
