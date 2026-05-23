@@ -36,7 +36,7 @@ const SECTION_ICONS: Record<string, IconName> = {
   '/dashboard/cameras':           'camera',
   'https://analytics.liv-entra.com': 'trending-up',
   'https://n8n.liv-entra.com':       'zap',
-  'https://notes.liv-entra.com':     'book-open',
+  'https://notes.liv-entra.com':     'file-text',
 };
 
 export interface AdminSidebarProps {
