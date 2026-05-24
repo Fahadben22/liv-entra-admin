@@ -315,14 +315,18 @@ function MiniBtn({ label, variant, onClick }: { label: string; variant: 'default
 function DetailPanel({ company: c, usage, flags, audit, plans, registry, onAction, onToggleFlag, onReload, onClose }: any) {
   const [dtab, setDtab] = useState('overview');
   const [editing, setEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ name_ar: '', name: '', slug: '', contact_phone: '', contact_email: '' });
-  const [saving, setSaving] = useState(false);
-  const [editMsg, setEditMsg] = useState('');
+  const [companyForm, setCompanyForm] = useState({ name_ar: '', name: '', slug: '', contact_phone: '', contact_email: '' });
+  const [loginForm, setLoginForm]     = useState({ phone: '', email: '' });
+  const [saving,    setSaving]    = useState(false);
+  const [editMsg,   setEditMsg]   = useState('');
   const pc = PLAN_C[c?.plan] || PLAN_C.basic;
   if (!c) return null;
 
+  const au = c.admin_user; // { id, phone, email, full_name_ar }
+
   const startEdit = () => {
-    setEditForm({ name_ar: c.name_ar || '', name: c.name || '', slug: c.slug || '', contact_phone: c.contact_phone || '', contact_email: c.contact_email || '' });
+    setCompanyForm({ name_ar: c.name_ar || '', name: c.name || '', slug: c.slug || '', contact_phone: c.contact_phone || '', contact_email: c.contact_email || '' });
+    setLoginForm({ phone: au?.phone || '', email: au?.email || '' });
     setEditMsg('');
     setEditing(true);
   };
@@ -331,7 +335,11 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
     setSaving(true);
     setEditMsg('');
     try {
-      await adminApi.updateCompany(c.id, editForm);
+      // Save company fields and login credentials in parallel
+      const tasks: Promise<any>[] = [adminApi.updateCompany(c.id, companyForm)];
+      const loginChanged = loginForm.phone !== (au?.phone || '') || loginForm.email !== (au?.email || '');
+      if (loginChanged && au?.id) tasks.push(adminApi.updateAdminLogin(c.id, loginForm));
+      await Promise.all(tasks);
       setEditMsg('تم الحفظ');
       setEditing(false);
       onReload();
@@ -342,8 +350,8 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
     setSaving(false);
   };
 
-  const ef = (k: keyof typeof editForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setEditForm(p => ({ ...p, [k]: e.target.value }));
+  const cf = (k: keyof typeof companyForm) => (e: React.ChangeEvent<HTMLInputElement>) => setCompanyForm(p => ({ ...p, [k]: e.target.value }));
+  const lf = (k: keyof typeof loginForm)   => (e: React.ChangeEvent<HTMLInputElement>) => setLoginForm(p => ({ ...p, [k]: e.target.value }));
 
   const DTABS = [
     { key: 'overview', label: 'نظرة عامة' },
@@ -354,6 +362,7 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
   ];
 
   const inp = { padding: '5px 10px', borderRadius: 7, border: '1px solid var(--border)', fontSize: 12, background: 'var(--surface)', color: 'var(--text-1)', outline: 'none', width: '100%', boxSizing: 'border-box' as const };
+  const secInp = { ...inp, background: 'rgba(124,58,237,.04)', border: '1px solid rgba(124,58,237,.2)' };
 
   return (
     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, marginTop: 10, position: 'relative' }}>
@@ -365,31 +374,50 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
 
         {editing ? (
           <div style={{ flex: 1 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6 }}>
+            {/* Company fields */}
+            <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>معلومات الشركة</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 10 }}>
               <div>
                 <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>الاسم بالعربي</p>
-                <input value={editForm.name_ar} onChange={ef('name_ar')} style={inp} placeholder="اسم الشركة" />
+                <input value={companyForm.name_ar} onChange={cf('name_ar')} style={inp} placeholder="اسم الشركة" />
               </div>
               <div>
                 <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>الاسم بالإنجليزي</p>
-                <input value={editForm.name} onChange={ef('name')} style={{ ...inp }} dir="ltr" placeholder="Company name" />
+                <input value={companyForm.name} onChange={cf('name')} style={inp} dir="ltr" placeholder="Company name" />
               </div>
               <div>
-                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>معرّف تسجيل الدخول</p>
-                <input value={editForm.slug} onChange={ef('slug')} style={{ ...inp }} dir="ltr" placeholder="company-slug" />
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>معرّف تسجيل الدخول (slug)</p>
+                <input value={companyForm.slug} onChange={cf('slug')} style={inp} dir="ltr" placeholder="company-slug" />
                 <p style={{ fontSize: 9, color: '#f59e0b', margin: '2px 0 0' }}>تغييره يتطلب إعادة تسجيل الدخول</p>
               </div>
               <div>
-                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>رقم الهاتف</p>
-                <input value={editForm.contact_phone} onChange={ef('contact_phone')} style={{ ...inp }} dir="ltr" placeholder="+966XXXXXXXXX" />
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>هاتف الشركة</p>
+                <input value={companyForm.contact_phone} onChange={cf('contact_phone')} style={inp} dir="ltr" placeholder="+966XXXXXXXXX" />
               </div>
               <div style={{ gridColumn: '1 / -1' }}>
-                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>البريد الإلكتروني</p>
-                <input value={editForm.contact_email} onChange={ef('contact_email')} style={{ ...inp }} dir="ltr" type="email" placeholder="email@company.com" />
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>بريد الشركة</p>
+                <input value={companyForm.contact_email} onChange={cf('contact_email')} style={inp} dir="ltr" type="email" placeholder="contact@company.com" />
               </div>
             </div>
+
+            {/* Login credentials (staff_users admin row) */}
+            <div style={{ background: 'rgba(124,58,237,.04)', border: '1px solid rgba(124,58,237,.15)', borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
+              <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--brand-600)', margin: '0 0 8px' }}>بيانات تسجيل الدخول — {au?.full_name_ar || 'مدير الشركة'}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                <div>
+                  <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>رقم جوال الدخول (OTP)</p>
+                  <input value={loginForm.phone} onChange={lf('phone')} style={secInp} dir="ltr" placeholder="+966XXXXXXXXX" type="tel" />
+                </div>
+                <div>
+                  <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>إيميل استقبال OTP</p>
+                  <input value={loginForm.email} onChange={lf('email')} style={secInp} dir="ltr" type="email" placeholder="admin@company.com" />
+                </div>
+              </div>
+              {!au && <p style={{ fontSize: 10, color: '#ef4444', margin: '6px 0 0' }}>لا يوجد مستخدم مدير — يجب إنشاء مستخدم أولاً</p>}
+            </div>
+
             <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-              <button onClick={saveEdit} disabled={saving} style={{ padding: '5px 14px', borderRadius: 7, background: 'var(--brand-600)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>{saving ? '...' : 'حفظ'}</button>
+              <button onClick={saveEdit} disabled={saving} style={{ padding: '5px 14px', borderRadius: 7, background: 'var(--brand-600)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>{saving ? '...' : 'حفظ الكل'}</button>
               <button onClick={() => setEditing(false)} style={{ padding: '5px 12px', borderRadius: 7, background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 11 }}>إلغاء</button>
               {editMsg && <span style={{ fontSize: 11, color: editMsg === 'تم الحفظ' ? '#22c55e' : '#ef4444' }}>{editMsg}</span>}
             </div>
@@ -403,8 +431,12 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
             </div>
             <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
               {c.slug} · {PLAN_AR[c.plan] || c.plan} · {lcOf(c)}
-              {c.contact_phone && <span> · {c.contact_phone}</span>}
             </p>
+            {(au?.phone || au?.email) && (
+              <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                دخول: {au.phone || '—'} · {au.email || '—'}
+              </p>
+            )}
           </div>
         )}
       </div>

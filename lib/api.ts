@@ -59,9 +59,10 @@ export const adminApi = {
   listCompanies:   ()             => request<any>('GET',  '/admin/companies'),
   getCompany:      (id: string)   => request<any>('GET',  `/admin/companies/${id}`),
   createCompany:   (data: any)    => request<any>('POST', '/admin/companies', data),
-  updateCompany:   (id: string, data: any) => request<any>('PATCH', `/admin/companies/${id}`, data),
-  suspendCompany:  (id: string)   => request<any>('POST', `/admin/companies/${id}/suspend`),
-  activateCompany: (id: string)   => request<any>('POST', `/admin/companies/${id}/activate`),
+  updateCompany:    (id: string, data: any)  => request<any>('PATCH', `/admin/companies/${id}`, data),
+  updateAdminLogin: (id: string, data: any)  => request<any>('PATCH', `/admin/companies/${id}/admin-login`, data),
+  suspendCompany:   (id: string)             => request<any>('POST', `/admin/companies/${id}/suspend`),
+  activateCompany:  (id: string)             => request<any>('POST', `/admin/companies/${id}/activate`),
   getUsage:        (id: string)   => request<any>('GET',  `/admin/companies/${id}/usage`),
   getStats:        ()             => request<any>('GET',  '/admin/stats'),
 
