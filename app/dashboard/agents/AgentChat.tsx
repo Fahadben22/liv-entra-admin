@@ -80,8 +80,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
   useEffect(() => {
     request<any>('GET', '/admin/agents/goals').then(res => {
       if (res?.data) {
-        const all = (res.data as AgentGoal[]).filter(g => g.status === 'active');
-        const filtered = all.filter((g: any) => g.assigned_to === agentType);
+        const filtered = (res.data as AgentGoal[]).filter((g: any) => g.assigned_to === agentType);
         setGoals(filtered);
       }
     }).catch(() => {});
@@ -286,35 +285,35 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
         </div>
       )}
 
-      {/* Goals toggle — collapsed by default */}
-      {goals.length > 0 && (
-        <div style={{ flexShrink: 0 }}>
-          <div style={{ padding: '4px 20px', borderBottom: '1px solid rgba(0,0,0,.04)', background: 'var(--bg)', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <button
-              onClick={() => setGoalsOpen(o => !o)}
-              style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
-            >
-              <span style={{ fontSize: 10, color: '#9ca3af' }}>الأهداف</span>
-              <span style={{ fontSize: 10, padding: '1px 7px', borderRadius: 8, background: 'rgba(124,92,252,.1)', color: '#7c5cfc', fontWeight: 700 }}>
-                {goals.length}
-              </span>
-              <span style={{ fontSize: 9, color: '#c4b5fd', transform: goalsOpen ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform .15s' }}>▼</span>
-            </button>
-          </div>
-          {goalsOpen && (
-            <div style={{ padding: '8px 20px 10px', borderBottom: '1px solid rgba(0,0,0,.06)', background: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 180, overflowY: 'auto' }}>
-              {goals.map(g => (
-                <div key={g.id} style={{ fontSize: 11, padding: '5px 10px', borderRadius: 8, background: 'rgba(124,92,252,.06)', border: '1px solid rgba(124,92,252,.15)', color: 'var(--text-1)', lineHeight: 1.5 }}>
-                  <span style={{ fontWeight: 600, color: '#7c5cfc', marginLeft: 6 }}>●</span>
-                  {g.goal_text}
-                  {g.target_value ? <span style={{ color: '#9ca3af', fontSize: 10 }}> ({g.current_value || 0}/{g.target_value})</span> : ''}
-                  {g.deadline ? <span style={{ color: '#9ca3af', fontSize: 10 }}> — {g.deadline}</span> : ''}
-                </div>
-              ))}
-            </div>
-          )}
+      {/* Goals toggle — weekly scoped */}
+      <div style={{ flexShrink: 0 }}>
+        <div style={{ padding: '4px 20px', borderBottom: '1px solid rgba(0,0,0,.04)', background: 'var(--bg)', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <button
+            onClick={() => setGoalsOpen(o => !o)}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0' }}
+          >
+            <span style={{ fontSize: 10, color: '#9ca3af' }}>أهداف الأسبوع</span>
+            <span style={{ fontSize: 10, padding: '1px 7px', borderRadius: 8, background: goals.length > 0 ? 'rgba(124,92,252,.1)' : 'rgba(0,0,0,.05)', color: goals.length > 0 ? '#7c5cfc' : '#9ca3af', fontWeight: 700 }}>
+              {goals.length}
+            </span>
+            <span style={{ fontSize: 9, color: '#c4b5fd', transform: goalsOpen ? 'rotate(180deg)' : 'none', display: 'inline-block', transition: 'transform .15s' }}>▼</span>
+          </button>
         </div>
-      )}
+        {goalsOpen && (
+          <div style={{ padding: '8px 20px 10px', borderBottom: '1px solid rgba(0,0,0,.06)', background: 'var(--surface)', display: 'flex', flexDirection: 'column', gap: 5, maxHeight: 180, overflowY: 'auto' }}>
+            {goals.length === 0 ? (
+              <p style={{ fontSize: 10, color: '#9ca3af', margin: 0, textAlign: 'center', padding: '6px 0' }}>لا أهداف هذا الأسبوع بعد</p>
+            ) : goals.map(g => (
+              <div key={g.id} style={{ fontSize: 11, padding: '5px 10px', borderRadius: 8, background: g.status === 'completed' ? 'rgba(16,185,129,.06)' : 'rgba(124,92,252,.06)', border: `1px solid ${g.status === 'completed' ? 'rgba(16,185,129,.2)' : 'rgba(124,92,252,.15)'}`, color: 'var(--text-1)', lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 600, color: g.status === 'completed' ? '#10b981' : '#7c5cfc', marginLeft: 6 }}>{g.status === 'completed' ? '✓' : '●'}</span>
+                {g.goal_text}
+                {g.target_value ? <span style={{ color: '#9ca3af', fontSize: 10 }}> ({g.current_value || 0}/{g.target_value})</span> : ''}
+                {g.deadline ? <span style={{ color: '#9ca3af', fontSize: 10 }}> — {g.deadline}</span> : ''}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Tab switcher */}
       <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid rgba(0,0,0,.06)', flexShrink: 0, paddingLeft: 20 }}>

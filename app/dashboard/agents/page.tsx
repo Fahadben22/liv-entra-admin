@@ -420,6 +420,7 @@ export default function AgentsWorkspace() {
   const [reports, setReports] = useState<any[]>([]);
   const [actions, setActions] = useState<any[]>([]);
   const [directives, setDirectives] = useState<any[]>([]);
+  const [pendingDirectivesCount, setPendingDirectivesCount] = useState(0);
   const [sidebarTab, setSidebarTab] = useState<'actions' | 'reports' | 'feed'>('actions');
   const [acting, setActing] = useState<string | null>(null);
   const [workshopOpen, setWorkshopOpen] = useState(false);
@@ -428,7 +429,11 @@ export default function AgentsWorkspace() {
     const [r, a, d] = await Promise.allSettled([adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.(), adminApi.sa.getLiveDirectives?.()]);
     if (r.status === 'fulfilled') setReports((r.value as any)?.data || []);
     if (a.status === 'fulfilled') setActions((a.value as any)?.data || []);
-    if (d.status === 'fulfilled') setDirectives((d.value as any)?.data || []);
+    if (d.status === 'fulfilled') {
+      const dRes = (d.value as any);
+      setDirectives(dRes?.data || []);
+      setPendingDirectivesCount(dRes?.pendingCount ?? 0);
+    }
   }, []);
   useEffect(() => { loadSidebar(); const iv = setInterval(loadSidebar, 30000); return () => clearInterval(iv); }, [loadSidebar]);
 
@@ -544,8 +549,11 @@ export default function AgentsWorkspace() {
         <div style={{ width: 300, borderRight: '1px solid rgba(0,0,0,.06)', background: 'var(--bg)', overflowY: 'auto', flexShrink: 0 }}>
           <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(0,0,0,.04)', background: 'var(--surface)', position: 'sticky', top: 0, zIndex: 10 }}>
             <div style={{ display: 'flex', gap: 4 }}>
-              <button onClick={() => setSidebarTab('feed')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'feed' ? 700 : 400, border: `1px solid ${sidebarTab === 'feed' ? '#7c3aed' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'feed' ? 'rgba(124,58,237,.07)' : 'var(--surface)', color: sidebarTab === 'feed' ? '#7c3aed' : 'var(--text-muted)', cursor: 'pointer' }}>
-                مباشر <span style={{ fontSize: 9, opacity: .7 }}>({directives.length})</span>
+              <button onClick={() => setSidebarTab('feed')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'feed' ? 700 : 400, border: `1px solid ${sidebarTab === 'feed' ? '#7c3aed' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'feed' ? 'rgba(124,58,237,.07)' : 'var(--surface)', color: sidebarTab === 'feed' ? '#7c3aed' : 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                مباشر
+                {pendingDirectivesCount > 0 && (
+                  <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 8, background: '#ef4444', color: '#fff', fontWeight: 700 }}>{pendingDirectivesCount}</span>
+                )}
               </button>
               <button onClick={() => setSidebarTab('actions')} style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: sidebarTab === 'actions' ? 700 : 400, border: `1px solid ${sidebarTab === 'actions' ? '#2563EB' : 'rgba(0,0,0,.06)'}`, background: sidebarTab === 'actions' ? 'rgba(124,92,252,.06)' : 'var(--surface)', color: sidebarTab === 'actions' ? '#2563EB' : 'var(--text-muted)', cursor: 'pointer' }}>
                 مهام {pendingCount > 0 && <span style={{ background: 'var(--danger)', color: '#fff', borderRadius: '50%', padding: '0 4px', fontSize: 8, marginRight: 2 }}>{pendingCount}</span>}
@@ -561,47 +569,47 @@ export default function AgentsWorkspace() {
               <>
                 {directives.length === 0 && (
                   <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', padding: 24, lineHeight: 1.7 }}>
-                    لا يوجد تواصل بين الوكلاء في آخر 24 ساعة<br />
-                    <span style={{ fontSize: 10, opacity: .6 }}>سيظهر هنا كل أمر وكل رد</span>
+                    لا يوجد تواصل نشط الآن<br />
+                    <span style={{ fontSize: 10, opacity: .6 }}>ستظهر هنا الأوامر المعلّقة والردود الأخيرة</span>
                   </p>
                 )}
-                {directives.map((d, idx) => {
+                {pendingDirectivesCount > 0 && (
+                  <div style={{ fontSize: 9, color: '#ef4444', fontWeight: 600, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#ef4444', animation: 'pulse-dot 1.4s ease-in-out infinite' }} />
+                    {pendingDirectivesCount} بانتظار الرد
+                  </div>
+                )}
+                {directives.map((d) => {
                   const from = AGENT_STYLE[d.from_agent] || { label: d.from_agent, color: '#6b7280', bg: '#f9fafb' };
                   const to   = AGENT_STYLE[d.to_agent]   || { label: d.to_agent,   color: '#6b7280', bg: '#f9fafb' };
                   const st   = DIRECTIVE_STATUS[d.status] || DIRECTIVE_STATUS.pending;
-                  const isFirst = idx === 0 || new Date(directives[idx - 1].created_at).toDateString() !== new Date(d.created_at).toDateString();
+                  const isPending = d.status === 'pending';
                   return (
-                    <div key={d.id}>
-                      {isFirst && (
-                        <div style={{ textAlign: 'center', margin: '6px 0', fontSize: 9, color: '#d1d5db' }}>
-                          {new Date(d.created_at).toLocaleDateString('ar-SA', { weekday: 'long', month: 'short', day: 'numeric' })}
+                    <div key={d.id} style={{ background: 'var(--surface)', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: isPending ? '1px solid rgba(239,68,68,.25)' : '1px solid rgba(0,0,0,.04)', borderRight: `3px solid ${from.color}`, opacity: isPending ? 1 : 0.8 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          {isPending && <span style={{ display: 'inline-block', width: 5, height: 5, borderRadius: '50%', background: '#ef4444', animation: 'pulse-dot 1.4s ease-in-out infinite', flexShrink: 0 }} />}
+                          <span style={{ fontSize: 9, fontWeight: 700, color: from.color, background: from.bg, padding: '1px 6px', borderRadius: 4 }}>{from.label}</span>
+                          <span style={{ fontSize: 9, color: '#d1d5db' }}>←</span>
+                          <span style={{ fontSize: 9, fontWeight: 600, color: to.color, background: to.bg, padding: '1px 6px', borderRadius: 4 }}>{to.label}</span>
+                        </div>
+                        <span style={{ fontSize: 9, color: '#d1d5db' }}>{timeAgoFeed(d.created_at)}</span>
+                      </div>
+                      <p style={{ fontSize: 11, color: 'var(--text-1)', margin: '0 0 6px', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.directive}</p>
+                      {d.reply && (
+                        <div style={{ background: '#f8faff', border: '1px solid #e0e7ff', borderRadius: 6, padding: '6px 8px', borderRight: `2px solid ${to.color}` }}>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: to.color, marginBottom: 3 }}>رد {to.label} {d.replied_at ? `· ${timeAgoFeed(d.replied_at)}` : ''}</div>
+                          <p style={{ fontSize: 10, color: '#374151', margin: 0, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.reply}</p>
                         </div>
                       )}
-                      <div style={{ background: 'var(--surface)', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)', borderRight: `3px solid ${from.color}` }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <span style={{ fontSize: 9, fontWeight: 700, color: from.color, background: from.bg, padding: '1px 6px', borderRadius: 4 }}>{from.label}</span>
-                            <span style={{ fontSize: 9, color: '#d1d5db' }}>←</span>
-                            <span style={{ fontSize: 9, fontWeight: 600, color: to.color, background: to.bg, padding: '1px 6px', borderRadius: 4 }}>{to.label}</span>
-                          </div>
-                          <span style={{ fontSize: 9, color: '#d1d5db' }}>{timeAgoFeed(d.created_at)}</span>
-                        </div>
-                        <p style={{ fontSize: 11, color: 'var(--text-1)', margin: '0 0 6px', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.directive}</p>
-                        {d.reply && (
-                          <div style={{ background: '#f8faff', border: '1px solid #e0e7ff', borderRadius: 6, padding: '6px 8px', borderRight: `2px solid ${to.color}` }}>
-                            <div style={{ fontSize: 9, fontWeight: 600, color: to.color, marginBottom: 3 }}>رد {to.label} {d.replied_at ? `· ${timeAgoFeed(d.replied_at)}` : ''}</div>
-                            <p style={{ fontSize: 10, color: '#374151', margin: 0, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.reply}</p>
-                          </div>
-                        )}
-                        <div style={{ marginTop: 4, textAlign: 'left' }}>
-                          <span style={{ fontSize: 9, color: st.color, fontWeight: 600 }}>{st.label}</span>
-                        </div>
+                      <div style={{ marginTop: 4, textAlign: 'left' }}>
+                        <span style={{ fontSize: 9, color: st.color, fontWeight: 600 }}>{st.label}</span>
                       </div>
                     </div>
                   );
                 })}
                 {directives.length > 0 && (
-                  <p style={{ textAlign: 'center', fontSize: 9, color: '#d1d5db', margin: '4px 0 0' }}>آخر 24 ساعة · تحديث تلقائي كل 30 ثانية</p>
+                  <p style={{ textAlign: 'center', fontSize: 9, color: '#d1d5db', margin: '4px 0 0' }}>معلّق + آخر 24 ساعة · تحديث كل 30 ثانية</p>
                 )}
               </>
             )}
