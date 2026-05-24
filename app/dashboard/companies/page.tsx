@@ -314,8 +314,36 @@ function MiniBtn({ label, variant, onClick }: { label: string; variant: 'default
 // ─── Detail Panel ────────────────────────────────────────────────────────────
 function DetailPanel({ company: c, usage, flags, audit, plans, registry, onAction, onToggleFlag, onReload, onClose }: any) {
   const [dtab, setDtab] = useState('overview');
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ name_ar: '', name: '', slug: '', contact_phone: '', contact_email: '' });
+  const [saving, setSaving] = useState(false);
+  const [editMsg, setEditMsg] = useState('');
   const pc = PLAN_C[c?.plan] || PLAN_C.basic;
   if (!c) return null;
+
+  const startEdit = () => {
+    setEditForm({ name_ar: c.name_ar || '', name: c.name || '', slug: c.slug || '', contact_phone: c.contact_phone || '', contact_email: c.contact_email || '' });
+    setEditMsg('');
+    setEditing(true);
+  };
+
+  const saveEdit = async () => {
+    setSaving(true);
+    setEditMsg('');
+    try {
+      await adminApi.updateCompany(c.id, editForm);
+      setEditMsg('تم الحفظ');
+      setEditing(false);
+      onReload();
+      setTimeout(() => setEditMsg(''), 2500);
+    } catch (e: any) {
+      setEditMsg(e.message || 'خطأ');
+    }
+    setSaving(false);
+  };
+
+  const ef = (k: keyof typeof editForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setEditForm(p => ({ ...p, [k]: e.target.value }));
 
   const DTABS = [
     { key: 'overview', label: 'نظرة عامة' },
@@ -325,16 +353,60 @@ function DetailPanel({ company: c, usage, flags, audit, plans, registry, onActio
     { key: 'audit', label: 'التدقيق' },
   ];
 
+  const inp = { padding: '5px 10px', borderRadius: 7, border: '1px solid var(--border)', fontSize: 12, background: 'var(--surface)', color: 'var(--text-1)', outline: 'none', width: '100%', boxSizing: 'border-box' as const };
+
   return (
     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 20, marginTop: 10, position: 'relative' }}>
       <button onClick={onClose} style={{ position: 'absolute', top: 14, left: 14, background: 'var(--ink-100)', border: 'none', borderRadius: 6, width: 26, height: 26, cursor: 'pointer', fontSize: 12, color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-        <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--brand-600)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--surface)', fontSize: 14, fontWeight: 600 }}>{(c.name_ar || c.name || '?').charAt(0)}</div>
-        <div>
-          <h2 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: 'var(--text-1)' }}>{c.name_ar || c.name}</h2>
-          <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0 }}>{c.slug} · {PLAN_AR[c.plan] || c.plan} · {lcOf(c)}</p>
-        </div>
+      {/* Company info header — view or edit mode */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16 }}>
+        <div style={{ width: 36, height: 36, borderRadius: 8, background: 'var(--brand-600)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--surface)', fontSize: 14, fontWeight: 600, flexShrink: 0 }}>{(c.name_ar || c.name || '?').charAt(0)}</div>
+
+        {editing ? (
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 6 }}>
+              <div>
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>الاسم بالعربي</p>
+                <input value={editForm.name_ar} onChange={ef('name_ar')} style={inp} placeholder="اسم الشركة" />
+              </div>
+              <div>
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>الاسم بالإنجليزي</p>
+                <input value={editForm.name} onChange={ef('name')} style={{ ...inp }} dir="ltr" placeholder="Company name" />
+              </div>
+              <div>
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>معرّف تسجيل الدخول</p>
+                <input value={editForm.slug} onChange={ef('slug')} style={{ ...inp }} dir="ltr" placeholder="company-slug" />
+                <p style={{ fontSize: 9, color: '#f59e0b', margin: '2px 0 0' }}>تغييره يتطلب إعادة تسجيل الدخول</p>
+              </div>
+              <div>
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>رقم الهاتف</p>
+                <input value={editForm.contact_phone} onChange={ef('contact_phone')} style={{ ...inp }} dir="ltr" placeholder="+966XXXXXXXXX" />
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '0 0 3px' }}>البريد الإلكتروني</p>
+                <input value={editForm.contact_email} onChange={ef('contact_email')} style={{ ...inp }} dir="ltr" type="email" placeholder="email@company.com" />
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <button onClick={saveEdit} disabled={saving} style={{ padding: '5px 14px', borderRadius: 7, background: 'var(--brand-600)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>{saving ? '...' : 'حفظ'}</button>
+              <button onClick={() => setEditing(false)} style={{ padding: '5px 12px', borderRadius: 7, background: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 11 }}>إلغاء</button>
+              {editMsg && <span style={{ fontSize: 11, color: editMsg === 'تم الحفظ' ? '#22c55e' : '#ef4444' }}>{editMsg}</span>}
+            </div>
+          </div>
+        ) : (
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h2 style={{ fontSize: 15, fontWeight: 600, margin: 0, color: 'var(--text-1)' }}>{c.name_ar || c.name}</h2>
+              <button onClick={startEdit} title="تعديل" style={{ padding: '2px 8px', borderRadius: 6, border: '1px solid var(--border)', background: 'transparent', cursor: 'pointer', fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5 }}>تعديل</button>
+              {editMsg && <span style={{ fontSize: 11, color: '#22c55e' }}>{editMsg}</span>}
+            </div>
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+              {c.slug} · {PLAN_AR[c.plan] || c.plan} · {lcOf(c)}
+              {c.contact_phone && <span> · {c.contact_phone}</span>}
+            </p>
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'flex', gap: 2, marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 0 }}>
