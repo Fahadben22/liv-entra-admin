@@ -290,7 +290,7 @@ export default function AutopilotPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await request<any>('GET', '/autopilot/goals');
+      const res = await request<any>('GET', '/admin/autopilot/goals');
       setGoals(res?.data ?? []);
     } catch { /* silent — empty state shown */ }
     setLoading(false);
@@ -299,19 +299,19 @@ export default function AutopilotPage() {
   useEffect(() => { load(); }, [load]);
 
   async function handleCreate(data: Record<string, unknown>) {
-    await request('POST', '/autopilot/goals', data);
+    await request('POST', '/admin/autopilot/goals', data);
     load();
   }
 
   async function handleEdit(id: string, data: Record<string, unknown>) {
-    await request('PATCH', `/autopilot/goals/${id}`, data);
+    await request('PATCH', `/admin/autopilot/goals/${id}`, data);
     load();
   }
 
   async function handleDrop(id: string) {
     if (!confirm('هل تريد إيقاف هذا الهدف؟')) return;
     try {
-      await request('PATCH', `/autopilot/goals/${id}`, { status: 'dropped' });
+      await request('PATCH', `/admin/autopilot/goals/${id}`, { status: 'dropped' });
       load();
     } catch { /* silent */ }
   }
