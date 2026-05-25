@@ -23,6 +23,7 @@ const SECTION_ICONS: Record<string, IconName> = {
   '/dashboard/agents/reea': 'robot',
   '/dashboard/reea': 'cpu',
   '/dashboard/reea/authority': 'shield',
+  '/dashboard/ai-ops':      'shield',
   '/dashboard/ai-knowledge': 'cpu',
   '/dashboard/companies/lifecycle': 'activity',
   '/dashboard/billing/settlements': 'coins',

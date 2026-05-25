@@ -46,6 +46,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/agents/correlations',  label: 'الارتباطات',     section: 'ops' },
   { href: '/dashboard/agents/constitution', label: 'دستور الوكلاء',  section: 'ops' },
   { href: '/dashboard/agents/time-machine', label: 'آلة الزمن',      section: 'ops' },
+  { href: '/dashboard/ai-ops',              label: 'حوكمة الذكاء',    section: 'ops' },
   { href: '/dashboard/agents',              label: 'الوكلاء',         section: 'ops' },
   { href: '/dashboard/agents/reea',     label: 'REEA — Chat',    section: 'ops' },
   { href: '/dashboard/reea',                label: 'REEA — AOM',       section: 'ops' },
