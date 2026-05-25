@@ -5,10 +5,15 @@ import Link from 'next/link';
 import { FileText, Download, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string }> = {
-  draft:         { label: 'مسودة',          color: '#6b7280', bg: 'var(--bg)' },
-  sent:          { label: 'مُرسل',           color: 'var(--info)', bg: 'var(--info-bg)' },
-  acknowledged:  { label: 'مُقَر به',         color: 'var(--success)', bg: 'var(--success-bg)' },
-  completed:     { label: 'مكتمل',           color: '#8b5cf6', bg: '#f5f3ff' },
+  draft:         { label: 'مسودة',          color: '#6b7280', bg: '#f9fafb' },
+  pending:       { label: 'معلقة',           color: '#b45309', bg: '#fef3c7' },
+  under_review:  { label: 'قيد المراجعة',   color: '#1d4ed8', bg: '#dbeafe' },
+  acknowledged:  { label: 'مُقَر به',         color: '#047857', bg: '#d1fae5' },
+  approved:      { label: 'معتمدة',          color: '#065f46', bg: '#d1fae5' },
+  transferred:   { label: 'تم التحويل',     color: '#166534', bg: '#dcfce7' },
+  completed:     { label: 'مكتمل',           color: '#5b21b6', bg: '#f5f3ff' },
+  disputed:      { label: 'متنازع عليها',   color: '#b91c1c', bg: '#fee2e2' },
+  cancelled:     { label: 'ملغاة',           color: '#6b7280', bg: '#f3f4f6' },
 };
 
 function formatSAR(n: number | null) {
@@ -90,10 +95,9 @@ export default function SettlementsAdminPage() {
         </select>
         <select value={statusFilter} onChange={e => setStatus(e.target.value)} style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid var(--border)', fontSize: 13, background: 'var(--surface)', cursor: 'pointer' }}>
           <option value="">جميع الحالات</option>
-          <option value="draft">مسودة</option>
-          <option value="sent">مُرسل</option>
-          <option value="acknowledged">مُقَر به</option>
-          <option value="completed">مكتمل</option>
+          {Object.entries(STATUS_META).map(([k, v]) => (
+            <option key={k} value={k}>{v.label}</option>
+          ))}
         </select>
         <button onClick={() => { setPage(1); load(1); }} style={{ padding: '8px 18px', background: 'var(--brand-600)', color: 'white', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
           بحث
@@ -113,7 +117,7 @@ export default function SettlementsAdminPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr style={{ background: 'var(--bg)', borderBottom: '1px solid var(--border)' }}>
-                {['الشركة', 'المالك', 'الفترة', 'إجمالي المحصّل', 'صافي الدفع', 'الحالة', 'بتاريخ', 'إجراء'].map(h => (
+                {['الشركة', 'المالك', 'النوع', 'الفترة', 'المحصّل', 'الصافي', 'الحالة', 'بتاريخ', 'PDF'].map(h => (
                   <th key={h} style={{ padding: '11px 14px', textAlign: 'right', fontWeight: 600, color: 'var(--text-1)', fontSize: 12 }}>{h}</th>
                 ))}
               </tr>
@@ -121,20 +125,24 @@ export default function SettlementsAdminPage() {
             <tbody>
               {settlements.map((s: any, i: number) => {
                 const statusMeta = STATUS_META[s.status] || { label: s.status, color: '#6b7280', bg: '#f9fafb' };
+                const typeLabel: Record<string, string> = { monthly: 'شهري', quarterly: 'ربعي', half_yearly: 'نصفي', annual: 'سنوي', final: 'نهائي' };
                 return (
                   <tr key={s.id} style={{ borderBottom: i < settlements.length - 1 ? '1px solid var(--border)' : 'none' }}>
                     <td style={{ padding: '11px 14px', fontWeight: 500, color: 'var(--text-1)' }}>
                       {s.companies?.name_ar || '—'}
                     </td>
                     <td style={{ padding: '11px 14px' }}>{s.property_owners?.full_name_ar || '—'}</td>
+                    <td style={{ padding: '11px 14px', fontSize: 11, color: 'var(--text-3)' }}>
+                      {typeLabel[s.statement_type] || s.statement_type || '—'}
+                    </td>
                     <td style={{ padding: '11px 14px', color: 'var(--text-3)', fontSize: 12 }}>
-                      {formatDate(s.period_start)} — {formatDate(s.period_end)}
+                      {s.settlement_period_start ? `${s.settlement_period_start} — ${s.settlement_period_end}` : '—'}
                     </td>
                     <td style={{ padding: '11px 14px', color: '#16a34a', fontWeight: 500 }}>
                       {formatSAR(s.total_collected)}
                     </td>
                     <td style={{ padding: '11px 14px', fontWeight: 700, color: 'var(--text-1)' }}>
-                      {formatSAR(s.net_payout)}
+                      {formatSAR(s.net_to_owner)}
                     </td>
                     <td style={{ padding: '11px 14px' }}>
                       <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 12, background: statusMeta.bg, color: statusMeta.color }}>
