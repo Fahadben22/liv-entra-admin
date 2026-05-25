@@ -42,6 +42,7 @@ export const NAV_ITEMS = [
   { href: '/dashboard/mission-control', label: 'مركز الأوامر',  section: 'ops' },
   { href: '/dashboard/agenda',          label: 'الأجندة',        section: 'ops' },
   { href: '/dashboard/agents',              label: 'الوكلاء',         section: 'ops' },
+  { href: '/dashboard/autopilot',           label: 'الأهداف التشغيلية', section: 'ops' },
   { href: '/dashboard/reea',                label: 'REEA',             section: 'ops' },
   { href: '/dashboard/ai-ops',              label: 'حوكمة الذكاء',    section: 'ops' },
   { href: '/dashboard/properties/import',   label: 'استيراد المحافظ',  section: 'ops' },
