@@ -11,7 +11,7 @@ interface AutopilotGoal {
   current_value: number | null;
   deadline: string | null;
   status: 'active' | 'achieved' | 'dropped';
-  assigned_agent: string | null;
+  assigned_to: string | null;
   created_at: string;
 }
 
@@ -33,7 +33,16 @@ const STATUS_CFG: Record<AutopilotGoal['status'], { label: string; color: string
   dropped:  { label: 'متوقف', color: '#6b7280', bg: '#f3f4f6' },
 };
 
-const BLANK: CreateForm = { goal_text: '', target_metric: 'occupancy_rate', target_value: '', deadline: '' };
+const AGENTS: { value: string; label: string }[] = [
+  { value: '',          label: 'بدون تكليف' },
+  { value: 'it',        label: 'سالم — IT' },
+  { value: 'sales',     label: 'خالد — المبيعات' },
+  { value: 'marketing', label: 'نورة — التسويق' },
+  { value: 'finance',   label: 'ريم — المالية' },
+  { value: 'product',   label: 'يوسف — المنتج' },
+];
+
+const BLANK: CreateForm = { goal_text: '', target_metric: 'occupancy_rate', target_value: '', deadline: '', assigned_to: '' };
 
 // ── Shared styles ─────────────────────────────────────────────────────────────
 const inputStyle: React.CSSProperties = {
@@ -95,7 +104,7 @@ function ProgressBar({ current, target, status }: { current: number | null; targ
 }
 
 // ── Modal (create + edit) ─────────────────────────────────────────────────────
-interface CreateForm { goal_text: string; target_metric: string; target_value: string; deadline: string; }
+interface CreateForm { goal_text: string; target_metric: string; target_value: string; deadline: string; assigned_to: string; }
 interface EditForm extends CreateForm { status: AutopilotGoal['status']; }
 
 interface ModalProps {
@@ -123,8 +132,9 @@ function GoalModal({ mode, initial, onSave, onClose }: ModalProps) {
         target_metric: form.target_metric,
         target_value:  Number(form.target_value),
       };
-      if (form.deadline) payload.deadline = form.deadline;
-      if (mode === 'edit') payload.status = form.status;
+      if (form.deadline)     payload.deadline    = form.deadline;
+      if (form.assigned_to)  payload.assigned_to = form.assigned_to;
+      if (mode === 'edit')   payload.status      = form.status;
       await onSave(payload);
       onClose();
     } catch (e: any) {
@@ -178,13 +188,20 @@ function GoalModal({ mode, initial, onSave, onClose }: ModalProps) {
           />
         </label>
 
-        <label style={{ display: 'block', marginBottom: mode === 'edit' ? 14 : 22 }}>
+        <label style={{ display: 'block', marginBottom: 14 }}>
           <span style={labelStyle}>الموعد النهائي (اختياري)</span>
           <input
             type="date" value={form.deadline}
             onChange={e => set('deadline', e.target.value)}
             style={inputStyle}
           />
+        </label>
+
+        <label style={{ display: 'block', marginBottom: mode === 'edit' ? 14 : 22 }}>
+          <span style={labelStyle}>تكليف الوكيل (اختياري)</span>
+          <select value={form.assigned_to} onChange={e => set('assigned_to', e.target.value)} style={inputStyle}>
+            {AGENTS.map(a => <option key={a.value} value={a.value}>{a.label}</option>)}
+          </select>
         </label>
 
         {mode === 'edit' && (
@@ -243,7 +260,7 @@ function GoalRow({ goal, onEdit, onDrop }: { goal: AutopilotGoal; onEdit: () => 
       {/* Agent */}
       <td style={{ padding: '14px 14px', verticalAlign: 'middle' }}>
         <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-          {goal.assigned_agent || '—'}
+          {AGENTS.find(a => a.value === goal.assigned_to)?.label || goal.assigned_to || '—'}
         </span>
       </td>
 
