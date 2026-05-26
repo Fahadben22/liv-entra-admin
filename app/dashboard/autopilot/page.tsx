@@ -7,8 +7,8 @@ interface AutopilotGoal {
   id: string;
   goal_text: string;
   target_metric: string;
-  target_value: number;
-  current_value: number;
+  target_value: number | null;
+  current_value: number | null;
   deadline: string | null;
   status: 'active' | 'achieved' | 'dropped';
   assigned_agent: string | null;
@@ -58,9 +58,9 @@ const ghostBtnStyle: React.CSSProperties = {
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function progressPct(current: number, target: number) {
+function progressPct(current: number | null, target: number | null) {
   if (!target) return 0;
-  return Math.min(Math.round((current / target) * 100), 100);
+  return Math.min(Math.round(((current ?? 0) / target) * 100), 100);
 }
 
 function fmtDate(iso: string | null) {
@@ -73,8 +73,10 @@ function isOverdue(deadline: string | null, status: AutopilotGoal['status']) {
 }
 
 // ── Progress bar ──────────────────────────────────────────────────────────────
-function ProgressBar({ current, target, status }: { current: number; target: number; status: AutopilotGoal['status'] }) {
-  const pct = progressPct(current, target);
+function ProgressBar({ current, target, status }: { current: number | null; target: number | null; status: AutopilotGoal['status'] }) {
+  const c = current ?? 0;
+  const t = target ?? 0;
+  const pct = progressPct(c, t);
   const color = status === 'achieved' ? '#6366f1'
     : pct >= 80 ? '#10b981'
     : pct >= 40 ? '#f59e0b'
@@ -82,7 +84,7 @@ function ProgressBar({ current, target, status }: { current: number; target: num
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{current.toLocaleString()} / {target.toLocaleString()}</span>
+        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{c.toLocaleString()} / {t.toLocaleString()}</span>
         <span style={{ fontSize: 11, fontWeight: 700, color }}>{pct}%</span>
       </div>
       <div style={{ height: 6, background: 'var(--bg)', borderRadius: 6, overflow: 'hidden' }}>
@@ -209,7 +211,7 @@ function GoalModal({ mode, initial, onSave, onClose }: ModalProps) {
 
 // ── Goal row ──────────────────────────────────────────────────────────────────
 function GoalRow({ goal, onEdit, onDrop }: { goal: AutopilotGoal; onEdit: () => void; onDrop: () => void }) {
-  const st      = STATUS_CFG[goal.status];
+  const st      = STATUS_CFG[goal.status] ?? STATUS_CFG.active;
   const overdue = isOverdue(goal.deadline, goal.status);
 
   return (
