@@ -12,10 +12,9 @@ const EMPTY_FORM = {
   name: '', location_tag: 'entrance',
   device_serial: '', ezviz_email: '', ezviz_password: '',
   rtsp_url: '', rtsp_username: '', rtsp_password: '',
-  tutk_uid: '', tutk_password: '',
 };
 
-type StreamData = { hls?: string | null; hls_smooth?: string | null; rtmp?: string | null; flv?: string | null; rtsp?: string | null; provider?: string; tutk_uid?: string; debug?: any[] };
+type StreamData = { hls?: string | null; hls_smooth?: string | null; rtmp?: string | null; flv?: string | null; rtsp?: string | null; provider?: string; debug?: any[] };
 
 
 // ── EZUIKit Live Player ───────────────────────────────────────────────────────
@@ -134,53 +133,6 @@ function StreamModal({ cam, data, onClose, showToast }: {
   );
 }
 
-// ── TUTK Live Preview Modal (auto-refreshes snapshots every 5 s) ───────────────
-function TutkLiveModal({ cam, onClose, showToast }: {
-  cam: any; onClose: () => void; showToast: (m: string) => void;
-}) {
-  const [snap,    setSnap]    = useState('');
-  const [loading, setLoading] = useState(true);
-  const [err,     setErr]     = useState('');
-
-  const refresh = async () => {
-    try {
-      const r: any = await (await import('@/lib/api')).adminApi.cameras.snapshot(cam.id);
-      if (r.data?.url) { setSnap(r.data.url); setErr(''); }
-    } catch (e: any) { setErr(e.message || 'فشل'); }
-    finally { setLoading(false); }
-  };
-
-  useEffect(() => {
-    refresh();
-    const t = setInterval(refresh, 5000);
-    return () => clearInterval(t);
-  }, [cam.id]);
-
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 9998, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      onClick={onClose}>
-      <div style={{ background: 'var(--bg)', borderRadius: 16, padding: 20, maxWidth: 740, width: '95%' }} onClick={e => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#22c55e', boxShadow: '0 0 6px #22c55e', display: 'inline-block' }} />
-            <p style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-1)', margin: 0 }}>{cam.name} — معاينة مباشرة (P2P)</p>
-          </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 22, lineHeight: 1 }}>×</button>
-        </div>
-        <div style={{ background: '#020617', borderRadius: 10, overflow: 'hidden', minHeight: 320, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-          {loading && !snap && <p style={{ color: 'var(--text-2)', fontSize: 12 }}>جاري الاتصال بالكاميرا عبر P2P...</p>}
-          {err && !snap && <p style={{ color: '#ef4444', fontSize: 12 }}>{err}</p>}
-          {snap && <img src={snap} alt="live" style={{ width: '100%', height: 'auto', display: 'block' }} />}
-          <span style={{ position: 'absolute', bottom: 8, left: 8, fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>تحديث كل 5 ثوانٍ</span>
-        </div>
-        <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '10px 0 0' }}>
-          UBox / ThroughTek P2P · UID: {cam.device_serial?.replace('tutk_', '').toUpperCase() || '—'}
-        </p>
-      </div>
-    </div>
-  );
-}
-
 export default function CamerasPage() {
   const [companies,   setCompanies]   = useState<any[]>([]);
   const [properties,  setProperties]  = useState<any[]>([]);
@@ -193,8 +145,7 @@ export default function CamerasPage() {
 
   const [companyId,   setCompanyId]   = useState('');
   const [propertyId,  setPropertyId]  = useState('');
-  const [provider,    setProvider]    = useState<'ezviz' | 'rtsp' | 'tutk'>('ezviz');
-  const [tutkLiveModal, setTutkLiveModal] = useState<any>(null);
+  const [provider,    setProvider]    = useState<'ezviz' | 'rtsp'>('ezviz');
   const [form,        setForm]        = useState({ ...EMPTY_FORM });
   const [showForm,    setShowForm]    = useState(false);
   const [activeTab,   setActiveTab]   = useState<'cameras' | 'devices'>('cameras');
@@ -255,11 +206,10 @@ export default function CamerasPage() {
     if (provider === 'ezviz' && (!form.device_serial || !form.ezviz_email || !form.ezviz_password))
       return showToast('Serial Number وبيانات حساب EZVIZ مطلوبة');
     if (provider === 'rtsp' && !form.rtsp_url) return showToast('RTSP URL مطلوب');
-    if (provider === 'tutk' && !form.tutk_uid) return showToast('UID الكاميرا مطلوب');
     setSaving(true);
     try {
       await adminApi.cameras.add(propertyId, { ...form, provider, company_id: companyId });
-      showToast(provider === 'tutk' ? 'تمت إضافة كاميرا UBox/P2P' : 'تمت إضافة الكاميرا');
+      showToast('تمت إضافة الكاميرا');
       setForm({ ...EMPTY_FORM }); setShowForm(false); reloadCameras();
     } catch (e: any) { showToast(`خطأ: ${e.message}`); }
     setSaving(false);
@@ -287,7 +237,6 @@ export default function CamerasPage() {
   };
 
   const handleStream = async (cam: any) => {
-    if (cam.provider === 'tutk') { setTutkLiveModal(cam); return; }
     setLoadingStream(cam.id);
     try {
       const r: any = await adminApi.cameras.stream(cam.id);
@@ -459,8 +408,8 @@ export default function CamerasPage() {
                           <div key={cam.id} style={{ background: 'var(--lv-bg)', borderRadius: 12, border: '1px solid var(--lv-line)', overflow: 'hidden' }}>
                             {/* Snapshot preview — click to open live stream */}
                             <div
-                              onClick={() => (cam.provider === 'ezviz' || cam.provider === 'tutk') && handleStream(cam)}
-                              style={{ background: '#0f172a', aspectRatio: '16/9', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: (cam.provider === 'ezviz' || cam.provider === 'tutk') ? 'pointer' : 'default' }}>
+                              onClick={() => cam.provider === 'ezviz' && handleStream(cam)}
+                              style={{ background: '#0f172a', aspectRatio: '16/9', position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: cam.provider === 'ezviz' ? 'pointer' : 'default' }}>
                               {snapshots[cam.id] ? (
                                 <img src={snapshots[cam.id]} alt="snap" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
                               ) : (
@@ -468,9 +417,9 @@ export default function CamerasPage() {
                               )}
                               {/* Provider badge */}
                               <span style={{ position: 'absolute', top: 6, right: 6, fontSize: 10, padding: '2px 7px', borderRadius: 5,
-                                background: cam.provider === 'rtsp' ? 'rgba(59,130,246,.85)' : cam.provider === 'tutk' ? 'rgba(234,88,12,.85)' : 'rgba(124,92,252,.85)',
+                                background: cam.provider === 'rtsp' ? 'rgba(59,130,246,.85)' : 'rgba(124,92,252,.85)',
                                 color: '#fff', fontWeight: 600 }}>
-                                {cam.provider === 'tutk' ? 'UBox/P2P' : cam.provider?.toUpperCase()}
+                                {cam.provider?.toUpperCase()}
                               </span>
                               {/* Online status dot */}
                               {status && (
@@ -479,7 +428,7 @@ export default function CamerasPage() {
                                   boxShadow: status.online ? '0 0 6px #22c55e' : 'none' }} />
                               )}
                               {/* Play hint */}
-                              {(cam.provider === 'ezviz' || cam.provider === 'tutk') && (
+                              {cam.provider === 'ezviz' && (
                                 <div style={{ position: 'absolute', bottom: 6, left: 6, width: 28, height: 28, borderRadius: '50%',
                                   background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                   <Icon name="play" size={13} color="#fff" />
@@ -503,9 +452,9 @@ export default function CamerasPage() {
 
                               {/* Action buttons */}
                               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                                {(cam.provider === 'ezviz' || cam.provider === 'tutk') && (
+                                {cam.provider === 'ezviz' && (
                                   <button onClick={() => handleStream(cam)} disabled={loadingStream === cam.id}
-                                    style={{ flex: 1, padding: '5px 0', borderRadius: 7, background: 'var(--bg)', color: cam.provider === 'tutk' ? '#fb923c' : '#38bdf8', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
+                                    style={{ flex: 1, padding: '5px 0', borderRadius: 7, background: 'var(--bg)', color: '#38bdf8', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 11, fontWeight: 600 }}>
                                     {loadingStream === cam.id ? '...' : 'بث مباشر'}
                                   </button>
                                 )}
@@ -566,12 +515,12 @@ export default function CamerasPage() {
 
                   {/* Provider toggle */}
                   <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-                    {([['ezviz', 'EZVIZ'], ['rtsp', 'RTSP — أي كاميرا'], ['tutk', 'UBox / P2P']] as const).map(([p, label]) => (
+                    {(['ezviz', 'rtsp'] as const).map(p => (
                       <button key={p} onClick={() => setProvider(p)}
                         style={{ padding: '6px 18px', borderRadius: 8, border: '1px solid var(--lv-line)', fontSize: 12, cursor: 'pointer', fontWeight: 500,
                           background: provider === p ? 'var(--lv-accent)' : 'var(--lv-bg)',
                           color: provider === p ? '#fff' : 'var(--lv-fg)' }}>
-                        {label}
+                        {p === 'ezviz' ? 'EZVIZ' : 'RTSP — أي كاميرا'}
                       </button>
                     ))}
                   </div>
@@ -606,22 +555,6 @@ export default function CamerasPage() {
                         <div>
                           <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>EZVIZ Password *</p>
                           <input value={form.ezviz_password} onChange={f('ezviz_password')} dir="ltr" style={inp} placeholder="••••••••" type="password" />
-                        </div>
-                      </div>
-                    </>
-                  ) : provider === 'tutk' ? (
-                    <>
-                      <div style={{ background: 'var(--ink-50)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 14px', marginBottom: 14, fontSize: 11, color: 'var(--brand-600)' }}>
-                        كاميرا UBox أو أي كاميرا ThroughTek P2P — أدخل الـ UID من تطبيق UBox (الإعدادات &gt; معلومات الجهاز)
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-                        <div style={{ gridColumn: '1 / -1' }}>
-                          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>UID الكاميرا *</p>
-                          <input value={form.tutk_uid} onChange={f('tutk_uid')} dir="ltr" style={inp} placeholder="FUVSSPJI2NY3QJFZJPHQ" />
-                        </div>
-                        <div style={{ gridColumn: '1 / -1' }}>
-                          <p style={{ fontSize: 11, color: 'var(--lv-muted)', margin: '0 0 4px', fontWeight: 500 }}>كلمة مرور الكاميرا (اختياري)</p>
-                          <input value={form.tutk_password} onChange={f('tutk_password')} dir="ltr" style={inp} type="password" placeholder="••••••" />
                         </div>
                       </div>
                     </>
@@ -669,14 +602,6 @@ export default function CamerasPage() {
         />
       )}
 
-      {/* ── TUTK Live Modal ── */}
-      {tutkLiveModal && (
-        <TutkLiveModal
-          cam={tutkLiveModal}
-          onClose={() => setTutkLiveModal(null)}
-          showToast={showToast}
-        />
-      )}
 
       {/* ── Alarms Modal ── */}
       {alarmModal && (
