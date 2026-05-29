@@ -166,7 +166,12 @@ function KnowledgeBaseTab() {
   const loadCorpora = useCallback(async () => {
     setLoadingList(true);
     try {
-      const res  = await fetch(`${BASE}/superadmin/knowledge/corpora`, { headers: authHeader() });
+      let res = await fetch(`${BASE}/superadmin/knowledge/corpora`, { headers: authHeader() });
+      if (res.status === 401) {
+        const renewed = await tryRenewToken();
+        if (renewed) res = await fetch(`${BASE}/superadmin/knowledge/corpora`, { headers: authHeader() });
+        else { setSessionExpired(true); setLoadingList(false); return; }
+      }
       const json = await res.json();
       setCorpora(json.data || []);
     } catch { /* silent */ }
