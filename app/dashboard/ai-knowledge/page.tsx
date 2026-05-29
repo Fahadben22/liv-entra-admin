@@ -138,6 +138,20 @@ export default function KnowledgePage() {
   );
 }
 
+// ── Token auto-refresh ────────────────────────────────────────────────────────
+async function tryRenewToken(): Promise<boolean> {
+  try {
+    const res = await fetch('/api/auth/renew', { method: 'POST' });
+    if (!res.ok) return false;
+    const json = await res.json();
+    if (json.ok && json.token) {
+      localStorage.setItem('admin_token', json.token);
+      return true;
+    }
+  } catch {}
+  return false;
+}
+
 // ── Tab 1: Knowledge Base ─────────────────────────────────────────────────────
 function KnowledgeBaseTab() {
   const dropRef   = useRef<HTMLDivElement>(null);
@@ -147,6 +161,7 @@ function KnowledgeBaseTab() {
   const [uploading, setUploading]     = useState(false);
   const [corpora, setCorpora]         = useState<Corpus[]>([]);
   const [loadingList, setLoadingList] = useState(true);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   const loadCorpora = useCallback(async () => {
     setLoadingList(true);
@@ -176,27 +191,49 @@ function KnowledgeBaseTab() {
     const pending = queue.filter(q => q.status === 'queued');
     if (!pending.length || uploading) return;
     setUploading(true);
+    setSessionExpired(false);
     setQueue(prev => prev.map(q => q.status === 'queued' ? { ...q, status: 'uploading' } : q));
-    try {
+
+    const buildForm = () => {
       const fd = new FormData();
       for (const q of pending) fd.append('files', q.file);
-      const res  = await fetch(`${BASE}/superadmin/knowledge/bulk-upload`, { method: 'POST', headers: authHeader(), body: fd });
-      const json = await res.json();
+      return fd;
+    };
+
+    const applyResult = (json: any) => {
       if (json.success) {
         const rm: Record<string, any> = {};
         for (const r of (json.data?.results || [])) rm[r.filename] = r;
         setQueue(prev => prev.map(q => {
           if (q.status !== 'uploading') return q;
           const r = rm[q.file.name];
-          if (!r)              return { ...q, status: 'error',    error: 'لم يُعالَج' };
-          if (r.status === 'success') return { ...q, status: 'done', inserted: r.inserted, corpus_id: r.corpus_id };
-          if (r.status === 'empty')   return { ...q, status: 'empty', inserted: 0 };
+          if (!r)                      return { ...q, status: 'error', error: 'لم يُعالَج' };
+          if (r.status === 'success')  return { ...q, status: 'done',  inserted: r.inserted, corpus_id: r.corpus_id };
+          if (r.status === 'empty')    return { ...q, status: 'empty', inserted: 0 };
           return { ...q, status: 'error', error: r.error || 'خطأ' };
         }));
         loadCorpora();
       } else {
         setQueue(prev => prev.map(q => q.status === 'uploading' ? { ...q, status: 'error', error: json.message } : q));
       }
+    };
+
+    try {
+      let res = await fetch(`${BASE}/superadmin/knowledge/bulk-upload`, { method: 'POST', headers: authHeader(), body: buildForm() });
+
+      // Auto-refresh on 401 and retry once
+      if (res.status === 401) {
+        const renewed = await tryRenewToken();
+        if (!renewed) {
+          setSessionExpired(true);
+          setQueue(prev => prev.map(q => q.status === 'uploading' ? { ...q, status: 'queued' } : q));
+          setUploading(false);
+          return;
+        }
+        res = await fetch(`${BASE}/superadmin/knowledge/bulk-upload`, { method: 'POST', headers: authHeader(), body: buildForm() });
+      }
+
+      applyResult(await res.json());
     } catch (err: any) {
       setQueue(prev => prev.map(q => q.status === 'uploading' ? { ...q, status: 'error', error: err.message } : q));
     }
@@ -214,6 +251,20 @@ function KnowledgeBaseTab() {
 
   return (
     <>
+      {/* Session expired banner */}
+      {sessionExpired && (
+        <div style={{ background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: 10, padding: '14px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 20 }}>🔒</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontWeight: 700, color: '#dc2626', margin: 0, fontSize: 14 }}>انتهت الجلسة — يجب تسجيل الدخول من جديد</p>
+            <p style={{ color: '#9ca3af', margin: '3px 0 0', fontSize: 12 }}>ملفاتك لا تزال في قائمة الانتظار، سجّل دخولك وحاول مرة أخرى.</p>
+          </div>
+          <a href="/login" style={{ background: '#dc2626', color: '#fff', padding: '8px 18px', borderRadius: 7, fontSize: 13, fontWeight: 600, textDecoration: 'none', flexShrink: 0 }}>
+            تسجيل الدخول
+          </a>
+        </div>
+      )}
+
       {/* Drop zone */}
       <div style={{ background: 'var(--lv-panel, #fff)', border: '1px solid var(--lv-line, #e5e7eb)', borderRadius: 14, padding: 24, marginBottom: 28 }}>
         <div
