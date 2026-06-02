@@ -87,13 +87,14 @@ const TABS = [
   { key: 'agents',   label: 'الوكلاء',    icon: <ShieldCheck style={{ width: 13, height: 13 }} /> },
   { key: 'optimize', label: 'التوصيات',   icon: <Layers style={{ width: 13, height: 13 }} /> },
   { key: 'icp',      label: 'ICP',         icon: <Network style={{ width: 13, height: 13 }} /> },
+  { key: 'metrics',  label: 'المؤشرات',   icon: <Activity style={{ width: 13, height: 13 }} /> },
 ];
 
 // ── Page ───────────────────────────────────────────────────────────────────────
 export default function AIGovPage() {
   const [tab, setTab] = useState('learning');
   const [data, setData] = useState<Record<string, any>>({
-    digest: {}, clusters: [], recs: [], scorecards: [], incidents: [], conflicts: [], stalled: [],
+    digest: {}, clusters: [], recs: [], scorecards: [], incidents: [], conflicts: [], stalled: [], metrics: {},
   });
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState<string | null>(null);
@@ -101,7 +102,7 @@ export default function AIGovPage() {
 
   const loadAll = useCallback(async () => {
     setLoading(true);
-    const [digestRes, clustersRes, recsRes, scorecardsRes, incidentsRes, conflictsRes, stalledRes] =
+    const [digestRes, clustersRes, recsRes, scorecardsRes, incidentsRes, conflictsRes, stalledRes, metricsRes] =
       await Promise.allSettled([
         request<any>('GET', '/adaptive/digest?days=7'),
         request<any>('GET', '/adaptive/clusters?limit=25'),
@@ -110,6 +111,7 @@ export default function AIGovPage() {
         request<any>('GET', '/audit/intel/incidents?status=open&limit=20'),
         request<any>('GET', '/icp/conflicts'),
         request<any>('GET', '/icp/stalled'),
+        request<any>('GET', '/admin/operational-metrics'),
       ]);
     setData({
       digest:     digestRes.status     === 'fulfilled' ? digestRes.value?.data     || {} : {},
@@ -119,6 +121,7 @@ export default function AIGovPage() {
       incidents:  incidentsRes.status  === 'fulfilled' ? incidentsRes.value?.data?.incidents   || [] : [],
       conflicts:  conflictsRes.status  === 'fulfilled' ? conflictsRes.value?.data?.conflicts   || [] : [],
       stalled:    stalledRes.status    === 'fulfilled' ? stalledRes.value?.data?.stalled       || [] : [],
+      metrics:    metricsRes.status    === 'fulfilled' ? metricsRes.value?.data              || {} : {},
     });
     setLoading(false);
   }, []);
@@ -580,6 +583,63 @@ export default function AIGovPage() {
               </table>
             )}
           </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {/* TAB: OPERATIONAL METRICS                                            */}
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {!loading && tab === 'metrics' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+            {[
+              {
+                label: 'معدل التحصيل',
+                value: data.metrics.collection_rate_pct != null ? `${data.metrics.collection_rate_pct}%` : '—',
+                sub: 'هذا الشهر',
+                color: data.metrics.collection_rate_pct >= 90 ? '#059669' : data.metrics.collection_rate_pct >= 75 ? '#d97706' : '#dc2626',
+              },
+              {
+                label: 'عقود متعثرة',
+                value: data.metrics.delinquency_count ?? '—',
+                sub: 'عقود نشطة بتأخر دفع',
+                color: (data.metrics.delinquency_count || 0) > 0 ? '#dc2626' : '#059669',
+              },
+              {
+                label: 'متوسط تأهيل الوحدة',
+                value: data.metrics.avg_vacancy_days != null ? `${data.metrics.avg_vacancy_days} يوم` : '—',
+                sub: 'من الإخلاء للإيجار (هدف: 7 أيام)',
+                color: (data.metrics.avg_vacancy_days || 0) <= 7 ? '#059669' : '#dc2626',
+              },
+              {
+                label: 'أحداث فاشلة (DLQ)',
+                value: data.metrics.dead_event_count ?? '—',
+                sub: 'في قائمة الانتظار',
+                color: (data.metrics.dead_event_count || 0) > 0 ? '#dc2626' : '#059669',
+              },
+              {
+                label: 'امتثال SLA الإشغال',
+                value: data.metrics.sla_compliant_units ?? '—',
+                sub: `وحدة ضمن SLA — خرق: ${data.metrics.sla_breached_units ?? 0}`,
+                color: (data.metrics.sla_breached_units || 0) > 0 ? '#dc2626' : '#059669',
+              },
+              {
+                label: 'إنجاز الوكلاء',
+                value: data.metrics.agent_completion_rate != null ? `${data.metrics.agent_completion_rate}%` : '—',
+                sub: 'مهام منجزة / إجمالي (30 يوم)',
+                color: (data.metrics.agent_completion_rate || 0) >= 80 ? '#059669' : '#d97706',
+              },
+            ].map((k, i) => (
+              <div key={i} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 18px' }}>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>{k.label}</p>
+                <p style={{ fontSize: 26, fontWeight: 700, color: k.color, lineHeight: 1, margin: 0 }}>{k.value}</p>
+                <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>{k.sub}</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center' }}>
+            آخر تحديث: {data.metrics.as_of ? new Date(data.metrics.as_of).toLocaleString('ar-SA') : '—'}
+          </p>
         </div>
       )}
 
