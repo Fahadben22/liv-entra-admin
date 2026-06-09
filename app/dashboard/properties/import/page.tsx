@@ -200,8 +200,8 @@ export default function PortfolioImportPage() {
     <div className="p-6 max-w-5xl mx-auto space-y-8" dir="rtl">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">استيراد المحافظ العقارية</h1>
-          <p className="mt-1 text-sm text-gray-500">ارفع ملفات المحفظة — REEA ستستخرج وتتحقق وتستورد البيانات تلقائياً</p>
+          <h1 className="text-2xl font-bold text-gray-900">إعداد محفظة شركة جديدة</h1>
+          <p className="mt-1 text-sm text-gray-500">رفع جماعي لمحفظة عقارية كاملة عند انضمام شركة جديدة. للإدارة اليومية للعقود، استخدم بوابة الـ OS &mdash; <a href="https://app.liv-entra.com/dashboard/contracts/import" className="underline text-blue-600">مزامنة إيجار التلقائية</a>.</p>
         </div>
         <button
           onClick={handleDownloadTemplate}
