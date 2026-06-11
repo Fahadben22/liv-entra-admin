@@ -1,10 +1,12 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { request } from '@/lib/api';
 import {
   Brain, ShieldCheck, Layers, Network, RefreshCw,
   ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle,
   AlertOctagon, Activity, ChevronDown, ChevronUp, SlidersHorizontal,
+  Radio, Server, Cpu, Trash2, MessageSquare, ChevronRight, X,
+  Clock, Zap, Terminal, Eye,
 } from 'lucide-react';
 
 // ── Arabic agent name map ──────────────────────────────────────────────────────
@@ -154,7 +156,83 @@ export default function AIGovPage() {
     setLoading(false);
   }, []);
 
+  // ── Live agent sessions state ──────────────────────────────────────────────
+  const [sessions, setSessions]     = useState<any[]>([]);
+  const [directives, setDirectives] = useState<any[]>([]);
+  const [gateway, setGateway]       = useState<any>(null);
+  const [selectedAgent, setSelectedAgent] = useState<string | null>(null);
+  const [agentHistory, setAgentHistory]   = useState<any[]>([]);
+  const [histLoading, setHistLoading]     = useState(false);
+  const [sendMsg, setSendMsg]             = useState('');
+  const [sendLoading, setSendLoading]     = useState(false);
+  const liveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const loadSessions = useCallback(async () => {
+    try {
+      const [sRes, dRes, gRes] = await Promise.allSettled([
+        request<any>('GET', '/admin/agents/sessions'),
+        request<any>('GET', '/admin/agents/directives/recent?limit=40'),
+        request<any>('GET', '/admin/agents/gateway'),
+      ]);
+      if (sRes.status === 'fulfilled') setSessions(sRes.value?.data || []);
+      if (dRes.status === 'fulfilled') setDirectives(dRes.value?.data || []);
+      if (gRes.status === 'fulfilled') setGateway(gRes.value?.data || null);
+    } catch {}
+  }, []);
+
+  async function loadAgentHistory(agentType: string) {
+    setHistLoading(true);
+    try {
+      const res = await request<any>('GET', `/admin/agents/${agentType}/history`);
+      setAgentHistory(res?.data || []);
+    } catch { setAgentHistory([]); }
+    setHistLoading(false);
+  }
+
+  async function handleClearSession(agentType: string) {
+    if (!confirm(`حذف محادثة ${agentType}؟`)) return;
+    try {
+      await request('DELETE', `/admin/agents/${agentType}/clear`);
+      showToast('تم حذف المحادثة');
+      if (selectedAgent === agentType) { setAgentHistory([]); setSelectedAgent(null); }
+      loadSessions();
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+  }
+
+  async function handleFlushAll() {
+    if (!confirm('حذف جميع محادثات الوكلاء؟ لا يمكن التراجع.')) return;
+    try {
+      await request('DELETE', '/admin/agents/flush-all');
+      showToast('تم مسح جميع المحادثات');
+      setSessions([]); setAgentHistory([]); setSelectedAgent(null);
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+  }
+
+  async function handleSendMessage() {
+    if (!selectedAgent || !sendMsg.trim() || sendLoading) return;
+    setSendLoading(true);
+    try {
+      await request<any>('POST', `/admin/agents/${selectedAgent}/chat`, { message: sendMsg.trim() });
+      setSendMsg('');
+      showToast('تم الإرسال');
+      await loadAgentHistory(selectedAgent);
+      loadSessions();
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+    setSendLoading(false);
+  }
+
   useEffect(() => { loadAll(); loadControls(); }, [loadAll, loadControls]);
+
+  // Auto-load sessions on tab switch; poll every 15s while tab is active
+  useEffect(() => {
+    if (tab === 'agents') {
+      loadSessions();
+      liveIntervalRef.current = setInterval(loadSessions, 15000);
+    } else {
+      if (liveIntervalRef.current) clearInterval(liveIntervalRef.current);
+    }
+    return () => { if (liveIntervalRef.current) clearInterval(liveIntervalRef.current); };
+  }, [tab, loadSessions]);
 
   async function handleApprove(id: string, action: 'approved' | 'rejected') {
     setActing(id);
@@ -324,89 +402,220 @@ export default function AIGovPage() {
       )}
 
       {/* ════════════════════════════════════════════════════════════════════ */}
-      {/* TAB: AGENTS                                                         */}
+      {/* TAB: AGENTS — LIVE SESSION MONITORING                              */}
       {/* ════════════════════════════════════════════════════════════════════ */}
-      {!loading && tab === 'agents' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {tab === 'agents' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-          {/* Scorecard grid */}
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
-            <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>بطاقات أداء الوكلاء</span>
-              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>يُحدَّث أسبوعياً الأحد 4:30 ص</span>
-            </div>
-            {scorecards.length === 0 ? (
-              <div style={{ padding: 48, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-                <ShieldCheck style={{ width: 28, height: 28, margin: '0 auto 10px', opacity: 0.3 }} />
-                <p>لا يوجد بيانات أداء — يبدأ جمع البيانات من أول دورة REEA</p>
+          {/* ── Gateway Health bar ── */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Server style={{ width: 15, height: 15, color: 'var(--brand-600)' }} />
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>بوابة الوكلاء</span>
+                <span style={{ fontSize: 10, color: 'var(--text-muted)', maxWidth: 240, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {gateway?.gateway_url || '—'}
+                </span>
               </div>
-            ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 0 }}>
-                {scorecards.map((s: any) => {
-                  const name = AGENT_AR[s.agent_type] || s.agent_type;
-                  const score = Math.round(s.reliability_score || 0);
-                  return (
-                    <div key={s.agent_type} style={{ padding: '20px 16px', borderInlineEnd: '1px solid var(--border)', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-                      <ScoreRing score={score} size={64} />
-                      <div style={{ textAlign: 'center' }}>
-                        <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-1)', margin: 0 }}>{name}</p>
-                        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 6, fontSize: 10, color: 'var(--text-muted)' }}>
-                          <span>حل: <strong style={{ color: '#059669' }}>{Math.round(s.resolution_rate || 0)}%</strong></span>
-                          <span>فشل: <strong style={{ color: '#dc2626' }}>{Math.round(s.failure_rate || 0)}%</strong></span>
-                        </div>
-                      </div>
-                      {score < 60 && (
-                        <span className="le-badge danger" style={{ fontSize: 9 }}>يحتاج مراجعة</span>
-                      )}
-                    </div>
-                  );
-                })}
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                {[
+                  { label: 'البيئة', value: gateway?.environment || '—' },
+                  { label: 'Ollama', value: gateway?.ollama_enabled ? 'مفعّل' : 'معطّل', warn: !!gateway?.ollama_enabled },
+                  { label: 'تجميد الكتابة', value: gateway?.write_freeze ? 'مفعّل' : 'إيقاف', warn: !!gateway?.write_freeze },
+                  { label: 'إيقاف كامل', value: gateway?.full_pause ? 'مفعّل' : 'إيقاف', warn: !!gateway?.full_pause },
+                ].map(({ label, value, warn }) => (
+                  <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11 }}>
+                    <span style={{ color: 'var(--text-muted)' }}>{label}:</span>
+                    <span style={{ fontWeight: 600, color: warn ? '#d97706' : 'var(--text-1)' }}>{value}</span>
+                  </div>
+                ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#059669', boxShadow: '0 0 6px rgba(5,150,105,.5)', animation: 'pulse 2s ease-in-out infinite' }} />
+                  <span style={{ fontSize: 10, color: '#059669', fontWeight: 600 }}>LIVE · يتحدث كل 15 ث</span>
+                </div>
+              </div>
+            </div>
+            {/* LLM routing table */}
+            {gateway?.routes && (
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
+                {gateway.routes.map((r: any) => (
+                  <div key={r.agent} style={{ fontSize: 10, padding: '3px 8px', borderRadius: 20, background: 'var(--ink-100)', color: 'var(--text-muted)', display: 'flex', gap: 4 }}>
+                    <span style={{ color: 'var(--text-1)', fontWeight: 600 }}>{AGENT_AR[r.agent] || r.agent}</span>
+                    <span>→</span>
+                    <span style={{ color: r.provider === 'anthropic' ? '#6366f1' : '#059669' }}>{r.model}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
-          {/* Incidents */}
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
-            <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>حوادث مفتوحة</span>
-              {incidents.length > 0 && <span className="le-badge warning">{incidents.length}</span>}
-            </div>
-            {incidents.length === 0 ? (
-              <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-                <CheckCircle style={{ width: 24, height: 24, color: '#059669', margin: '0 auto 8px' }} />
-                <p>لا توجد حوادث مفتوحة</p>
+          {/* ── Main layout: sessions list + detail panel ── */}
+          <div style={{ display: 'grid', gridTemplateColumns: selectedAgent ? '1fr 380px' : '1fr', gap: 14 }}>
+
+            {/* Sessions list */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Radio style={{ width: 14, height: 14, color: 'var(--brand-600)' }} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>جلسات مباشرة ({sessions.length})</span>
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button className="le-btn ghost sm" onClick={loadSessions} title="تحديث">
+                    <RefreshCw style={{ width: 12, height: 12 }} />
+                  </button>
+                  <button className="le-btn ghost sm" onClick={handleFlushAll}
+                    style={{ color: '#dc2626', borderColor: '#fca5a5' }} title="مسح الكل">
+                    <Trash2 style={{ width: 12, height: 12 }} />
+                    <span style={{ fontSize: 11 }}>مسح الكل</span>
+                  </button>
+                </div>
               </div>
-            ) : (
-              <div style={{ overflowX: 'auto' }}>
-              <table className="le-table" style={{ width: '100%', minWidth: 400 }}>
-                <thead>
-                  <tr>
-                    <th>نوع الحادثة</th>
-                    <th>الوكيل</th>
-                    <th>الخطورة</th>
-                    <th>التاريخ</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {incidents.map((inc: any) => {
-                    const ss = sevStyle(inc.severity || 'low');
+
+              {sessions.length === 0 ? (
+                <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 48, textAlign: 'center', color: 'var(--text-muted)' }}>
+                  <Cpu style={{ width: 28, height: 28, margin: '0 auto 10px', opacity: 0.3 }} />
+                  <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>لا توجد جلسات في آخر 24 ساعة</p>
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 8 }}>
+                  {sessions.map((s: any) => {
+                    const isLive   = s.status === 'live';
+                    const isActive = s.status === 'active';
+                    const dotColor = isLive ? '#059669' : isActive ? '#d97706' : '#94a3b8';
+                    const selected = selectedAgent === s.agent_type;
+                    const relTime  = s.last_message_at ? (() => {
+                      const diff = Date.now() - new Date(s.last_message_at).getTime();
+                      if (diff < 60000) return 'الآن';
+                      if (diff < 3600000) return `${Math.floor(diff/60000)} د`;
+                      if (diff < 86400000) return `${Math.floor(diff/3600000)} س`;
+                      return `${Math.floor(diff/86400000)} ي`;
+                    })() : '—';
                     return (
-                      <tr key={inc.id}>
-                        <td style={{ fontWeight: 500 }}>{(inc.incident_type || '').replace(/_/g, ' ')}</td>
-                        <td style={{ color: 'var(--text-muted)' }}>{AGENT_AR[inc.agent_type] || inc.agent_type || '—'}</td>
-                        <td>
-                          <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: ss.bg, color: ss.color }}>
-                            {inc.severity}
-                          </span>
-                        </td>
-                        <td style={{ color: 'var(--text-muted)', fontSize: 11 }}>
-                          {inc.created_at ? new Date(inc.created_at).toLocaleDateString('ar-SA') : '—'}
-                        </td>
-                      </tr>
+                      <div key={s.agent_type}
+                        onClick={() => { setSelectedAgent(s.agent_type); loadAgentHistory(s.agent_type); }}
+                        style={{ background: 'var(--surface)', border: `1.5px solid ${selected ? 'var(--brand-600)' : 'var(--border)'}`, borderRadius: 10, padding: '12px 14px', cursor: 'pointer', transition: 'border-color .15s, box-shadow .15s', boxShadow: selected ? '0 0 0 2px rgba(99,102,241,.1)' : 'none' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor, boxShadow: isLive ? `0 0 6px ${dotColor}88` : 'none' }} />
+                            <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-1)' }}>{s.agent_name}</span>
+                          </div>
+                          <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{relTime}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, fontSize: 10, color: 'var(--text-muted)' }}>
+                          <span><Clock style={{ width: 9, height: 9, display: 'inline', marginInlineEnd: 2 }} />{s.messages_1h} رسالة/س</span>
+                          <span><Zap style={{ width: 9, height: 9, display: 'inline', marginInlineEnd: 2 }} />{s.tool_calls_24h} أداة/24س</span>
+                        </div>
+                        {s.last_model && (
+                          <div style={{ marginTop: 6, fontSize: 10, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <Terminal style={{ width: 9, height: 9 }} />
+                            <span style={{ color: s.last_model?.includes('claude') ? '#6366f1' : '#059669' }}>{s.last_model}</span>
+                            {s.last_outcome && <span style={{ marginInlineStart: 4, padding: '1px 6px', borderRadius: 10, fontSize: 9, background: s.last_outcome === 'success' ? '#f0fdf4' : s.last_outcome === 'escalated' ? '#fffbeb' : '#fef2f2', color: s.last_outcome === 'success' ? '#059669' : s.last_outcome === 'escalated' ? '#d97706' : '#dc2626' }}>{s.last_outcome}</span>}
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
-                </tbody>
-              </table>
+                </div>
+              )}
+
+              {/* ── Recent A2A dispatches ── */}
+              {directives.length > 0 && (
+                <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
+                  <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Network style={{ width: 13, height: 13, color: 'var(--brand-600)' }} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>تمريرات A2A الأخيرة</span>
+                    </div>
+                    <span className="le-badge">{directives.length}</span>
+                  </div>
+                  <div style={{ maxHeight: 260, overflowY: 'auto' }}>
+                    {directives.map((d: any) => {
+                      const statusColor = d.status === 'replied' ? '#059669' : d.status === 'failed' ? '#dc2626' : d.status === 'processing' ? '#d97706' : '#6366f1';
+                      return (
+                        <div key={d.id} style={{ padding: '10px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)' }}>{AGENT_AR[d.from_agent] || d.from_agent}</span>
+                              <ChevronRight style={{ width: 10, height: 10, color: 'var(--text-muted)' }} />
+                              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)' }}>{AGENT_AR[d.to_agent] || d.to_agent}</span>
+                            </div>
+                            <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {(d.directive || '').slice(0, 80)}
+                            </p>
+                          </div>
+                          <div style={{ flexShrink: 0, textAlign: 'end' }}>
+                            <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 10, background: statusColor + '15', color: statusColor }}>{d.status}</span>
+                            <p style={{ fontSize: 9, color: 'var(--text-muted)', margin: '4px 0 0' }}>
+                              {d.created_at ? new Date(d.created_at).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : ''}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Session Deep Dive panel */}
+            {selectedAgent && (
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', display: 'flex', flexDirection: 'column', maxHeight: '80vh' }}>
+                {/* Panel header */}
+                <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--ink-100)' }}>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>{AGENT_AR[selectedAgent] || selectedAgent}</p>
+                    <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                      {sessions.find(s => s.agent_type === selectedAgent)?.messages_24h || 0} رسالة اليوم
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button className="le-btn ghost sm" onClick={() => handleClearSession(selectedAgent)}
+                      title="حذف الجلسة" style={{ color: '#dc2626' }}>
+                      <Trash2 style={{ width: 12, height: 12 }} />
+                    </button>
+                    <button className="le-btn ghost sm" onClick={() => setSelectedAgent(null)} title="إغلاق">
+                      <X style={{ width: 13, height: 13 }} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Transcript */}
+                <div style={{ flex: 1, overflowY: 'auto', padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {histLoading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: 30 }}>
+                      <div style={{ width: 20, height: 20, border: '2px solid var(--border)', borderTopColor: 'var(--brand-600)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                    </div>
+                  ) : agentHistory.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: 30, color: 'var(--text-muted)', fontSize: 12 }}>
+                      <Eye style={{ width: 20, height: 20, margin: '0 auto 8px', opacity: 0.3 }} />
+                      لا توجد رسائل في الذاكرة المؤقتة
+                    </div>
+                  ) : agentHistory.map((m: any, i: number) => (
+                    <div key={i} style={{ display: 'flex', flexDirection: m.role === 'user' ? 'row-reverse' : 'row', gap: 6 }}>
+                      <div style={{
+                        maxWidth: '85%', padding: '8px 10px', borderRadius: 10, fontSize: 11, lineHeight: 1.5,
+                        background: m.role === 'user' ? 'var(--brand-600)' : 'var(--ink-100)',
+                        color: m.role === 'user' ? '#fff' : 'var(--text-1)',
+                      }}>
+                        {(m.content || '').slice(0, 400)}{(m.content || '').length > 400 ? '…' : ''}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Send message input */}
+                <div style={{ padding: '10px 12px', borderTop: '1px solid var(--border)', display: 'flex', gap: 6 }}>
+                  <input
+                    value={sendMsg}
+                    onChange={e => setSendMsg(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                    placeholder="أرسل رسالة للوكيل..."
+                    style={{ flex: 1, fontSize: 12, padding: '7px 10px', border: '1px solid var(--border)', borderRadius: 8, background: 'var(--surface)', color: 'var(--text-1)', outline: 'none' }}
+                  />
+                  <button className="le-btn primary sm" onClick={handleSendMessage} disabled={sendLoading || !sendMsg.trim()}>
+                    <MessageSquare style={{ width: 12, height: 12 }} />
+                  </button>
+                </div>
               </div>
             )}
           </div>
