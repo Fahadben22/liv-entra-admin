@@ -170,30 +170,6 @@ export default function CommandCenterPage() {
   const [agentTokens, setAgentTokens] = useState(0);
   const agentScrollRef = useRef<HTMLDivElement>(null);
 
-  // --- WS-1: Agent system controls ---
-  const [ctrl, setCtrl] = useState<{agents_write_freeze:{enabled:boolean};agents_full_pause:{enabled:boolean}}>({
-    agents_write_freeze: { enabled: false },
-    agents_full_pause:   { enabled: false },
-  });
-  const [ctrlLoading, setCtrlLoading] = useState<string|null>(null);
-
-  const loadControls = useCallback(async () => {
-    try {
-      const res = await request<any>('GET', '/superadmin/system/controls');
-      if (res?.data?.controls) setCtrl(res.data.controls);
-    } catch {}
-  }, []);
-
-  async function toggleControl(key: 'agents_write_freeze' | 'agents_full_pause') {
-    const next = !ctrl[key]?.enabled;
-    setCtrlLoading(key);
-    try {
-      const res = await request<any>('POST', '/superadmin/system/controls', { key, enabled: next });
-      if (res?.data?.value) setCtrl(prev => ({ ...prev, [key]: res.data.value }));
-      showToast(res?.data?.message || (next ? 'تم التفعيل' : 'تم الإيقاف'));
-    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
-    setCtrlLoading(null);
-  }
 
   const LIMIT = 25;
   const showToast = (m:string) => { setToast(m); setTimeout(()=>setToast(''),3000); };
@@ -242,9 +218,8 @@ export default function CommandCenterPage() {
   // --- Initial load ---
   useEffect(() => {
     if (!localStorage.getItem('admin_token')) { router.push('/login'); return; }
-    loadControls();
     loadOverview().finally(() => setLoading(false));
-  }, [loadOverview, loadControls, router]);
+  }, [loadOverview, router]);
 
   // --- Auto-refresh ---
   useEffect(() => {
@@ -449,41 +424,6 @@ export default function CommandCenterPage() {
 
             {/* --- TAB: OVERVIEW --- */}
             {tab === 'overview' && <>
-              {/* Agent system controls (WS-1) */}
-              <div className="card" style={{ background:C.card,border:'none',boxShadow:'var(--lv-shadow-sm)',borderRadius:14,padding:'14px 16px',marginBottom:14,borderTop:`3px solid ${ctrl.agents_full_pause?.enabled ? '#ef4444' : ctrl.agents_write_freeze?.enabled ? '#f59e0b' : '#16a34a'}` }}>
-                <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12 }}>
-                  <p style={{ fontSize:13,fontWeight:600,color:C.text1,margin:0 }}>تحكّم بالوكلاء</p>
-                  <span style={{ fontSize:10,color:ctrl.agents_full_pause?.enabled ? '#ef4444' : ctrl.agents_write_freeze?.enabled ? '#f59e0b' : '#16a34a',fontWeight:600,padding:'3px 10px',borderRadius:20,background:ctrl.agents_full_pause?.enabled ? 'rgba(239,68,68,.08)' : ctrl.agents_write_freeze?.enabled ? 'rgba(245,158,11,.08)' : 'rgba(22,163,74,.08)' }}>
-                    {ctrl.agents_full_pause?.enabled ? 'متوقف كامل' : ctrl.agents_write_freeze?.enabled ? 'قراءة فقط' : 'يعمل'}
-                  </span>
-                </div>
-                <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:10 }}>
-                  {([
-                    { key: 'agents_write_freeze' as const, label: 'تجميد الكتابة', sub: 'الوكلاء يقرؤون فقط — الأدوات التنفيذية محظورة', color: '#f59e0b', dangerColor: '#f59e0b' },
-                    { key: 'agents_full_pause' as const,   label: 'إيقاف كامل',    sub: 'جميع إجراءات الوكلاء محظورة بلا استثناء', color: '#ef4444', dangerColor: '#ef4444' },
-                  ]).map(({ key, label, sub, color }) => {
-                    const on = !!ctrl[key]?.enabled;
-                    const busy = ctrlLoading === key;
-                    return (
-                      <div key={key} style={{ border:`1.5px solid ${on ? color+'44' : C.border}`,borderRadius:12,padding:'12px 14px',background:on ? color+'07' : 'transparent',transition:'all .2s' }}>
-                        <div style={{ display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6 }}>
-                          <span style={{ fontSize:12,fontWeight:600,color:on ? color : C.text1 }}>{label}</span>
-                          <button
-                            onClick={() => toggleControl(key)}
-                            disabled={busy}
-                            style={{ position:'relative',width:40,height:22,borderRadius:11,background:on ? color : '#d1d5db',border:'none',cursor:busy?'wait':'pointer',transition:'background .2s',flexShrink:0,padding:0 }}
-                          >
-                            <span style={{ position:'absolute',top:3,left:on?20:3,width:16,height:16,borderRadius:'50%',background:'#fff',transition:'left .2s',boxShadow:'0 1px 3px rgba(0,0,0,.2)' }} />
-                          </button>
-                        </div>
-                        <p style={{ fontSize:10,color:C.muted,margin:0,lineHeight:1.4 }}>{sub}</p>
-                        {busy && <p style={{ fontSize:10,color:color,marginTop:4,margin:'4px 0 0' }}>جارٍ التحديث...</p>}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Timeline */}
               <div className="card" style={{ background:C.card,border:'none',boxShadow:'var(--lv-shadow-sm)',borderRadius:14,padding:'14px 16px',marginBottom:14 }}>
                 <p style={{ fontSize:13,fontWeight:600,color:C.text1,marginBottom:8 }}>الجدول الزمني — 24 ساعة</p>

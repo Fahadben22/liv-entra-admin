@@ -4,7 +4,7 @@ import { request } from '@/lib/api';
 import {
   Brain, ShieldCheck, Layers, Network, RefreshCw,
   ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle,
-  AlertOctagon, Activity, ChevronDown, ChevronUp,
+  AlertOctagon, Activity, ChevronDown, ChevronUp, SlidersHorizontal,
 } from 'lucide-react';
 
 // ── Arabic agent name map ──────────────────────────────────────────────────────
@@ -88,6 +88,7 @@ const TABS = [
   { key: 'optimize', label: 'التوصيات',   icon: <Layers style={{ width: 13, height: 13 }} /> },
   { key: 'icp',      label: 'ICP',         icon: <Network style={{ width: 13, height: 13 }} /> },
   { key: 'metrics',  label: 'المؤشرات',   icon: <Activity style={{ width: 13, height: 13 }} /> },
+  { key: 'controls', label: 'تحكّم',      icon: <SlidersHorizontal style={{ width: 13, height: 13 }} /> },
 ];
 
 // ── Page ───────────────────────────────────────────────────────────────────────
@@ -99,6 +100,33 @@ export default function AIGovPage() {
   const [loading, setLoading] = useState(true);
   const [acting, setActing] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [toast, setToast] = useState('');
+  const showToast = (m: string) => { setToast(m); setTimeout(() => setToast(''), 3000); };
+
+  // WS-1 agent system controls
+  const [ctrl, setCtrl] = useState<{ agents_write_freeze: { enabled: boolean }; agents_full_pause: { enabled: boolean } }>({
+    agents_write_freeze: { enabled: false },
+    agents_full_pause:   { enabled: false },
+  });
+  const [ctrlLoading, setCtrlLoading] = useState<string | null>(null);
+
+  const loadControls = useCallback(async () => {
+    try {
+      const res = await request<any>('GET', '/superadmin/system/controls');
+      if (res?.data?.controls) setCtrl(res.data.controls);
+    } catch {}
+  }, []);
+
+  async function toggleControl(key: 'agents_write_freeze' | 'agents_full_pause') {
+    const next = !ctrl[key]?.enabled;
+    setCtrlLoading(key);
+    try {
+      const res = await request<any>('POST', '/superadmin/system/controls', { key, enabled: next });
+      if (res?.data?.value) setCtrl(prev => ({ ...prev, [key]: res.data.value }));
+      showToast(res?.data?.message || (next ? 'تم التفعيل' : 'تم الإيقاف'));
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+    setCtrlLoading(null);
+  }
 
   const loadAll = useCallback(async () => {
     setLoading(true);
@@ -126,7 +154,7 @@ export default function AIGovPage() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { loadAll(); }, [loadAll]);
+  useEffect(() => { loadAll(); loadControls(); }, [loadAll, loadControls]);
 
   async function handleApprove(id: string, action: 'approved' | 'rejected') {
     setActing(id);
@@ -154,7 +182,12 @@ export default function AIGovPage() {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto' }}>
+    <div style={{ padding: '16px 20px', maxWidth: 1200, margin: '0 auto', minWidth: 0 }}>
+      {toast && (
+        <div style={{ position: 'fixed', top: 16, left: '50%', transform: 'translateX(-50%)', background: 'var(--surface)', color: 'var(--text-1)', padding: '8px 20px', borderRadius: 10, fontSize: 12, zIndex: 9999, border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,.08)' }}>
+          {toast}
+        </div>
+      )}
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
@@ -180,7 +213,7 @@ export default function AIGovPage() {
       </div>
 
       {/* ── Tabs ───────────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid var(--border)' }}>
+      <div style={{ display: 'flex', gap: 0, marginBottom: 24, borderBottom: '1px solid var(--border)', overflowX: 'auto', scrollbarWidth: 'none' }}>
         {TABS.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
             style={{
@@ -213,7 +246,7 @@ export default function AIGovPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* Signal summary cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 12 }}>
             {[
               { label: 'إشارات تعلم (7 أيام)', value: sig.total ?? '—', color: 'var(--brand-600)', sub: 'مجموع الإشارات' },
               { label: 'نجاحات', value: sig.success ?? '—', color: '#059669', sub: 'مهام ناجحة وشكاوى مغلقة' },
@@ -344,7 +377,8 @@ export default function AIGovPage() {
                 <p>لا توجد حوادث مفتوحة</p>
               </div>
             ) : (
-              <table className="le-table" style={{ width: '100%' }}>
+              <div style={{ overflowX: 'auto' }}>
+              <table className="le-table" style={{ width: '100%', minWidth: 400 }}>
                 <thead>
                   <tr>
                     <th>نوع الحادثة</th>
@@ -373,6 +407,7 @@ export default function AIGovPage() {
                   })}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </div>
@@ -554,7 +589,8 @@ export default function AIGovPage() {
                 <p>جميع سير العمل ضمن المواعيد</p>
               </div>
             ) : (
-              <table className="le-table" style={{ width: '100%' }}>
+              <div style={{ overflowX: 'auto' }}>
+              <table className="le-table" style={{ width: '100%', minWidth: 480 }}>
                 <thead>
                   <tr>
                     <th>المصدر</th>
@@ -581,6 +617,7 @@ export default function AIGovPage() {
                   })}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </div>
@@ -591,7 +628,7 @@ export default function AIGovPage() {
       {/* ════════════════════════════════════════════════════════════════════ */}
       {!loading && tab === 'metrics' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 }}>
             {[
               {
                 label: 'معدل التحصيل',
@@ -640,6 +677,96 @@ export default function AIGovPage() {
           <p style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center' }}>
             آخر تحديث: {data.metrics.as_of ? new Date(data.metrics.as_of).toLocaleString('ar-SA') : '—'}
           </p>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {/* TAB: AGENT CONTROLS (WS-1 kill switch / write-freeze)               */}
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {!loading && tab === 'controls' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Status banner */}
+          <div style={{
+            background: ctrl.agents_full_pause?.enabled ? 'rgba(220,38,38,.06)' : ctrl.agents_write_freeze?.enabled ? 'rgba(217,119,6,.06)' : 'rgba(5,150,105,.06)',
+            border: `1.5px solid ${ctrl.agents_full_pause?.enabled ? '#dc2626' : ctrl.agents_write_freeze?.enabled ? '#d97706' : '#059669'}33`,
+            borderRadius: 12, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: ctrl.agents_full_pause?.enabled ? '#dc2626' : ctrl.agents_write_freeze?.enabled ? '#d97706' : '#059669', boxShadow: `0 0 8px ${ctrl.agents_full_pause?.enabled ? '#dc2626' : ctrl.agents_write_freeze?.enabled ? '#d97706' : '#059669'}66` }} />
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)' }}>
+                {ctrl.agents_full_pause?.enabled ? 'الوكلاء متوقفون كلياً' : ctrl.agents_write_freeze?.enabled ? 'الوكلاء في وضع القراءة فقط' : 'الوكلاء يعملون بشكل طبيعي'}
+              </span>
+            </div>
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>الحالة محفوظة في قاعدة البيانات — تصمد بعد إعادة تشغيل Redis</span>
+          </div>
+
+          {/* Control toggles */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 14 }}>
+            {([
+              {
+                key:   'agents_write_freeze' as const,
+                label: 'تجميد الكتابة',
+                sub:   'الوكلاء يقرؤون البيانات فقط — جميع الأدوات التنفيذية محظورة. تبقى صمامات الأمان مفتوحة: addToAgenda، recordObservation، writeSharedMemory.',
+                color: '#d97706',
+                icon:  '🔒',
+              },
+              {
+                key:   'agents_full_pause' as const,
+                label: 'إيقاف كامل',
+                sub:   'جميع إجراءات الوكلاء محظورة بلا استثناء. فقط addToAgenda تبقى مفتوحة حتى لا تُفقد البنود المعلّقة.',
+                color: '#dc2626',
+                icon:  '⛔',
+              },
+            ] as const).map(({ key, label, sub, color }) => {
+              const on = !!ctrl[key]?.enabled;
+              const busy = ctrlLoading === key;
+              return (
+                <div key={key} style={{ background: 'var(--surface)', border: `1.5px solid ${on ? color + '44' : 'var(--border)'}`, borderRadius: 12, padding: '18px 20px', transition: 'border-color .2s' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 10 }}>
+                    <div>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: on ? color : 'var(--text-1)', margin: '0 0 4px' }}>{label}</p>
+                      <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>{sub}</p>
+                    </div>
+                    <button
+                      onClick={() => toggleControl(key)}
+                      disabled={busy}
+                      style={{ position: 'relative', width: 44, height: 24, borderRadius: 12, background: on ? color : '#d1d5db', border: 'none', cursor: busy ? 'wait' : 'pointer', transition: 'background .2s', flexShrink: 0, padding: 0 }}
+                      title={on ? `إيقاف ${label}` : `تفعيل ${label}`}
+                    >
+                      <span style={{ position: 'absolute', top: 4, left: on ? 22 : 4, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left .2s', boxShadow: '0 1px 3px rgba(0,0,0,.2)' }} />
+                    </button>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 20, background: on ? color + '14' : 'var(--ink-100)', color: on ? color : 'var(--text-muted)' }}>
+                      {busy ? 'جارٍ التحديث...' : on ? 'مفعّل' : 'معطّل'}
+                    </span>
+                    {on && <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>تم الحفظ في Postgres</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Explanation card */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '16px 18px' }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', marginBottom: 10 }}>كيف يعمل نظام التحكّم</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { label: 'مصدر الحقيقة', value: 'قاعدة البيانات (جدول system_controls) — يصمد حتى لو أُعيد تشغيل Redis' },
+                { label: 'وقت الاستجابة', value: 'التخزين المؤقت في Redis: 30 ثانية — يُطبَّق التغيير فورياً على الطلب التالي' },
+                { label: 'الأدوات المحظورة', value: 'تجميد الكتابة: send*, create*, update*, assign*, approve*, schedule*, flag*, initiate* — كل ما يُغيّر البيانات أو يرسل رسائل' },
+                { label: 'صمامات الأمان', value: 'addToAgenda · recordObservation · writeSharedMemory — تبقى مفتوحة دائماً حتى يتمكن الوكلاء من التصعيد' },
+                { label: 'سجل التغييرات', value: 'كل تغيير يُسجَّل في admin_audit_logs مع اسم المدير ووقت التغيير' },
+              ].map(({ label, value }) => (
+                <div key={label} style={{ display: 'flex', gap: 12, fontSize: 12 }}>
+                  <span style={{ color: 'var(--text-muted)', whiteSpace: 'nowrap', minWidth: 120 }}>{label}</span>
+                  <span style={{ color: 'var(--text-1)' }}>{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       )}
 
