@@ -198,10 +198,19 @@ export default function PortfolioImportPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-8" dir="rtl">
+      <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 flex items-start gap-3">
+        <div className="text-amber-700">⚠️</div>
+        <div className="text-sm text-amber-900">
+          <p className="font-semibold mb-1">هذه الصفحة لإعداد محفظة شركة جديدة فقط (Platform Onboarding).</p>
+          <p>للاستخدام اليومي (إضافة/تعديل/تسوية)، استخدم بوابة الـ OS:</p>
+          <a href="https://app.liv-entra.com/dashboard/portfolio/import" className="underline text-blue-600 font-medium">app.liv-entra.com/dashboard/portfolio/import</a>
+          <p className="text-xs mt-2 text-amber-800">في الـ OS: الـ Excel هو المرجع الأساسي (Excel-wins)، التحديثات تُسجَّل في سجل التدقيق، والكيانات اليتيمة تُحذف بشكل ناعم تلقائياً.</p>
+        </div>
+      </div>
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">إعداد محفظة شركة جديدة</h1>
-          <p className="mt-1 text-sm text-gray-500">رفع جماعي لمحفظة عقارية كاملة عند انضمام شركة جديدة. للإدارة اليومية للعقود، استخدم بوابة الـ OS &mdash; <a href="https://app.liv-entra.com/dashboard/contracts/import" className="underline text-blue-600">مزامنة إيجار التلقائية</a>.</p>
+          <p className="mt-1 text-sm text-gray-500">رفع جماعي لمحفظة عقارية كاملة عند انضمام شركة جديدة. للإدارة اليومية للعقود، استخدم بوابة الـ OS &mdash; <a href="https://app.liv-entra.com/dashboard/portfolio/import" className="underline text-blue-600">استيراد المحفظة</a>.</p>
         </div>
         <button
           onClick={handleDownloadTemplate}
