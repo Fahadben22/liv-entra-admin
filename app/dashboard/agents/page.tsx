@@ -807,6 +807,7 @@ export default function AgentsWorkspace() {
                 onMessagesChange={msgs => updateMessages(activeAgent, msgs)}
                 compact={true}
                 pendingMessage={pendingMessage}
+                photoSrc={AGENT_PHOTOS[activeAgent] || ''}
               />
             </div>
           </div>

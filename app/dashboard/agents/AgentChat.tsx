@@ -41,6 +41,7 @@ interface AgentChatProps {
   onMessagesChange?: (msgs: Message[]) => void;
   compact?: boolean;
   pendingMessage?: string;
+  photoSrc?: string;
 }
 
 interface DraftEmail {
@@ -62,7 +63,7 @@ interface Directive {
   replied_at: string | null;
 }
 
-export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions, messages: externalMessages, onMessagesChange, compact, pendingMessage }: AgentChatProps) {
+export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions, messages: externalMessages, onMessagesChange, compact, pendingMessage, photoSrc }: AgentChatProps) {
   const [internalMessages, setInternalMessages] = useState<Message[]>([]);
   const messages = externalMessages ?? internalMessages;
   const setMessages = onMessagesChange ?? setInternalMessages;
@@ -274,8 +275,10 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       {/* Header */}
       {!compact && (
         <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(0,0,0,.06)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Icon name={agentIcon} size={16} color="var(--lv-accent)" />
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: photoSrc ? 'transparent' : 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+            {photoSrc
+              ? <img src={photoSrc} alt={agentName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', borderRadius: 8 }} />
+              : <Icon name={agentIcon} size={16} color="var(--lv-accent)" />}
           </div>
           <div style={{ flex: 1 }}>
             <h2 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', margin: 0 }}>{agentName}</h2>
@@ -463,11 +466,13 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                     <div style={{ display: 'flex', gap: 12, flexDirection: 'row-reverse' }}>
                       <div style={{
                         width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
-                        background: 'linear-gradient(135deg,#10b981,#059669)',
+                        background: photoSrc ? 'transparent' : accentColor,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 11, fontWeight: 700, color: '#fff',
+                        fontSize: 11, fontWeight: 700, color: '#fff', overflow: 'hidden',
                       }}>
-                        {agentName.slice(0, 2)}
+                        {photoSrc
+                          ? <img src={photoSrc} alt={agentName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', borderRadius: '50%' }} />
+                          : agentName.charAt(0)}
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexDirection: 'row-reverse' }}>
@@ -505,8 +510,10 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
       <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', flexDirection: 'column', gap: 12, display: activeTab === 'inbox' ? 'none' : 'flex' }}>
         {messages.length === 0 && !outreachDraft && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-            <div style={{ width: 56, height: 56, borderRadius: 16, background: 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name={agentIcon} size={28} color="var(--lv-accent)" />
+            <div style={{ width: 56, height: 56, borderRadius: 16, background: photoSrc ? 'transparent' : 'var(--lv-chip)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              {photoSrc
+                ? <img src={photoSrc} alt={agentName} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', borderRadius: 16 }} />
+                : <Icon name={agentIcon} size={28} color="var(--lv-accent)" />}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center', maxWidth: 480 }}>
               {quickActions.map((q, i) => (
