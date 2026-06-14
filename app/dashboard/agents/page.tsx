@@ -412,11 +412,6 @@ function OfficeSVG() {
             {/* Chair */}
             <ellipse cx={r.x+r.w/2} cy={by-62} rx={16} ry={13}
               fill="#8ab8d4" stroke="#68a0bc" strokeWidth="1" />
-            {/* Corner agent name */}
-            <text x={r.x+r.w-8} y={r.y+21} textAnchor="end"
-              fontSize="10" fontWeight="700" fill="#3a6888" style={{ userSelect: 'none' }}>
-              {info.name}
-            </text>
             {/* Windows on outer top wall */}
             {r.y === 28 && [r.x+18, r.x+64, r.x+110].filter(wx => wx < r.x+r.w-16).map((wx, i) => (
               <rect key={i} x={wx} y={5} width={28} height={5} rx="1" fill="#80b8d8" opacity="0.7" />
@@ -453,11 +448,6 @@ function OfficeSVG() {
             <rect x="710" y={deskY-32} width="28" height="22" rx="2" fill="#223850" />
             <rect x="718" y={deskY-10} width="12" height="8"  rx="1" fill="#2e4a64" />
             <ellipse cx="720" cy={by-46} rx={15} ry={12} fill="#c4b068" stroke="#a09040" strokeWidth="1" />
-            {/* Lead label */}
-            <text x="798" y={r.y+20} textAnchor="end" fontSize="10" fontWeight="700"
-              fill="#7a5e10" style={{ userSelect: 'none' }}>{li.name}</text>
-            <text x="638" y={r.y+20} textAnchor="start" fontSize="8" fontWeight="600"
-              fill="#b09030" style={{ userSelect: 'none' }}>مدير</text>
             {/* Plant */}
             <circle cx="644" cy={r.y+18} r="8" fill="#3a6a3a" opacity="0.6" />
 
@@ -481,10 +471,6 @@ function OfficeSVG() {
                 <line x1="1018" y1={r.y+14} x2="1018" y2={by-12}
                   stroke="#c0a898" strokeWidth="1" strokeDasharray="4,4" />
 
-                <text x="1228" y={r.y+20} textAnchor="end" fontSize="9.5" fontWeight="700"
-                  fill="#786050" style={{ userSelect: 'none' }}>ليلى · سارة</text>
-                <text x="810" y={r.y+20} textAnchor="start" fontSize="8" fontWeight="600"
-                  fill="#a89080" style={{ userSelect: 'none' }}>متخصصون</text>
               </>
             ) : (
               // Single specialist
@@ -495,10 +481,6 @@ function OfficeSVG() {
                 <rect x="1014" y={deskY-32} width="28" height="22" rx="2" fill="#223850" />
                 <rect x="1022" y={deskY-10} width="12" height="8" rx="1" fill="#2e4a64" />
                 <ellipse cx="1020" cy={by-46} rx={15} ry={12} fill="#b8a898" stroke="#988878" strokeWidth="1" />
-                <text x="1228" y={r.y+20} textAnchor="end" fontSize="10" fontWeight="700"
-                  fill="#786050" style={{ userSelect: 'none' }}>{si.name}</text>
-                <text x="810" y={r.y+20} textAnchor="start" fontSize="8" fontWeight="600"
-                  fill="#a89080" style={{ userSelect: 'none' }}>متخصص</text>
               </>
             )}
 
