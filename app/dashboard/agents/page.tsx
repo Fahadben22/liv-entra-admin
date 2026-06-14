@@ -394,16 +394,16 @@ function sanitize(s?: string): string {
   return (s || '').replace(/[*#_`>]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-function OfficeSVG({ meetingTopic, meetingDecisions }: { meetingTopic?: string; meetingDecisions?: string }) {
+function OfficeSVG({ meetingTopic, meetingDecisions, meetingDate, meetingLive }: { meetingTopic?: string; meetingDecisions?: string; meetingDate?: string; meetingLive?: boolean }) {
   const PART = EXEC_PART;
-  const topicLines = wrapText(sanitize(meetingTopic), 28, 2);
-  const noteLines  = wrapText(sanitize(meetingDecisions), 40, 7);
+  const topicLines = wrapText(sanitize(meetingTopic), 26, 2);
+  const noteLines  = wrapText(sanitize(meetingDecisions), 42, 6);
 
   return (
     <svg viewBox="0 0 1240 880" preserveAspectRatio="none"
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
       <defs>
-        <clipPath id="notesClip"><rect x="364" y="622" width="316" height="160" rx="3" /></clipPath>
+        <clipPath id="notesClip"><rect x="364" y="646" width="316" height="138" rx="3" /></clipPath>
       </defs>
 
       {/* ── Floor ── */}
@@ -510,42 +510,51 @@ function OfficeSVG({ meetingTopic, meetingDecisions }: { meetingTopic?: string; 
       <text x="522" y="98" textAnchor="middle" fontSize="12" fill="white" fontWeight="800"
         style={{ userSelect: 'none' }}>غرفة الاجتماعات</text>
 
-      {/* Projection screen — shows current meeting TOPIC */}
-      <rect x="372" y="116" width="300" height="92" rx="3" fill="#16263c" stroke="#90b0cc" strokeWidth="1.5" />
-      <rect x="378" y="122" width="288" height="80" rx="2" fill="#1e3a5f" />
-      <text x="522" y="137" textAnchor="middle" fontSize="8" fill="#7aa0c4" style={{ userSelect: 'none' }}>
-        موضوع الاجتماع الحالي
+      {/* Projection screen — shows current meeting TOPIC + live date */}
+      <rect x="372" y="116" width="300" height="98" rx="3" fill="#16263c" stroke="#90b0cc" strokeWidth="1.5" />
+      <rect x="378" y="122" width="288" height="86" rx="2" fill="#1e3a5f" />
+      {/* live badge */}
+      {meetingLive && (
+        <>
+          <circle cx="392" cy="135" r="3.5" fill="#4ade80" />
+          <text x="402" y="138" textAnchor="start" fontSize="7.5" fontWeight="700" fill="#4ade80" style={{ userSelect: 'none' }}>مباشر</text>
+        </>
+      )}
+      <text x="652" y="138" textAnchor="end" fontSize="7.5" fill="#7aa0c4" style={{ userSelect: 'none' }}>
+        {meetingDate || 'موضوع الاجتماع الحالي'}
       </text>
       {topicLines.length > 0 ? topicLines.map((ln, i) => (
-        <text key={i} x="522" y={158 + i*18} textAnchor="middle" fontSize="13" fontWeight="700" fill="#ffffff" style={{ userSelect: 'none' }}>{ln}</text>
+        <text key={i} x="522" y={162 + i*19} textAnchor="middle" fontSize="13" fontWeight="700" fill="#ffffff" style={{ userSelect: 'none' }}>{ln}</text>
       )) : (
-        <text x="522" y="168" textAnchor="middle" fontSize="11" fill="#6a88a8" style={{ userSelect: 'none' }}>لا يوجد اجتماع نشط</text>
+        <text x="522" y="172" textAnchor="middle" fontSize="11" fill="#6a88a8" style={{ userSelect: 'none' }}>لا يوجد اجتماع نشط</text>
       )}
       {/* projector mount */}
-      <line x1="522" y1="208" x2="522" y2="232" stroke="#90b0cc" strokeWidth="1" strokeDasharray="3,3" />
+      <line x1="522" y1="214" x2="522" y2="236" stroke="#90b0cc" strokeWidth="1" strokeDasharray="3,3" />
 
       {/* Conference table — tall oval, seats around it */}
-      <ellipse cx="522" cy="410" rx="118" ry="150" fill="#cce0f0" stroke="#7098bc" strokeWidth="2" />
-      <ellipse cx="522" cy="410" rx="96" ry="128" fill="#d8e8f6" stroke="#a8c4dc" strokeWidth="1" />
+      <ellipse cx="522" cy="408" rx="116" ry="142" fill="#cce0f0" stroke="#7098bc" strokeWidth="2" />
+      <ellipse cx="522" cy="408" rx="94" ry="120" fill="#d8e8f6" stroke="#a8c4dc" strokeWidth="1" />
       {/* documents on table */}
-      {[[-40,360],[40,360],[-40,460],[40,460],[0,410]].map(([dx,dy],i) => (
+      {[[-38,362],[38,362],[-38,454],[38,454],[0,408]].map(([dx,dy],i) => (
         <rect key={i} x={522+dx-13} y={dy-9} width={26} height={18} rx="2" fill="#ffffff" stroke="#bcd0e0" strokeWidth="0.8" opacity="0.85" />
       ))}
 
-      {/* Notes / Decisions area — persists current meeting result */}
-      <rect x="362" y="598" width="320" height="186" rx="3" fill="#fffdf2" stroke="#d8c88c" strokeWidth="1.4" />
-      <rect x="362" y="598" width="320" height="22" rx="3" fill="#f0e6c2" />
-      <text x="674" y="613" textAnchor="end" fontSize="9.5" fontWeight="800" fill="#8a6e20" style={{ userSelect: 'none' }}>
+      {/* Notes / Decisions area — bottom of room, clipped, never overflows */}
+      <rect x="362" y="624" width="320" height="166" rx="4" fill="#fffdf2" stroke="#d8c88c" strokeWidth="1.4" />
+      <rect x="362" y="624" width="320" height="24" rx="4" fill="#f0e6c2" />
+      <rect x="362" y="638" width="320" height="10" fill="#f0e6c2" />
+      <circle cx="376" cy="636" r="3" fill="#b8860b" />
+      <text x="674" y="640" textAnchor="end" fontSize="10" fontWeight="800" fill="#8a6e20" style={{ userSelect: 'none' }}>
         محضر الاجتماع · القرارات
       </text>
       {noteLines.length > 0 ? (
         <g clipPath="url(#notesClip)">
           {noteLines.map((ln, i) => (
-            <text key={i} x="674" y={640 + i*19} textAnchor="end" fontSize="10.5" fill="#4a4230" style={{ userSelect: 'none' }}>{ln}</text>
+            <text key={i} x="672" y={664 + i*19} textAnchor="end" fontSize="10" fill="#4a4230" style={{ userSelect: 'none' }}>{ln}</text>
           ))}
         </g>
       ) : (
-        <text x="522" y="700" textAnchor="middle" fontSize="10" fill="#b0a878" style={{ userSelect: 'none' }}>
+        <text x="522" y="712" textAnchor="middle" fontSize="10" fill="#b0a878" style={{ userSelect: 'none' }}>
           ستظهر قرارات آخر اجتماع هنا
         </text>
       )}
@@ -698,17 +707,19 @@ export default function AgentsWorkspace() {
   const [conversations, setConversations] = useState<Record<string, Message[]>>({});
   const [reports, setReports]           = useState<any[]>([]);
   const [actions, setActions]           = useState<any[]>([]);
+  const [briefing, setBriefing]         = useState<any>(null);
   const [workshopOpen, setWorkshopOpen] = useState(false);
   const [meetingOpen, setMeetingOpen]   = useState(false);
   const [pendingMessage, setPendingMessage] = useState('');
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const loadMeeting = useCallback(async () => {
-    const [r, a] = await Promise.allSettled([
-      adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.(),
+    const [r, a, b] = await Promise.allSettled([
+      adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.(), adminApi.sa.getTodayBriefing?.(),
     ]);
     if (r.status === 'fulfilled') setReports((r.value as any)?.data || []);
     if (a.status === 'fulfilled') setActions((a.value as any)?.data || []);
+    if (b.status === 'fulfilled') setBriefing((b.value as any)?.data || null);
   }, []);
 
   useEffect(() => {
@@ -719,10 +730,24 @@ export default function AgentsWorkspace() {
 
   const pendingCount = actions.filter(a => a.status === 'pending_approval').length;
 
-  // Latest executive report = current meeting topic + decisions (persists till next)
-  const latestReport   = reports[0] || null;
-  const meetingTopic   = latestReport?.title || '';
-  const meetingDecisions = latestReport?.summary || '';
+  // Meeting board — real-time: prefer today's briefing, else latest exec report.
+  function meetingDateLabel(iso?: string) {
+    const d = iso ? new Date(iso) : new Date();
+    return d.toLocaleDateString('ar-SA', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+  const latestReport = reports[0] || null;
+  let meetingTopic = '', meetingDecisions = '', meetingDate = '', meetingLive = false;
+  if (briefing) {
+    meetingLive = true;
+    meetingTopic = 'الموجز التنفيذي اليومي';
+    meetingDate  = meetingDateLabel(briefing.created_at);
+    const acts = (briefing.actions_taken || []).map((x: any) => `• ${x.company_name || ''}: ${x.result || ''}`).join('  ');
+    meetingDecisions = [briefing.content, acts].filter(Boolean).join('  ').trim();
+  } else if (latestReport) {
+    meetingTopic = latestReport.title || '';
+    meetingDate  = meetingDateLabel(latestReport.created_at);
+    meetingDecisions = latestReport.summary || '';
+  }
 
   function updateMessages(agentType: string, msgs: Message[]) {
     setConversations(prev => ({ ...prev, [agentType]: msgs }));
@@ -783,7 +808,7 @@ export default function AgentsWorkspace() {
         <div ref={canvasRef} style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#edf1f6', minHeight: 0, containerType: 'size', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 10 }}>
           {/* Fixed-aspect stage — SVG and % avatars share one coordinate system */}
           <div style={{ position: 'relative', aspectRatio: '1240 / 880', width: 'min(100cqw, 100cqh * 1240 / 880)', maxWidth: '100%', maxHeight: '100%' }}>
-            <OfficeSVG meetingTopic={meetingTopic} meetingDecisions={meetingDecisions} />
+            <OfficeSVG meetingTopic={meetingTopic} meetingDecisions={meetingDecisions} meetingDate={meetingDate} meetingLive={meetingLive} />
             {/* Office desk seats */}
             {Object.keys(SEAT_POS).map(type => (
               <AgentSeat key={type} type={type} isActive={activeAgent === type}
