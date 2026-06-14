@@ -6,7 +6,7 @@ import {
   ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle,
   AlertOctagon, Activity, ChevronDown, ChevronUp, SlidersHorizontal,
   Radio, Server, Cpu, Trash2, MessageSquare, ChevronRight, X,
-  Clock, Zap, Terminal, Eye,
+  Clock, Zap, Terminal, Eye, Award,
 } from 'lucide-react';
 
 // ── Arabic agent name map ──────────────────────────────────────────────────────
@@ -91,6 +91,7 @@ const TABS = [
   { key: 'icp',      label: 'ICP',         icon: <Network style={{ width: 13, height: 13 }} /> },
   { key: 'metrics',  label: 'المؤشرات',   icon: <Activity style={{ width: 13, height: 13 }} /> },
   { key: 'controls', label: 'تحكّم',      icon: <SlidersHorizontal style={{ width: 13, height: 13 }} /> },
+  { key: 'quality',  label: 'جودة الوكلاء', icon: <Award style={{ width: 13, height: 13 }} /> },
 ];
 
 // ── Page ───────────────────────────────────────────────────────────────────────
@@ -222,6 +223,33 @@ export default function AIGovPage() {
   }
 
   useEffect(() => { loadAll(); loadControls(); }, [loadAll, loadControls]);
+
+  // ── Quality KPI state ─────────────────────────────────────────────────────
+  const [qualityData, setQualityData]       = useState<any>(null);
+  const [qualityLoading, setQualityLoading] = useState(false);
+  const [qualityAgent, setQualityAgent]     = useState<string | null>(null);
+
+  const loadQuality = useCallback(async () => {
+    setQualityLoading(true);
+    try {
+      const res = await request<any>('GET', '/admin/agents/quality/scores');
+      if (res?.data) setQualityData(res.data);
+    } catch {}
+    setQualityLoading(false);
+  }, []);
+
+  useEffect(() => { if (tab === 'quality') loadQuality(); }, [tab, loadQuality]);
+
+  const scoreColor = (s: number | null) =>
+    s == null ? '#94a3b8' : s >= 80 ? '#059669' : s >= 60 ? '#d97706' : '#dc2626';
+
+  const relTime = (iso: string | null) => {
+    if (!iso) return '—';
+    const d = Date.now() - new Date(iso).getTime();
+    if (d < 3600000)  return `${Math.floor(d / 60000)} د`;
+    if (d < 86400000) return `${Math.floor(d / 3600000)} س`;
+    return `${Math.floor(d / 86400000)} ي`;
+  };
 
   // Auto-load sessions on tab switch; poll every 15s while tab is active
   useEffect(() => {
@@ -975,6 +1003,233 @@ export default function AIGovPage() {
               ))}
             </div>
           </div>
+
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {/* TAB: AGENT QUALITY KPI                                              */}
+      {/* ════════════════════════════════════════════════════════════════════ */}
+      {tab === 'quality' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+          {/* Header row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Award style={{ width: 15, height: 15, color: 'var(--brand-600)' }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>جودة الوكلاء</span>
+              {qualityData?.computed_at && (
+                <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                  آخر تحديث: {relTime(qualityData.computed_at)}
+                </span>
+              )}
+            </div>
+            <button className="le-btn ghost sm" onClick={loadQuality} disabled={qualityLoading} title="تحديث">
+              <RefreshCw style={{ width: 12, height: 12, animation: qualityLoading ? 'spin 0.8s linear infinite' : 'none' }} />
+            </button>
+          </div>
+
+          {qualityLoading && !qualityData && (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
+              <div style={{ width: 28, height: 28, border: '3px solid var(--border)', borderTopColor: 'var(--brand-600)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+            </div>
+          )}
+
+          {qualityData && (<>
+
+            {/* Ecosystem KPI cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 12 }}>
+              {[
+                { label: 'متوسط الدقة',          value: qualityData.ecosystem.avg_accuracy,          sub: 'آخر 30 يوم' },
+                { label: 'يستخدمون الذاكرة',      value: qualityData.ecosystem.pct_agents_with_memory, sub: '% من الوكلاء', suffix: '%' },
+                { label: 'متوسط موافقة فهد',      value: qualityData.ecosystem.avg_approval_rate,     sub: 'آخر 90 يوم' },
+                { label: 'متوسط درجة الثقة',      value: qualityData.ecosystem.avg_trust_score,       sub: '0–100' },
+              ].map(k => (
+                <div key={k.label} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 6 }}>{k.label}</p>
+                  <p style={{ fontSize: 28, fontWeight: 700, color: scoreColor(k.value), lineHeight: 1, margin: 0 }}>
+                    {k.value != null ? `${k.value}${k.suffix || ''}` : '—'}
+                  </p>
+                  <p style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>{k.sub}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Main: agent grid + drill-down */}
+            <div style={{ display: 'grid', gridTemplateColumns: qualityAgent ? '1fr 360px' : '1fr', gap: 14 }}>
+
+              {/* Agent scorecard grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: 10, alignContent: 'start' }}>
+                {(qualityData.agents as any[]).map((agent: any) => {
+                  const selected = qualityAgent === agent.agent_type;
+                  const tierAr: Record<string,string> = { full_autopilot:'أتمتة كاملة', autopilot:'أتمتة قياسية', high_risk_manual:'مراجعة يدوية', manual:'يدوي' };
+                  const tierColor: Record<string,string> = { full_autopilot:'#059669', autopilot:'#2563eb', high_risk_manual:'#d97706', manual:'#dc2626' };
+                  const tier = agent.meta.autonomy_tier;
+                  const dims = ['accuracy','grounding_rate','memory','approval_rate','capability'] as const;
+                  return (
+                    <div key={agent.agent_type}
+                      onClick={() => setQualityAgent(selected ? null : agent.agent_type)}
+                      style={{ background: 'var(--surface)', border: `1.5px solid ${selected ? 'var(--brand-600)' : 'var(--border)'}`, borderRadius: 10, padding: '14px', cursor: 'pointer', transition: 'border-color .15s', boxShadow: selected ? '0 0 0 2px rgba(99,102,241,.1)' : 'none' }}>
+                      {/* Card header */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                        <ScoreRing score={agent.overall_score} size={48} />
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-1)', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{agent.agent_name}</p>
+                          {tier && (
+                            <span style={{ fontSize: 9, fontWeight: 600, padding: '2px 7px', borderRadius: 10, background: (tierColor[tier] || '#94a3b8') + '18', color: tierColor[tier] || '#94a3b8' }}>
+                              {tierAr[tier] || tier}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {/* Score bars */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        {dims.map(dim => {
+                          const s = agent.scores[dim];
+                          return (
+                            <div key={dim}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                                <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{s.label}</span>
+                                {s.insufficient
+                                  ? <span className="le-badge" style={{ fontSize: 8 }}>بيانات غير كافية</span>
+                                  : <span style={{ fontSize: 10, fontWeight: 600, color: scoreColor(s.score) }}>{s.score}%</span>
+                                }
+                              </div>
+                              <div style={{ height: 4, background: '#f0f0f0', borderRadius: 2 }}>
+                                {!s.insufficient && s.score != null && (
+                                  <div style={{ height: '100%', borderRadius: 2, background: scoreColor(s.score), width: `${s.score}%`, transition: 'width .4s ease' }} />
+                                )}
+                              </div>
+                              {dim === 'memory' && s.active_memories > 0 && (
+                                <p style={{ fontSize: 9, color: 'var(--text-muted)', margin: '2px 0 0' }}>{s.active_memories} ذاكرة نشطة</p>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Drill-down panel */}
+              {qualityAgent && (() => {
+                const agent = (qualityData.agents as any[]).find((a: any) => a.agent_type === qualityAgent);
+                if (!agent) return null;
+                const tierAr: Record<string,string> = { full_autopilot:'أتمتة كاملة', autopilot:'أتمتة قياسية', high_risk_manual:'مراجعة يدوية', manual:'يدوي' };
+                return (
+                  <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', alignSelf: 'start', position: 'sticky', top: 80 }}>
+                    {/* Panel header */}
+                    <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)', background: 'var(--ink-100)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <ScoreRing score={agent.overall_score} size={40} />
+                        <div>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>{agent.agent_name}</p>
+                          <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                            {agent.meta.autonomy_tier ? tierAr[agent.meta.autonomy_tier] : '—'}
+                          </p>
+                        </div>
+                      </div>
+                      <button className="le-btn ghost sm" onClick={() => setQualityAgent(null)}>
+                        <X style={{ width: 13, height: 13 }} />
+                      </button>
+                    </div>
+
+                    <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+                      {/* درجات التفصيل */}
+                      <div>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)', marginBottom: 8 }}>درجات التفصيل</p>
+                        {(['accuracy','grounding_rate','memory','approval_rate','capability'] as const).map(dim => {
+                          const s = agent.scores[dim];
+                          return (
+                            <div key={dim} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.label}</span>
+                              <span style={{ fontSize: 12, fontWeight: 700, color: s.insufficient ? '#94a3b8' : scoreColor(s.score) }}>
+                                {s.insufficient ? '—' : `${s.score}%`}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* الذاكرة */}
+                      <div style={{ background: 'var(--ink-100)', borderRadius: 8, padding: '10px 12px' }}>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)', marginBottom: 6 }}>الذاكرة الدائمة</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                          <span style={{ color: 'var(--text-muted)' }}>ذاكرة نشطة</span>
+                          <span style={{ fontWeight: 600, color: agent.scores.memory.active_memories > 0 ? '#059669' : '#dc2626' }}>
+                            {agent.scores.memory.active_memories} إدخال
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginTop: 4 }}>
+                          <span style={{ color: 'var(--text-muted)' }}>آخر كتابة</span>
+                          <span style={{ color: 'var(--text-1)' }}>{relTime(agent.scores.memory.last_write)}</span>
+                        </div>
+                      </div>
+
+                      {/* ثقة فهد */}
+                      <div style={{ background: 'var(--ink-100)', borderRadius: 8, padding: '10px 12px' }}>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)', marginBottom: 6 }}>قرارات فهد</p>
+                        {agent.scores.approval_rate.insufficient ? (
+                          <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>بيانات غير كافية (أقل من 5 قرارات)</p>
+                        ) : (
+                          <div style={{ display: 'flex', gap: 14, fontSize: 11 }}>
+                            <div style={{ textAlign: 'center' }}>
+                              <p style={{ fontWeight: 700, fontSize: 18, color: '#059669', margin: 0 }}>{agent.scores.approval_rate.approved}</p>
+                              <p style={{ color: 'var(--text-muted)', margin: '2px 0 0' }}>موافقة</p>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                              <p style={{ fontWeight: 700, fontSize: 18, color: '#dc2626', margin: 0 }}>{agent.scores.approval_rate.rejected}</p>
+                              <p style={{ color: 'var(--text-muted)', margin: '2px 0 0' }}>رفض</p>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                              <p style={{ fontWeight: 700, fontSize: 18, color: scoreColor(agent.scores.approval_rate.score), margin: 0 }}>{agent.scores.approval_rate.score}%</p>
+                              <p style={{ color: 'var(--text-muted)', margin: '2px 0 0' }}>معدل</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* تنوع الأدوات */}
+                      <div style={{ background: 'var(--ink-100)', borderRadius: 8, padding: '10px 12px' }}>
+                        <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)', marginBottom: 6 }}>تنوع الأدوات</p>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                          <span style={{ color: 'var(--text-muted)' }}>أدوات مختلفة (30 يوم)</span>
+                          <span style={{ fontWeight: 600, color: 'var(--text-1)' }}>{agent.scores.capability.unique_tools}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginTop: 4 }}>
+                          <span style={{ color: 'var(--text-muted)' }}>درجة التنوع</span>
+                          <span style={{ fontWeight: 600, color: scoreColor(agent.scores.capability.tool_diversity) }}>{agent.scores.capability.tool_diversity}%</span>
+                        </div>
+                      </div>
+
+                      {/* إحصاءات الجلسة */}
+                      {!agent.scores.accuracy.insufficient && (
+                        <div style={{ background: 'var(--ink-100)', borderRadius: 8, padding: '10px 12px' }}>
+                          <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)', marginBottom: 6 }}>
+                            إحصاءات الجلسة — {agent.scores.accuracy.total} استجابة (30 يوم)
+                          </p>
+                          <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                            نجاح · فشل · تصعيد · جزئي — مبني على حقل outcome في agent_conversation_history
+                          </p>
+                        </div>
+                      )}
+
+                      {agent.meta.trust_score != null && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 11, padding: '8px 12px', background: 'var(--ink-100)', borderRadius: 8 }}>
+                          <span style={{ color: 'var(--text-muted)' }}>درجة الثقة الكلية</span>
+                          <span style={{ fontWeight: 700, fontSize: 14, color: scoreColor(agent.meta.trust_score) }}>{agent.meta.trust_score}/100</span>
+                        </div>
+                      )}
+
+                    </div>
+                  </div>
+                );
+              })()}
+
+            </div>
+          </>)}
 
         </div>
       )}
