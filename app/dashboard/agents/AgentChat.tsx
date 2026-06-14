@@ -384,12 +384,8 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                   }}
                 >
                   {/* Avatar */}
-                  <div style={{
-                    width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                    background: 'linear-gradient(135deg,#7c5cfc,#2563EB)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 13, fontWeight: 700, color: '#fff',
-                  }}>R</div>
+                  <img src="/agents/reea.png" alt="REEA"
+                    style={{ width: 34, height: 34, borderRadius: '50%', flexShrink: 0, objectFit: 'cover', border: '2px solid #e0d8f8' }} />
 
                   {/* Content */}
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -443,12 +439,8 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
                 {/* Directive bubble */}
                 <div style={{ padding: '20px 20px 10px' }}>
                   <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
-                      background: 'linear-gradient(135deg,#7c5cfc,#2563EB)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 14, fontWeight: 700, color: '#fff',
-                    }}>R</div>
+                    <img src="/agents/reea.png" alt="REEA"
+                      style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0, objectFit: 'cover', border: '2px solid #e0d8f8' }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                         <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-1)' }}>REEA</span>
