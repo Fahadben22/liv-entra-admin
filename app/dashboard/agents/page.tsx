@@ -389,14 +389,22 @@ function wrapText(text: string, maxChars: number, maxLines: number): string[] {
   return lines.slice(0, maxLines);
 }
 
+// Strip markdown markers / collapse whitespace for clean SVG text
+function sanitize(s?: string): string {
+  return (s || '').replace(/[*#_`>]/g, '').replace(/\s+/g, ' ').trim();
+}
+
 function OfficeSVG({ meetingTopic, meetingDecisions }: { meetingTopic?: string; meetingDecisions?: string }) {
   const PART = EXEC_PART;
-  const topicLines = wrapText(meetingTopic || '', 30, 2);
-  const noteLines  = wrapText(meetingDecisions || '', 36, 8);
+  const topicLines = wrapText(sanitize(meetingTopic), 28, 2);
+  const noteLines  = wrapText(sanitize(meetingDecisions), 40, 7);
 
   return (
-    <svg viewBox="0 0 1240 880" preserveAspectRatio="xMidYMid slice"
+    <svg viewBox="0 0 1240 880" preserveAspectRatio="none"
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+      <defs>
+        <clipPath id="notesClip"><rect x="364" y="622" width="316" height="160" rx="3" /></clipPath>
+      </defs>
 
       {/* ── Floor ── */}
       <rect x="0" y="0" width="1240" height="880" fill="#edf1f6" />
@@ -530,10 +538,14 @@ function OfficeSVG({ meetingTopic, meetingDecisions }: { meetingTopic?: string; 
       <text x="674" y="613" textAnchor="end" fontSize="9.5" fontWeight="800" fill="#8a6e20" style={{ userSelect: 'none' }}>
         محضر الاجتماع · القرارات
       </text>
-      {noteLines.length > 0 ? noteLines.map((ln, i) => (
-        <text key={i} x="674" y={638 + i*17} textAnchor="end" fontSize="10.5" fill="#4a4230" style={{ userSelect: 'none' }}>{ln}</text>
-      )) : (
-        <text x="522" y="690" textAnchor="middle" fontSize="10" fill="#b0a878" style={{ userSelect: 'none' }}>
+      {noteLines.length > 0 ? (
+        <g clipPath="url(#notesClip)">
+          {noteLines.map((ln, i) => (
+            <text key={i} x="674" y={640 + i*19} textAnchor="end" fontSize="10.5" fill="#4a4230" style={{ userSelect: 'none' }}>{ln}</text>
+          ))}
+        </g>
+      ) : (
+        <text x="522" y="700" textAnchor="middle" fontSize="10" fill="#b0a878" style={{ userSelect: 'none' }}>
           ستظهر قرارات آخر اجتماع هنا
         </text>
       )}
@@ -767,21 +779,24 @@ export default function AgentsWorkspace() {
           </div>
         </div>
 
-        {/* OFFICE CANVAS */}
-        <div ref={canvasRef} style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#edf1f6', minHeight: 0 }}>
-          <OfficeSVG meetingTopic={meetingTopic} meetingDecisions={meetingDecisions} />
-          {/* Office desk seats */}
-          {Object.keys(SEAT_POS).map(type => (
-            <AgentSeat key={type} type={type} isActive={activeAgent === type}
-              onClick={() => openAgent(type)}
-              hasConversation={(conversations[type]?.length ?? 0) > 0} />
-          ))}
-          {/* Meeting-room seated core agents */}
-          {MEETING_SEATS.map(seat => (
-            <MeetingSeat key={seat.type} seat={seat}
-              onClick={() => openAgent(seat.type)}
-              badge={seat.head ? pendingCount : undefined} />
-          ))}
+        {/* OFFICE CANVAS — container-query box; stage fits fully, never crops */}
+        <div ref={canvasRef} style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#edf1f6', minHeight: 0, containerType: 'size', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 10 }}>
+          {/* Fixed-aspect stage — SVG and % avatars share one coordinate system */}
+          <div style={{ position: 'relative', aspectRatio: '1240 / 880', width: 'min(100cqw, 100cqh * 1240 / 880)', maxWidth: '100%', maxHeight: '100%' }}>
+            <OfficeSVG meetingTopic={meetingTopic} meetingDecisions={meetingDecisions} />
+            {/* Office desk seats */}
+            {Object.keys(SEAT_POS).map(type => (
+              <AgentSeat key={type} type={type} isActive={activeAgent === type}
+                onClick={() => openAgent(type)}
+                hasConversation={(conversations[type]?.length ?? 0) > 0} />
+            ))}
+            {/* Meeting-room seated core agents */}
+            {MEETING_SEATS.map(seat => (
+              <MeetingSeat key={seat.type} seat={seat}
+                onClick={() => openAgent(seat.type)}
+                badge={seat.head ? pendingCount : undefined} />
+            ))}
+          </div>
         </div>
 
         {/* BOTTOM DRAWER — full-width chat panel, slides up */}
