@@ -315,6 +315,20 @@ function timeAgoFeed(iso: string) {
 
 interface SeatMeta { x: number; y: number; isLead: boolean; zone: 'exec' | 'ops' | 'meeting'; }
 
+// Agent photos — agents without a photo keep the coloured letter avatar
+const AGENT_PHOTOS: Record<string, string> = {
+  meeting_room:         '/agents/sultan.png',    // chief orchestrator
+  it:                   '/agents/nasser.png',    // network/IT lead
+  sales:                '/agents/khalid.png',    // name match
+  marketing:            '/agents/noura.png',     // name match ✓
+  product:              '/agents/abdullah.png',  // data scientist → product
+  it_specialist:        '/agents/tariq.png',     // name match ✓
+  sales_specialist:     '/agents/turki.png',     // automation → sales spec
+  marketing_specialist: '/agents/sara.png',      // name match ✓
+  finance_specialist:   '/agents/majed.png',     // name match ✓
+  collections:          '/agents/yasser.png',    // remaining male
+};
+
 const SEAT_POS: Record<string, SeatMeta> = {
   // Meeting room — center of the building
   meeting_room:         { x: 40.6, y: 50.0, isLead: true,  zone: 'meeting' },
@@ -547,11 +561,16 @@ function AgentSeat({ type, isActive, onClick, hasConversation, pendingCount }: {
     <button onClick={onClick} title={`${info.name} — ${info.role}`}
       style={{ position: 'absolute', left: `${pos.x}%`, top: `${pos.y}%`, transform: 'translate(-50%, -50%)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, zIndex: isActive ? 9 : 5, padding: 0 }}>
       {/* Avatar */}
-      <div style={{ width: size, height: size, borderRadius: '50%', background: info.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: pos.isLead ? 15 : 12, flexShrink: 0, position: 'relative',
+      <div style={{ width: size, height: size, borderRadius: '50%', background: info.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: pos.isLead ? 15 : 12, flexShrink: 0, position: 'relative', overflow: 'hidden',
         boxShadow: isActive ? `0 0 0 3px #1e3a5f, 0 8px 22px rgba(15,23,42,.32)` : `0 5px 12px rgba(15,23,42,.28), inset 0 0 0 1.5px rgba(255,255,255,.45)`,
         transition: 'box-shadow .18s',
       }}>
-        {type === 'meeting_room' ? <Icon name="grid" size={pos.isLead ? 16 : 12} color="#fff" /> : info.name.charAt(0)}
+        {AGENT_PHOTOS[type]
+          ? <img src={AGENT_PHOTOS[type]} alt={info.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', borderRadius: '50%' }} />
+          : type === 'meeting_room'
+            ? <Icon name="grid" size={pos.isLead ? 16 : 12} color="#fff" />
+            : info.name.charAt(0)
+        }
         <span style={{ position: 'absolute', right: -1, bottom: -1, width: 10, height: 10, borderRadius: '50%', background: '#22c55e', border: '2px solid #fff', animation: 'seatPulse 2.4s infinite' }} />
         {(pendingCount ?? 0) > 0 && (
           <span style={{ position: 'absolute', top: -5, right: -5, width: 16, height: 16, borderRadius: '50%', background: '#ef4444', color: '#fff', fontSize: 8, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{pendingCount}</span>
@@ -743,8 +762,10 @@ export default function AgentsWorkspace() {
           <div style={{ flexShrink: 0, height: 460, display: 'flex', flexDirection: 'column', background: 'var(--surface)', borderTop: `3px solid ${info.color}`, animation: 'drawerUp .22s cubic-bezier(.22,1,.36,1)', overflow: 'hidden' }}>
             {/* Drawer header */}
             <div style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
-              <div style={{ width: 36, height: 36, borderRadius: '50%', background: info.color, color: '#fff', display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: 'inset 0 0 0 2px rgba(255,255,255,.4)' }}>
-                {info.name.charAt(0)}
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: info.color, color: '#fff', display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 14, flexShrink: 0, overflow: 'hidden', boxShadow: 'inset 0 0 0 2px rgba(255,255,255,.4)' }}>
+                {AGENT_PHOTOS[activeAgent!]
+                  ? <img src={AGENT_PHOTOS[activeAgent!]} alt={info.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+                  : info.name.charAt(0)}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#1f2733' }}>{info.name}</div>
