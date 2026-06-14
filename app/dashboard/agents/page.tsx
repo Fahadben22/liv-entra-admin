@@ -554,7 +554,7 @@ function OfficeSVG() {
 // ─── Agent Seat button ─────────────────────────────────────────────────────────
 function AgentSeat({ type, isActive, onClick, hasConversation, pendingCount }: {
   type: string; isActive: boolean;
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick: () => void;
   hasConversation: boolean; pendingCount?: number;
 }) {
   const pos = SEAT_POS[type]; if (!pos) return null;
@@ -652,7 +652,6 @@ function MeetingRoomModal({ onClose, onOpenAgent, onAskAgent }: {
 // ─── Main Workspace ────────────────────────────────────────────────────────────
 export default function AgentsWorkspace() {
   const [activeAgent, setActiveAgent]   = useState<string | null>(null);
-  const [panelPos, setPanelPos]         = useState({ x: 0, y: 0 });
   const [conversations, setConversations] = useState<Record<string, Message[]>>({});
   const [sidebarOpen, setSidebarOpen]   = useState(true);
   const [reports, setReports]           = useState<any[]>([]);
@@ -664,7 +663,7 @@ export default function AgentsWorkspace() {
   const [workshopOpen, setWorkshopOpen] = useState(false);
   const [meetingOpen, setMeetingOpen]   = useState(false);
   const [pendingMessage, setPendingMessage] = useState('');
-  const panelRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   const loadSidebar = useCallback(async () => {
     const [r, a, d] = await Promise.allSettled([
@@ -685,18 +684,6 @@ export default function AgentsWorkspace() {
     return () => clearInterval(iv);
   }, [loadSidebar]);
 
-  // Close panel on outside click
-  useEffect(() => {
-    if (!activeAgent) return;
-    function handler(e: MouseEvent) {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        setActiveAgent(null);
-      }
-    }
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [activeAgent]);
-
   async function handleApprove(id: string) { setActing(id); try { await adminApi.sa.approveAction?.(id); await loadSidebar(); } catch {} setActing(null); }
   async function handleReject(id: string) { setActing(id); try { await adminApi.sa.rejectAction?.(id, 'Rejected'); await loadSidebar(); } catch {} setActing(null); }
   async function handleApproveReport(id: string) { setActing(id); try { await adminApi.sa.approveReport?.(id); await loadSidebar(); } catch {} setActing(null); }
@@ -707,34 +694,13 @@ export default function AgentsWorkspace() {
     setConversations(prev => ({ ...prev, [agentType]: msgs }));
   }
 
-  function positionPanel(rect: DOMRect) {
-    let x = rect.left + rect.width / 2 - 160;
-    let y = rect.top - 450;
-    x = Math.max(8, Math.min(x, window.innerWidth - 328));
-    y = Math.max(56, Math.min(y, window.innerHeight - 460));
-    setPanelPos({ x, y });
-  }
-
-  function openAgent(type: string, e: React.MouseEvent<HTMLButtonElement>) {
+  function openAgent(type: string) {
     if (type === 'meeting_room') { setMeetingOpen(true); return; }
     setPendingMessage('');
-    const rect = e.currentTarget.getBoundingClientRect();
-    positionPanel(rect);
     setActiveAgent(prev => prev === type ? null : type);
   }
 
-  function openAgentCentered(type: string) {
-    setPendingMessage('');
-    const x = Math.max(8, window.innerWidth / 2 - 160);
-    const y = Math.max(56, window.innerHeight / 2 - 220);
-    setPanelPos({ x, y });
-    setActiveAgent(type);
-  }
-
   function askAgent(agentType: string, msg: string) {
-    const x = Math.max(8, window.innerWidth / 2 - 160);
-    const y = Math.max(56, window.innerHeight / 2 - 220);
-    setPanelPos({ x, y });
     setActiveAgent(agentType);
     setPendingMessage(msg);
   }
@@ -750,73 +716,72 @@ export default function AgentsWorkspace() {
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
 
-      {/* ── Office Floor Plan ─────────────────────────────────── */}
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#edf1f6' }}>
+      {/* ── Main column: top bar + floor plan + bottom drawer ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
 
-        {/* Top bar inside canvas */}
-        <div style={{ position: 'absolute', top: 0, inset: '0 0 auto 0', padding: '10px 18px', display: 'flex', alignItems: 'center', gap: 10, zIndex: 12 }}>
-          <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 500, pointerEvents: 'none' }}>لوحة التحكم / الوكلاء /</span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#1e3a5f', pointerEvents: 'none' }}>مكتب الوكلاء</span>
+        {/* TOP BAR — own row, never overlaps SVG */}
+        <div style={{ flexShrink: 0, background: '#e6ecf5', borderBottom: '1px solid #cdd8e8', padding: '8px 18px', display: 'flex', alignItems: 'center', gap: 10, zIndex: 20 }}>
+          <span style={{ fontSize: 10, color: '#6b7280', fontWeight: 500 }}>لوحة التحكم / الوكلاء /</span>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#1e3a5f' }}>مكتب الوكلاء</span>
           <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
             <button onClick={() => setMeetingOpen(true)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#1e3a5f', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11.5, fontWeight: 700, padding: '7px 14px', borderRadius: 9, boxShadow: '0 5px 14px rgba(30,58,95,.28)' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: '#1e3a5f', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 11.5, fontWeight: 700, padding: '7px 14px', borderRadius: 9, boxShadow: '0 4px 12px rgba(30,58,95,.25)' }}>
               <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ade80', animation: 'seatPulse 2.4s infinite', display: 'inline-block' }} />
               غرفة الاجتماعات
             </button>
             <button onClick={() => setWorkshopOpen(true)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.9)', color: '#7c3aed', border: '1px solid #ddd6fe', cursor: 'pointer', fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 9, backdropFilter: 'blur(4px)' }}>
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: '#7c3aed', border: '1px solid #ddd6fe', cursor: 'pointer', fontSize: 11, fontWeight: 700, padding: '7px 12px', borderRadius: 9 }}>
               <Icon name="layers" size={13} color="#7c3aed" />
               ورشة تسويق
             </button>
           </div>
+          {/* Legend */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {[{ bg: '#22c55e', label: 'متصل' }, { bg: '#f59e0b', label: 'مشغول' }, { bg: '#9ca3af', label: 'بعيد' }].map(s => (
+              <span key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: '#6b7280' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.bg, display: 'inline-block' }} />{s.label}
+              </span>
+            ))}
+          </div>
         </div>
 
-        {/* SVG background */}
-        <OfficeSVG />
-
-        {/* Agent seats */}
-        {Object.keys(SEAT_POS).map(type => (
-          <AgentSeat key={type} type={type} isActive={activeAgent === type}
-            onClick={e => openAgent(type, e)}
-            hasConversation={(conversations[type]?.length ?? 0) > 0}
-            pendingCount={type === 'meeting_room' ? pendingCount : undefined} />
-        ))}
-
-        {/* Legend */}
-        <div style={{ position: 'absolute', bottom: 12, insetInlineEnd: 18, zIndex: 8, display: 'flex', alignItems: 'center', gap: 14, pointerEvents: 'none' }}>
-          {[{ bg: '#22c55e', label: 'متصل' }, { bg: '#f59e0b', label: 'مشغول' }, { bg: '#9ca3af', label: 'بعيد' }].map(s => (
-            <span key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: '#6b7280', fontWeight: 500 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: s.bg, display: 'inline-block' }} />{s.label}
-            </span>
+        {/* OFFICE CANVAS */}
+        <div ref={canvasRef} style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#edf1f6', minHeight: 0 }}>
+          <OfficeSVG />
+          {Object.keys(SEAT_POS).map(type => (
+            <AgentSeat key={type} type={type} isActive={activeAgent === type}
+              onClick={() => openAgent(type)}
+              hasConversation={(conversations[type]?.length ?? 0) > 0}
+              pendingCount={type === 'meeting_room' ? pendingCount : undefined} />
           ))}
         </div>
 
-        {/* Floating chat panel */}
+        {/* BOTTOM DRAWER — full-width chat panel, slides up */}
         {activeAgent && info && (
-          <div ref={panelRef}
-            style={{ position: 'fixed', left: panelPos.x, top: panelPos.y, width: 320, height: 460, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, boxShadow: '0 22px 60px rgba(15,23,42,.22)', display: 'flex', flexDirection: 'column', overflow: 'hidden', zIndex: 30, direction: 'rtl' }}>
-            {/* Panel header */}
-            <div style={{ padding: '11px 13px', display: 'flex', alignItems: 'center', gap: 9, borderBottom: '1px solid var(--border)', flexShrink: 0, background: 'var(--surface)' }}>
-              <div style={{ width: 34, height: 34, borderRadius: '50%', background: info.color, color: '#fff', display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 13, flexShrink: 0, boxShadow: 'inset 0 0 0 1.5px rgba(255,255,255,.45)' }}>
+          <div style={{ flexShrink: 0, height: 460, display: 'flex', flexDirection: 'column', background: 'var(--surface)', borderTop: `3px solid ${info.color}`, animation: 'drawerUp .22s cubic-bezier(.22,1,.36,1)', overflow: 'hidden' }}>
+            {/* Drawer header */}
+            <div style={{ padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: info.color, color: '#fff', display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 14, flexShrink: 0, boxShadow: 'inset 0 0 0 2px rgba(255,255,255,.4)' }}>
                 {info.name.charAt(0)}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#1f2733' }}>{info.name}</div>
-                <div style={{ fontSize: 10, color: '#6b7280' }}>{info.role}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#1f2733' }}>{info.name}</div>
+                <div style={{ fontSize: 10.5, color: '#6b7280' }}>{info.role}</div>
               </div>
-              <span style={{ fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 999, background: '#ecfdf3', color: '#15803d', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+              <span style={{ fontSize: 10.5, fontWeight: 600, padding: '3px 10px', borderRadius: 999, background: '#ecfdf3', color: '#15803d', display: 'flex', alignItems: 'center', gap: 5 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />متصل
               </span>
               <button onClick={handleClearChat}
-                style={{ fontSize: 10, padding: '3px 8px', borderRadius: 6, border: '1px solid rgba(0,0,0,.07)', background: 'transparent', color: '#9ca3af', cursor: 'pointer', flexShrink: 0 }}>
+                style={{ fontSize: 11, padding: '4px 10px', borderRadius: 7, border: '1px solid rgba(0,0,0,.08)', background: 'transparent', color: '#9ca3af', cursor: 'pointer' }}>
                 مسح
               </button>
               <button onClick={() => setActiveAgent(null)}
-                style={{ width: 24, height: 24, borderRadius: 7, border: 'none', background: 'transparent', color: '#9ca3af', cursor: 'pointer', display: 'grid', placeItems: 'center', flexShrink: 0 }}>
-                <Icon name="x" size={14} color="#9ca3af" />
+                style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: '#f3f4f6', color: '#6b7280', cursor: 'pointer', display: 'grid', placeItems: 'center' }}
+                title="إغلاق">
+                <Icon name="chevron-down" size={16} color="#6b7280" />
               </button>
             </div>
-            {/* Chat */}
+            {/* AgentChat fills the rest */}
             <div style={{ flex: 1, overflow: 'hidden' }}>
               <AgentChat
                 key={activeAgent}
@@ -836,6 +801,7 @@ export default function AgentsWorkspace() {
 
         <style>{`
           @keyframes seatPulse { 0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)} 70%{box-shadow:0 0 0 5px rgba(34,197,94,0)} 100%{box-shadow:0 0 0 0 rgba(34,197,94,0)} }
+          @keyframes drawerUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
           @keyframes ws-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
           @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
           @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
@@ -957,7 +923,7 @@ export default function AgentsWorkspace() {
       {meetingOpen && (
         <MeetingRoomModal
           onClose={() => setMeetingOpen(false)}
-          onOpenAgent={openAgentCentered}
+          onOpenAgent={t => { setActiveAgent(t); setPendingMessage(''); }}
           onAskAgent={askAgent}
         />
       )}
