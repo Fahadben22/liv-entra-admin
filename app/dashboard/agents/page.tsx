@@ -315,18 +315,28 @@ function timeAgoFeed(iso: string) {
 
 interface SeatMeta { x: number; y: number; isLead: boolean; zone: 'exec' | 'ops' | 'meeting'; }
 
-// Agent photos — agents without a photo keep the coloured letter avatar
+// Agent photos — real photos (PNG) + illustrated SVG portraits for the rest
 const AGENT_PHOTOS: Record<string, string> = {
-  meeting_room:         '/agents/sultan.png',    // chief orchestrator
-  it:                   '/agents/nasser.png',    // network/IT lead
-  sales:                '/agents/khalid.png',    // name match
-  marketing:            '/agents/noura.png',     // name match ✓
-  product:              '/agents/abdullah.png',  // data scientist → product
-  it_specialist:        '/agents/tariq.png',     // name match ✓
-  sales_specialist:     '/agents/turki.png',     // automation → sales spec
-  marketing_specialist: '/agents/sara.png',      // name match ✓
-  finance_specialist:   '/agents/majed.png',     // name match ✓
-  collections:          '/agents/yasser.png',    // remaining male
+  // Real photos
+  meeting_room:         '/agents/sultan.png',
+  it:                   '/agents/nasser.png',
+  sales:                '/agents/khalid.png',
+  marketing:            '/agents/noura.png',
+  product:              '/agents/abdullah.png',
+  it_specialist:        '/agents/tariq.png',
+  sales_specialist:     '/agents/turki.png',
+  marketing_specialist: '/agents/sara.png',
+  finance_specialist:   '/agents/majed.png',
+  collections:          '/agents/yasser.png',
+  // SVG illustrated portraits
+  finance:              '/agents/reem.svg',
+  leasing:              '/agents/dana.svg',
+  ops:                  '/agents/fares.svg',
+  tenant_exp:           '/agents/mona.svg',
+  owner_rel:            '/agents/nadia.svg',
+  os_finance:           '/agents/reza.svg',
+  design_specialist:    '/agents/layla.svg',
+  product_specialist:   '/agents/lina.svg',
 };
 
 const SEAT_POS: Record<string, SeatMeta> = {

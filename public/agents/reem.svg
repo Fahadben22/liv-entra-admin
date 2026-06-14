@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bg-r" cx="44%" cy="32%" r="82%">
+      <stop offset="0%" stop-color="#2a3020"/>
+      <stop offset="55%" stop-color="#1a2030"/>
+      <stop offset="100%" stop-color="#080e18"/>
+    </radialGradient>
+    <radialGradient id="skin-r" cx="48%" cy="42%" r="56%">
+      <stop offset="0%" stop-color="#d8a87a"/>
+      <stop offset="100%" stop-color="#b07a48"/>
+    </radialGradient>
+    <linearGradient id="body-r" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1c2030"/>
+      <stop offset="100%" stop-color="#0a1020"/>
+    </linearGradient>
+    <linearGradient id="hijab-r" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1a10"/>
+      <stop offset="100%" stop-color="#0e1020"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg-r)"/>
+  <!-- warm amber ambient from top -->
+  <ellipse cx="190" cy="110" rx="310" ry="210" fill="rgba(245,158,11,0.07)"/>
+  <!-- body -->
+  <path d="M 0 512 C 30 400 110 358 178 348 Q 217 342 256 342 Q 295 342 334 348 C 402 358 482 400 512 512 Z" fill="url(#body-r)"/>
+  <!-- hijab drape -->
+  <path d="M 137 238 C 110 298 114 382 142 425 Q 192 450 256 452 Q 320 450 370 425 C 398 382 402 298 375 238 C 342 218 300 210 256 210 C 212 210 170 218 137 238 Z" fill="url(#hijab-r)"/>
+  <!-- hijab top cap -->
+  <ellipse cx="256" cy="204" rx="122" ry="96" fill="#14100c"/>
+  <!-- face -->
+  <ellipse cx="256" cy="254" rx="78" ry="90" fill="url(#skin-r)"/>
+  <!-- inner hijab frame -->
+  <path d="M 178 232 C 176 248 179 268 182 280 C 206 218 256 214 306 218 C 309 268 312 248 334 232 C 326 212 294 198 256 197 C 218 198 186 212 178 232 Z" fill="#14100c"/>
+  <!-- eyebrows -->
+  <path d="M 208 228 Q 223 220 238 225" stroke="#1a100a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M 274 225 Q 289 220 304 228" stroke="#1a100a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- left eye -->
+  <ellipse cx="226" cy="244" rx="17" ry="10" fill="#f5ede5"/>
+  <ellipse cx="226" cy="244" rx="12" ry="10" fill="#28160a"/>
+  <ellipse cx="226" cy="244" rx="7.5" ry="7.5" fill="#080408"/>
+  <circle cx="230" cy="241" r="2.5" fill="white" opacity="0.75"/>
+  <!-- right eye -->
+  <ellipse cx="286" cy="244" rx="17" ry="10" fill="#f5ede5"/>
+  <ellipse cx="286" cy="244" rx="12" ry="10" fill="#28160a"/>
+  <ellipse cx="286" cy="244" rx="7.5" ry="7.5" fill="#080408"/>
+  <circle cx="290" cy="241" r="2.5" fill="white" opacity="0.75"/>
+  <!-- lashes -->
+  <path d="M 209 236 Q 226 229 243 235" stroke="#080408" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 269 235 Q 286 229 303 236" stroke="#080408" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- nose -->
+  <ellipse cx="248" cy="284" rx="5" ry="4" fill="rgba(0,0,0,0.13)"/>
+  <ellipse cx="264" cy="284" rx="5" ry="4" fill="rgba(0,0,0,0.13)"/>
+  <!-- lips -->
+  <path d="M 237 308 Q 248 300 256 302 Q 264 300 275 308 Q 265 318 256 319 Q 247 318 237 308 Z" fill="#c8603e"/>
+  <path d="M 237 308 Q 256 322 275 308 Q 265 318 256 319 Q 247 318 237 308 Z" fill="#d87860" opacity="0.8"/>
+  <!-- cheek warmth -->
+  <ellipse cx="204" cy="268" rx="26" ry="16" fill="rgba(245,158,11,0.10)"/>
+  <ellipse cx="308" cy="268" rx="26" ry="16" fill="rgba(245,158,11,0.10)"/>
+  <!-- bottom shadow -->
+  <rect x="0" y="380" width="512" height="132" fill="url(#body-r)" opacity="0.3"/>
+</svg>
