@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const TABS = [
-  { href: '/dashboard/agents',              label: 'الوكلاء',       exact: true },
+  { href: '/dashboard/agents',              label: 'الوكلاء',   exact: true },
+  { href: '/dashboard/agents/live',         label: 'مباشر' },
   { href: '/dashboard/agents/health',       label: 'الصحة' },
   { href: '/dashboard/agents/economy',      label: 'الاقتصاد' },
   { href: '/dashboard/agents/correlations', label: 'الارتباطات' },

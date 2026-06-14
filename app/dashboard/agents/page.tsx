@@ -274,38 +274,6 @@ function getAgentInfo(type: string) {
   return AGENTS[0];
 }
 
-const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> = {
-  pending_approval: { label: 'انتظار',     color: '#f59e0b', bg: '#fffbeb' },
-  approved:         { label: 'معتمد',      color: '#10b981', bg: '#ecfdf5' },
-  in_progress:      { label: 'قيد التنفيذ',color: '#3b82f6', bg: '#eff6ff' },
-  done:             { label: 'منجز',       color: '#059669', bg: '#f0fdf4' },
-  blocked:          { label: 'مرفوض',      color: '#ef4444', bg: '#fef2f2' },
-  pending:          { label: 'معلق',       color: '#f59e0b', bg: '#fffbeb' },
-};
-
-const AGENT_STYLE: Record<string, { label: string; color: string; bg: string }> = {
-  reea:        { label: 'REEA',     color: '#7c3aed', bg: '#f5f3ff' },
-  collections: { label: 'تحصيل',   color: '#dc2626', bg: '#fef2f2' },
-  leasing:     { label: 'تأجير',   color: '#2563eb', bg: '#eff6ff' },
-  maintenance: { label: 'صيانة',   color: '#d97706', bg: '#fffbeb' },
-  renewals:    { label: 'تجديد',   color: '#059669', bg: '#ecfdf5' },
-  onboarding:  { label: 'استقبال', color: '#0891b2', bg: '#ecfeff' },
-};
-
-const DIRECTIVE_STATUS: Record<string, { label: string; color: string }> = {
-  pending: { label: 'بانتظار الرد', color: '#f59e0b' },
-  replied: { label: 'تم الرد',      color: '#10b981' },
-  failed:  { label: 'فشل',          color: '#ef4444' },
-};
-
-function timeAgoFeed(iso: string) {
-  const sec = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (sec < 60) return 'الآن';
-  if (sec < 3600) return `${Math.floor(sec / 60)}د`;
-  if (sec < 86400) return `${Math.floor(sec / 3600)}س`;
-  return `${Math.floor(sec / 86400)}ي`;
-}
-
 // ─── Floor Plan ────────────────────────────────────────────────────────────────
 // Layout (canvas 1240 × 880):
 //   OPS ZONE  x=5–375    2-col × 3-row individual offices
@@ -340,36 +308,47 @@ const AGENT_PHOTOS: Record<string, string> = {
 };
 
 const SEAT_POS: Record<string, SeatMeta> = {
-  // Meeting room — center of the building
-  meeting_room:         { x: 40.6, y: 50.0, isLead: true,  zone: 'meeting' },
+  // ── Executive zone (x 715–1235) ──────────────────────────────────────────
+  // Lead desks in left sub-area (715–880), center x ≈ 64.3%
+  // Spec desks in right sub-area (880–1235), center x ≈ 85.3%
+  // Marketing has 2 specs (سارة ≈ 78.1%, ليلى ≈ 92.4%)
+  it:                   { x: 64.3, y: 11.8, isLead: true,  zone: 'exec' },
+  sales:                { x: 64.3, y: 31.4, isLead: true,  zone: 'exec' },
+  marketing:            { x: 64.3, y: 50.9, isLead: true,  zone: 'exec' },
+  finance:              { x: 64.3, y: 70.5, isLead: true,  zone: 'exec' },
+  product:              { x: 64.3, y: 89.3, isLead: true,  zone: 'exec' },
 
-  // ── Executive zone (x 634–1235) ──────────────────────────────────────────
-  // Lead desks sit in left sub-area (634–806), center x ≈ 58.1%
-  // Spec desks sit in right sub-area (806–1235), center x ≈ 82.3%
-  // Marketing has 2 specs (سارة ≈ 73.6%, ليلى ≈ 90.9%)
-  it:                   { x: 58.1, y: 11.8, isLead: true,  zone: 'exec' },
-  sales:                { x: 58.1, y: 31.4, isLead: true,  zone: 'exec' },
-  marketing:            { x: 58.1, y: 50.9, isLead: true,  zone: 'exec' },
-  finance:              { x: 58.1, y: 70.5, isLead: true,  zone: 'exec' },
-  product:              { x: 58.1, y: 89.3, isLead: true,  zone: 'exec' },
+  it_specialist:        { x: 85.3, y: 11.8, isLead: false, zone: 'exec' },
+  sales_specialist:     { x: 85.3, y: 31.4, isLead: false, zone: 'exec' },
+  marketing_specialist: { x: 78.1, y: 50.9, isLead: false, zone: 'exec' }, // سارة
+  design_specialist:    { x: 92.4, y: 50.9, isLead: false, zone: 'exec' }, // ليلى
+  finance_specialist:   { x: 85.3, y: 70.5, isLead: false, zone: 'exec' },
+  product_specialist:   { x: 85.3, y: 89.3, isLead: false, zone: 'exec' },
 
-  it_specialist:        { x: 82.3, y: 11.8, isLead: false, zone: 'exec' },
-  sales_specialist:     { x: 82.3, y: 31.4, isLead: false, zone: 'exec' },
-  marketing_specialist: { x: 73.6, y: 50.9, isLead: false, zone: 'exec' }, // سارة
-  design_specialist:    { x: 90.9, y: 50.9, isLead: false, zone: 'exec' }, // ليلى
-  finance_specialist:   { x: 82.3, y: 70.5, isLead: false, zone: 'exec' },
-  product_specialist:   { x: 82.3, y: 89.3, isLead: false, zone: 'exec' },
-
-  // ── Ops zone (x 5–375, col A ≈ 7.5%, col B ≈ 23.1%) ────────────────────
-  leasing:              { x: 7.5,  y: 17.4, isLead: true,  zone: 'ops' }, // دانة
-  collections:          { x: 23.1, y: 17.4, isLead: true,  zone: 'ops' }, // بدر
-  ops:                  { x: 7.5,  y: 50.0, isLead: true,  zone: 'ops' }, // فارس
-  tenant_exp:           { x: 23.1, y: 50.0, isLead: true,  zone: 'ops' }, // منى
-  owner_rel:            { x: 7.5,  y: 82.6, isLead: true,  zone: 'ops' }, // نادية
-  os_finance:           { x: 23.1, y: 82.6, isLead: true,  zone: 'ops' }, // رضا
+  // ── Ops zone (x 5–332, col A ≈ 6.8%, col B ≈ 20.4%) ────────────────────
+  leasing:              { x: 6.8,  y: 17.4, isLead: true,  zone: 'ops' }, // دانة
+  collections:          { x: 20.4, y: 17.4, isLead: true,  zone: 'ops' }, // بدر
+  ops:                  { x: 6.8,  y: 50.0, isLead: true,  zone: 'ops' }, // فارس
+  tenant_exp:           { x: 20.4, y: 50.0, isLead: true,  zone: 'ops' }, // منى
+  owner_rel:            { x: 6.8,  y: 82.6, isLead: true,  zone: 'ops' }, // نادية
+  os_finance:           { x: 20.4, y: 82.6, isLead: true,  zone: 'ops' }, // رضا
 };
 
+// ── Meeting room — 7 core agents seated around the conference table ────────
+// Table centre in SVG: (522, 410). Positions are % of 1240×880 canvas.
+// REEA presides at the head (top); clicking REEA opens the meeting overview.
+const MEETING_SEATS: { type: string; name: string; photo: string; x: number; y: number; head?: boolean }[] = [
+  { type: 'reea',        name: 'REEA',  photo: '/agents/reea.png',   x: 42.1, y: 28.0, head: true },
+  { type: 'it',          name: 'سالم',  photo: '/agents/nasser.png', x: 51.8, y: 36.0 },
+  { type: 'product',     name: 'يوسف',  photo: '/agents/abdullah.png', x: 53.6, y: 47.0 },
+  { type: 'finance',     name: 'ريم',   photo: '/agents/reem.svg',   x: 51.8, y: 58.0 },
+  { type: 'collections', name: 'بدر',   photo: '/agents/yasser.png', x: 32.4, y: 36.0 },
+  { type: 'ops',         name: 'فارس',  photo: '/agents/fares.svg',  x: 30.6, y: 47.0 },
+  { type: 'os_finance',  name: 'رضا',   photo: '/agents/reza.svg',   x: 32.4, y: 58.0 },
+];
+
 // ── Exec combined rows (lead + specialist(s) share one wide room) ──────────
+const EXEC_X = 715, EXEC_W = 520, EXEC_PART = 880; // partition between lead & spec
 const EXEC_ROWS: { y: number; h: number; leadType: string; specType: string; specType2?: string }[] = [
   { y: 28,  h: 160, leadType: 'it',       specType: 'it_specialist'                                          },
   { y: 200, h: 160, leadType: 'sales',    specType: 'sales_specialist'                                       },
@@ -377,18 +356,43 @@ const EXEC_ROWS: { y: number; h: number; leadType: string; specType: string; spe
   { y: 544, h: 160, leadType: 'finance',  specType: 'finance_specialist'                                     },
   { y: 716, h: 156, leadType: 'product',  specType: 'product_specialist'                                     },
 ];
-// OPS individual rooms
+// OPS individual rooms (left col x=5 w=158, right col x=173 w=159)
 const OPS_ROOMS: { x: number; y: number; w: number; h: number; type: string }[] = [
-  { x: 5,   y: 28,  w: 177, h: 272, type: 'leasing'    },
-  { x: 197, y: 28,  w: 178, h: 272, type: 'collections' },
-  { x: 5,   y: 315, w: 177, h: 272, type: 'ops'         },
-  { x: 197, y: 315, w: 178, h: 272, type: 'tenant_exp'  },
-  { x: 5,   y: 602, w: 177, h: 270, type: 'owner_rel'   },
-  { x: 197, y: 602, w: 178, h: 270, type: 'os_finance'  },
+  { x: 5,   y: 28,  w: 158, h: 272, type: 'leasing'     },
+  { x: 173, y: 28,  w: 159, h: 272, type: 'collections' },
+  { x: 5,   y: 315, w: 158, h: 272, type: 'ops'         },
+  { x: 173, y: 315, w: 159, h: 272, type: 'tenant_exp'  },
+  { x: 5,   y: 602, w: 158, h: 270, type: 'owner_rel'   },
+  { x: 173, y: 602, w: 159, h: 270, type: 'os_finance'  },
 ];
 
-function OfficeSVG() {
-  const PART = 806; // x of lead/spec partition inside exec zone
+// Wrap Arabic/LTR text into SVG lines
+function wrapText(text: string, maxChars: number, maxLines: number): string[] {
+  if (!text) return [];
+  const words = text.replace(/\s+/g, ' ').trim().split(' ');
+  const lines: string[] = [];
+  let cur = '';
+  for (const w of words) {
+    if ((cur + ' ' + w).trim().length > maxChars) {
+      if (cur) lines.push(cur);
+      cur = w;
+    } else {
+      cur = (cur + ' ' + w).trim();
+    }
+    if (lines.length >= maxLines) break;
+  }
+  if (cur && lines.length < maxLines) lines.push(cur);
+  if (lines.length === maxLines) {
+    const used = lines.join(' ').length;
+    if (text.trim().length > used + 1) lines[maxLines - 1] = lines[maxLines - 1].slice(0, maxChars - 1) + '…';
+  }
+  return lines.slice(0, maxLines);
+}
+
+function OfficeSVG({ meetingTopic, meetingDecisions }: { meetingTopic?: string; meetingDecisions?: string }) {
+  const PART = EXEC_PART;
+  const topicLines = wrapText(meetingTopic || '', 30, 2);
+  const noteLines  = wrapText(meetingDecisions || '', 36, 8);
 
   return (
     <svg viewBox="0 0 1240 880" preserveAspectRatio="xMidYMid slice"
@@ -398,47 +402,41 @@ function OfficeSVG() {
       <rect x="0" y="0" width="1240" height="880" fill="#edf1f6" />
 
       {/* ── Zone header strips ── */}
-      <rect x="5" y="5" width="370" height="22" fill="#c8dcf0" rx="2" />
-      <text x="190" y="20" textAnchor="middle" fontSize="10.5" fontWeight="800" fill="#1e4a6a"
+      <rect x="5" y="5" width="327" height="22" fill="#c8dcf0" rx="2" />
+      <text x="168" y="20" textAnchor="middle" fontSize="10.5" fontWeight="800" fill="#1e4a6a"
         style={{ userSelect: 'none' }}>قسم العمليات</text>
 
-      <rect x="634" y="5" width="601" height="22" fill="#ede0c0" rx="2" />
-      <text x="934" y="20" textAnchor="middle" fontSize="10.5" fontWeight="800" fill="#7a5e10"
+      <rect x={EXEC_X} y="5" width={EXEC_W} height="22" fill="#ede0c0" rx="2" />
+      <text x={EXEC_X + EXEC_W/2} y="20" textAnchor="middle" fontSize="10.5" fontWeight="800" fill="#7a5e10"
         style={{ userSelect: 'none' }}>القسم التنفيذي</text>
 
       {/* ── Corridors ── */}
-      <rect x="183" y="28" width="13" height="844" fill="#cddae8" />   {/* OPS vertical */}
-      <rect x="5"   y="301" width="370" height="13" fill="#cddae8" />  {/* OPS H-1 */}
-      <rect x="5"   y="588" width="370" height="13" fill="#cddae8" />  {/* OPS H-2 */}
-      <rect x="378" y="5"   width="255" height="870" fill="#dce6f2" /> {/* centre zone */}
-      <rect x="634" y="189" width="601" height="10" fill="#cddae8" />  {/* EXEC H-1 */}
-      <rect x="634" y="361" width="601" height="10" fill="#cddae8" />  {/* EXEC H-2 */}
-      <rect x="634" y="533" width="601" height="10" fill="#cddae8" />  {/* EXEC H-3 */}
-      <rect x="634" y="705" width="601" height="10" fill="#cddae8" />  {/* EXEC H-4 */}
+      <rect x="163" y="28" width="10" height="844" fill="#cddae8" />   {/* OPS vertical */}
+      <rect x="5"   y="301" width="327" height="13" fill="#cddae8" />  {/* OPS H-1 */}
+      <rect x="5"   y="588" width="327" height="13" fill="#cddae8" />  {/* OPS H-2 */}
+      <rect x="338" y="5"   width="369" height="870" fill="#dce6f2" /> {/* centre zone */}
+      <rect x={EXEC_X} y="189" width={EXEC_W} height="10" fill="#cddae8" />  {/* EXEC H-1 */}
+      <rect x={EXEC_X} y="361" width={EXEC_W} height="10" fill="#cddae8" />  {/* EXEC H-2 */}
+      <rect x={EXEC_X} y="533" width={EXEC_W} height="10" fill="#cddae8" />  {/* EXEC H-3 */}
+      <rect x={EXEC_X} y="705" width={EXEC_W} height="10" fill="#cddae8" />  {/* EXEC H-4 */}
 
       {/* ── OPS rooms — spacious individual offices ── */}
       {OPS_ROOMS.map(r => {
         const info = getAgentInfo(r.type);
-        const by = r.y + r.h; // room bottom y
+        const by = r.y + r.h;
         return (
           <g key={r.type}>
             <rect x={r.x} y={r.y} width={r.w} height={r.h} rx="2"
               fill="#e4f0fc" stroke="#70a0c4" strokeWidth="2.2" />
-            {/* Agent colour accent bar */}
             <rect x={r.x+2} y={r.y+2} width={r.w-4} height={6} rx="1" fill={info.color} opacity="0.6" />
-            {/* Desk surface */}
             <rect x={r.x+14} y={by-94} width={r.w-28} height={54} rx="3"
               fill="#aecce4" stroke="#80a8c0" strokeWidth="1.2" />
             <rect x={r.x+14} y={by-94} width={r.w-28} height={7} rx="2" fill="#98bcd8" />
-            {/* Monitor */}
             <rect x={r.x+r.w/2-16} y={by-132} width={32} height={22} rx="2" fill="#223850" />
             <rect x={r.x+r.w/2-5}  y={by-110} width={10} height={8}  rx="1" fill="#2e4a64" />
-            {/* Chair */}
-            <ellipse cx={r.x+r.w/2} cy={by-62} rx={16} ry={13}
-              fill="#8ab8d4" stroke="#68a0bc" strokeWidth="1" />
-            {/* Windows on outer top wall */}
-            {r.y === 28 && [r.x+18, r.x+64, r.x+110].filter(wx => wx < r.x+r.w-16).map((wx, i) => (
-              <rect key={i} x={wx} y={5} width={28} height={5} rx="1" fill="#80b8d8" opacity="0.7" />
+            <ellipse cx={r.x+r.w/2} cy={by-62} rx={16} ry={13} fill="#8ab8d4" stroke="#68a0bc" strokeWidth="1" />
+            {r.y === 28 && [r.x+18, r.x+58, r.x+98].filter(wx => wx < r.x+r.w-16).map((wx, i) => (
+              <rect key={i} x={wx} y={5} width={26} height={5} rx="1" fill="#80b8d8" opacity="0.7" />
             ))}
           </g>
         );
@@ -450,104 +448,98 @@ function OfficeSVG() {
         const si = getAgentInfo(r.specType);
         const by = r.y + r.h;
         const deskY = by - 80;
+        const specMid = (PART + (EXEC_X + EXEC_W)) / 2; // centre of single-spec sub-area
         return (
           <g key={r.leadType}>
-            {/* Room box */}
-            <rect x="634" y={r.y} width="601" height={r.h} rx="2"
+            <rect x={EXEC_X} y={r.y} width={EXEC_W} height={r.h} rx="2"
               fill="#fff8e8" stroke="#b89840" strokeWidth="2" />
+            <rect x={EXEC_X+2} y={r.y+2} width={PART-EXEC_X-4} height={5} rx="1" fill={li.color} opacity="0.55" />
+            <rect x={PART+2} y={r.y+2} width={EXEC_X+EXEC_W-PART-4} height={5} rx="1" fill={si.color} opacity="0.45" />
+            <line x1={PART} y1={r.y+10} x2={PART} y2={by-10} stroke="#c0a840" strokeWidth="1.4" strokeDasharray="6,4" />
 
-            {/* Lead-side accent bar */}
-            <rect x="636" y={r.y+2} width={PART-638} height={5} rx="1" fill={li.color} opacity="0.55" />
-            {/* Spec-side accent bar */}
-            <rect x={PART+2} y={r.y+2} width={1232-PART} height={5} rx="1" fill={si.color} opacity="0.45" />
+            {/* LEAD DESK (715–880 = 165px) */}
+            <rect x={EXEC_X+8} y={deskY} width="148" height="50" rx="3" fill="#d4c07c" stroke="#a89840" strokeWidth="1.2" />
+            <rect x={EXEC_X+8} y={deskY} width="148" height="7" rx="2" fill="#c0b060" />
+            <rect x={EXEC_X+71} y={deskY-32} width="26" height="22" rx="2" fill="#223850" />
+            <ellipse cx={EXEC_X+82} cy={by-46} rx={15} ry={12} fill="#c4b068" stroke="#a09040" strokeWidth="1" />
+            <circle cx={EXEC_X+16} cy={r.y+18} r="8" fill="#3a6a3a" opacity="0.6" />
 
-            {/* Internal dashed partition (lead | spec) */}
-            <line x1={PART} y1={r.y+10} x2={PART} y2={by-10}
-              stroke="#c0a840" strokeWidth="1.4" strokeDasharray="6,4" />
-
-            {/* ── LEAD DESK (x 634–806 = 172px wide) ── */}
-            <rect x="642" y={deskY} width="156" height="50" rx="3"
-              fill="#d4c07c" stroke="#a89840" strokeWidth="1.2" />
-            <rect x="642" y={deskY} width="156" height="7" rx="2" fill="#c0b060" />
-            <rect x="710" y={deskY-32} width="28" height="22" rx="2" fill="#223850" />
-            <rect x="718" y={deskY-10} width="12" height="8"  rx="1" fill="#2e4a64" />
-            <ellipse cx="720" cy={by-46} rx={15} ry={12} fill="#c4b068" stroke="#a09040" strokeWidth="1" />
-            {/* Plant */}
-            <circle cx="644" cy={r.y+18} r="8" fill="#3a6a3a" opacity="0.6" />
-
-            {/* ── SPECIALIST DESK(S) (x 806–1235 = 429px) ── */}
+            {/* SPECIALIST DESK(S) (880–1235 = 355px) */}
             {r.specType2 ? (
-              // Two specialists: سارة (left) + ليلى (right)
               <>
-                <rect x="814" y={deskY} width="196" height="50" rx="3"
-                  fill="#ccc0b4" stroke="#a09080" strokeWidth="1.2" />
-                <rect x="814" y={deskY} width="196" height="7" rx="2" fill="#bcb0a4" />
-                <rect x="895" y={deskY-32} width="26" height="22" rx="2" fill="#223850" />
-                <ellipse cx="912" cy={by-46} rx={13} ry={11} fill="#b8a898" stroke="#988878" strokeWidth="1" />
+                <rect x={PART+8} y={deskY} width="158" height="50" rx="3" fill="#ccc0b4" stroke="#a09080" strokeWidth="1.2" />
+                <rect x={PART+8} y={deskY} width="158" height="7" rx="2" fill="#bcb0a4" />
+                <rect x={PART+74} y={deskY-32} width="24" height="22" rx="2" fill="#223850" />
+                <ellipse cx={PART+87} cy={by-46} rx={12} ry={10} fill="#b8a898" stroke="#988878" strokeWidth="1" />
 
-                <rect x="1022" y={deskY} width="207" height="50" rx="3"
-                  fill="#ccc0b4" stroke="#a09080" strokeWidth="1.2" />
-                <rect x="1022" y={deskY} width="207" height="7" rx="2" fill="#bcb0a4" />
-                <rect x="1116" y={deskY-32} width="26" height="22" rx="2" fill="#223850" />
-                <ellipse cx="1126" cy={by-46} rx={13} ry={11} fill="#b8a898" stroke="#988878" strokeWidth="1" />
+                <rect x={PART+182} y={deskY} width="161" height="50" rx="3" fill="#ccc0b4" stroke="#a09080" strokeWidth="1.2" />
+                <rect x={PART+182} y={deskY} width="161" height="7" rx="2" fill="#bcb0a4" />
+                <rect x={PART+250} y={deskY-32} width="24" height="22" rx="2" fill="#223850" />
+                <ellipse cx={PART+262} cy={by-46} rx={12} ry={10} fill="#b8a898" stroke="#988878" strokeWidth="1" />
 
-                {/* Shared room divider */}
-                <line x1="1018" y1={r.y+14} x2="1018" y2={by-12}
-                  stroke="#c0a898" strokeWidth="1" strokeDasharray="4,4" />
-
+                <line x1={PART+174} y1={r.y+14} x2={PART+174} y2={by-12} stroke="#c0a898" strokeWidth="1" strokeDasharray="4,4" />
               </>
             ) : (
-              // Single specialist
               <>
-                <rect x="814" y={deskY} width="413" height="50" rx="3"
-                  fill="#ccc0b4" stroke="#a09080" strokeWidth="1.2" />
-                <rect x="814" y={deskY} width="413" height="7" rx="2" fill="#bcb0a4" />
-                <rect x="1014" y={deskY-32} width="28" height="22" rx="2" fill="#223850" />
-                <rect x="1022" y={deskY-10} width="12" height="8" rx="1" fill="#2e4a64" />
-                <ellipse cx="1020" cy={by-46} rx={15} ry={12} fill="#b8a898" stroke="#988878" strokeWidth="1" />
+                <rect x={PART+8} y={deskY} width={EXEC_X+EXEC_W-PART-16} height="50" rx="3" fill="#ccc0b4" stroke="#a09080" strokeWidth="1.2" />
+                <rect x={PART+8} y={deskY} width={EXEC_X+EXEC_W-PART-16} height="7" rx="2" fill="#bcb0a4" />
+                <rect x={specMid-14} y={deskY-32} width="28" height="22" rx="2" fill="#223850" />
+                <ellipse cx={specMid} cy={by-46} rx={15} ry={12} fill="#b8a898" stroke="#988878" strokeWidth="1" />
               </>
             )}
 
-            {/* Windows on outer top wall */}
-            {r.y === 28 && [646, 700, 840, 940, 1040, 1140].map((wx, i) => (
-              <rect key={i} x={wx} y={5} width={26} height={5} rx="1" fill="#c8ae60" opacity="0.6" />
+            {r.y === 28 && [EXEC_X+12, EXEC_X+60, PART+30, PART+120, PART+210, PART+300].map((wx, i) => (
+              <rect key={i} x={wx} y={5} width={24} height={5} rx="1" fill="#c8ae60" opacity="0.6" />
             ))}
           </g>
         );
       })}
 
-      {/* ── MEETING ROOM — centre of the building ── */}
-      <rect x="382" y="78" width="244" height="724" rx="4"
-        fill="#f5f9ff" stroke="#1e3a5f" strokeWidth="2.5" />
+      {/* ── MEETING ROOM — centre, enlarged ── */}
+      <rect x="345" y="78" width="355" height="724" rx="4" fill="#f5f9ff" stroke="#1e3a5f" strokeWidth="2.5" />
       {/* Header */}
-      <rect x="383" y="79" width="242" height="28" rx="3" fill="#1e3a5f" />
-      <text x="504" y="98" textAnchor="middle" fontSize="11" fill="white" fontWeight="800"
+      <rect x="346" y="79" width="353" height="28" rx="3" fill="#1e3a5f" />
+      <text x="522" y="98" textAnchor="middle" fontSize="12" fill="white" fontWeight="800"
         style={{ userSelect: 'none' }}>غرفة الاجتماعات</text>
-      {/* Projection screen */}
-      <rect x="396" y="116" width="216" height="82" rx="3" fill="#d8e8f8" stroke="#90b0cc" strokeWidth="1" />
-      <text x="504" y="162" textAnchor="middle" fontSize="9" fill="#6888a8"
-        style={{ userSelect: 'none' }}>شاشة العرض</text>
-      <line x1="504" y1="199" x2="504" y2="290" stroke="#90b0cc" strokeWidth="1" strokeDasharray="4,3" />
-      {/* Conference table */}
-      <ellipse cx="504" cy="450" rx="92" ry="60" fill="#cce0f0" stroke="#80a8c4" strokeWidth="1.8" />
-      {/* Chairs */}
-      {[0,40,80,120,160,200,240,280,320].map((deg, i) => {
-        const rad = (deg-90)*Math.PI/180;
-        return <circle key={i} cx={504+Math.cos(rad)*113} cy={450+Math.sin(rad)*76}
-          r="12" fill="#b8d0e8" stroke="#80a8c4" strokeWidth="1" />;
-      })}
-      {[-44,0,44].map((dx,i) => (
-        <circle key={i} cx={504+dx} cy={450} r="5" fill="#90c0e0" opacity="0.55" />
+
+      {/* Projection screen — shows current meeting TOPIC */}
+      <rect x="372" y="116" width="300" height="92" rx="3" fill="#16263c" stroke="#90b0cc" strokeWidth="1.5" />
+      <rect x="378" y="122" width="288" height="80" rx="2" fill="#1e3a5f" />
+      <text x="522" y="137" textAnchor="middle" fontSize="8" fill="#7aa0c4" style={{ userSelect: 'none' }}>
+        موضوع الاجتماع الحالي
+      </text>
+      {topicLines.length > 0 ? topicLines.map((ln, i) => (
+        <text key={i} x="522" y={158 + i*18} textAnchor="middle" fontSize="13" fontWeight="700" fill="#ffffff" style={{ userSelect: 'none' }}>{ln}</text>
+      )) : (
+        <text x="522" y="168" textAnchor="middle" fontSize="11" fill="#6a88a8" style={{ userSelect: 'none' }}>لا يوجد اجتماع نشط</text>
+      )}
+      {/* projector mount */}
+      <line x1="522" y1="208" x2="522" y2="232" stroke="#90b0cc" strokeWidth="1" strokeDasharray="3,3" />
+
+      {/* Conference table — tall oval, seats around it */}
+      <ellipse cx="522" cy="410" rx="118" ry="150" fill="#cce0f0" stroke="#7098bc" strokeWidth="2" />
+      <ellipse cx="522" cy="410" rx="96" ry="128" fill="#d8e8f6" stroke="#a8c4dc" strokeWidth="1" />
+      {/* documents on table */}
+      {[[-40,360],[40,360],[-40,460],[40,460],[0,410]].map(([dx,dy],i) => (
+        <rect key={i} x={522+dx-13} y={dy-9} width={26} height={18} rx="2" fill="#ffffff" stroke="#bcd0e0" strokeWidth="0.8" opacity="0.85" />
       ))}
-      {/* Notes area */}
-      <rect x="396" y="574" width="216" height="208" rx="3" fill="#eaf2fa" stroke="#b0c8e0" strokeWidth="1" />
-      <text x="504" y="590" textAnchor="middle" fontSize="8.5" fill="#8aa4bc"
-        style={{ userSelect: 'none' }}>ملاحظات الاجتماع</text>
-      {[600,616,632,648,664,680,696,712,728,744,760,774].map((ly,i) => (
-        <line key={i} x1="404" y1={ly} x2="604" y2={ly} stroke="#c0d4e8" strokeWidth="0.8" />
-      ))}
-      {/* Meeting room windows */}
-      {[392,430,470,510,552].map((wx,i) => (
+
+      {/* Notes / Decisions area — persists current meeting result */}
+      <rect x="362" y="598" width="320" height="186" rx="3" fill="#fffdf2" stroke="#d8c88c" strokeWidth="1.4" />
+      <rect x="362" y="598" width="320" height="22" rx="3" fill="#f0e6c2" />
+      <text x="674" y="613" textAnchor="end" fontSize="9.5" fontWeight="800" fill="#8a6e20" style={{ userSelect: 'none' }}>
+        محضر الاجتماع · القرارات
+      </text>
+      {noteLines.length > 0 ? noteLines.map((ln, i) => (
+        <text key={i} x="674" y={638 + i*17} textAnchor="end" fontSize="10.5" fill="#4a4230" style={{ userSelect: 'none' }}>{ln}</text>
+      )) : (
+        <text x="522" y="690" textAnchor="middle" fontSize="10" fill="#b0a878" style={{ userSelect: 'none' }}>
+          ستظهر قرارات آخر اجتماع هنا
+        </text>
+      )}
+
+      {/* Meeting room windows on top wall */}
+      {[358,410,470,530,590,650].map((wx,i) => (
         <rect key={i} x={wx} y={77} width={22} height={5} rx="1" fill="#7aacc8" opacity="0.55" />
       ))}
 
@@ -597,6 +589,34 @@ function AgentSeat({ type, isActive, onClick, hasConversation, pendingCount }: {
           <div style={{ width: 5, height: 5, borderRadius: '50%', background: info.color, margin: '2px auto 0' }} />
         )}
       </div>
+    </button>
+  );
+}
+
+// ─── Meeting Seat (core agent seated around the conference table) ───────────────
+function MeetingSeat({ seat, onClick, badge }: {
+  seat: typeof MEETING_SEATS[number];
+  onClick: () => void;
+  badge?: number;
+}) {
+  const size = seat.head ? 46 : 38;
+  return (
+    <button onClick={onClick} title={seat.name}
+      style={{ position: 'absolute', left: `${seat.x}%`, top: `${seat.y}%`, transform: 'translate(-50%,-50%)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, zIndex: 8, padding: 0 }}>
+      <div style={{ width: size, height: size, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, position: 'relative',
+        boxShadow: seat.head
+          ? '0 0 0 3px #b8860b, 0 6px 16px rgba(15,23,42,.35)'
+          : '0 0 0 2px #ffffff, 0 5px 13px rgba(15,23,42,.30)',
+        background: '#1e3a5f' }}>
+        <img src={seat.photo} alt={seat.name} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }} />
+        <span style={{ position: 'absolute', right: 0, bottom: 0, width: 9, height: 9, borderRadius: '50%', background: '#22c55e', border: '2px solid #fff' }} />
+        {(badge ?? 0) > 0 && (
+          <span style={{ position: 'absolute', top: -4, right: -4, minWidth: 15, height: 15, padding: '0 3px', borderRadius: 8, background: '#ef4444', color: '#fff', fontSize: 8, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{badge}</span>
+        )}
+      </div>
+      <span style={{ fontSize: 9, fontWeight: 700, color: seat.head ? '#8a6608' : '#1e3a5f', background: 'rgba(255,255,255,.92)', padding: '1px 6px', borderRadius: 6, boxShadow: '0 1px 4px rgba(15,23,42,.12)', whiteSpace: 'nowrap' }}>
+        {seat.head ? `${seat.name} · المنسّق` : seat.name}
+      </span>
     </button>
   );
 }
@@ -664,49 +684,40 @@ function MeetingRoomModal({ onClose, onOpenAgent, onAskAgent }: {
 export default function AgentsWorkspace() {
   const [activeAgent, setActiveAgent]   = useState<string | null>(null);
   const [conversations, setConversations] = useState<Record<string, Message[]>>({});
-  const [sidebarOpen, setSidebarOpen]   = useState(true);
   const [reports, setReports]           = useState<any[]>([]);
   const [actions, setActions]           = useState<any[]>([]);
-  const [directives, setDirectives]     = useState<any[]>([]);
-  const [pendingDirectivesCount, setPendingDirectivesCount] = useState(0);
-  const [sidebarTab, setSidebarTab]     = useState<'actions' | 'reports' | 'feed'>('actions');
-  const [acting, setActing]             = useState<string | null>(null);
   const [workshopOpen, setWorkshopOpen] = useState(false);
   const [meetingOpen, setMeetingOpen]   = useState(false);
   const [pendingMessage, setPendingMessage] = useState('');
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  const loadSidebar = useCallback(async () => {
-    const [r, a, d] = await Promise.allSettled([
-      adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.(), adminApi.sa.getLiveDirectives?.(),
+  const loadMeeting = useCallback(async () => {
+    const [r, a] = await Promise.allSettled([
+      adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.(),
     ]);
     if (r.status === 'fulfilled') setReports((r.value as any)?.data || []);
     if (a.status === 'fulfilled') setActions((a.value as any)?.data || []);
-    if (d.status === 'fulfilled') {
-      const dRes = d.value as any;
-      setDirectives(dRes?.data || []);
-      setPendingDirectivesCount(dRes?.pendingCount ?? 0);
-    }
   }, []);
 
   useEffect(() => {
-    loadSidebar();
-    const iv = setInterval(loadSidebar, 30000);
+    loadMeeting();
+    const iv = setInterval(loadMeeting, 30000);
     return () => clearInterval(iv);
-  }, [loadSidebar]);
-
-  async function handleApprove(id: string) { setActing(id); try { await adminApi.sa.approveAction?.(id); await loadSidebar(); } catch {} setActing(null); }
-  async function handleReject(id: string) { setActing(id); try { await adminApi.sa.rejectAction?.(id, 'Rejected'); await loadSidebar(); } catch {} setActing(null); }
-  async function handleApproveReport(id: string) { setActing(id); try { await adminApi.sa.approveReport?.(id); await loadSidebar(); } catch {} setActing(null); }
+  }, [loadMeeting]);
 
   const pendingCount = actions.filter(a => a.status === 'pending_approval').length;
+
+  // Latest executive report = current meeting topic + decisions (persists till next)
+  const latestReport   = reports[0] || null;
+  const meetingTopic   = latestReport?.title || '';
+  const meetingDecisions = latestReport?.summary || '';
 
   function updateMessages(agentType: string, msgs: Message[]) {
     setConversations(prev => ({ ...prev, [agentType]: msgs }));
   }
 
   function openAgent(type: string) {
-    if (type === 'meeting_room') { setMeetingOpen(true); return; }
+    if (type === 'meeting_room' || type === 'reea') { setMeetingOpen(true); return; }
     setPendingMessage('');
     setActiveAgent(prev => prev === type ? null : type);
   }
@@ -758,12 +769,18 @@ export default function AgentsWorkspace() {
 
         {/* OFFICE CANVAS */}
         <div ref={canvasRef} style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#edf1f6', minHeight: 0 }}>
-          <OfficeSVG />
+          <OfficeSVG meetingTopic={meetingTopic} meetingDecisions={meetingDecisions} />
+          {/* Office desk seats */}
           {Object.keys(SEAT_POS).map(type => (
             <AgentSeat key={type} type={type} isActive={activeAgent === type}
               onClick={() => openAgent(type)}
-              hasConversation={(conversations[type]?.length ?? 0) > 0}
-              pendingCount={type === 'meeting_room' ? pendingCount : undefined} />
+              hasConversation={(conversations[type]?.length ?? 0) > 0} />
+          ))}
+          {/* Meeting-room seated core agents */}
+          {MEETING_SEATS.map(seat => (
+            <MeetingSeat key={seat.type} seat={seat}
+              onClick={() => openAgent(seat.type)}
+              badge={seat.head ? pendingCount : undefined} />
           ))}
         </div>
 
@@ -821,116 +838,6 @@ export default function AgentsWorkspace() {
           @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
         `}</style>
       </div>
-
-      {/* ── Right Sidebar ─────────────────────────────────────── */}
-      {sidebarOpen && (
-        <div style={{ width: 300, borderRight: '1px solid rgba(0,0,0,.06)', background: 'var(--bg)', overflowY: 'auto', flexShrink: 0 }}>
-          <div style={{ padding: '10px 12px', borderBottom: '1px solid rgba(0,0,0,.04)', background: 'var(--surface)', position: 'sticky', top: 0, zIndex: 10 }}>
-            <div style={{ display: 'flex', gap: 4 }}>
-              {(['feed', 'actions', 'reports'] as const).map(tab => {
-                const labels: Record<string, string> = { feed: 'مباشر', actions: 'مهام', reports: `تقارير (${reports.length})` };
-                const colors: Record<string, string> = { feed: '#7c3aed', actions: '#2563EB', reports: '#2563EB' };
-                const isActive = sidebarTab === tab;
-                return (
-                  <button key={tab} onClick={() => setSidebarTab(tab)}
-                    style={{ flex: 1, padding: '6px', borderRadius: 6, fontSize: 10, fontWeight: isActive ? 700 : 400, border: `1px solid ${isActive ? colors[tab] : 'rgba(0,0,0,.06)'}`, background: isActive ? `${colors[tab]}10` : 'var(--surface)', color: isActive ? colors[tab] : 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
-                    {labels[tab]}
-                    {tab === 'feed' && pendingDirectivesCount > 0 && <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 8, background: '#ef4444', color: '#fff', fontWeight: 700 }}>{pendingDirectivesCount}</span>}
-                    {tab === 'actions' && pendingCount > 0 && <span style={{ background: 'var(--danger)', color: '#fff', borderRadius: '50%', padding: '0 4px', fontSize: 8 }}>{pendingCount}</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div style={{ padding: '8px 10px' }}>
-            {/* Feed tab */}
-            {sidebarTab === 'feed' && (
-              <>
-                {directives.length === 0 && <p style={{ textAlign: 'center', fontSize: 11, color: '#9ca3af', padding: 24, lineHeight: 1.7 }}>لا يوجد تواصل نشط الآن<br /><span style={{ fontSize: 10, opacity: .6 }}>ستظهر هنا الأوامر المعلّقة والردود الأخيرة</span></p>}
-                {pendingDirectivesCount > 0 && <div style={{ fontSize: 9, color: '#ef4444', fontWeight: 600, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 4 }}><span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: '#ef4444', animation: 'pulse-dot 1.4s ease-in-out infinite' }} />{pendingDirectivesCount} بانتظار الرد</div>}
-                {directives.map(d => {
-                  const from = AGENT_STYLE[d.from_agent] || { label: d.from_agent, color: '#6b7280', bg: '#f9fafb' };
-                  const to   = AGENT_STYLE[d.to_agent]   || { label: d.to_agent,   color: '#6b7280', bg: '#f9fafb' };
-                  const st   = DIRECTIVE_STATUS[d.status] || DIRECTIVE_STATUS.pending;
-                  const isPending = d.status === 'pending';
-                  return (
-                    <div key={d.id} style={{ background: 'var(--surface)', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: isPending ? '1px solid rgba(239,68,68,.25)' : '1px solid rgba(0,0,0,.04)', borderRight: `3px solid ${from.color}`, opacity: isPending ? 1 : 0.8 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                          {isPending && <span style={{ display: 'inline-block', width: 5, height: 5, borderRadius: '50%', background: '#ef4444', animation: 'pulse-dot 1.4s ease-in-out infinite', flexShrink: 0 }} />}
-                          <span style={{ fontSize: 9, fontWeight: 700, color: from.color, background: from.bg, padding: '1px 6px', borderRadius: 4 }}>{from.label}</span>
-                          <span style={{ fontSize: 9, color: '#d1d5db' }}>←</span>
-                          <span style={{ fontSize: 9, fontWeight: 600, color: to.color, background: to.bg, padding: '1px 6px', borderRadius: 4 }}>{to.label}</span>
-                        </div>
-                        <span style={{ fontSize: 9, color: '#d1d5db' }}>{timeAgoFeed(d.created_at)}</span>
-                      </div>
-                      <p style={{ fontSize: 11, color: 'var(--text-1)', margin: '0 0 6px', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.directive}</p>
-                      {d.reply && (
-                        <div style={{ background: '#f8faff', border: '1px solid #e0e7ff', borderRadius: 6, padding: '6px 8px', borderRight: `2px solid ${to.color}` }}>
-                          <div style={{ fontSize: 9, fontWeight: 600, color: to.color, marginBottom: 3 }}>رد {to.label} {d.replied_at ? `· ${timeAgoFeed(d.replied_at)}` : ''}</div>
-                          <p style={{ fontSize: 10, color: '#374151', margin: 0, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{d.reply}</p>
-                        </div>
-                      )}
-                      <div style={{ marginTop: 4, textAlign: 'left' }}><span style={{ fontSize: 9, color: st.color, fontWeight: 600 }}>{st.label}</span></div>
-                    </div>
-                  );
-                })}
-                {directives.length > 0 && <p style={{ textAlign: 'center', fontSize: 9, color: '#d1d5db', margin: '4px 0 0' }}>معلّق + آخر 24 ساعة · تحديث كل 30 ثانية</p>}
-              </>
-            )}
-
-            {/* Actions tab */}
-            {sidebarTab === 'actions' && (
-              <>
-                {actions.map(a => {
-                  const st = STATUS_MAP[a.status] || STATUS_MAP.pending_approval;
-                  return (
-                    <div key={a.id} style={{ background: 'var(--surface)', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)' }}>
-                      <div style={{ marginBottom: 4 }}><span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 4, background: st.bg, color: st.color, fontWeight: 600 }}>{st.label}</span></div>
-                      <p style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)', margin: '0 0 2px' }}>{a.title}</p>
-                      {a.result && <p style={{ fontSize: 9, color: '#059669', margin: '2px 0' }}>{a.result?.slice(0, 80)}</p>}
-                      {a.status === 'pending_approval' && (
-                        <div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
-                          <button onClick={() => handleApprove(a.id)} disabled={acting === a.id} style={{ flex: 1, padding: '4px', borderRadius: 5, fontSize: 9, fontWeight: 600, border: 'none', background: '#10b981', color: '#fff', cursor: 'pointer' }}>موافقة</button>
-                          <button onClick={() => handleReject(a.id)} disabled={acting === a.id} style={{ flex: 1, padding: '4px', borderRadius: 5, fontSize: 9, fontWeight: 600, border: '1px solid #fecaca', background: 'var(--surface)', color: 'var(--danger)', cursor: 'pointer' }}>رفض</button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-                {actions.length === 0 && <p style={{ textAlign: 'center', fontSize: 10, color: '#9ca3af', padding: 16 }}>لا توجد مهام</p>}
-              </>
-            )}
-
-            {/* Reports tab */}
-            {sidebarTab === 'reports' && (
-              <>
-                {reports.map(r => {
-                  const st = STATUS_MAP[r.status] || STATUS_MAP.pending;
-                  return (
-                    <div key={r.id} style={{ background: 'var(--surface)', borderRadius: 8, padding: '10px 12px', marginBottom: 6, border: '1px solid rgba(0,0,0,.04)' }}>
-                      <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 4, background: st.bg, color: st.color, fontWeight: 600 }}>{st.label}</span>
-                      <h4 style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-1)', margin: '4px 0 2px' }}>{r.title}</h4>
-                      <p style={{ fontSize: 9, color: '#6b7280', margin: '0 0 6px', maxHeight: 40, overflow: 'hidden' }}>{r.summary?.slice(0, 120)}</p>
-                      {r.status === 'pending' && (
-                        <button onClick={() => handleApproveReport(r.id)} disabled={acting === r.id} style={{ width: '100%', padding: '5px', borderRadius: 5, fontSize: 10, fontWeight: 600, border: 'none', background: '#2563EB', color: '#fff', cursor: 'pointer' }}>اعتماد</button>
-                      )}
-                    </div>
-                  );
-                })}
-                {reports.length === 0 && <p style={{ textAlign: 'center', fontSize: 10, color: '#9ca3af', padding: 16 }}>لا توجد تقارير</p>}
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Sidebar toggle */}
-      <button onClick={() => setSidebarOpen(!sidebarOpen)}
-        style={{ position: 'fixed', bottom: 16, left: 16, width: 32, height: 32, borderRadius: '50%', background: '#2563EB', color: '#fff', border: 'none', cursor: 'pointer', fontSize: 14, boxShadow: '0 2px 8px rgba(124,92,252,.3)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        {sidebarOpen ? '→' : '←'}
-      </button>
 
       {/* Modals */}
       {workshopOpen && <MarketingWorkshop onClose={() => setWorkshopOpen(false)} />}
