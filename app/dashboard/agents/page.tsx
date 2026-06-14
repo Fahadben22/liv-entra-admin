@@ -307,75 +307,65 @@ function timeAgoFeed(iso: string) {
 }
 
 // ─── Floor Plan ────────────────────────────────────────────────────────────────
+// Layout (canvas 1240 × 880):
+//   OPS ZONE  x=5–375    2-col × 3-row individual offices
+//   CENTER    x=380–628  tall meeting room
+//   EXEC ZONE x=634–1235 5 combined rows — lead desk left (634–806) + spec desk(s) right (806–1235)
+//             internal dashed partition at x=806
+
 interface SeatMeta { x: number; y: number; isLead: boolean; zone: 'exec' | 'ops' | 'meeting'; }
 
-// Positions are % of canvas (1240 × 880).
-// Each agent is placed at the desk centre inside their walled room.
-// OPS: 2-col × 3-row grid (x 9.7% and 28.8%)
-// EXEC LEADS: single col (x 71.2%), EXEC SPECS: single col (x 90.2%)
-// Marketing specs (سارة/ليلى) share one room — placed side-by-side
 const SEAT_POS: Record<string, SeatMeta> = {
-  meeting_room:         { x: 49.3, y: 50,   isLead: true,  zone: 'meeting' },
-  // Exec leads
-  it:                   { x: 71.2, y: 9.4,  isLead: true,  zone: 'exec'    },
-  sales:                { x: 71.2, y: 29.4, isLead: true,  zone: 'exec'    },
-  marketing:            { x: 71.2, y: 49.4, isLead: true,  zone: 'exec'    },
-  finance:              { x: 71.2, y: 69.4, isLead: true,  zone: 'exec'    },
-  product:              { x: 71.2, y: 89.4, isLead: true,  zone: 'exec'    },
-  // Exec specialists
-  it_specialist:        { x: 90.2, y: 9.4,  isLead: false, zone: 'exec'    },
-  sales_specialist:     { x: 90.2, y: 29.4, isLead: false, zone: 'exec'    },
-  marketing_specialist: { x: 86.7, y: 46.6, isLead: false, zone: 'exec'    },
-  design_specialist:    { x: 93.9, y: 52.2, isLead: false, zone: 'exec'    },
-  finance_specialist:   { x: 90.2, y: 69.4, isLead: false, zone: 'exec'    },
-  product_specialist:   { x: 90.2, y: 89.4, isLead: false, zone: 'exec'    },
-  // Ops (col A = 9.7%, col B = 28.8%)
-  leasing:              { x: 9.7,  y: 14.5, isLead: true,  zone: 'ops'     },
-  collections:          { x: 28.8, y: 14.5, isLead: true,  zone: 'ops'     },
-  ops:                  { x: 9.7,  y: 47.9, isLead: true,  zone: 'ops'     },
-  tenant_exp:           { x: 28.8, y: 47.9, isLead: true,  zone: 'ops'     },
-  owner_rel:            { x: 9.7,  y: 81.4, isLead: true,  zone: 'ops'     },
-  os_finance:           { x: 28.8, y: 81.4, isLead: true,  zone: 'ops'     },
+  // Meeting room — center of the building
+  meeting_room:         { x: 40.6, y: 50.0, isLead: true,  zone: 'meeting' },
+
+  // ── Executive zone (x 634–1235) ──────────────────────────────────────────
+  // Lead desks sit in left sub-area (634–806), center x ≈ 58.1%
+  // Spec desks sit in right sub-area (806–1235), center x ≈ 82.3%
+  // Marketing has 2 specs (سارة ≈ 73.6%, ليلى ≈ 90.9%)
+  it:                   { x: 58.1, y: 11.8, isLead: true,  zone: 'exec' },
+  sales:                { x: 58.1, y: 31.4, isLead: true,  zone: 'exec' },
+  marketing:            { x: 58.1, y: 50.9, isLead: true,  zone: 'exec' },
+  finance:              { x: 58.1, y: 70.5, isLead: true,  zone: 'exec' },
+  product:              { x: 58.1, y: 89.3, isLead: true,  zone: 'exec' },
+
+  it_specialist:        { x: 82.3, y: 11.8, isLead: false, zone: 'exec' },
+  sales_specialist:     { x: 82.3, y: 31.4, isLead: false, zone: 'exec' },
+  marketing_specialist: { x: 73.6, y: 50.9, isLead: false, zone: 'exec' }, // سارة
+  design_specialist:    { x: 90.9, y: 50.9, isLead: false, zone: 'exec' }, // ليلى
+  finance_specialist:   { x: 82.3, y: 70.5, isLead: false, zone: 'exec' },
+  product_specialist:   { x: 82.3, y: 89.3, isLead: false, zone: 'exec' },
+
+  // ── Ops zone (x 5–375, col A ≈ 7.5%, col B ≈ 23.1%) ────────────────────
+  leasing:              { x: 7.5,  y: 17.4, isLead: true,  zone: 'ops' }, // دانة
+  collections:          { x: 23.1, y: 17.4, isLead: true,  zone: 'ops' }, // بدر
+  ops:                  { x: 7.5,  y: 50.0, isLead: true,  zone: 'ops' }, // فارس
+  tenant_exp:           { x: 23.1, y: 50.0, isLead: true,  zone: 'ops' }, // منى
+  owner_rel:            { x: 7.5,  y: 82.6, isLead: true,  zone: 'ops' }, // نادية
+  os_finance:           { x: 23.1, y: 82.6, isLead: true,  zone: 'ops' }, // رضا
 };
 
-// Room definitions — (x, y, w, h) in SVG units (canvas 1240×880)
-const OPS_ROOMS = [
-  { x: 8,   y: 8,   w: 224, h: 274, type: 'leasing'    },
-  { x: 248, y: 8,   w: 218, h: 274, type: 'collections' },
-  { x: 8,   y: 302, w: 224, h: 274, type: 'ops'         },
-  { x: 248, y: 302, w: 218, h: 274, type: 'tenant_exp'  },
-  { x: 8,   y: 596, w: 224, h: 276, type: 'owner_rel'   },
-  { x: 248, y: 596, w: 218, h: 276, type: 'os_finance'  },
+// ── Exec combined rows (lead + specialist(s) share one wide room) ──────────
+const EXEC_ROWS: { y: number; h: number; leadType: string; specType: string; specType2?: string }[] = [
+  { y: 28,  h: 160, leadType: 'it',       specType: 'it_specialist'                                          },
+  { y: 200, h: 160, leadType: 'sales',    specType: 'sales_specialist'                                       },
+  { y: 372, h: 160, leadType: 'marketing',specType: 'marketing_specialist', specType2: 'design_specialist'   },
+  { y: 544, h: 160, leadType: 'finance',  specType: 'finance_specialist'                                     },
+  { y: 716, h: 156, leadType: 'product',  specType: 'product_specialist'                                     },
 ];
-const EXEC_LEAD_ROOMS = [
-  { x: 778, y: 8,   w: 211, h: 161, type: 'it'        },
-  { x: 778, y: 184, w: 211, h: 161, type: 'sales'     },
-  { x: 778, y: 360, w: 211, h: 161, type: 'marketing' },
-  { x: 778, y: 536, w: 211, h: 161, type: 'finance'   },
-  { x: 778, y: 712, w: 211, h: 160, type: 'product'   },
+// OPS individual rooms
+const OPS_ROOMS: { x: number; y: number; w: number; h: number; type: string }[] = [
+  { x: 5,   y: 28,  w: 177, h: 272, type: 'leasing'    },
+  { x: 197, y: 28,  w: 178, h: 272, type: 'collections' },
+  { x: 5,   y: 315, w: 177, h: 272, type: 'ops'         },
+  { x: 197, y: 315, w: 178, h: 272, type: 'tenant_exp'  },
+  { x: 5,   y: 602, w: 177, h: 270, type: 'owner_rel'   },
+  { x: 197, y: 602, w: 178, h: 270, type: 'os_finance'  },
 ];
-const EXEC_SPEC_ROOMS = [
-  { x: 1004, y: 8,   w: 228, h: 161, type: 'it_specialist',        shared: false },
-  { x: 1004, y: 184, w: 228, h: 161, type: 'sales_specialist',     shared: false },
-  { x: 1004, y: 360, w: 228, h: 161, type: 'marketing_specialist', shared: true  },
-  { x: 1004, y: 536, w: 228, h: 161, type: 'finance_specialist',   shared: false },
-  { x: 1004, y: 712, w: 228, h: 160, type: 'product_specialist',   shared: false },
-];
-
-function Desk({ x, y, w, h, fill, stroke }: { x:number; y:number; w:number; h:number; fill:string; stroke:string }) {
-  return (
-    <g>
-      <rect x={x} y={y} width={w} height={h} rx="3" fill={fill} stroke={stroke} strokeWidth="1.2" />
-      {/* monitor */}
-      <rect x={x + w/2 - 14} y={y - 24} width={28} height={19} rx="2" fill="#2c4060" />
-      <rect x={x + w/2 - 5} y={y - 5} width={10} height={6} rx="1" fill="#3a5070" />
-      {/* chair */}
-      <ellipse cx={x + w/2} cy={y + h + 14} rx={14} ry={11} fill={stroke} opacity="0.6" />
-    </g>
-  );
-}
 
 function OfficeSVG() {
+  const PART = 806; // x of lead/spec partition inside exec zone
+
   return (
     <svg viewBox="0 0 1240 880" preserveAspectRatio="xMidYMid slice"
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
@@ -383,176 +373,180 @@ function OfficeSVG() {
       {/* ── Floor ── */}
       <rect x="0" y="0" width="1240" height="880" fill="#edf1f6" />
 
-      {/* ── Corridor fills ── */}
-      {/* OPS vertical corridor (between col A and col B) */}
-      <rect x="233" y="8" width="14" height="864" fill="#d8e4f0" />
-      {/* OPS horizontal corridors */}
-      <rect x="8" y="283" width="458" height="18" fill="#d8e4f0" />
-      <rect x="8" y="577" width="458" height="18" fill="#d8e4f0" />
-      {/* Centre zone */}
-      <rect x="467" y="8" width="310" height="864" fill="#e2eaf5" />
-      {/* EXEC vertical corridor (between leads and specs) */}
-      <rect x="990" y="8" width="13" height="864" fill="#d8e4f0" />
-      {/* EXEC horizontal corridors */}
-      <rect x="778" y="170" width="462" height="13" fill="#d8e4f0" />
-      <rect x="778" y="346" width="462" height="13" fill="#d8e4f0" />
-      <rect x="778" y="522" width="462" height="13" fill="#d8e4f0" />
-      <rect x="778" y="698" width="462" height="13" fill="#d8e4f0" />
+      {/* ── Zone header strips ── */}
+      <rect x="5" y="5" width="370" height="22" fill="#c8dcf0" rx="2" />
+      <text x="190" y="20" textAnchor="middle" fontSize="10.5" fontWeight="800" fill="#1e4a6a"
+        style={{ userSelect: 'none' }}>قسم العمليات</text>
 
-      {/* ── OPS rooms ── */}
+      <rect x="634" y="5" width="601" height="22" fill="#ede0c0" rx="2" />
+      <text x="934" y="20" textAnchor="middle" fontSize="10.5" fontWeight="800" fill="#7a5e10"
+        style={{ userSelect: 'none' }}>القسم التنفيذي</text>
+
+      {/* ── Corridors ── */}
+      <rect x="183" y="28" width="13" height="844" fill="#cddae8" />   {/* OPS vertical */}
+      <rect x="5"   y="301" width="370" height="13" fill="#cddae8" />  {/* OPS H-1 */}
+      <rect x="5"   y="588" width="370" height="13" fill="#cddae8" />  {/* OPS H-2 */}
+      <rect x="378" y="5"   width="255" height="870" fill="#dce6f2" /> {/* centre zone */}
+      <rect x="634" y="189" width="601" height="10" fill="#cddae8" />  {/* EXEC H-1 */}
+      <rect x="634" y="361" width="601" height="10" fill="#cddae8" />  {/* EXEC H-2 */}
+      <rect x="634" y="533" width="601" height="10" fill="#cddae8" />  {/* EXEC H-3 */}
+      <rect x="634" y="705" width="601" height="10" fill="#cddae8" />  {/* EXEC H-4 */}
+
+      {/* ── OPS rooms — spacious individual offices ── */}
       {OPS_ROOMS.map(r => {
         const info = getAgentInfo(r.type);
-        const deskY = r.y + r.h - 90;
-        return (
-          <g key={r.type}>
-            {/* Room box */}
-            <rect x={r.x} y={r.y} width={r.w} height={r.h} rx="2"
-              fill="#e8f2ff" stroke="#7fa8cc" strokeWidth="2" />
-            {/* Agent colour accent strip on top wall */}
-            <rect x={r.x + 2} y={r.y + 2} width={r.w - 4} height={5} rx="1" fill={info.color} opacity="0.55" />
-            {/* Desk furniture */}
-            <Desk x={r.x + 14} y={deskY} w={r.w - 28} h={50} fill="#b8cfe4" stroke="#88a8c0" />
-            {/* Corner nameplate */}
-            <text x={r.x + r.w - 7} y={r.y + 18} textAnchor="end"
-              fontSize="9.5" fontWeight="700" fill="#5a7a9a" style={{ userSelect: 'none' }}>
-              {getAgentInfo(r.type).name}
-            </text>
-            {/* Window marks on outer top wall (rooms touching y=8) */}
-            {r.y === 8 && [r.x + 22, r.x + 70, r.x + 118].map((wx, i) => (
-              <rect key={i} x={wx} y={r.y - 1} width={28} height={5} rx="1" fill="#a8c8e4" opacity="0.75" />
-            ))}
-          </g>
-        );
-      })}
-
-      {/* ── EXEC LEAD rooms (private offices) ── */}
-      {EXEC_LEAD_ROOMS.map(r => {
-        const info = getAgentInfo(r.type);
-        const deskY = r.y + r.h - 75;
+        const by = r.y + r.h; // room bottom y
         return (
           <g key={r.type}>
             <rect x={r.x} y={r.y} width={r.w} height={r.h} rx="2"
-              fill="#fff9ed" stroke="#c4a84c" strokeWidth="1.8" />
-            {/* Gold accent strip */}
-            <rect x={r.x + 2} y={r.y + 2} width={r.w - 4} height={4} rx="1" fill={info.color} opacity="0.5" />
-            {/* Executive desk (L-shape implied) */}
-            <Desk x={r.x + 10} y={deskY} w={r.w - 20} h={44} fill="#d8c890" stroke="#b8a860" />
-            {/* Plant in corner */}
-            <circle cx={r.x + 16} cy={r.y + 16} r="8" fill="#3a6b3a" opacity="0.7" />
-            <circle cx={r.x + 16} cy={r.y + 20} r="5" fill="#5a8a3a" opacity="0.5" />
-            {/* Corner nameplate */}
-            <text x={r.x + r.w - 7} y={r.y + 16} textAnchor="end"
-              fontSize="9.5" fontWeight="700" fill="#8a7030" style={{ userSelect: 'none' }}>
+              fill="#e4f0fc" stroke="#70a0c4" strokeWidth="2.2" />
+            {/* Agent colour accent bar */}
+            <rect x={r.x+2} y={r.y+2} width={r.w-4} height={6} rx="1" fill={info.color} opacity="0.6" />
+            {/* Desk surface */}
+            <rect x={r.x+14} y={by-94} width={r.w-28} height={54} rx="3"
+              fill="#aecce4" stroke="#80a8c0" strokeWidth="1.2" />
+            <rect x={r.x+14} y={by-94} width={r.w-28} height={7} rx="2" fill="#98bcd8" />
+            {/* Monitor */}
+            <rect x={r.x+r.w/2-16} y={by-132} width={32} height={22} rx="2" fill="#223850" />
+            <rect x={r.x+r.w/2-5}  y={by-110} width={10} height={8}  rx="1" fill="#2e4a64" />
+            {/* Chair */}
+            <ellipse cx={r.x+r.w/2} cy={by-62} rx={16} ry={13}
+              fill="#8ab8d4" stroke="#68a0bc" strokeWidth="1" />
+            {/* Corner agent name */}
+            <text x={r.x+r.w-8} y={r.y+21} textAnchor="end"
+              fontSize="10" fontWeight="700" fill="#3a6888" style={{ userSelect: 'none' }}>
               {info.name}
             </text>
-            {/* "مدير" label */}
-            <text x={r.x + 7} y={r.y + 16} textAnchor="start"
-              fontSize="8" fontWeight="600" fill="#c4a84c" opacity="0.8" style={{ userSelect: 'none' }}>
-              مدير
-            </text>
-            {r.y === 8 && [r.x + 18, r.x + 60, r.x + 102].map((wx, i) => (
-              <rect key={i} x={wx} y={r.y - 1} width={24} height={5} rx="1" fill="#d4b860" opacity="0.6" />
+            {/* Windows on outer top wall */}
+            {r.y === 28 && [r.x+18, r.x+64, r.x+110].filter(wx => wx < r.x+r.w-16).map((wx, i) => (
+              <rect key={i} x={wx} y={5} width={28} height={5} rx="1" fill="#80b8d8" opacity="0.7" />
             ))}
           </g>
         );
       })}
 
-      {/* ── EXEC SPECIALIST rooms ── */}
-      {EXEC_SPEC_ROOMS.map(r => {
-        const info = getAgentInfo(r.type);
-        const deskY = r.y + r.h - 75;
+      {/* ── EXEC combined rooms — lead + specialist(s) in one wide room ── */}
+      {EXEC_ROWS.map(r => {
+        const li = getAgentInfo(r.leadType);
+        const si = getAgentInfo(r.specType);
+        const by = r.y + r.h;
+        const deskY = by - 80;
         return (
-          <g key={r.type}>
-            <rect x={r.x} y={r.y} width={r.w} height={r.h} rx="2"
-              fill="#fff5f0" stroke="#b8a090" strokeWidth="1.5" />
-            {/* Accent strip */}
-            <rect x={r.x + 2} y={r.y + 2} width={r.w - 4} height={4} rx="1" fill={info.color} opacity="0.4" />
+          <g key={r.leadType}>
+            {/* Room box */}
+            <rect x="634" y={r.y} width="601" height={r.h} rx="2"
+              fill="#fff8e8" stroke="#b89840" strokeWidth="2" />
 
-            {r.shared ? (
-              /* Shared room: dividing line + two desks */
+            {/* Lead-side accent bar */}
+            <rect x="636" y={r.y+2} width={PART-638} height={5} rx="1" fill={li.color} opacity="0.55" />
+            {/* Spec-side accent bar */}
+            <rect x={PART+2} y={r.y+2} width={1232-PART} height={5} rx="1" fill={si.color} opacity="0.45" />
+
+            {/* Internal dashed partition (lead | spec) */}
+            <line x1={PART} y1={r.y+10} x2={PART} y2={by-10}
+              stroke="#c0a840" strokeWidth="1.4" strokeDasharray="6,4" />
+
+            {/* ── LEAD DESK (x 634–806 = 172px wide) ── */}
+            <rect x="642" y={deskY} width="156" height="50" rx="3"
+              fill="#d4c07c" stroke="#a89840" strokeWidth="1.2" />
+            <rect x="642" y={deskY} width="156" height="7" rx="2" fill="#c0b060" />
+            <rect x="710" y={deskY-32} width="28" height="22" rx="2" fill="#223850" />
+            <rect x="718" y={deskY-10} width="12" height="8"  rx="1" fill="#2e4a64" />
+            <ellipse cx="720" cy={by-46} rx={15} ry={12} fill="#c4b068" stroke="#a09040" strokeWidth="1" />
+            {/* Lead label */}
+            <text x="798" y={r.y+20} textAnchor="end" fontSize="10" fontWeight="700"
+              fill="#7a5e10" style={{ userSelect: 'none' }}>{li.name}</text>
+            <text x="638" y={r.y+20} textAnchor="start" fontSize="8" fontWeight="600"
+              fill="#b09030" style={{ userSelect: 'none' }}>مدير</text>
+            {/* Plant */}
+            <circle cx="644" cy={r.y+18} r="8" fill="#3a6a3a" opacity="0.6" />
+
+            {/* ── SPECIALIST DESK(S) (x 806–1235 = 429px) ── */}
+            {r.specType2 ? (
+              // Two specialists: سارة (left) + ليلى (right)
               <>
-                <line x1={r.x + r.w / 2} y1={r.y + 8} x2={r.x + r.w / 2} y2={r.y + r.h - 8}
-                  stroke="#c8b0a8" strokeWidth="1" strokeDasharray="5,4" />
-                {/* Left desk (سارة) */}
-                <Desk x={r.x + 8} y={deskY} w={r.w / 2 - 14} h={44} fill="#d0b8b0" stroke="#b09888" />
-                {/* Right desk (ليلى) */}
-                <Desk x={r.x + r.w / 2 + 6} y={deskY} w={r.w / 2 - 14} h={44} fill="#d0b8b0" stroke="#b09888" />
-                <text x={r.x + r.w - 7} y={r.y + 16} textAnchor="end"
-                  fontSize="8.5" fontWeight="700" fill="#8a7068" style={{ userSelect: 'none' }}>سارة · ليلى</text>
-                <text x={r.x + 7} y={r.y + 16} textAnchor="start"
-                  fontSize="8" fill="#b0988a" style={{ userSelect: 'none' }}>مشترك</text>
+                <rect x="814" y={deskY} width="196" height="50" rx="3"
+                  fill="#ccc0b4" stroke="#a09080" strokeWidth="1.2" />
+                <rect x="814" y={deskY} width="196" height="7" rx="2" fill="#bcb0a4" />
+                <rect x="895" y={deskY-32} width="26" height="22" rx="2" fill="#223850" />
+                <ellipse cx="912" cy={by-46} rx={13} ry={11} fill="#b8a898" stroke="#988878" strokeWidth="1" />
+
+                <rect x="1022" y={deskY} width="207" height="50" rx="3"
+                  fill="#ccc0b4" stroke="#a09080" strokeWidth="1.2" />
+                <rect x="1022" y={deskY} width="207" height="7" rx="2" fill="#bcb0a4" />
+                <rect x="1116" y={deskY-32} width="26" height="22" rx="2" fill="#223850" />
+                <ellipse cx="1126" cy={by-46} rx={13} ry={11} fill="#b8a898" stroke="#988878" strokeWidth="1" />
+
+                {/* Shared room divider */}
+                <line x1="1018" y1={r.y+14} x2="1018" y2={by-12}
+                  stroke="#c0a898" strokeWidth="1" strokeDasharray="4,4" />
+
+                <text x="1228" y={r.y+20} textAnchor="end" fontSize="9.5" fontWeight="700"
+                  fill="#786050" style={{ userSelect: 'none' }}>ليلى · سارة</text>
+                <text x="810" y={r.y+20} textAnchor="start" fontSize="8" fontWeight="600"
+                  fill="#a89080" style={{ userSelect: 'none' }}>متخصصون</text>
               </>
             ) : (
+              // Single specialist
               <>
-                <Desk x={r.x + 10} y={deskY} w={r.w - 20} h={44} fill="#d0b8b0" stroke="#b09888" />
-                <text x={r.x + r.w - 7} y={r.y + 16} textAnchor="end"
-                  fontSize="9.5" fontWeight="700" fill="#7a6858" style={{ userSelect: 'none' }}>
-                  {info.name}
-                </text>
-                <text x={r.x + 7} y={r.y + 16} textAnchor="start"
-                  fontSize="8" fill="#b0988a" style={{ userSelect: 'none' }}>متخصص</text>
+                <rect x="814" y={deskY} width="413" height="50" rx="3"
+                  fill="#ccc0b4" stroke="#a09080" strokeWidth="1.2" />
+                <rect x="814" y={deskY} width="413" height="7" rx="2" fill="#bcb0a4" />
+                <rect x="1014" y={deskY-32} width="28" height="22" rx="2" fill="#223850" />
+                <rect x="1022" y={deskY-10} width="12" height="8" rx="1" fill="#2e4a64" />
+                <ellipse cx="1020" cy={by-46} rx={15} ry={12} fill="#b8a898" stroke="#988878" strokeWidth="1" />
+                <text x="1228" y={r.y+20} textAnchor="end" fontSize="10" fontWeight="700"
+                  fill="#786050" style={{ userSelect: 'none' }}>{si.name}</text>
+                <text x="810" y={r.y+20} textAnchor="start" fontSize="8" fontWeight="600"
+                  fill="#a89080" style={{ userSelect: 'none' }}>متخصص</text>
               </>
             )}
-            {r.y === 8 && [r.x + 18, r.x + 60, r.x + 110, r.x + 155].map((wx, i) => (
-              <rect key={i} x={wx} y={r.y - 1} width={22} height={5} rx="1" fill="#c8a898" opacity="0.55" />
+
+            {/* Windows on outer top wall */}
+            {r.y === 28 && [646, 700, 840, 940, 1040, 1140].map((wx, i) => (
+              <rect key={i} x={wx} y={5} width={26} height={5} rx="1" fill="#c8ae60" opacity="0.6" />
             ))}
           </g>
         );
       })}
 
-      {/* ── MEETING ROOM ── */}
-      {/* Outer room walls */}
-      <rect x="483" y="130" width="256" height="620" rx="4"
-        fill="#f6faff" stroke="#1e3a5f" strokeWidth="2.5" />
-      {/* Header bar */}
-      <rect x="484" y="131" width="254" height="26" rx="3" fill="#1e3a5f" />
-      <text x="611" y="149" textAnchor="middle" fontSize="10.5" fill="white" fontWeight="800"
+      {/* ── MEETING ROOM — centre of the building ── */}
+      <rect x="382" y="78" width="244" height="724" rx="4"
+        fill="#f5f9ff" stroke="#1e3a5f" strokeWidth="2.5" />
+      {/* Header */}
+      <rect x="383" y="79" width="242" height="28" rx="3" fill="#1e3a5f" />
+      <text x="504" y="98" textAnchor="middle" fontSize="11" fill="white" fontWeight="800"
         style={{ userSelect: 'none' }}>غرفة الاجتماعات</text>
       {/* Projection screen */}
-      <rect x="510" y="166" width="202" height="80" rx="3" fill="#dce8f6" stroke="#9ab4cc" strokeWidth="1" />
-      <rect x="516" y="172" width="190" height="68" rx="2" fill="#1e3a5f" opacity="0.07" />
-      {/* Screen label */}
-      <text x="611" y="210" textAnchor="middle" fontSize="9" fill="#6080a0" style={{ userSelect: 'none' }}>شاشة العرض</text>
-      {/* Projector beam */}
-      <line x1="611" y1="247" x2="611" y2="320" stroke="#9ab4cc" strokeWidth="1" strokeDasharray="4,3" />
+      <rect x="396" y="116" width="216" height="82" rx="3" fill="#d8e8f8" stroke="#90b0cc" strokeWidth="1" />
+      <text x="504" y="162" textAnchor="middle" fontSize="9" fill="#6888a8"
+        style={{ userSelect: 'none' }}>شاشة العرض</text>
+      <line x1="504" y1="199" x2="504" y2="290" stroke="#90b0cc" strokeWidth="1" strokeDasharray="4,3" />
       {/* Conference table */}
-      <ellipse cx="611" cy="445" rx="92" ry="60" fill="#d4e2f0" stroke="#8ab0cc" strokeWidth="1.5" />
-      {/* Chairs around table */}
-      {[0, 40, 80, 120, 160, 200, 240, 280, 320].map((deg, i) => {
-        const rad = (deg - 90) * Math.PI / 180;
-        return (
-          <circle key={i} cx={611 + Math.cos(rad) * 112} cy={445 + Math.sin(rad) * 76}
-            r="11" fill="#c0d4e8" stroke="#8ab0cc" strokeWidth="1" />
-        );
+      <ellipse cx="504" cy="450" rx="92" ry="60" fill="#cce0f0" stroke="#80a8c4" strokeWidth="1.8" />
+      {/* Chairs */}
+      {[0,40,80,120,160,200,240,280,320].map((deg, i) => {
+        const rad = (deg-90)*Math.PI/180;
+        return <circle key={i} cx={504+Math.cos(rad)*113} cy={450+Math.sin(rad)*76}
+          r="12" fill="#b8d0e8" stroke="#80a8c4" strokeWidth="1" />;
       })}
-      {/* Water glasses on table */}
-      {[-50, 0, 50].map((dx, i) => (
-        <circle key={i} cx={611 + dx} cy={445} r="5" fill="#a8c8e4" opacity="0.6" />
+      {[-44,0,44].map((dx,i) => (
+        <circle key={i} cx={504+dx} cy={450} r="5" fill="#90c0e0" opacity="0.55" />
       ))}
-      {/* Bottom note area */}
-      <rect x="500" y="560" width="222" height="168" rx="3" fill="#edf3fa" stroke="#b8cce0" strokeWidth="1" />
-      <text x="611" y="575" textAnchor="middle" fontSize="8.5" fill="#8aa0b8" style={{ userSelect: 'none' }}>ملاحظات الاجتماع</text>
-      {[585, 600, 615, 630, 645, 658, 671, 684, 697, 710].map((ly, i) => (
-        <line key={i} x1="510" y1={ly} x2="712" y2={ly} stroke="#c8d8e8" strokeWidth="0.8" />
+      {/* Notes area */}
+      <rect x="396" y="574" width="216" height="208" rx="3" fill="#eaf2fa" stroke="#b0c8e0" strokeWidth="1" />
+      <text x="504" y="590" textAnchor="middle" fontSize="8.5" fill="#8aa4bc"
+        style={{ userSelect: 'none' }}>ملاحظات الاجتماع</text>
+      {[600,616,632,648,664,680,696,712,728,744,760,774].map((ly,i) => (
+        <line key={i} x1="404" y1={ly} x2="604" y2={ly} stroke="#c0d4e8" strokeWidth="0.8" />
       ))}
-      {/* Meeting room window marks */}
-      {[500, 552, 612, 664].map((wx, i) => (
-        <rect key={i} x={wx} y={129} width={22} height={5} rx="1" fill="#8ab0cc" opacity="0.55" />
+      {/* Meeting room windows */}
+      {[392,430,470,510,552].map((wx,i) => (
+        <rect key={i} x={wx} y={77} width={22} height={5} rx="1" fill="#7aacc8" opacity="0.55" />
       ))}
 
       {/* ── Outer building wall ── */}
-      <rect x="5" y="5" width="1230" height="870" fill="none" stroke="#6a90b0" strokeWidth="3" rx="3" />
-
-      {/* ── Zone header labels ── */}
-      <rect x="8" y="8" width="458" height="22" rx="1" fill="#dce8f8" />
-      <text x="237" y="23" textAnchor="middle" fontSize="10" fontWeight="800" fill="#4a7090"
-        style={{ userSelect: 'none' }}>قسم العمليات</text>
-      <rect x="778" y="8" width="211" height="22" rx="1" fill="#f5ead5" />
-      <text x="883" y="23" textAnchor="middle" fontSize="10" fontWeight="800" fill="#8a6a20"
-        style={{ userSelect: 'none' }}>المكتب التنفيذي — مدراء</text>
-      <rect x="1004" y="8" width="228" height="22" rx="1" fill="#f0e8e0" />
-      <text x="1118" y="23" textAnchor="middle" fontSize="10" fontWeight="800" fill="#7a6050"
-        style={{ userSelect: 'none' }}>المكتب التنفيذي — متخصصون</text>
+      <rect x="5" y="5" width="1230" height="870" fill="none" stroke="#5a8ab0" strokeWidth="3" rx="3" />
     </svg>
   );
 }
@@ -775,22 +769,6 @@ export default function AgentsWorkspace() {
               ورشة تسويق
             </button>
           </div>
-        </div>
-
-        {/* Zone label chips */}
-        <div style={{ position: 'absolute', top: 50, insetInlineEnd: 16, zIndex: 8, pointerEvents: 'none' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,253,247,.92)', border: '1px solid #efe2c2', padding: '5px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, color: '#8a6608', boxShadow: '0 2px 8px rgba(15,23,42,.06)', backdropFilter: 'blur(4px)' }}>
-            <Icon name="star" size={12} color="#b8860b" />
-            المكتب التنفيذي
-            <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 400 }}>5 مدراء · 6 متخصصين</span>
-          </span>
-        </div>
-        <div style={{ position: 'absolute', bottom: 44, insetInlineStart: 16, zIndex: 8, pointerEvents: 'none' }}>
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,.9)', border: '1px solid #d0e4f5', padding: '5px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, color: '#1e3a5f', boxShadow: '0 2px 8px rgba(15,23,42,.06)', backdropFilter: 'blur(4px)' }}>
-            <Icon name="building" size={12} color="#1e3a5f" />
-            قسم العمليات
-            <span style={{ fontSize: 10, color: '#9ca3af', fontWeight: 400 }}>6 وكلاء</span>
-          </span>
         </div>
 
         {/* SVG background */}
