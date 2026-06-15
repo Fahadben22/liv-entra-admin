@@ -1,20 +1,14 @@
 'use client';
-import AgentChat from '../AgentChat';
+import OpsAgentPage from '../OpsAgentPage';
 
-export default function OwnerRelAgentPage() {
+export default function OwnerRelPage() {
   return (
-    <AgentChat
+    <OpsAgentPage
       agentType="owner_rel"
       agentName="نادية — مديرة علاقات الملاك"
       agentIcon="key"
       accentColor="#0ea5e9"
-      quickActions={[
-        'تسويات معلقة',
-        'تقارير الملاك',
-        'أداء العقارات',
-        'كشف حساب مالك',
-        'قلق مالك جديد',
-      ]}
+      quickActions={['تسويات معلقة', 'تقارير الملاك', 'أداء العقارات', 'كشف حساب مالك', 'قلق مالك جديد']}
     />
   );
 }

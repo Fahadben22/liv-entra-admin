@@ -1,20 +1,14 @@
 'use client';
-import AgentChat from '../AgentChat';
+import OpsAgentPage from '../OpsAgentPage';
 
-export default function TenantExpAgentPage() {
+export default function TenantExpPage() {
   return (
-    <AgentChat
+    <OpsAgentPage
       agentType="tenant_exp"
       agentName="لينا — مديرة تجربة المستأجرين"
       agentIcon="users"
       accentColor="#ec4899"
-      quickActions={[
-        'تجديدات قادمة',
-        'شكاوى مفتوحة',
-        'إرسال إعلان',
-        'المستأجرون المنتهية عقودهم',
-        'مؤشرات رضا المستأجرين',
-      ]}
+      quickActions={['تجديدات قادمة', 'شكاوى مفتوحة', 'إرسال إعلان', 'المستأجرون المنتهية عقودهم', 'مؤشرات رضا المستأجرين']}
     />
   );
 }

@@ -1,20 +1,14 @@
 'use client';
-import AgentChat from '../AgentChat';
+import OpsAgentPage from '../OpsAgentPage';
 
-export default function LeasingAgentPage() {
+export default function LeasingPage() {
   return (
-    <AgentChat
+    <OpsAgentPage
       agentType="leasing"
       agentName="سارة — مديرة التأجير"
       agentIcon="home"
       accentColor="#10b981"
-      quickActions={[
-        'عقود تنتهي قريباً',
-        'وحدات شاغرة',
-        'حالة التأجير',
-        'تسجيلات إيجار معلقة',
-        'أنبوب العملاء المحتملين',
-      ]}
+      quickActions={['عقود تنتهي قريباً', 'وحدات شاغرة', 'حالة التأجير', 'تسجيلات إيجار معلقة', 'أنبوب العملاء المحتملين']}
     />
   );
 }

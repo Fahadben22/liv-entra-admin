@@ -42,6 +42,7 @@ interface AgentChatProps {
   compact?: boolean;
   pendingMessage?: string;
   photoSrc?: string;
+  companyId?: string;
 }
 
 interface DraftEmail {
@@ -63,7 +64,7 @@ interface Directive {
   replied_at: string | null;
 }
 
-export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions, messages: externalMessages, onMessagesChange, compact, pendingMessage, photoSrc }: AgentChatProps) {
+export default function AgentChat({ agentType, agentName, agentIcon, accentColor, quickActions, messages: externalMessages, onMessagesChange, compact, pendingMessage, photoSrc, companyId }: AgentChatProps) {
   const [internalMessages, setInternalMessages] = useState<Message[]>([]);
   const messages = externalMessages ?? internalMessages;
   const setMessages = onMessagesChange ?? setInternalMessages;
@@ -145,7 +146,7 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
     setLoading(true);
 
     try {
-      const res = await request<any>('POST', `/admin/agents/${agentType}/chat`, { message: msg });
+      const res = await request<any>('POST', `/admin/agents/${agentType}/chat`, { message: msg, ...(companyId && { company_id: companyId }) });
       const reply = res?.data?.reply || 'لم أتمكن من الرد.';
       const toolsUsed: string[] = res?.data?.tools_used || [];
       const msgTokens: number = res?.data?.tokens_used || 0;

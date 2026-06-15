@@ -1,20 +1,14 @@
 'use client';
-import AgentChat from '../AgentChat';
+import OpsAgentPage from '../OpsAgentPage';
 
-export default function OSFinanceAgentPage() {
+export default function OSFinancePage() {
   return (
-    <AgentChat
+    <OpsAgentPage
       agentType="os_finance"
       agentName="رضا — المراقب المالي"
       agentIcon="receipt"
       accentColor="#a855f7"
-      quickActions={[
-        'صافي الدخل التشغيلي',
-        'الميزانية مقابل الفعلي',
-        'التدفق النقدي',
-        'تقرير رسوم الإدارة',
-        'إنشاء تقرير شهري',
-      ]}
+      quickActions={['صافي الدخل التشغيلي', 'الميزانية مقابل الفعلي', 'التدفق النقدي', 'تقرير رسوم الإدارة', 'إنشاء تقرير شهري']}
     />
   );
 }

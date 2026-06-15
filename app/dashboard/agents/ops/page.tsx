@@ -1,20 +1,14 @@
 'use client';
-import AgentChat from '../AgentChat';
+import OpsAgentPage from '../OpsAgentPage';
 
-export default function OpsAgentPage() {
+export default function OpsPage() {
   return (
-    <AgentChat
+    <OpsAgentPage
       agentType="ops"
       agentName="فارس — مدير العمليات"
       agentIcon="wrench"
       accentColor="#6366f1"
-      quickActions={[
-        'تذاكر مفتوحة',
-        'انتهاك SLA',
-        'طلبات الشراء المعلقة',
-        'تقرير تكاليف الصيانة',
-        'الحالات الطارئة',
-      ]}
+      quickActions={['تذاكر مفتوحة', 'انتهاك SLA', 'طلبات الشراء المعلقة', 'تقرير تكاليف الصيانة', 'الحالات الطارئة']}
     />
   );
 }
