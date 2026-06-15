@@ -366,45 +366,17 @@ const OPS_ROOMS: { x: number; y: number; w: number; h: number; type: string }[] 
   { x: 173, y: 602, w: 159, h: 270, type: 'os_finance'  },
 ];
 
-// Wrap Arabic/LTR text into SVG lines
-function wrapText(text: string, maxChars: number, maxLines: number): string[] {
-  if (!text) return [];
-  const words = text.replace(/\s+/g, ' ').trim().split(' ');
-  const lines: string[] = [];
-  let cur = '';
-  for (const w of words) {
-    if ((cur + ' ' + w).trim().length > maxChars) {
-      if (cur) lines.push(cur);
-      cur = w;
-    } else {
-      cur = (cur + ' ' + w).trim();
-    }
-    if (lines.length >= maxLines) break;
-  }
-  if (cur && lines.length < maxLines) lines.push(cur);
-  if (lines.length === maxLines) {
-    const used = lines.join(' ').length;
-    if (text.trim().length > used + 1) lines[maxLines - 1] = lines[maxLines - 1].slice(0, maxChars - 1) + '…';
-  }
-  return lines.slice(0, maxLines);
-}
-
-// Strip markdown markers / collapse whitespace for clean SVG text
+// Strip markdown markers / collapse whitespace for clean text
 function sanitize(s?: string): string {
   return (s || '').replace(/[*#_`>]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-function OfficeSVG({ meetingTopic, meetingDecisions, meetingDate, meetingLive }: { meetingTopic?: string; meetingDecisions?: string; meetingDate?: string; meetingLive?: boolean }) {
+function OfficeSVG() {
   const PART = EXEC_PART;
-  const topicLines = wrapText(sanitize(meetingTopic), 26, 2);
-  const noteLines  = wrapText(sanitize(meetingDecisions), 42, 6);
 
   return (
     <svg viewBox="0 0 1240 880" preserveAspectRatio="none"
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-      <defs>
-        <clipPath id="notesClip"><rect x="364" y="646" width="316" height="138" rx="3" /></clipPath>
-      </defs>
 
       {/* ── Floor ── */}
       <rect x="0" y="0" width="1240" height="880" fill="#edf1f6" />
@@ -510,54 +482,20 @@ function OfficeSVG({ meetingTopic, meetingDecisions, meetingDate, meetingLive }:
       <text x="522" y="98" textAnchor="middle" fontSize="12" fill="white" fontWeight="800"
         style={{ userSelect: 'none' }}>غرفة الاجتماعات</text>
 
-      {/* Projection screen — shows current meeting TOPIC + live date */}
-      <rect x="372" y="116" width="300" height="98" rx="3" fill="#16263c" stroke="#90b0cc" strokeWidth="1.5" />
-      <rect x="378" y="122" width="288" height="86" rx="2" fill="#1e3a5f" />
-      {/* live badge */}
-      {meetingLive && (
-        <>
-          <circle cx="392" cy="135" r="3.5" fill="#4ade80" />
-          <text x="402" y="138" textAnchor="start" fontSize="7.5" fontWeight="700" fill="#4ade80" style={{ userSelect: 'none' }}>مباشر</text>
-        </>
-      )}
-      <text x="652" y="138" textAnchor="end" fontSize="7.5" fill="#7aa0c4" style={{ userSelect: 'none' }}>
-        {meetingDate || 'موضوع الاجتماع الحالي'}
-      </text>
-      {topicLines.length > 0 ? topicLines.map((ln, i) => (
-        <text key={i} x="522" y={162 + i*19} textAnchor="middle" fontSize="13" fontWeight="700" fill="#ffffff" style={{ userSelect: 'none' }}>{ln}</text>
-      )) : (
-        <text x="522" y="172" textAnchor="middle" fontSize="11" fill="#6a88a8" style={{ userSelect: 'none' }}>لا يوجد اجتماع نشط</text>
-      )}
-      {/* projector mount */}
-      <line x1="522" y1="214" x2="522" y2="236" stroke="#90b0cc" strokeWidth="1" strokeDasharray="3,3" />
+      {/* Projection screen frame (topic text is an HTML overlay) */}
+      <rect x="372" y="114" width="300" height="96" rx="4" fill="#16263c" stroke="#90b0cc" strokeWidth="1.5" />
+      <rect x="378" y="120" width="288" height="84" rx="3" fill="#1e3a5f" />
+      <line x1="522" y1="210" x2="522" y2="232" stroke="#90b0cc" strokeWidth="1" strokeDasharray="3,3" />
 
       {/* Conference table — tall oval, seats around it */}
-      <ellipse cx="522" cy="408" rx="116" ry="142" fill="#cce0f0" stroke="#7098bc" strokeWidth="2" />
-      <ellipse cx="522" cy="408" rx="94" ry="120" fill="#d8e8f6" stroke="#a8c4dc" strokeWidth="1" />
-      {/* documents on table */}
-      {[[-38,362],[38,362],[-38,454],[38,454],[0,408]].map(([dx,dy],i) => (
-        <rect key={i} x={522+dx-13} y={dy-9} width={26} height={18} rx="2" fill="#ffffff" stroke="#bcd0e0" strokeWidth="0.8" opacity="0.85" />
-      ))}
+      <ellipse cx="522" cy="406" rx="120" ry="146" fill="#c4dcef" stroke="#6f96bb" strokeWidth="2" />
+      <ellipse cx="522" cy="406" rx="98" ry="124" fill="#dceaf6" stroke="#aecadf" strokeWidth="1" />
+      <text x="522" y="412" textAnchor="middle" fontSize="11" fontWeight="700" fill="#9fbcd6" style={{ userSelect: 'none' }}>طاولة الاجتماع</text>
 
-      {/* Notes / Decisions area — bottom of room, clipped, never overflows */}
-      <rect x="362" y="624" width="320" height="166" rx="4" fill="#fffdf2" stroke="#d8c88c" strokeWidth="1.4" />
-      <rect x="362" y="624" width="320" height="24" rx="4" fill="#f0e6c2" />
-      <rect x="362" y="638" width="320" height="10" fill="#f0e6c2" />
-      <circle cx="376" cy="636" r="3" fill="#b8860b" />
-      <text x="674" y="640" textAnchor="end" fontSize="10" fontWeight="800" fill="#8a6e20" style={{ userSelect: 'none' }}>
-        محضر الاجتماع · القرارات
-      </text>
-      {noteLines.length > 0 ? (
-        <g clipPath="url(#notesClip)">
-          {noteLines.map((ln, i) => (
-            <text key={i} x="672" y={664 + i*19} textAnchor="end" fontSize="10" fill="#4a4230" style={{ userSelect: 'none' }}>{ln}</text>
-          ))}
-        </g>
-      ) : (
-        <text x="522" y="712" textAnchor="middle" fontSize="10" fill="#b0a878" style={{ userSelect: 'none' }}>
-          ستظهر قرارات آخر اجتماع هنا
-        </text>
-      )}
+      {/* Notes / Decisions board frame (text is an HTML overlay) */}
+      <rect x="360" y="624" width="324" height="168" rx="5" fill="#fffdf2" stroke="#d8c88c" strokeWidth="1.4" />
+      <rect x="360" y="624" width="324" height="26" rx="5" fill="#efe4bc" />
+      <rect x="360" y="640" width="324" height="10" fill="#efe4bc" />
 
       {/* Meeting room windows on top wall */}
       {[358,410,470,530,590,650].map((wx,i) => (
@@ -808,7 +746,36 @@ export default function AgentsWorkspace() {
         <div ref={canvasRef} style={{ flex: 1, position: 'relative', overflow: 'hidden', background: '#edf1f6', minHeight: 0, containerType: 'size', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 10 }}>
           {/* Fixed-aspect stage — SVG and % avatars share one coordinate system */}
           <div style={{ position: 'relative', aspectRatio: '1240 / 880', width: 'min(100cqw, 100cqh * 1240 / 880)', maxWidth: '100%', maxHeight: '100%' }}>
-            <OfficeSVG meetingTopic={meetingTopic} meetingDecisions={meetingDecisions} meetingDate={meetingDate} meetingLive={meetingLive} />
+            <OfficeSVG />
+
+            {/* Meeting TOPIC — HTML overlay on the projection screen */}
+            <div style={{ position: 'absolute', left: '30.0%', top: '12.95%', width: '24.19%', height: '10.91%', display: 'flex', flexDirection: 'column', padding: '0.7% 1.4%', boxSizing: 'border-box', pointerEvents: 'none', direction: 'rtl' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 4 }}>
+                {meetingLive
+                  ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 'clamp(6px,0.8cqw,10px)', fontWeight: 700, color: '#4ade80' }}>
+                      <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#4ade80' }} />مباشر
+                    </span>
+                  : <span />}
+                <span style={{ fontSize: 'clamp(6px,0.8cqw,10px)', color: '#8fb0cf' }}>{meetingDate}</span>
+              </div>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+                {meetingTopic
+                  ? <span style={{ fontSize: 'clamp(10px,1.45cqw,18px)', fontWeight: 800, color: '#fff', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{sanitize(meetingTopic)}</span>
+                  : <span style={{ fontSize: 'clamp(9px,1.1cqw,13px)', color: '#6a88a8' }}>لا يوجد اجتماع نشط</span>}
+              </div>
+            </div>
+
+            {/* Meeting NOTES / decisions — HTML overlay on the board */}
+            <div style={{ position: 'absolute', left: '29.03%', top: '70.91%', width: '26.13%', height: '19.09%', display: 'flex', flexDirection: 'column', padding: '0.6% 1.3% 1%', boxSizing: 'border-box', pointerEvents: 'none', direction: 'rtl' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, height: '15%', minHeight: 16 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#b8860b', flexShrink: 0 }} />
+                <span style={{ fontSize: 'clamp(8px,1.05cqw,13px)', fontWeight: 800, color: '#8a6e20' }}>محضر الاجتماع · القرارات</span>
+              </div>
+              <div style={{ flex: 1, overflow: 'hidden', fontSize: 'clamp(8px,0.95cqw,12px)', lineHeight: 1.55, color: '#4a4230', display: '-webkit-box', WebkitLineClamp: 6, WebkitBoxOrient: 'vertical', textAlign: 'right' }}>
+                {meetingDecisions ? sanitize(meetingDecisions) : 'ستظهر قرارات آخر اجتماع هنا'}
+              </div>
+            </div>
+
             {/* Office desk seats */}
             {Object.keys(SEAT_POS).map(type => (
               <AgentSeat key={type} type={type} isActive={activeAgent === type}
