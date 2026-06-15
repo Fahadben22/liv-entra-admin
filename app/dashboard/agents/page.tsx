@@ -817,13 +817,12 @@ export default function AgentsWorkspace() {
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#1f2733' }}>{info.name}</div>
                 <div style={{ fontSize: 10.5, color: '#6b7280' }}>{info.role}</div>
               </div>
-              {activeAgent && OPS_AGENT_TYPES.has(activeAgent) && hubCompanies.length > 1 && (
+              {activeAgent && OPS_AGENT_TYPES.has(activeAgent) && hubCompanyId && hubCompanies.length > 1 && (
                 <select
                   value={hubCompanyId}
                   onChange={e => setHubCompanyId(e.target.value)}
                   style={{ fontSize: 11, padding: '4px 8px', borderRadius: 7, border: '1px solid rgba(0,0,0,.1)', background: 'var(--surface)', color: 'var(--text-1)', cursor: 'pointer', maxWidth: 140 }}
                 >
-                  <option value="">-- اختر الشركة --</option>
                   {hubCompanies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               )}
@@ -840,22 +839,36 @@ export default function AgentsWorkspace() {
                 <Icon name="chevron-down" size={16} color="#6b7280" />
               </button>
             </div>
-            {/* AgentChat fills the rest */}
+            {/* AgentChat fills the rest — ops agents require a company_id */}
             <div style={{ flex: 1, overflow: 'hidden' }}>
-              <AgentChat
-                key={activeAgent}
-                agentType={activeAgent}
-                agentName={info.name}
-                agentIcon={info.icon as IconName}
-                accentColor={info.color}
-                quickActions={info.quickActions || []}
-                messages={conversations[activeAgent] || []}
-                onMessagesChange={msgs => updateMessages(activeAgent, msgs)}
-                compact={true}
-                pendingMessage={pendingMessage}
-                photoSrc={AGENT_PHOTOS[activeAgent] || ''}
-                companyId={activeAgent && OPS_AGENT_TYPES.has(activeAgent) ? hubCompanyId : undefined}
-              />
+              {activeAgent && OPS_AGENT_TYPES.has(activeAgent) && !hubCompanyId ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 14 }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-2)', margin: 0 }}>اختر الشركة للمتابعة مع {info?.name}</p>
+                  <select
+                    value={hubCompanyId}
+                    onChange={e => setHubCompanyId(e.target.value)}
+                    style={{ padding: '9px 16px', borderRadius: 8, border: '1px solid rgba(0,0,0,.1)', fontSize: 13, color: 'var(--text-1)', background: 'var(--surface)', minWidth: 220, cursor: 'pointer' }}
+                  >
+                    <option value="">-- اختر الشركة --</option>
+                    {hubCompanies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+              ) : (
+                <AgentChat
+                  key={activeAgent}
+                  agentType={activeAgent}
+                  agentName={info.name}
+                  agentIcon={info.icon as IconName}
+                  accentColor={info.color}
+                  quickActions={info.quickActions || []}
+                  messages={conversations[activeAgent] || []}
+                  onMessagesChange={msgs => updateMessages(activeAgent, msgs)}
+                  compact={true}
+                  pendingMessage={pendingMessage}
+                  photoSrc={AGENT_PHOTOS[activeAgent] || ''}
+                  companyId={activeAgent && OPS_AGENT_TYPES.has(activeAgent) ? hubCompanyId : undefined}
+                />
+              )}
             </div>
           </div>
         )}
