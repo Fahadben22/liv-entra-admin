@@ -146,7 +146,8 @@ export default function AgentChat({ agentType, agentName, agentIcon, accentColor
     setLoading(true);
 
     try {
-      const res = await request<any>('POST', `/admin/agents/${agentType}/chat`, { message: msg, ...(companyId && { company_id: companyId }) });
+      const chatUrl = `/admin/agents/${agentType}/chat${companyId ? `?company_id=${encodeURIComponent(companyId)}` : ''}`;
+      const res = await request<any>('POST', chatUrl, { message: msg, ...(companyId && { company_id: companyId }) });
       const reply = res?.data?.reply || 'لم أتمكن من الرد.';
       const toolsUsed: string[] = res?.data?.tools_used || [];
       const msgTokens: number = res?.data?.tokens_used || 0;
