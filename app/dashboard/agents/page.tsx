@@ -639,6 +639,8 @@ function MeetingRoomModal({ onClose, onOpenAgent, onAskAgent }: {
   );
 }
 
+const OPS_AGENT_TYPES = new Set(['leasing', 'collections', 'ops', 'tenant_exp', 'owner_rel', 'os_finance']);
+
 // ─── Main Workspace ────────────────────────────────────────────────────────────
 export default function AgentsWorkspace() {
   const [activeAgent, setActiveAgent]   = useState<string | null>(null);
@@ -649,6 +651,8 @@ export default function AgentsWorkspace() {
   const [workshopOpen, setWorkshopOpen] = useState(false);
   const [meetingOpen, setMeetingOpen]   = useState(false);
   const [pendingMessage, setPendingMessage] = useState('');
+  const [hubCompanyId, setHubCompanyId] = useState('');
+  const [hubCompanies, setHubCompanies] = useState<{ id: string; name: string }[]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const loadMeeting = useCallback(async () => {
@@ -665,6 +669,14 @@ export default function AgentsWorkspace() {
     const iv = setInterval(loadMeeting, 30000);
     return () => clearInterval(iv);
   }, [loadMeeting]);
+
+  useEffect(() => {
+    request<any>('GET', '/admin/companies').then(res => {
+      const list = (res?.data || []).map((c: any) => ({ id: c.id, name: c.name || c.company_name || c.id }));
+      setHubCompanies(list);
+      if (list.length === 1) setHubCompanyId(list[0].id);
+    }).catch(() => {});
+  }, []);
 
   const pendingCount = actions.filter(a => a.status === 'pending_approval').length;
 
@@ -805,6 +817,16 @@ export default function AgentsWorkspace() {
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#1f2733' }}>{info.name}</div>
                 <div style={{ fontSize: 10.5, color: '#6b7280' }}>{info.role}</div>
               </div>
+              {activeAgent && OPS_AGENT_TYPES.has(activeAgent) && hubCompanies.length > 1 && (
+                <select
+                  value={hubCompanyId}
+                  onChange={e => setHubCompanyId(e.target.value)}
+                  style={{ fontSize: 11, padding: '4px 8px', borderRadius: 7, border: '1px solid rgba(0,0,0,.1)', background: 'var(--surface)', color: 'var(--text-1)', cursor: 'pointer', maxWidth: 140 }}
+                >
+                  <option value="">-- اختر الشركة --</option>
+                  {hubCompanies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              )}
               <span style={{ fontSize: 10.5, fontWeight: 600, padding: '3px 10px', borderRadius: 999, background: '#ecfdf3', color: '#15803d', display: 'flex', alignItems: 'center', gap: 5 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />متصل
               </span>
@@ -832,6 +854,7 @@ export default function AgentsWorkspace() {
                 compact={true}
                 pendingMessage={pendingMessage}
                 photoSrc={AGENT_PHOTOS[activeAgent] || ''}
+                companyId={activeAgent && OPS_AGENT_TYPES.has(activeAgent) ? hubCompanyId : undefined}
               />
             </div>
           </div>
