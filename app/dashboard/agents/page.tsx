@@ -371,12 +371,73 @@ function sanitize(s?: string): string {
   return (s || '').replace(/[*#_`>]/g, '').replace(/\s+/g, ' ').trim();
 }
 
+// ─── Live neon pulses (agent-to-agent activity) ────────────────────────────────
+interface Pulse { id: number; from: string; to: string; color: string }
+
+// Position (% of 1240×880 canvas) for any agent key — desk seat, meeting seat, or hub
+function agentPos(key: string): { x: number; y: number } | null {
+  if (key === 'reea' || key === 'meeting_room') return { x: 42.1, y: 46 };
+  const m = MEETING_SEATS.find(s => s.type === key);
+  if (m) return { x: m.x, y: m.y };
+  const s = SEAT_POS[key];
+  if (s) return { x: s.x, y: s.y };
+  return null;
+}
+const PULSE_KEYS = [...Object.keys(SEAT_POS), 'reea'];
+function pulseColor(key: string): string {
+  if (key === 'reea' || key === 'meeting_room') return '#22d3ee';
+  return getAgentInfo(key).color;
+}
+
+// A single neon comet streaking from one office to another, arcing through the hub
+function PulseComet({ pulse }: { pulse: Pulse }) {
+  const a = agentPos(pulse.from); const b = agentPos(pulse.to);
+  if (!a || !b) return null;
+  const x1 = a.x / 100 * 1240, y1 = a.y / 100 * 880;
+  const x2 = b.x / 100 * 1240, y2 = b.y / 100 * 880;
+  // control point biased toward central hub (522,410) → arcs through the middle
+  const cx = ((x1 + x2) / 2) * 0.4 + 522 * 0.6;
+  const cy = ((y1 + y2) / 2) * 0.4 + 410 * 0.6;
+  const d = `M ${x1.toFixed(0)} ${y1.toFixed(0)} Q ${cx.toFixed(0)} ${cy.toFixed(0)} ${x2.toFixed(0)} ${y2.toFixed(0)}`;
+  const DUR = '1.9s';
+  return (
+    <g>
+      {/* wide soft glow trail */}
+      <path d={d} fill="none" stroke={pulse.color} strokeWidth={12} strokeLinecap="round"
+        pathLength={1} strokeDasharray="0.24 0.76" filter="url(#pulseGlow)" opacity={0}>
+        <animate attributeName="stroke-dashoffset" from="1" to="-0.24" dur={DUR} fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" />
+        <animate attributeName="opacity" values="0;0.55;0.55;0" keyTimes="0;0.12;0.7;1" dur={DUR} fill="freeze" />
+      </path>
+      {/* bright hot core */}
+      <path d={d} fill="none" stroke={pulse.color} strokeWidth={4} strokeLinecap="round"
+        pathLength={1} strokeDasharray="0.16 0.84" opacity={0}>
+        <animate attributeName="stroke-dashoffset" from="1" to="-0.16" dur={DUR} fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" />
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.7;1" dur={DUR} fill="freeze" />
+      </path>
+      {/* comet head */}
+      <circle r="6" fill={pulse.color} filter="url(#pulseGlow)" opacity={0}>
+        <animateMotion dur={DUR} fill="freeze" path={d} calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" />
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.82;1" dur={DUR} fill="freeze" />
+      </circle>
+      <circle r="2.4" fill="#ffffff" opacity={0}>
+        <animateMotion dur={DUR} fill="freeze" path={d} calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" />
+        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.82;1" dur={DUR} fill="freeze" />
+      </circle>
+    </g>
+  );
+}
+
 function OfficeSVG() {
   const PART = EXEC_PART;
 
   return (
     <svg viewBox="0 0 1240 880" preserveAspectRatio="none"
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+      <defs>
+        <filter id="roomBloom" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="2.4" />
+        </filter>
+      </defs>
 
       {/* ── Floor ── */}
       <rect x="0" y="0" width="1240" height="880" fill="#edf1f6" />
@@ -401,13 +462,17 @@ function OfficeSVG() {
       <rect x={EXEC_X} y="705" width={EXEC_W} height="10" fill="#cddae8" />  {/* EXEC H-4 */}
 
       {/* ── OPS rooms — spacious individual offices ── */}
-      {OPS_ROOMS.map(r => {
+      {OPS_ROOMS.map((r, ri) => {
         const info = getAgentInfo(r.type);
         const by = r.y + r.h;
         return (
           <g key={r.type}>
             <rect x={r.x} y={r.y} width={r.w} height={r.h} rx="2"
               fill="#e4f0fc" stroke="#70a0c4" strokeWidth="2.2" />
+            {/* breathing neon rim */}
+            <rect className="liveRim" x={r.x+2} y={r.y+2} width={r.w-4} height={r.h-4} rx="2"
+              fill="none" stroke={info.color} strokeWidth="2.5" filter="url(#roomBloom)"
+              style={{ animationDelay: `${(ri*0.5).toFixed(2)}s` }} />
             <rect x={r.x+2} y={r.y+2} width={r.w-4} height={6} rx="1" fill={info.color} opacity="0.6" />
             <rect x={r.x+14} y={by-94} width={r.w-28} height={54} rx="3"
               fill="#aecce4" stroke="#80a8c0" strokeWidth="1.2" />
@@ -423,7 +488,7 @@ function OfficeSVG() {
       })}
 
       {/* ── EXEC combined rooms — lead + specialist(s) in one wide room ── */}
-      {EXEC_ROWS.map(r => {
+      {EXEC_ROWS.map((r, ri) => {
         const li = getAgentInfo(r.leadType);
         const si = getAgentInfo(r.specType);
         const by = r.y + r.h;
@@ -433,6 +498,10 @@ function OfficeSVG() {
           <g key={r.leadType}>
             <rect x={EXEC_X} y={r.y} width={EXEC_W} height={r.h} rx="2"
               fill="#fff8e8" stroke="#b89840" strokeWidth="2" />
+            {/* breathing neon rim */}
+            <rect className="liveRim" x={EXEC_X+2} y={r.y+2} width={EXEC_W-4} height={r.h-4} rx="2"
+              fill="none" stroke={li.color} strokeWidth="2.5" filter="url(#roomBloom)"
+              style={{ animationDelay: `${(ri*0.5 + 0.25).toFixed(2)}s` }} />
             <rect x={EXEC_X+2} y={r.y+2} width={PART-EXEC_X-4} height={5} rx="1" fill={li.color} opacity="0.55" />
             <rect x={PART+2} y={r.y+2} width={EXEC_X+EXEC_W-PART-4} height={5} rx="1" fill={si.color} opacity="0.45" />
             <line x1={PART} y1={r.y+10} x2={PART} y2={by-10} stroke="#c0a840" strokeWidth="1.4" strokeDasharray="6,4" />
@@ -477,6 +546,9 @@ function OfficeSVG() {
 
       {/* ── MEETING ROOM — centre, enlarged ── */}
       <rect x="345" y="78" width="355" height="724" rx="4" fill="#f5f9ff" stroke="#1e3a5f" strokeWidth="2.5" />
+      {/* breathing neon rim — hub */}
+      <rect className="liveRim liveRimHub" x="347" y="80" width="351" height="720" rx="4"
+        fill="none" stroke="#22d3ee" strokeWidth="3" filter="url(#roomBloom)" />
       {/* Header */}
       <rect x="346" y="79" width="353" height="28" rx="3" fill="#1e3a5f" />
       <text x="522" y="98" textAnchor="middle" fontSize="12" fill="white" fontWeight="800"
@@ -655,20 +727,66 @@ export default function AgentsWorkspace() {
   const [hubCompanies, setHubCompanies] = useState<{ id: string; name: string }[]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
 
+  // ── Live neon pulses ──
+  const [pulses, setPulses] = useState<Pulse[]>([]);
+  const pulseIdRef   = useRef(0);
+  const seenDirRef   = useRef<Set<string>>(new Set());
+  const lastRealRef  = useRef<number>(0);          // last real A2A activity (ms)
+  const dirListRef   = useRef<any[]>([]);          // latest directives for replay
+
+  const spawnPulse = useCallback((from?: string, to?: string, color?: string) => {
+    if (!from || !to || from === to || !agentPos(from) || !agentPos(to)) return;
+    const id = ++pulseIdRef.current;
+    setPulses(prev => [...prev.slice(-14), { id, from, to, color: color || pulseColor(from) }]);
+    setTimeout(() => setPulses(prev => prev.filter(p => p.id !== id)), 2100);
+  }, []);
+
   const loadMeeting = useCallback(async () => {
-    const [r, a, b] = await Promise.allSettled([
-      adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.(), adminApi.sa.getTodayBriefing?.(),
+    const [r, a, b, d] = await Promise.allSettled([
+      adminApi.sa.getMeetingReports?.(), adminApi.sa.getMeetingActions?.(), adminApi.sa.getTodayBriefing?.(), adminApi.sa.getLiveDirectives?.(),
     ]);
+    if (d.status === 'fulfilled') {
+      const list = ((d.value as any)?.data || []) as any[];
+      dirListRef.current = list;
+      const fresh = list.filter(x => x?.id && !seenDirRef.current.has(x.id));
+      if (seenDirRef.current.size === 0) {
+        // First load — seed seen set without a pulse storm; mark active if anything recent
+        list.forEach(x => x?.id && seenDirRef.current.add(x.id));
+        if (list.some(x => x?.created_at && Date.now() - new Date(x.created_at).getTime() < 300000)) lastRealRef.current = Date.now();
+      } else if (fresh.length) {
+        fresh.forEach(x => { seenDirRef.current.add(x.id); spawnPulse(x.from_agent, x.to_agent); });
+        lastRealRef.current = Date.now();
+      }
+    }
     if (r.status === 'fulfilled') setReports((r.value as any)?.data || []);
     if (a.status === 'fulfilled') setActions((a.value as any)?.data || []);
     if (b.status === 'fulfilled') setBriefing((b.value as any)?.data || null);
-  }, []);
+  }, [spawnPulse]);
 
   useEffect(() => {
     loadMeeting();
     const iv = setInterval(loadMeeting, 30000);
     return () => clearInterval(iv);
   }, [loadMeeting]);
+
+  // Continuous neon activity: replay recent real A2A when active, decorative when idle (>5 min)
+  useEffect(() => {
+    const iv = setInterval(() => {
+      const idle = Date.now() - lastRealRef.current > 300000; // 5 min
+      const list = dirListRef.current;
+      if (!idle && list.length) {
+        const pick = list[Math.floor(Math.random() * Math.min(list.length, 8))];
+        if (pick) spawnPulse(pick.from_agent, pick.to_agent);
+      } else {
+        const from = PULSE_KEYS[Math.floor(Math.random() * PULSE_KEYS.length)];
+        let to = PULSE_KEYS[Math.floor(Math.random() * PULSE_KEYS.length)];
+        let g = 0; while (to === from && g++ < 6) to = PULSE_KEYS[Math.floor(Math.random() * PULSE_KEYS.length)];
+        // bias half the decorative pulses through the REEA hub
+        spawnPulse(from, Math.random() < 0.5 ? 'reea' : to);
+      }
+    }, 2600);
+    return () => clearInterval(iv);
+  }, [spawnPulse]);
 
   useEffect(() => {
     request<any>('GET', '/admin/companies').then(res => {
@@ -759,6 +877,18 @@ export default function AgentsWorkspace() {
           {/* Fixed-aspect stage — SVG and % avatars share one coordinate system */}
           <div style={{ position: 'relative', aspectRatio: '1240 / 880', width: 'min(100cqw, 100cqh * 1240 / 880)', maxWidth: '100%', maxHeight: '100%' }}>
             <OfficeSVG />
+
+            {/* Live neon pulse layer — agent-to-agent activity */}
+            <svg viewBox="0 0 1240 880" preserveAspectRatio="none"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 4 }}>
+              <defs>
+                <filter id="pulseGlow" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="4.5" result="b" />
+                  <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+                </filter>
+              </defs>
+              {pulses.map(p => <PulseComet key={p.id} pulse={p} />)}
+            </svg>
 
             {/* Meeting TOPIC — HTML overlay on the projection screen */}
             <div style={{ position: 'absolute', left: '30.0%', top: '12.95%', width: '24.19%', height: '10.91%', display: 'flex', flexDirection: 'column', padding: '0.7% 1.4%', boxSizing: 'border-box', pointerEvents: 'none', direction: 'rtl' }}>
@@ -879,6 +1009,9 @@ export default function AgentsWorkspace() {
           @keyframes ws-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
           @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:1} }
           @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+          .liveRim { opacity: 0.12; animation: rimGlow 3.6s ease-in-out infinite; }
+          .liveRimHub { animation-duration: 2.8s; }
+          @keyframes rimGlow { 0%,100%{opacity:0.1} 50%{opacity:0.85} }
         `}</style>
       </div>
 
