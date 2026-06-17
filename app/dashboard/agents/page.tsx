@@ -389,40 +389,29 @@ function pulseColor(key: string): string {
   return getAgentInfo(key).color;
 }
 
-// A single neon comet streaking from one office to another, arcing through the hub
+// A single neon comet streaking from one office to another, arcing through the hub.
+// Uses CSS animation (reliable in React) on stroke-dashoffset — a light segment travels the path.
 function PulseComet({ pulse }: { pulse: Pulse }) {
   const a = agentPos(pulse.from); const b = agentPos(pulse.to);
   if (!a || !b) return null;
   const x1 = a.x / 100 * 1240, y1 = a.y / 100 * 880;
   const x2 = b.x / 100 * 1240, y2 = b.y / 100 * 880;
-  // control point biased toward central hub (522,410) → arcs through the middle
   const cx = ((x1 + x2) / 2) * 0.4 + 522 * 0.6;
   const cy = ((y1 + y2) / 2) * 0.4 + 410 * 0.6;
   const d = `M ${x1.toFixed(0)} ${y1.toFixed(0)} Q ${cx.toFixed(0)} ${cy.toFixed(0)} ${x2.toFixed(0)} ${y2.toFixed(0)}`;
-  const DUR = '1.9s';
+  const anim = 'pulseStreak 1.9s ease-in-out forwards';
   return (
     <g>
+      {/* faint full wire */}
+      <path d={d} fill="none" stroke={pulse.color} strokeWidth={1.5} opacity={0.18} />
       {/* wide soft glow trail */}
-      <path d={d} fill="none" stroke={pulse.color} strokeWidth={12} strokeLinecap="round"
-        pathLength={1} strokeDasharray="0.24 0.76" filter="url(#pulseGlow)" opacity={0}>
-        <animate attributeName="stroke-dashoffset" from="1" to="-0.24" dur={DUR} fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" />
-        <animate attributeName="opacity" values="0;0.55;0.55;0" keyTimes="0;0.12;0.7;1" dur={DUR} fill="freeze" />
-      </path>
+      <path className="pulsePath" d={d} fill="none" stroke={pulse.color} strokeWidth={13} strokeLinecap="round"
+        pathLength={1} strokeDasharray="0.22 0.78" strokeDashoffset={1} filter="url(#pulseGlow)"
+        style={{ animation: anim }} />
       {/* bright hot core */}
-      <path d={d} fill="none" stroke={pulse.color} strokeWidth={4} strokeLinecap="round"
-        pathLength={1} strokeDasharray="0.16 0.84" opacity={0}>
-        <animate attributeName="stroke-dashoffset" from="1" to="-0.16" dur={DUR} fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" />
-        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.12;0.7;1" dur={DUR} fill="freeze" />
-      </path>
-      {/* comet head */}
-      <circle r="6" fill={pulse.color} filter="url(#pulseGlow)" opacity={0}>
-        <animateMotion dur={DUR} fill="freeze" path={d} calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" />
-        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.82;1" dur={DUR} fill="freeze" />
-      </circle>
-      <circle r="2.4" fill="#ffffff" opacity={0}>
-        <animateMotion dur={DUR} fill="freeze" path={d} calcMode="spline" keyTimes="0;1" keySplines="0.4 0 0.2 1" />
-        <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.82;1" dur={DUR} fill="freeze" />
-      </circle>
+      <path className="pulsePath" d={d} fill="none" stroke={pulse.color} strokeWidth={5} strokeLinecap="round"
+        pathLength={1} strokeDasharray="0.14 0.86" strokeDashoffset={1}
+        style={{ animation: anim }} />
     </g>
   );
 }
@@ -784,7 +773,7 @@ export default function AgentsWorkspace() {
         // bias half the decorative pulses through the REEA hub
         spawnPulse(from, Math.random() < 0.5 ? 'reea' : to);
       }
-    }, 2600);
+    }, 1500);
     return () => clearInterval(iv);
   }, [spawnPulse]);
 
@@ -1012,6 +1001,13 @@ export default function AgentsWorkspace() {
           .liveRim { opacity: 0.12; animation: rimGlow 3.6s ease-in-out infinite; }
           .liveRimHub { animation-duration: 2.8s; }
           @keyframes rimGlow { 0%,100%{opacity:0.1} 50%{opacity:0.85} }
+          .pulsePath { opacity: 0; }
+          @keyframes pulseStreak {
+            0%   { stroke-dashoffset: 1;     opacity: 0; }
+            12%  { opacity: 1; }
+            72%  { opacity: 1; }
+            100% { stroke-dashoffset: -0.25; opacity: 0; }
+          }
         `}</style>
       </div>
 
