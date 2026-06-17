@@ -6,10 +6,10 @@ const TABS = [
   { href: '/dashboard/agents',              label: 'الوكلاء',   exact: true },
   { href: '/dashboard/agents/live',         label: 'مباشر' },
   { href: '/dashboard/agents/health',       label: 'الصحة' },
-  { href: '/dashboard/agents/economy',      label: 'الاقتصاد' },
-  { href: '/dashboard/agents/correlations', label: 'الارتباطات' },
-  { href: '/dashboard/agents/time-machine', label: 'آلة الزمن' },
-  { href: '/dashboard/agents/constitution', label: 'الدستور' },
+  { href: '/dashboard/agents/economy',      label: 'الاستهلاك' },
+  { href: '/dashboard/agents/correlations', label: 'الكفاءة' },
+  { href: '/dashboard/agents/time-machine', label: 'سجل النشاط' },
+  { href: '/dashboard/agents/constitution', label: 'الصلاحيات' },
 ];
 
 export default function AgentsLayout({ children }: { children: React.ReactNode }) {
