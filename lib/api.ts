@@ -196,6 +196,16 @@ export const adminApi = {
     getDemoRequestStats: () =>
       request<any>('GET', '/superadmin/demo-requests/stats'),
 
+    // Scraped leads (AI sales agent outbound prospects)
+    listScrapedLeads: (status?: string, page?: number) => {
+      const qs = new URLSearchParams();
+      if (status) qs.set('status', status);
+      qs.set('page', String(page || 1));
+      return request<any>('GET', `/superadmin/scraped-leads?${qs.toString()}`);
+    },
+    updateScrapedLead: (id: string, data: { status?: string; notes?: string }) =>
+      request<any>('PATCH', `/superadmin/scraped-leads/${id}`, data),
+
     // Demo leads (free live demo portal leads)
     listDemoLeads: (params?: Record<string, string>) => {
       const qs = params ? '?' + new URLSearchParams(params).toString() : '';
