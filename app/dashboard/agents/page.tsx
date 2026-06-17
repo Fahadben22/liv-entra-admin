@@ -399,18 +399,18 @@ function PulseComet({ pulse }: { pulse: Pulse }) {
   const cx = ((x1 + x2) / 2) * 0.4 + 522 * 0.6;
   const cy = ((y1 + y2) / 2) * 0.4 + 410 * 0.6;
   const d = `M ${x1.toFixed(0)} ${y1.toFixed(0)} Q ${cx.toFixed(0)} ${cy.toFixed(0)} ${x2.toFixed(0)} ${y2.toFixed(0)}`;
-  const anim = 'pulseStreak 1.9s ease-in-out forwards';
+  const anim = 'pulseStreak 0.85s ease-in forwards';
   return (
     <g>
-      {/* faint full wire */}
-      <path d={d} fill="none" stroke={pulse.color} strokeWidth={1.5} opacity={0.18} />
-      {/* wide soft glow trail */}
-      <path className="pulsePath" d={d} fill="none" stroke={pulse.color} strokeWidth={13} strokeLinecap="round"
-        pathLength={1} strokeDasharray="0.22 0.78" strokeDashoffset={1} filter="url(#pulseGlow)"
+      {/* nerve fibre (faint full wire) */}
+      <path d={d} fill="none" stroke={pulse.color} strokeWidth={0.6} opacity={0.16} />
+      {/* thin glow */}
+      <path className="pulsePath" d={d} fill="none" stroke={pulse.color} strokeWidth={3.5} strokeLinecap="round"
+        pathLength={1} strokeDasharray="0.07 0.93" strokeDashoffset={1} filter="url(#pulseGlow)"
         style={{ animation: anim }} />
-      {/* bright hot core */}
-      <path className="pulsePath" d={d} fill="none" stroke={pulse.color} strokeWidth={5} strokeLinecap="round"
-        pathLength={1} strokeDasharray="0.14 0.86" strokeDashoffset={1}
+      {/* bright synapse spark */}
+      <path className="pulsePath" d={d} fill="none" stroke={pulse.color} strokeWidth={1.6} strokeLinecap="round"
+        pathLength={1} strokeDasharray="0.04 0.96" strokeDashoffset={1}
         style={{ animation: anim }} />
     </g>
   );
@@ -726,8 +726,8 @@ export default function AgentsWorkspace() {
   const spawnPulse = useCallback((from?: string, to?: string, color?: string) => {
     if (!from || !to || from === to || !agentPos(from) || !agentPos(to)) return;
     const id = ++pulseIdRef.current;
-    setPulses(prev => [...prev.slice(-14), { id, from, to, color: color || pulseColor(from) }]);
-    setTimeout(() => setPulses(prev => prev.filter(p => p.id !== id)), 2100);
+    setPulses(prev => [...prev.slice(-26), { id, from, to, color: color || pulseColor(from) }]);
+    setTimeout(() => setPulses(prev => prev.filter(p => p.id !== id)), 950);
   }, []);
 
   const loadMeeting = useCallback(async () => {
@@ -763,17 +763,20 @@ export default function AgentsWorkspace() {
     const iv = setInterval(() => {
       const idle = Date.now() - lastRealRef.current > 300000; // 5 min
       const list = dirListRef.current;
-      if (!idle && list.length) {
-        const pick = list[Math.floor(Math.random() * Math.min(list.length, 8))];
-        if (pick) spawnPulse(pick.from_agent, pick.to_agent);
-      } else {
-        const from = PULSE_KEYS[Math.floor(Math.random() * PULSE_KEYS.length)];
-        let to = PULSE_KEYS[Math.floor(Math.random() * PULSE_KEYS.length)];
-        let g = 0; while (to === from && g++ < 6) to = PULSE_KEYS[Math.floor(Math.random() * PULSE_KEYS.length)];
-        // bias half the decorative pulses through the REEA hub
-        spawnPulse(from, Math.random() < 0.5 ? 'reea' : to);
+      // fire 1–2 sparks per tick for a busy neural-network feel
+      const bursts = 1 + (Math.random() < 0.6 ? 1 : 0);
+      for (let k = 0; k < bursts; k++) {
+        if (!idle && list.length) {
+          const pick = list[Math.floor(Math.random() * Math.min(list.length, 8))];
+          if (pick) spawnPulse(pick.from_agent, pick.to_agent);
+        } else {
+          const from = PULSE_KEYS[Math.floor(Math.random() * PULSE_KEYS.length)];
+          let to = PULSE_KEYS[Math.floor(Math.random() * PULSE_KEYS.length)];
+          let g = 0; while (to === from && g++ < 6) to = PULSE_KEYS[Math.floor(Math.random() * PULSE_KEYS.length)];
+          spawnPulse(from, Math.random() < 0.5 ? 'reea' : to);
+        }
       }
-    }, 1500);
+    }, 650);
     return () => clearInterval(iv);
   }, [spawnPulse]);
 
