@@ -6,7 +6,7 @@ import {
   ThumbsUp, ThumbsDown, AlertTriangle, CheckCircle,
   AlertOctagon, Activity, ChevronDown, ChevronUp, SlidersHorizontal,
   Radio, Server, Cpu, Trash2, MessageSquare, ChevronRight, X,
-  Clock, Zap, Terminal, Eye, Award,
+  Clock, Zap, Terminal, Eye, Award, Users,
 } from 'lucide-react';
 
 // ── Arabic agent name map ──────────────────────────────────────────────────────
@@ -85,13 +85,14 @@ const SIGNAL_AR: Record<string, string> = {
 };
 
 const TABS = [
-  { key: 'learning', label: 'التعلم',     icon: <Activity style={{ width: 13, height: 13 }} /> },
-  { key: 'agents',   label: 'الوكلاء',    icon: <ShieldCheck style={{ width: 13, height: 13 }} /> },
-  { key: 'optimize', label: 'التوصيات',   icon: <Layers style={{ width: 13, height: 13 }} /> },
-  { key: 'icp',      label: 'ICP',         icon: <Network style={{ width: 13, height: 13 }} /> },
-  { key: 'metrics',  label: 'المؤشرات',   icon: <Activity style={{ width: 13, height: 13 }} /> },
-  { key: 'controls', label: 'تحكّم',      icon: <SlidersHorizontal style={{ width: 13, height: 13 }} /> },
+  { key: 'learning', label: 'التعلم',       icon: <Activity style={{ width: 13, height: 13 }} /> },
+  { key: 'agents',   label: 'الوكلاء',      icon: <ShieldCheck style={{ width: 13, height: 13 }} /> },
+  { key: 'optimize', label: 'التوصيات',     icon: <Layers style={{ width: 13, height: 13 }} /> },
+  { key: 'icp',      label: 'ICP',           icon: <Network style={{ width: 13, height: 13 }} /> },
+  { key: 'metrics',  label: 'المؤشرات',     icon: <Activity style={{ width: 13, height: 13 }} /> },
+  { key: 'controls', label: 'تحكّم',        icon: <SlidersHorizontal style={{ width: 13, height: 13 }} /> },
   { key: 'quality',  label: 'جودة الوكلاء', icon: <Award style={{ width: 13, height: 13 }} /> },
+  { key: 'ops_team', label: 'فريق العمليات', icon: <Users style={{ width: 13, height: 13 }} /> },
 ];
 
 // ── Page ───────────────────────────────────────────────────────────────────────
@@ -156,6 +157,26 @@ export default function AIGovPage() {
     });
     setLoading(false);
   }, []);
+
+  // ── Ops team state ─────────────────────────────────────────────────────────
+  const [teamMemory, setTeamMemory] = useState<Record<string, any[]>>({});
+  const [a2aTraffic, setA2aTraffic] = useState<any[]>([]);
+  const [teamLoading, setTeamLoading] = useState(false);
+
+  const loadTeam = useCallback(async () => {
+    setTeamLoading(true);
+    try {
+      const [mRes, tRes] = await Promise.allSettled([
+        request<any>('GET', '/admin/agents/team-memory'),
+        request<any>('GET', '/admin/agents/a2a-traffic?days=7'),
+      ]);
+      if (mRes.status === 'fulfilled') setTeamMemory(mRes.value?.data?.by_agent || {});
+      if (tRes.status === 'fulfilled') setA2aTraffic(tRes.value?.data?.traffic || []);
+    } catch {}
+    setTeamLoading(false);
+  }, []);
+
+  useEffect(() => { if (tab === 'ops_team') loadTeam(); }, [tab, loadTeam]);
 
   // ── Live agent sessions state ──────────────────────────────────────────────
   const [sessions, setSessions]     = useState<any[]>([]);
@@ -1231,6 +1252,73 @@ export default function AIGovPage() {
             </div>
           </>)}
 
+        </div>
+      )}
+
+      {/* ── فريق العمليات tab ──────────────────────────────────────────────── */}
+      {tab === 'ops_team' && (
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+            <h2 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-1)', margin: 0 }}>فريق العمليات — رؤية 360°</h2>
+            <button className="le-btn ghost sm" onClick={loadTeam} disabled={teamLoading}>
+              <RefreshCw style={{ width: 12, height: 12, animation: teamLoading ? 'spin 1s linear infinite' : 'none' }} />
+            </button>
+          </div>
+
+          {/* A2A traffic matrix */}
+          <div className="le-card" style={{ marginBottom: 20 }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', marginBottom: 12 }}>حركة A2A — آخر 7 أيام</h3>
+            {a2aTraffic.length === 0
+              ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>لا توجد حركة مسجلة</p>
+              : <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+                    <thead>
+                      <tr style={{ background: 'var(--ink-100)' }}>
+                        {['من', 'إلى', 'الطلبات', 'الفاشلة', 'نسبة الفشل', 'متوسط التأخر'].map(h => (
+                          <th key={h} style={{ padding: '6px 10px', textAlign: 'right', color: 'var(--text-muted)', fontWeight: 600 }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {a2aTraffic.map((row: any, i: number) => (
+                        <tr key={i} style={{ borderTop: '1px solid var(--border)' }}>
+                          <td style={{ padding: '6px 10px', color: 'var(--text-1)' }}>{AGENT_AR[row.from] || row.from}</td>
+                          <td style={{ padding: '6px 10px', color: 'var(--text-1)' }}>{AGENT_AR[row.to] || row.to}</td>
+                          <td style={{ padding: '6px 10px', fontWeight: 600 }}>{row.count}</td>
+                          <td style={{ padding: '6px 10px', color: row.failed > 0 ? '#dc2626' : 'var(--text-muted)' }}>{row.failed}</td>
+                          <td style={{ padding: '6px 10px', color: row.failure_rate > 20 ? '#dc2626' : row.failure_rate > 5 ? '#f59e0b' : '#16a34a' }}>{row.failure_rate}%</td>
+                          <td style={{ padding: '6px 10px', color: 'var(--text-muted)' }}>{row.avg_latency_ms != null ? `${row.avg_latency_ms} ms` : '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+            }
+          </div>
+
+          {/* Team memory feed */}
+          <div className="le-card">
+            <h3 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)', marginBottom: 12 }}>الذاكرة المشتركة النشطة</h3>
+            {Object.keys(teamMemory).length === 0
+              ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>لا توجد إدخالات نشطة</p>
+              : Object.entries(teamMemory).map(([agent, rows]: [string, any[]]) => (
+                  <div key={agent} style={{ marginBottom: 16 }}>
+                    <p style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--brand-600)', marginBottom: 6 }}>
+                      {AGENT_AR[agent] || agent}
+                    </p>
+                    {rows.map((row: any, i: number) => (
+                      <div key={i} style={{ display: 'flex', gap: 10, padding: '6px 0', borderTop: i > 0 ? '1px solid var(--border)' : 'none', alignItems: 'flex-start' }}>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', whiteSpace: 'nowrap', paddingTop: 2 }}>{row.memory_key}</span>
+                        <span style={{ fontSize: 11, color: 'var(--text-1)', flex: 1 }}>{(row.content || '').slice(0, 200)}</span>
+                        {(row.tags || []).length > 0 && (
+                          <span style={{ fontSize: 10, color: '#7c3aed', whiteSpace: 'nowrap' }}>{row.tags.join(' · ')}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ))
+            }
+          </div>
         </div>
       )}
 
