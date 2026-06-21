@@ -304,11 +304,15 @@ export default function AIGovPage() {
 
   useEffect(() => { loadAll(); loadControls(); loadRoutingData(); }, [loadAll, loadControls, loadRoutingData]);
 
-  // Auto-load sessions on tab switch; poll every 15s while tab is active
+  // Auto-load sessions on tab switch; poll every 15s while agents tab is active.
+  // Controls tab also needs loadSessions() once so gateway.routes is populated for the routing cards.
   useEffect(() => {
     if (tab === 'agents') {
       loadSessions();
       liveIntervalRef.current = setInterval(loadSessions, 15000);
+    } else if (tab === 'controls') {
+      loadSessions(); // one-shot: populates gateway.routes for the routing override cards
+      if (liveIntervalRef.current) clearInterval(liveIntervalRef.current);
     } else {
       if (liveIntervalRef.current) clearInterval(liveIntervalRef.current);
     }
