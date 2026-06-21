@@ -243,7 +243,7 @@ export default function AIGovPage() {
     setSendLoading(false);
   }
 
-  useEffect(() => { loadAll(); loadControls(); }, [loadAll, loadControls]);
+  // loadAll + loadControls + loadRoutingData are all triggered by the combined useEffect below
 
   // ── Quality KPI state ─────────────────────────────────────────────────────
   const [qualityData, setQualityData]       = useState<any>(null);
@@ -271,6 +271,38 @@ export default function AIGovPage() {
     if (d < 86400000) return `${Math.floor(d / 3600000)} س`;
     return `${Math.floor(d / 86400000)} ي`;
   };
+
+  // ── Routing overrides + loop events (controls tab) ──────────────────────────
+  const [loopEvents, setLoopEvents]           = useState<Record<string, number>>({});
+  const [routingOverrides, setRoutingOverrides] = useState<Record<string, string>>({});
+  const [routingLoading, setRoutingLoading]   = useState<string | null>(null);
+
+  const loadRoutingData = useCallback(async () => {
+    try {
+      const [loopRes, overrideRes] = await Promise.allSettled([
+        request<any>('GET', '/admin/agents/loop-events'),
+        request<any>('GET', '/admin/agents/routing-overrides'),
+      ]);
+      if (loopRes.status === 'fulfilled')     setLoopEvents(loopRes.value?.data || {});
+      if (overrideRes.status === 'fulfilled') setRoutingOverrides(overrideRes.value?.data || {});
+    } catch {}
+  }, []);
+
+  async function setRoutingOverride(agentType: string, provider: string | null) {
+    setRoutingLoading(agentType);
+    try {
+      await request<any>('POST', '/admin/agents/routing-override', { agentType, provider });
+      setRoutingOverrides(prev => {
+        const next = { ...prev };
+        if (!provider) delete next[agentType]; else next[agentType] = provider;
+        return next;
+      });
+      showToast(provider ? `${agentType} → ${provider}` : `${agentType}: إعادة للافتراضي`);
+    } catch (e: any) { showToast(`خطأ: ${e.message}`); }
+    setRoutingLoading(null);
+  }
+
+  useEffect(() => { loadAll(); loadControls(); loadRoutingData(); }, [loadAll, loadControls, loadRoutingData]);
 
   // Auto-load sessions on tab switch; poll every 15s while tab is active
   useEffect(() => {
@@ -1005,6 +1037,78 @@ export default function AIGovPage() {
               );
             })}
           </div>
+
+          {/* ── Loop alerts + routing overrides ── */}
+          {(() => {
+            const OPS = [
+              { key: 'leasing', ar: 'دانة — التأجير' },
+              { key: 'collections', ar: 'بدر — التحصيل' },
+              { key: 'ops', ar: 'فارس — العمليات' },
+              { key: 'tenant_exp', ar: 'منى — المستأجرون' },
+              { key: 'owner_rel', ar: 'نادية — الملاك' },
+              { key: 'os_finance', ar: 'رضا — المالية' },
+            ];
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Terminal style={{ width: 13, height: 13, color: 'var(--brand-600)' }} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>توجيه الوكلاء</span>
+                  <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>— تجاوز المسار الافتراضي (يستمر 24 ساعة)</span>
+                  <button className="le-btn ghost sm" onClick={loadRoutingData} title="تحديث" style={{ marginInlineStart: 'auto' }}>
+                    <RefreshCw style={{ width: 11, height: 11 }} />
+                  </button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 8 }}>
+                  {OPS.map(({ key, ar }) => {
+                    const loops = loopEvents[key] || 0;
+                    const override = routingOverrides[key] || null;
+                    const busy = routingLoading === key;
+                    const defaultRoute = gateway?.routes?.find((r: any) => r.agent === key);
+                    const effectiveProvider = override || defaultRoute?.provider || '—';
+                    const provColor = effectiveProvider === 'ollama' ? '#d97706' : effectiveProvider === 'deepseek' ? '#059669' : '#6366f1';
+                    return (
+                      <div key={key} style={{ background: 'var(--surface)', border: `1.5px solid ${loops > 0 ? '#fca5a544' : 'var(--border)'}`, borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-1)' }}>{ar}</span>
+                          {loops > 0 && (
+                            <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10, background: '#fef2f2', color: '#dc2626', display: 'flex', alignItems: 'center', gap: 3 }}>
+                              <AlertTriangle style={{ width: 9, height: 9 }} />
+                              {loops} حلقة/أسبوع
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11 }}>
+                          <span style={{ color: 'var(--text-muted)' }}>المسار:</span>
+                          <span style={{ fontWeight: 600, color: provColor }}>{effectiveProvider}</span>
+                          {override && <span style={{ fontSize: 9, padding: '1px 5px', borderRadius: 8, background: '#fffbeb', color: '#d97706' }}>تجاوز</span>}
+                        </div>
+                        <div style={{ display: 'flex', gap: 5 }}>
+                          <button className="le-btn ghost sm" disabled={busy || override === 'deepseek'}
+                            onClick={() => setRoutingOverride(key, 'deepseek')}
+                            style={{ fontSize: 10, flex: 1, color: override === 'deepseek' ? '#059669' : undefined }}>
+                            DeepSeek
+                          </button>
+                          <button className="le-btn ghost sm" disabled={busy || override === 'ollama'}
+                            onClick={() => setRoutingOverride(key, 'ollama')}
+                            style={{ fontSize: 10, flex: 1, color: override === 'ollama' ? '#d97706' : undefined }}>
+                            Ollama
+                          </button>
+                          {override && (
+                            <button className="le-btn ghost sm" disabled={busy}
+                              onClick={() => setRoutingOverride(key, null)}
+                              style={{ fontSize: 10, flex: 1 }}>
+                              <X style={{ width: 9, height: 9 }} />
+                              افتراضي
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Explanation card */}
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '16px 18px' }}>
