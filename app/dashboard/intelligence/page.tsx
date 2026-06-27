@@ -196,8 +196,8 @@ function OverviewTab({ data }: { data: any }) {
       {/* Financial KPIs */}
       <Section title="المالية">
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
-          <KPICard label="الإيرادات (آخر 30 يوماً)" value={fmtSAR(financial?.total_revenue)} color={'var(--lv-success)'} />
-          <KPICard label="المصاريف (آخر 30 يوماً)" value={fmtSAR(financial?.total_expenses)} color={'var(--lv-danger)'} />
+          <KPICard label="الإيرادات (آخر 90 يوماً)" value={fmtSAR(financial?.total_revenue)} color={'var(--lv-success)'} />
+          <KPICard label="المصاريف (آخر 90 يوماً)" value={fmtSAR(financial?.total_expenses)} color={'var(--lv-danger)'} />
           <KPICard label="صافي الدخل" value={fmtSAR(financial?.net_income)} color={Number(financial?.net_income) >= 0 ? 'var(--lv-success)' : 'var(--lv-danger)'} />
           <KPICard label="المتأخرات" value={fmtSAR(financial?.total_overdue)} color={'var(--lv-warn)'} />
           <KPICard label="معدل التحصيل" value={pct(financial?.collection_rate)} color={'var(--lv-accent)'} />
@@ -304,7 +304,7 @@ function CompanyRevenueChart({ companies, selectedId, onSelect }: { companies: a
     <div style={{ background: 'var(--lv-panel)', border: '1px solid var(--lv-line)', borderRadius: 12, padding: '20px 24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h3 style={{ fontSize: 14, fontWeight: 600, color: 'var(--lv-fg)', margin: 0 }}>
-          مقارنة الإيرادات والمصاريف — آخر 30 يوماً
+          مقارنة الإيرادات والمصاريف — آخر 90 يوماً
         </h3>
         <span style={{ fontSize: 11, color: 'var(--lv-muted)' }}>اضغط على شركة لعرض التفاصيل</span>
       </div>
@@ -473,8 +473,8 @@ function FinancialTab({ data, onRefresh }: { data: any; onRefresh?: () => void }
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 14px', background: 'var(--lv-chip)', borderRadius: 8, border: '1px solid var(--lv-line)' }}>
         <span style={{ fontSize: 11, color: 'var(--lv-muted)' }}>
           {hoursAgo !== null
-            ? `بيانات محدّثة قبل ${hoursAgo} ساعة — يتم التحديث تلقائياً كل ليلة`
-            : 'بيانات مجمّعة — يتم التحديث تلقائياً كل ليلة'}
+            ? `بيانات محدّثة قبل ${hoursAgo} ساعة — الإيرادات والمصاريف آخر 90 يوماً`
+            : 'بيانات مباشرة — الإيرادات والمصاريف آخر 90 يوماً'}
         </span>
         <button
           onClick={handleRefresh}
@@ -487,8 +487,8 @@ function FinancialTab({ data, onRefresh }: { data: any; onRefresh?: () => void }
 
       {/* KPI Totals */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
-        <KPICard label="إجمالي الإيرادات" value={fmtSAR(totals?.total_revenue)} color={'var(--lv-success)'} />
-        <KPICard label="إجمالي المصاريف" value={fmtSAR(totals?.total_expenses)} />
+        <KPICard label="إجمالي الإيرادات (90 يوماً)" value={fmtSAR(totals?.total_revenue)} color={'var(--lv-success)'} />
+        <KPICard label="إجمالي المصاريف (90 يوماً)" value={fmtSAR(totals?.total_expenses)} />
         <KPICard label="صافي الدخل" value={fmtSAR(totals?.net_income)} color={Number(totals?.net_income) >= 0 ? 'var(--lv-success)' : 'var(--lv-danger)'} />
         <KPICard label="المتأخرات" value={fmtSAR(totals?.total_overdue)} color={'var(--lv-warn)'} />
         <KPICard label="نسبة الإشغال" value={pct(totals?.occupancy_rate)} />
